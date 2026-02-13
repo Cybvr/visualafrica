@@ -144,24 +144,7 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* More Explore */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
-              More Vendors
-            </h3>
-            <ul className="mt-4 flex flex-col gap-2">
-              {exploreLinks.slice(8).map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm opacity-70 transition-opacity hover:opacity-100"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+
 
           {/* Offerings */}
           <div>
