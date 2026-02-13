@@ -11,8 +11,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+const exploreCategories = [
+  { label: "Packages", href: "/explore/vendors/packages" },
+  { label: "Bar Tenders", href: "/explore/vendors/bartenders" },
+  { label: "Cakes & Sweets", href: "/explore/vendors/cakes" },
+  { label: "Catering", href: "/explore/vendors/catering" },
+  { label: "Decorations", href: "/explore/vendors/decorations" },
+  { label: "Entertainment", href: "/explore/vendors/entertainment" },
+  { label: "Event Planners", href: "/explore/vendors/planners" },
+  { label: "Photographers", href: "/explore/vendors/photographers" },
+  { label: "Venues", href: "/explore/vendors/venues" },
+  { label: "Yachts", href: "/explore/vendors/yachts" },
+]
+
 const navLinks = [
-  { label: "Find Vendors", href: "/vendors" },
   { label: "Kids Parties", href: "/kids-parties" },
   { label: "Wedding", href: "/wedding" },
   { label: "Social", href: "/social" },
@@ -38,6 +50,27 @@ export function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
+          {/* Explore Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+              Explore <ChevronDown className="h-3.5 w-3.5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuItem asChild>
+                <Link href="/explore/vendors" className="cursor-pointer font-medium">
+                  All Vendors
+                </Link>
+              </DropdownMenuItem>
+              {exploreCategories.map((cat) => (
+                <DropdownMenuItem key={cat.label} asChild>
+                  <Link href={cat.href} className="cursor-pointer">
+                    {cat.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {navLinks.map((link) => (
             <Link
               key={link.label}
@@ -77,6 +110,25 @@ export function Header() {
       {mobileOpen && (
         <div className="border-t border-border bg-background lg:hidden">
           <nav className="flex flex-col px-4 py-4" aria-label="Mobile navigation">
+            <Link
+              href="/explore/vendors"
+              className="rounded-md px-3 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+              onClick={() => setMobileOpen(false)}
+            >
+              Explore Vendors
+            </Link>
+            <div className="ml-4 flex flex-col border-l border-border pl-2">
+              {exploreCategories.slice(0, 6).map((cat) => (
+                <Link
+                  key={cat.label}
+                  href={cat.href}
+                  className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {cat.label}
+                </Link>
+              ))}
+            </div>
             {navLinks.map((link) => (
               <Link
                 key={link.label}
