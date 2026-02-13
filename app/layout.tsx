@@ -1,19 +1,19 @@
 import type { Metadata, Viewport } from 'next'
-import { DM_Sans } from 'next/font/google'
+import { Mulish, Neuton } from 'next/font/google'
 
 import './globals.css'
 
-const dmSans = DM_Sans({
+const mulish = Mulish({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
 })
 
-const dmSansSerif = DM_Sans({
+const neuton = Neuton({
   subsets: ['latin'],
   variable: '--font-serif',
   display: 'swap',
-  weight: ['700'],
+  weight: ['400', '700'],
 })
 
 export const metadata: Metadata = {
@@ -34,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${dmSansSerif.variable}`}>
+    <html lang="en" className={`${mulish.variable} ${neuton.variable}`}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   )

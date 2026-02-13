@@ -4,7 +4,6 @@ import { VENDOR_CATEGORIES, CATEGORY_SLUG_MAP } from "@/lib/vendors-data"
 import { offerings } from "@/lib/offerings-data"
 
 const quickLinks = [
-  { label: "Home", href: "/" },
   { label: "Vendor Signup", href: "/vendor-signup" },
   { label: "About", href: "/about" },
   { label: "FAQs", href: "/faqs" },
@@ -106,10 +105,10 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Company */}
+          {/* Thunder About (formerly Company + Quick Links) */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
-              Company
+              Thunder About
             </h3>
             <ul className="mt-4 flex flex-col gap-2">
               <li>
@@ -128,16 +127,7 @@ export function Footer() {
                   Contact
                 </Link>
               </li>
-            </ul>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
-              Quick Links
-            </h3>
-            <ul className="mt-4 flex flex-col gap-2">
-              {quickLinks.slice(0, 6).map((link) => (
+              {quickLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}

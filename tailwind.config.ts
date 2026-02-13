@@ -63,8 +63,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'Inter', 'system-ui', 'sans-serif'],
-        serif: ['var(--font-serif)', 'Playfair Display', 'Georgia', 'serif'],
+        sans: ['var(--font-sans)', 'Mulish', 'Inter', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Neuton', 'Playfair Display', 'Georgia', 'serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',
