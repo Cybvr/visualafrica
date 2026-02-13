@@ -1,5 +1,7 @@
 import Link from "next/link"
 import { Facebook, Instagram, MessageCircle } from "lucide-react"
+import { VENDOR_CATEGORIES, CATEGORY_SLUG_MAP } from "@/lib/vendors-data"
+import { offerings } from "@/lib/offerings-data"
 
 const quickLinks = [
   { label: "Home", href: "/" },
@@ -8,27 +10,26 @@ const quickLinks = [
   { label: "FAQs", href: "/faqs" },
   { label: "Blog", href: "/blog" },
   { label: "Explore", href: "/explore/vendors" },
+  { label: "Pricing", href: "/pricing" },
   { label: "Contact", href: "/contact" },
 ]
 
-const exploreLinks = [
-  { label: "Packages", href: "/explore/vendors/packages" },
-  { label: "Bar Tenders", href: "/explore/vendors/bartenders" },
-  { label: "Cakes & Sweets", href: "/explore/vendors/cakes" },
-  { label: "Catering", href: "/explore/vendors/catering" },
-  { label: "Decorations", href: "/explore/vendors/decorations" },
-  { label: "Entertainment", href: "/explore/vendors/entertainment" },
-  { label: "Event Planners", href: "/explore/vendors/planners" },
-  { label: "Gifts & Invites", href: "/explore/vendors/gifts" },
-  { label: "Limousines", href: "/explore/vendors/limousines" },
-  { label: "Makeup Artists", href: "/explore/vendors/makeup" },
-  { label: "Party Equipment", href: "/explore/vendors/equipment" },
-  { label: "Party Wear", href: "/explore/vendors/partywear" },
-  { label: "Photographers", href: "/explore/vendors/photographers" },
-  { label: "Photo Booths", href: "/explore/vendors/photobooths" },
-  { label: "Venues", href: "/explore/vendors/venues" },
-  { label: "Yachts", href: "/explore/vendors/yachts" },
-]
+// Build explore links from vendor data
+const categoryToSlug = Object.fromEntries(
+  Object.entries(CATEGORY_SLUG_MAP).map(([slug, cat]) => [cat, slug])
+)
+const exploreLinks = VENDOR_CATEGORIES.filter(
+  (c) => c !== "All Categories"
+).map((cat) => ({
+  label: cat,
+  href: `/explore/vendors/${categoryToSlug[cat] ?? cat.toLowerCase().replace(/\s+/g, "-")}`,
+}))
+
+// Build offerings links from data
+const offeringLinks = offerings.map((o) => ({
+  label: o.title,
+  href: `/offerings/${o.slug}`,
+}))
 
 const legalLinks = [
   { label: "Privacy Policy", href: "/privacy" },
@@ -83,7 +84,7 @@ export function Footer() {
 
       {/* Footer Content */}
       <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2">
@@ -143,13 +144,32 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* More Explore + Legal */}
+          {/* More Explore */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
-              More
+              More Vendors
             </h3>
             <ul className="mt-4 flex flex-col gap-2">
               {exploreLinks.slice(8).map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="text-sm opacity-70 transition-opacity hover:opacity-100"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Offerings */}
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
+              Offerings
+            </h3>
+            <ul className="mt-4 flex flex-col gap-2">
+              {offeringLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}

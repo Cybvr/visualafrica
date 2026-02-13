@@ -1,0 +1,86 @@
+import Link from "next/link"
+import Image from "next/image"
+import { ArrowRight } from "lucide-react"
+import { offerings } from "@/lib/offerings-data"
+import { Button } from "@/components/ui/button"
+
+export const metadata = {
+  title: "Our Offerings | Visual Africa",
+  description:
+    "Explore our full range of event planning services. From corporate offsites and conferences to full-service planning, we handle it all.",
+}
+
+export default function OfferingsPage() {
+  return (
+    <>
+      {/* Hero */}
+      <section className="bg-foreground px-4 py-20 text-background lg:py-28">
+        <div className="mx-auto max-w-4xl text-center">
+          <h1 className="font-serif text-4xl font-bold text-balance md:text-5xl lg:text-6xl">
+            Our Offerings
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed opacity-80">
+            From corporate retreats to full-service event planning, Visual
+            Africa delivers premium experiences tailored to your goals.
+          </p>
+        </div>
+      </section>
+
+      {/* Offerings Grid */}
+      <section className="mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-24">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {offerings.map((offering) => (
+            <Link
+              key={offering.slug}
+              href={`/offerings/${offering.slug}`}
+              className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-lg"
+            >
+              <div className="relative aspect-[16/10] overflow-hidden">
+                <Image
+                  src={offering.image}
+                  alt={offering.title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-foreground/20 transition-opacity group-hover:bg-foreground/10" />
+              </div>
+              <div className="flex flex-1 flex-col p-6">
+                <h3 className="font-serif text-xl font-bold text-card-foreground">
+                  {offering.title}
+                </h3>
+                <p className="mt-1 text-sm font-medium text-primary">
+                  {offering.tagline}
+                </p>
+                <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">
+                  {offering.description}
+                </p>
+                <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-primary transition-colors group-hover:text-accent">
+                  Learn more <ArrowRight className="h-4 w-4" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-primary px-4 py-16 text-center text-primary-foreground">
+        <h2 className="font-serif text-3xl font-bold md:text-4xl">
+          Not sure which service fits?
+        </h2>
+        <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed opacity-90 md:text-base">
+          Talk to our team and we will recommend the perfect planning approach
+          for your event.
+        </p>
+        <Link href="/contact">
+          <Button
+            size="lg"
+            className="mt-8 bg-foreground text-background hover:bg-foreground/90"
+          >
+            Get in Touch
+          </Button>
+        </Link>
+      </section>
+    </>
+  )
+}

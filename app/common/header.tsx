@@ -10,19 +10,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { VENDOR_CATEGORIES, CATEGORY_SLUG_MAP } from "@/lib/vendors-data"
+import { offerings } from "@/lib/offerings-data"
 
-const exploreCategories = [
-  { label: "Packages", href: "/explore/vendors/packages" },
-  { label: "Bar Tenders", href: "/explore/vendors/bartenders" },
-  { label: "Cakes & Sweets", href: "/explore/vendors/cakes" },
-  { label: "Catering", href: "/explore/vendors/catering" },
-  { label: "Decorations", href: "/explore/vendors/decorations" },
-  { label: "Entertainment", href: "/explore/vendors/entertainment" },
-  { label: "Event Planners", href: "/explore/vendors/planners" },
-  { label: "Photographers", href: "/explore/vendors/photographers" },
-  { label: "Venues", href: "/explore/vendors/venues" },
-  { label: "Yachts", href: "/explore/vendors/yachts" },
-]
+// Build explore categories from vendor data (skip "All Categories")
+const categoryToSlug = Object.fromEntries(
+  Object.entries(CATEGORY_SLUG_MAP).map(([slug, cat]) => [cat, slug])
+)
+const exploreCategories = VENDOR_CATEGORIES.filter(
+  (c) => c !== "All Categories"
+).map((cat) => ({
+  label: cat,
+  href: `/explore/vendors/${categoryToSlug[cat] ?? cat.toLowerCase().replace(/\s+/g, "-")}`,
+}))
+
+// Build offerings nav from data file
+const offeringLinks = offerings.map((o) => ({
+  label: o.title,
+  href: `/offerings/${o.slug}`,
+}))
 
 const navLinks = [
   { label: "Kids Parties", href: "/kids-parties" },
@@ -65,6 +71,27 @@ export function Header() {
                 <DropdownMenuItem key={cat.label} asChild>
                   <Link href={cat.href} className="cursor-pointer">
                     {cat.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Offerings Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+              Offerings <ChevronDown className="h-3.5 w-3.5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-52">
+              <DropdownMenuItem asChild>
+                <Link href="/offerings" className="cursor-pointer font-medium">
+                  All Offerings
+                </Link>
+              </DropdownMenuItem>
+              {offeringLinks.map((item) => (
+                <DropdownMenuItem key={item.label} asChild>
+                  <Link href={item.href} className="cursor-pointer">
+                    {item.label}
                   </Link>
                 </DropdownMenuItem>
               ))}
@@ -126,6 +153,25 @@ export function Header() {
                   onClick={() => setMobileOpen(false)}
                 >
                   {cat.label}
+                </Link>
+              ))}
+            </div>
+            <Link
+              href="/offerings"
+              className="rounded-md px-3 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+              onClick={() => setMobileOpen(false)}
+            >
+              Offerings
+            </Link>
+            <div className="ml-4 flex flex-col border-l border-border pl-2">
+              {offeringLinks.slice(0, 5).map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {item.label}
                 </Link>
               ))}
             </div>
