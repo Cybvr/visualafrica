@@ -84,7 +84,7 @@ export function Footer() {
 
       {/* Footer Content */}
       <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-6">
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2">
@@ -106,13 +106,38 @@ export function Footer() {
             </div>
           </div>
 
+          {/* Company */}
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
+              Company
+            </h3>
+            <ul className="mt-4 flex flex-col gap-2">
+              <li>
+                <Link
+                  href="/about"
+                  className="text-sm opacity-70 transition-opacity hover:opacity-100"
+                >
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="text-sm opacity-70 transition-opacity hover:opacity-100"
+                >
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Quick Links */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
               Quick Links
             </h3>
             <ul className="mt-4 flex flex-col gap-2">
-              {quickLinks.map((link) => (
+              {quickLinks.slice(0, 6).map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}
@@ -131,7 +156,7 @@ export function Footer() {
               Explore
             </h3>
             <ul className="mt-4 flex flex-col gap-2">
-              {exploreLinks.slice(0, 8).map((link) => (
+              {exploreLinks.slice(0, 6).map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}
@@ -143,8 +168,6 @@ export function Footer() {
               ))}
             </ul>
           </div>
-
-
 
           {/* Offerings */}
           <div>
@@ -163,6 +186,29 @@ export function Footer() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Newsletter Signup */}
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
+              Stay Up to Date
+            </h3>
+            <p className="mt-4 text-sm opacity-70">
+              Get the latest updates on vendors and events.
+            </p>
+            <form className="mt-4 flex flex-col gap-2">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="rounded-lg border border-background/20 bg-background/10 px-4 py-2 text-sm text-background placeholder:text-background/50 focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <button
+                type="submit"
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                Subscribe
+              </button>
+            </form>
           </div>
         </div>
 
