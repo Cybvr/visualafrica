@@ -19,6 +19,7 @@ import { VendorDetail } from "@/components/vendor-detail"
 import {
   vendors,
   getVendorBySlug,
+  EVENT_THEMES,
   CATEGORY_SLUG_MAP,
   VENDOR_FAQ,
   type EventTheme,
@@ -58,9 +59,15 @@ function VendorListingContent({
   const [selectedTheme, setSelectedTheme] = useState<EventTheme>("All Themes")
   const [selectedCategory, setSelectedCategory] =
     useState<VendorCategory>(initialCategory)
+  const [selectedLocation, setSelectedLocation] = useState("All Locations")
   const [search, setSearch] = useState("")
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
   const [showMobileFilters, setShowMobileFilters] = useState(false)
+
+  const locations = useMemo(() => {
+    const locs = vendors.map((v) => v.location.split(",")[0].trim())
+    return ["All Locations", ...Array.from(new Set(locs))]
+  }, [])
 
   const filteredVendors = useMemo(() => {
     let result = [...vendors]
@@ -71,6 +78,10 @@ function VendorListingContent({
 
     if (selectedTheme !== "All Themes") {
       result = result.filter((v) => v.eventThemes.includes(selectedTheme))
+    }
+
+    if (selectedLocation !== "All Locations") {
+      result = result.filter((v) => v.location.includes(selectedLocation))
     }
 
     if (search.trim()) {
@@ -84,7 +95,7 @@ function VendorListingContent({
     }
 
     return result
-  }, [selectedCategory, selectedTheme, search])
+  }, [selectedCategory, selectedTheme, selectedLocation, search])
 
   const visibleVendors = filteredVendors.slice(0, visibleCount)
   const hasMore = visibleCount < filteredVendors.length
@@ -92,14 +103,15 @@ function VendorListingContent({
   const handleClearAll = () => {
     setSelectedTheme("All Themes")
     setSelectedCategory("All Categories")
+    setSelectedLocation("All Locations")
     setSearch("")
   }
 
   const categoryTitle =
     selectedCategory !== "All Categories" ? selectedCategory : "All Vendors"
-  const pageTitle = `Event Vendors Lagos | ${categoryTitle}, Catering & More`
+  const pageTitle = `Plan your next ${categoryTitle} Event`
   const pageDescription =
-    "For every party planner in Lagos, explore packages with caterers, decorators, and entertainment. We make party planning simple, fast, and fun for any occasion."
+    "We make event planning simple, fast, and fun for any occasion."
 
   // Active filter pills
   const activeFilters: { label: string; onRemove: () => void }[] = []
@@ -115,23 +127,70 @@ function VendorListingContent({
       onRemove: () => setSelectedTheme("All Themes"),
     })
   }
+  if (selectedLocation !== "All Locations") {
+    activeFilters.push({
+      label: selectedLocation,
+      onRemove: () => setSelectedLocation("All Locations"),
+    })
+  }
 
   return (
     <div>
       {/* Hero Banner */}
-      <section className="bg-foreground px-4 py-10 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <h1 className="font-serif text-3xl font-bold text-background md:text-4xl text-balance">
+      <section className="bg-foreground px-4 py-20 lg:px-8 flex items-center justify-center text-center">
+        <div className="mx-auto max-w-4xl">
+          <h1 className="font-serif text-4xl font-bold text-background md:text-6xl text-balance">
             {pageTitle}
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-background/70 md:text-base">
+          <p className="mt-6 text-base leading-relaxed text-background/70 md:text-xl">
             {pageDescription}
           </p>
+
+          {/* Big Location Dropdown */}
+          <div className="mt-10 max-w-md mx-auto relative group">
+            <select
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              className="w-full appearance-none bg-background text-foreground px-6 py-4 rounded-2xl font-bold shadow-xl outline-none focus:ring-4 focus:ring-primary/20 transition-all cursor-pointer pr-12 text-lg"
+            >
+              {locations.map((loc) => (
+                <option key={loc} value={loc}>
+                  {loc === "All Locations" ? "Select Location (Lagos)" : loc}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors">
+              <ChevronRight className="rotate-90 h-6 w-6" />
+            </div>
+          </div>
         </div>
       </section>
 
+      {/* Horizontal Themes */}
+      <div className="border-b border-border bg-background sticky top-[64px] z-10 overflow-hidden px-4 lg:px-8">
+        <div className="mx-auto max-w-7xl flex items-center gap-4 py-4 overflow-x-auto scrollbar-hide">
+          <span className="text-xs font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap bg-secondary/50 px-3 py-1.5 rounded-full border border-border/50">
+            Event Themes
+          </span>
+          <div className="flex gap-2 min-w-max pr-4">
+            {EVENT_THEMES.map((theme) => (
+              <button
+                key={theme}
+                onClick={() => setSelectedTheme(theme)}
+                className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all border-2 ${selectedTheme === theme
+                  ? "border-primary bg-primary/5 text-primary shadow-sm scale-105"
+                  : "border-transparent bg-secondary/30 text-muted-foreground hover:bg-secondary hover:border-border"
+                  }`}
+              >
+                {theme}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Breadcrumb */}
-      <div className="border-b border-border bg-secondary/50 px-4 py-3 lg:px-8">
+      <div className="border-b border-border bg-secondary/30 px-4 py-3 lg:px-8">
         <div className="mx-auto flex max-w-7xl items-center gap-2 text-sm text-muted-foreground">
           <Link href="/" className="hover:text-foreground">
             Home
@@ -156,9 +215,7 @@ function VendorListingContent({
             {/* Desktop Sidebar Filters */}
             <div className="hidden lg:block">
               <VendorFilters
-                selectedTheme={selectedTheme}
                 selectedCategory={selectedCategory}
-                onThemeChange={setSelectedTheme}
                 onCategoryChange={setSelectedCategory}
                 onClearAll={handleClearAll}
               />
@@ -306,11 +363,7 @@ function VendorListingContent({
             </div>
             <div className="mt-6">
               <VendorFilters
-                selectedTheme={selectedTheme}
                 selectedCategory={selectedCategory}
-                onThemeChange={(t) => {
-                  setSelectedTheme(t)
-                }}
                 onCategoryChange={(c) => {
                   setSelectedCategory(c)
                 }}
