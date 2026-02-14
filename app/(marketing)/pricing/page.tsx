@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Check } from "lucide-react"
-import { Header } from "@/app/common/header"
-import { Footer } from "@/app/common/footer"
+import { Header } from "@/app/(marketing)/common/header"
+import { Footer } from "@/app/(marketing)/common/footer"
 import { Button } from "@/components/ui/button"
 import { pricingTiers } from "@/lib/pricing-data"
 
@@ -40,11 +40,10 @@ export default function PricingPage() {
             {pricingTiers.map((tier) => (
               <div
                 key={tier.name}
-                className={`relative flex flex-col rounded-lg border p-8 transition-shadow hover:shadow-lg ${
-                  tier.highlighted
+                className={`relative flex flex-col rounded-lg border p-8 transition-shadow hover:shadow-lg ${tier.highlighted
                     ? "border-primary bg-primary/5 shadow-md ring-2 ring-primary"
                     : "border-border bg-card"
-                }`}
+                  }`}
               >
                 {tier.highlighted && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
@@ -55,9 +54,8 @@ export default function PricingPage() {
                 {/* Tier Header */}
                 <div>
                   <h3
-                    className={`text-xl font-bold ${
-                      tier.highlighted ? "text-primary" : "text-card-foreground"
-                    }`}
+                    className={`text-xl font-bold ${tier.highlighted ? "text-primary" : "text-card-foreground"
+                      }`}
                   >
                     {tier.name}
                   </h3>
@@ -81,13 +79,12 @@ export default function PricingPage() {
                 {/* CTA */}
                 <Link href={tier.ctaHref} className="mt-6 block">
                   <Button
-                    className={`w-full ${
-                      tier.highlighted
+                    className={`w-full ${tier.highlighted
                         ? "bg-primary text-primary-foreground hover:bg-primary/90"
                         : tier.name === "Starter"
                           ? "bg-foreground text-background hover:bg-foreground/90"
                           : "border-primary bg-card text-primary hover:bg-primary hover:text-primary-foreground"
-                    }`}
+                      }`}
                     variant={
                       tier.highlighted || tier.name === "Starter"
                         ? "default"
@@ -118,11 +115,10 @@ export default function PricingPage() {
 
                 {/* Features */}
                 <ul
-                  className={`flex flex-1 flex-col gap-4 ${
-                    tier.inheritsFrom || tier.name === "Full Service"
+                  className={`flex flex-1 flex-col gap-4 ${tier.inheritsFrom || tier.name === "Full Service"
                       ? "mt-4"
                       : "mt-6"
-                  }`}
+                    }`}
                 >
                   {tier.features.map((feature) => (
                     <li key={feature.title} className="flex gap-3">

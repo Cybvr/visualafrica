@@ -4,16 +4,28 @@ import { Button } from "@/components/ui/button"
 
 export function Hero() {
     return (
-        <section className="relative flex min-h-[80vh] flex-col items-center justify-center px-4 py-20 text-center lg:px-8">
-            <div className="mx-auto max-w-4xl">
-                <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary">
-                    Premium Event Planning
-                </p>
-                <h1 className="mb-6 font-serif text-5xl font-bold tracking-tight text-foreground md:text-7xl lg:text-8xl">
+        <section className="relative flex min-h-[80vh] flex-col items-center justify-center px-4 py-20 text-center lg:px-8 overflow-hidden bg-black">
+            {/* Video Background */}
+            <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 h-full w-full object-cover"
+            >
+                <source src="/video/about.mp4" type="video/mp4" />
+            </video>
+
+            {/* Overlay for better text readability */}
+            <div className="absolute inset-0 bg-black/50" />
+
+            {/* Content */}
+            <div className="relative z-10 mx-auto max-w-4xl">
+                <h1 className="mb-6 font-serif text-5xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl">
                     Africa's Events <br />
                     <span className="text-primary italic">made easy.</span>
                 </h1>
-                <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl">
+                <p className="mx-auto mb-10 max-w-2xl text-lg text-white/90 md:text-xl">
                     Expert planners, unbeatable prices, and <br className="hidden md:block" />
                     AI-powered event software for extraordinary results.
                 </p>
@@ -21,28 +33,11 @@ export function Hero() {
                     <Button size="lg" className="h-14 px-10 text-lg bg-primary hover:bg-primary/90">
                         Get started for free
                     </Button>
-                    <Button size="lg" variant="outline" className="h-14 px-10 text-lg border-primary text-primary hover:bg-primary/5">
+                    <Button size="lg" variant="outline" className="h-14 px-10 text-lg border-white text-white hover:bg-white/10">
                         Talk to an expert
                     </Button>
-                </div>
-
-                <div className="mt-16 flex items-center justify-center gap-8">
-                    <div className="text-center">
-                        <p className="text-3xl font-bold text-foreground">5 Stars</p>
-                        <p className="text-sm text-muted-foreground">Google Reviews</p>
-                    </div>
-                    <div className="h-12 w-[1px] bg-border" />
-                    <div className="text-center">
-                        <p className="text-3xl font-bold text-foreground">500,000+</p>
-                        <p className="text-sm text-muted-foreground">Attendees hosted</p>
-                    </div>
-                    <div className="h-12 w-[1px] bg-border" />
-                    <div className="text-center">
-                        <p className="text-3xl font-bold text-foreground">1M+</p>
-                        <p className="text-sm text-muted-foreground">Vendor partners</p>
-                    </div>
                 </div>
             </div>
         </section>
     )
-}
+}   

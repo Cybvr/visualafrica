@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { VENDOR_CATEGORIES, CATEGORY_SLUG_MAP } from "@/lib/vendors-data"
 import { offerings } from "@/lib/offerings-data"
+import { auth } from "@/lib/firebase"
+import { onAuthStateChanged, signOut, User } from "firebase/auth"
+import { useEffect } from "react"
 
 // Build explore categories from vendor data (skip "All Categories")
 const categoryToSlug = Object.fromEntries(
@@ -32,6 +35,22 @@ const offeringLinks = offerings.map((o) => ({
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser)
+    })
+    return () => unsubscribe()
+  }, [])
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth)
+    } catch (error) {
+      console.error("Logout error:", error)
+    }
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -113,11 +132,29 @@ export function Header() {
               Talk to an Expert
             </Button>
           </Link>
-          <Link href="/auth/login">
-            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Sign In
-            </Button>
-          </Link>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                  Account <ChevronDown className="ml-1 h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard" className="cursor-pointer font-bold">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer font-bold text-destructive">
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link href="/auth/login">
+              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                Sign In
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -192,11 +229,24 @@ export function Header() {
                   Talk to an Expert
                 </Button>
               </Link>
-              <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
-                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                  Sign In
-                </Button>
-              </Link>
+              {user ? (
+                <>
+                  <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
+                    <Button className="w-full bg-secondary text-secondary-foreground">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button onClick={() => { handleLogout(); setMobileOpen(false); }} variant="destructive" className="w-full">
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
+                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                    Sign In
+                  </Button>
+                </Link>
+              )}
             </div>
           </nav>
         </div>

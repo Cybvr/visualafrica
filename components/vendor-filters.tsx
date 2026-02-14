@@ -45,13 +45,13 @@ export function VendorFilters({
             <label
               key={theme}
               className="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-secondary"
+              onClick={() => onThemeChange(theme)}
             >
               <span
-                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                  selectedTheme === theme
+                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${selectedTheme === theme
                     ? "border-primary bg-primary"
                     : "border-border bg-background"
-                }`}
+                  }`}
               >
                 {selectedTheme === theme && (
                   <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
@@ -81,13 +81,13 @@ export function VendorFilters({
             <label
               key={category}
               className="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-secondary"
+              onClick={() => onCategoryChange(category)}
             >
               <span
-                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                  selectedCategory === category
+                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${selectedCategory === category
                     ? "border-primary bg-primary"
                     : "border-border bg-background"
-                }`}
+                  }`}
               >
                 {selectedCategory === category && (
                   <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />

@@ -1,5 +1,5 @@
-import { Header } from "@/app/common/header"
-import { Footer } from "@/app/common/footer"
+import { Header } from "@/app/(marketing)/common/header"
+import { Footer } from "@/app/(marketing)/common/footer"
 
 export default function OfferingsLayout({
   children,

@@ -3,7 +3,7 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Star, Heart } from "lucide-react"
+import { Star, Heart, MapPin } from "lucide-react"
 import type { Vendor } from "@/lib/vendors-data"
 
 export function VendorCard({ vendor }: { vendor: Vendor }) {
@@ -65,6 +65,12 @@ export function VendorCard({ vendor }: { vendor: Vendor }) {
             Contact for pricing
           </p>
         )}
+
+        {/* Location */}
+        <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+          <MapPin className="h-4 w-4 shrink-0 text-primary" />
+          <span className="truncate">{vendor.location}</span>
+        </div>
 
         {/* Vendor info */}
         <div className="mt-3 flex items-center gap-2 border-t border-border pt-3">
