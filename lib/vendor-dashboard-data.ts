@@ -94,12 +94,7 @@ export const VENDOR_DASHBOARD_DATA = {
         22: { title: "Corporate Party", type: "Corporate" },
     } as Record<number, CalendarEvent>,
 
-    portfolioItems: [
-        { id: "p1", title: "Wedding Ceremony Highlights", type: "Video", date: "Jan 2026", image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800" },
-        { id: "p2", title: "Garden Reception Decor", type: "Gallery", date: "Dec 2025", image: "https://images.unsplash.com/photo-1519225421980-715cb0202128?auto=format&fit=crop&q=80&w=800" },
-        { id: "p3", title: "Corporate Awards Night", type: "Video", date: "Nov 2025", image: "https://images.unsplash.com/photo-1540575861501-7c00117fc24b?auto=format&fit=crop&q=80&w=800" },
-        { id: "p4", title: "Birthday Bash", type: "Gallery", date: "Oct 2025", image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=800" },
-    ] as PortfolioItem[],
+    portfolioItems: getCurrentVendor()?.portfolio || [] as PortfolioItem[],
 
     chats: [
         {

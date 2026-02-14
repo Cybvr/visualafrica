@@ -40,6 +40,10 @@ const VendorCard: React.FC<Vendor> = ({ name, location, price, rating, image, ca
           <Heart size={14} className={isLiked ? 'fill-white' : ''} />
         </button>
 
+        <div className="absolute bottom-4 left-4 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border border-slate-100/50">
+          <span className="text-[10px] font-black text-slate-900 uppercase tracking-wider">{portfolio?.length || 0} Works</span>
+        </div>
+
         <div className="absolute bottom-4 right-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm">
           <Star size={10} className="text-orange-500 fill-orange-500" />
           <span className="text-[10px] font-bold text-slate-900">{rating}</span>

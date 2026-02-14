@@ -87,6 +87,14 @@ export interface VendorImage {
   alt: string
 }
 
+export interface PortfolioItem {
+  id: string;
+  title: string;
+  type: 'Video' | 'Gallery';
+  date: string;
+  image: string;
+}
+
 export interface Vendor {
   id: string
   slug: string
@@ -119,6 +127,7 @@ export interface Vendor {
   areaServed: string[]
   yearEstablished: number
   responseTime: string
+  portfolio: PortfolioItem[]
 }
 
 export const vendors: Vendor[] = [
@@ -144,6 +153,10 @@ export const vendors: Vendor[] = [
     areaServed: ["Lagos"],
     yearEstablished: 2019,
     responseTime: "Within 24 hours",
+    portfolio: [
+      { id: "p1", title: "Wedding Ceremony Highlights", type: "Video", date: "Jan 2026", image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800" },
+      { id: "p2", title: "Garden Reception Decor", type: "Gallery", date: "Dec 2025", image: "https://images.unsplash.com/photo-1519225421980-715cb0202128?auto=format&fit=crop&q=80&w=800" },
+    ]
   },
   {
     id: "v2",
@@ -167,6 +180,7 @@ export const vendors: Vendor[] = [
     areaServed: ["Lagos"],
     yearEstablished: 2019,
     responseTime: "Within 24 hours",
+    portfolio: []
   },
   {
     id: "v-catering-1",
@@ -190,6 +204,9 @@ export const vendors: Vendor[] = [
     areaServed: ["Lagos", "Abuja"],
     yearEstablished: 2010,
     responseTime: "Within 6 hours",
+    portfolio: [
+      { id: "p3", title: "Corporate Awards Night", type: "Video", date: "Nov 2025", image: "https://images.unsplash.com/photo-1540575861501-7c00117fc24b?auto=format&fit=crop&q=80&w=800" },
+    ]
   },
   {
     id: "v-photo-1",
@@ -213,6 +230,9 @@ export const vendors: Vendor[] = [
     areaServed: ["Nationwide"],
     yearEstablished: 2016,
     responseTime: "Within 12 hours",
+    portfolio: [
+      { id: "p4", title: "Birthday Bash", type: "Gallery", date: "Oct 2025", image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=800" },
+    ]
   },
   {
     id: "v-venue-1",
@@ -236,6 +256,7 @@ export const vendors: Vendor[] = [
     areaServed: ["Lagos"],
     yearEstablished: 2020,
     responseTime: "Within 24 hours",
+    portfolio: []
   },
   {
     id: "v-makeup-1",
@@ -259,6 +280,7 @@ export const vendors: Vendor[] = [
     areaServed: ["Lagos", "Ibadan"],
     yearEstablished: 2018,
     responseTime: "Within 3 hours",
+    portfolio: []
   }
 ]
 

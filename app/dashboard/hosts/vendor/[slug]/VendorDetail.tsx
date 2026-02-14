@@ -87,6 +87,35 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor, onBack }) => {
             </div>
           </div>
 
+          {/* Portfolio Section */}
+          {vendor.portfolio && vendor.portfolio.length > 0 && (
+            <section className="space-y-8">
+              <div className="flex items-center justify-between">
+                <h3 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                  <Zap size={24} className="text-orange-600" />
+                  Work Portfolio
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {vendor.portfolio.map(item => (
+                  <div key={item.id} className="group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden hover:shadow-lg transition-all">
+                    <div className="aspect-[4/3] relative overflow-hidden">
+                      <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                      <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 text-xs">
+                        {item.type === 'Video' ? <Video size={12} /> : <ImageIcon size={12} />}
+                        {item.type}
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.date}</div>
+                      <h3 className="text-lg font-bold text-slate-900">{item.title}</h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Descriptions */}
           <section className="space-y-6">
             <h3 className="text-2xl font-black text-slate-900 flex items-center gap-3">
