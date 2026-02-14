@@ -4,7 +4,7 @@ import { Hero } from "@/components/hero"
 import { FeaturesGrid } from "@/components/features-grid"
 import { HandpickedExperiences } from "@/components/handpicked-experiences"
 import { HottestVendors } from "@/components/hottest-vendors"
-import { EventExperts } from "@/components/event-experts"
+import { EventInsights } from "@/components/event-insights"
 import { Testimonials } from "@/components/testimonials"
 import { Button } from "@/components/ui/button"
 
@@ -17,7 +17,7 @@ export default function HomePage() {
         <FeaturesGrid />
         <HottestVendors />
         <HandpickedExperiences />
-        <EventExperts />
+        <EventInsights />
         <Testimonials />
 
         {/* Final CTA Section */}
