@@ -21,23 +21,23 @@ const ExperiencesPage: React.FC = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
-                        <Sparkles className="text-orange-600" size={20} />
-                        <span className="text-orange-600 text-[10px] font-black uppercase tracking-widest">Premium Branded</span>
+                        <Sparkles className="text-primary" size={20} />
+                        <span className="text-primary text-[10px] font-black uppercase tracking-widest">Premium Branded</span>
                     </div>
-                    <h2 className="text-4xl font-black tracking-tight text-slate-900">Experiences</h2>
+                    <h2 className="text-4xl font-serif font-black tracking-tight text-slate-900">Experiences</h2>
                     <p className="text-slate-500 font-medium mt-1">Ultra-exclusive curated events and activity packages.</p>
                 </div>
 
                 <div className="flex items-center gap-3">
                     <div className="relative group">
-                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-600 transition-colors" />
+                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" />
                         <input
                             type="text"
                             placeholder="Search experiences..."
-                            className="pl-12 pr-6 py-4 bg-white border border-slate-100 rounded-2xl w-full md:w-80 font-bold focus:ring-2 focus:ring-orange-600 outline-none transition-all shadow-sm"
+                            className="pl-12 pr-6 py-4 bg-white border border-slate-100 rounded-2xl w-full md:w-80 font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm"
                         />
                     </div>
-                    <button className="p-4 bg-white border border-slate-100 rounded-2xl text-slate-600 hover:text-orange-600 transition-all shadow-sm">
+                    <button className="p-4 bg-white border border-slate-100 rounded-2xl text-slate-600 hover:text-primary transition-all shadow-sm">
                         <Filter size={20} />
                     </button>
                 </div>
@@ -48,7 +48,7 @@ const ExperiencesPage: React.FC = () => {
                 <button
                     onClick={() => setActiveTab('all')}
                     className={`px-8 py-4 text-sm font-black transition-all border-b-2 ${activeTab === 'all'
-                        ? 'border-orange-600 text-orange-600'
+                        ? 'border-primary text-primary'
                         : 'border-transparent text-slate-400 hover:text-slate-600'
                         }`}
                 >
@@ -57,7 +57,7 @@ const ExperiencesPage: React.FC = () => {
                 <button
                     onClick={() => setActiveTab('saved')}
                     className={`px-8 py-4 text-sm font-black transition-all border-b-2 ${activeTab === 'saved'
-                        ? 'border-orange-600 text-orange-600'
+                        ? 'border-primary text-primary'
                         : 'border-transparent text-slate-400 hover:text-slate-600'
                         }`}
                 >

@@ -38,7 +38,7 @@ export default function VendorPortfolioPage() {
         <div className="max-w-6xl mx-auto space-y-8">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-3xl font-black tracking-tight text-slate-900">Portfolio</h2>
+                    <h2 className="text-3xl font-serif font-black tracking-tight text-slate-900">Portfolio</h2>
                     <p className="text-slate-500 mt-1">Showcase your best work to potential clients.</p>
                 </div>
                 <button
@@ -96,7 +96,7 @@ export default function VendorPortfolioPage() {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
                     <div className="relative bg-white w-full max-w-md rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in zoom-in-95 duration-200">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-2xl font-black text-slate-900">{isEditing ? 'Edit Portfolio Item' : 'New Portfolio Item'}</h3>
+                            <h3 className="text-2xl font-serif font-black text-slate-900">{isEditing ? 'Edit Portfolio Item' : 'New Portfolio Item'}</h3>
                             <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors">
                                 <X size={20} className="text-slate-400" />
                             </button>

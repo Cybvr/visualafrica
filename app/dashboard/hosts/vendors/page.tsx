@@ -26,7 +26,7 @@ const Vendors: React.FC = () => {
     <div className="max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-4xl font-black tracking-tight text-slate-900">Vendors</h2>
+          <h2 className="text-4xl font-serif font-black tracking-tight text-slate-900">Vendors</h2>
           <p className="text-slate-500 font-medium mt-1">Discover top-rated professionals for your Waddi event.</p>
         </div>
         <div className="flex items-center gap-3">
@@ -35,10 +35,10 @@ const Vendors: React.FC = () => {
             <input
               type="text"
               placeholder="Search packages..."
-              className="pl-12 pr-4 py-2.5 bg-white border border-slate-100 rounded-full text-sm outline-none w-64 focus:ring-2 focus:ring-orange-600/20 transition-all"
+              className="pl-12 pr-4 py-2.5 bg-white border border-slate-100 rounded-full text-sm outline-none w-64 focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
-          <button className="p-2.5 bg-white border border-slate-100 rounded-full text-slate-600 hover:text-orange-600 transition-colors">
+          <button className="p-2.5 bg-white border border-slate-100 rounded-full text-slate-600 hover:text-primary transition-colors">
             <Filter size={20} />
           </button>
         </div>
@@ -49,7 +49,7 @@ const Vendors: React.FC = () => {
         <button
           onClick={() => setActiveTab('all')}
           className={`px-8 py-4 text-sm font-black transition-all border-b-2 ${activeTab === 'all'
-            ? 'border-orange-600 text-orange-600'
+            ? 'border-primary text-primary'
             : 'border-transparent text-slate-400 hover:text-slate-600'
             }`}
         >
@@ -58,7 +58,7 @@ const Vendors: React.FC = () => {
         <button
           onClick={() => setActiveTab('saved')}
           className={`px-8 py-4 text-sm font-black transition-all border-b-2 ${activeTab === 'saved'
-            ? 'border-orange-600 text-orange-600'
+            ? 'border-primary text-primary'
             : 'border-transparent text-slate-400 hover:text-slate-600'
             }`}
         >
@@ -73,8 +73,8 @@ const Vendors: React.FC = () => {
               key={cat}
               onClick={() => setSelectedCat(cat)}
               className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all border ${selectedCat === cat
-                ? 'bg-orange-600 border-orange-600 text-white shadow-lg shadow-orange-600/20 scale-105'
-                : 'bg-white border-slate-100 text-slate-600 hover:border-orange-600'
+                ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105'
+                : 'bg-white border-slate-100 text-slate-600 hover:border-primary'
                 }`}
             >
               {cat}
