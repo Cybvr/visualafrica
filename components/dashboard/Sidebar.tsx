@@ -124,9 +124,11 @@ const NavItem: React.FC<{
   active?: boolean;
   href: string;
   count?: number;
-}> = ({ icon, label, active, href, count }) => (
+  onNavigate?: () => void;
+}> = ({ icon, label, active, href, count, onNavigate }) => (
   <Link
     href={href}
+    onClick={onNavigate}
     className={`flex items-center justify-between px-4 py-2.5 text-sm transition-all rounded-xl group ${active
       ? "text-primary bg-primary/10 font-black shadow-sm"
       : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
@@ -149,7 +151,7 @@ const NavItem: React.FC<{
   </Link>
 );
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) => {
   const pathname = usePathname();
 
   const isActive = (item: NavItemConfig) => {
@@ -160,7 +162,16 @@ const Sidebar: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-sidebar border-r border-sidebar-border">
-      <CreateEventButton />
+      <div className="px-4 mt-4 mb-3">
+        <Link
+          href="/dashboard/events/new"
+          onClick={onNavigate}
+          className="w-full px-4 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl flex items-center justify-center gap-2 transition-colors"
+        >
+          <Plus size={18} />
+          Create an event
+        </Link>
+      </div>
 
       <div className="flex-1 px-4 overflow-y-auto scrollbar-hide pb-1">
         <SidebarSection divider>
@@ -172,6 +183,7 @@ const Sidebar: React.FC = () => {
               active={isActive(item)}
               href={item.href}
               count={item.count}
+              onNavigate={onNavigate}
             />
           ))}
         </SidebarSection>
@@ -185,6 +197,7 @@ const Sidebar: React.FC = () => {
               active={isActive(item)}
               href={item.href}
               count={item.count}
+              onNavigate={onNavigate}
             />
           ))}
         </SidebarSection>

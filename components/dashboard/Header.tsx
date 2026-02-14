@@ -3,15 +3,24 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ChevronLeft, Bell, Search, Plus } from 'lucide-react';
+import { ChevronLeft, Bell, Search, Plus, Menu } from 'lucide-react';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  onOpenMenu?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onOpenMenu }) => {
   return (
     <div className="h-full flex items-center justify-between px-6">
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onOpenMenu}
+          className="md:hidden p-2 -ml-2 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
+        >
+          <Menu size={20} />
+        </button>
 
         <Link href="/dashboard" className="flex items-center gap-3 cursor-pointer group">
-
           <span className="font-black text-lg tracking-tighter text-slate-900">Dashboard</span>
         </Link>
       </div>
