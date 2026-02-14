@@ -87,11 +87,9 @@ export function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-                <span className="text-sm font-bold text-primary-foreground">VA</span>
-              </div>
+              <img src="/logo.png" alt="Waddi Logo" className="h-8 w-auto object-contain" />
               <span className="font-serif text-xl font-bold">
-                Visual<span className="text-primary">Africa</span>
+                Waddi
               </span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed opacity-70">

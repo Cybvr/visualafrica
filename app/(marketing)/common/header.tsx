@@ -58,11 +58,9 @@ export function Header() {
         {/* Logo and Desktop Nav */}
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-              <span className="text-sm font-bold text-primary-foreground">VA</span>
-            </div>
+            <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
             <span className="font-serif text-xl font-bold text-foreground">
-              Visual<span className="text-primary">Africa</span>
+              Waddi
             </span>
           </Link>
 
@@ -168,89 +166,91 @@ export function Header() {
       </div>
 
       {/* Mobile Nav */}
-      {mobileOpen && (
-        <div className="border-t border-border bg-background lg:hidden">
-          <nav className="flex flex-col px-4 py-4" aria-label="Mobile navigation">
-            <Link
-              href="/explore/vendors"
-              className="rounded-md px-3 py-3 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
-              onClick={() => setMobileOpen(false)}
-            >
-              Explore Vendors
-            </Link>
-            <div className="ml-4 flex flex-col border-l border-border pl-2">
-              {exploreCategories.slice(0, 6).map((cat) => (
-                <Link
-                  key={cat.label}
-                  href={cat.href}
-                  className="rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {cat.label}
-                </Link>
-              ))}
-            </div>
-            <Link
-              href="/offerings"
-              className="rounded-md px-3 py-3 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
-              onClick={() => setMobileOpen(false)}
-            >
-              Offerings
-            </Link>
-            <div className="ml-4 flex flex-col border-l border-border pl-2">
-              {offeringLinks.slice(0, 5).map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className="rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-            <Link
-              href="/about"
-              className="rounded-md px-3 py-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              onClick={() => setMobileOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              href="/pricing"
-              className="rounded-md px-3 py-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              onClick={() => setMobileOpen(false)}
-            >
-              Pricing
-            </Link>
-            <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
-              <Link href="/list-business" onClick={() => setMobileOpen(false)}>
-                <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                  Talk to an Expert
-                </Button>
+      {
+        mobileOpen && (
+          <div className="border-t border-border bg-background lg:hidden">
+            <nav className="flex flex-col px-4 py-4" aria-label="Mobile navigation">
+              <Link
+                href="/explore/vendors"
+                className="rounded-md px-3 py-3 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
+                onClick={() => setMobileOpen(false)}
+              >
+                Explore Vendors
               </Link>
-              {user ? (
-                <>
-                  <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
-                    <Button className="w-full bg-secondary text-secondary-foreground">
-                      Dashboard
+              <div className="ml-4 flex flex-col border-l border-border pl-2">
+                {exploreCategories.slice(0, 6).map((cat) => (
+                  <Link
+                    key={cat.label}
+                    href={cat.href}
+                    className="rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {cat.label}
+                  </Link>
+                ))}
+              </div>
+              <Link
+                href="/offerings"
+                className="rounded-md px-3 py-3 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
+                onClick={() => setMobileOpen(false)}
+              >
+                Offerings
+              </Link>
+              <div className="ml-4 flex flex-col border-l border-border pl-2">
+                {offeringLinks.slice(0, 5).map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className="rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+              <Link
+                href="/about"
+                className="rounded-md px-3 py-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                onClick={() => setMobileOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="/pricing"
+                className="rounded-md px-3 py-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                onClick={() => setMobileOpen(false)}
+              >
+                Pricing
+              </Link>
+              <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
+                <Link href="/list-business" onClick={() => setMobileOpen(false)}>
+                  <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                    Talk to an Expert
+                  </Button>
+                </Link>
+                {user ? (
+                  <>
+                    <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
+                      <Button className="w-full bg-secondary text-secondary-foreground">
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <Button onClick={() => { handleLogout(); setMobileOpen(false); }} variant="destructive" className="w-full">
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
+                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                      Sign In
                     </Button>
                   </Link>
-                  <Button onClick={() => { handleLogout(); setMobileOpen(false); }} variant="destructive" className="w-full">
-                    Sign Out
-                  </Button>
-                </>
-              ) : (
-                <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
-                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                    Sign In
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </nav>
-        </div>
-      )}
-    </header>
+                )}
+              </div>
+            </nav>
+          </div>
+        )
+      }
+    </header >
   )
 }

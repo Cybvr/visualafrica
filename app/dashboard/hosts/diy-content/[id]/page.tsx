@@ -56,7 +56,7 @@ export default function BlogDetailPage() {
                                 </div>
                                 <div>
                                     <p className="text-sm font-black text-slate-900">{post.author}</p>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider italic">VisualAfrica Expert</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider italic">Waddi Expert</p>
                                 </div>
                             </div>
 

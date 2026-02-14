@@ -39,16 +39,12 @@ const Header: React.FC<HeaderProps> = ({ onOpenMenu }) => {
           />
         </div>
 
-        <div className="flex -space-x-2">
-          {[1, 2, 3].map((i) => (
-            <img
-              key={i}
-              className="inline-block h-8 w-8 rounded-full ring-2 ring-white"
-              src={`https://picsum.photos/seed/${i + 20}/64/64`}
-              alt="Team member"
-            />
-          ))}
-        </div>
+        <Link href="/pricing">
+          <button className="hidden lg:flex items-center gap-2 px-4 py-2 bg-zinc-200 text-foreground rounded-xl text-xs font-normal">
+            <Plus size={14} />
+            Upgrade to Pro
+          </button>
+        </Link>
 
         <button className="relative p-2 text-slate-400 hover:text-slate-600 transition-colors">
           <Bell size={20} />

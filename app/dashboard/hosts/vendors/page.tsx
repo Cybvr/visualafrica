@@ -27,7 +27,7 @@ const Vendors: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-4xl font-black tracking-tight text-slate-900">Vendors</h2>
-          <p className="text-slate-500 font-medium mt-1">Discover top-rated professionals for your VisualAfrica event.</p>
+          <p className="text-slate-500 font-medium mt-1">Discover top-rated professionals for your Waddi event.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">

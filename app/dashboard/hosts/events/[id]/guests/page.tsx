@@ -60,7 +60,7 @@ const GuestWebsite: React.FC = () => {
             </div>
             <div>
               <h3 className="text-xl font-bold mb-2">RSVP Website</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">Your custom guest portal is live at:<br /><span className="text-orange-400 font-medium">visualafrica.events/may-offsite</span></p>
+              <p className="text-slate-400 text-sm leading-relaxed">Your custom guest portal is live at:<br /><span className="text-orange-400 font-medium">Waddi.events/may-offsite</span></p>
             </div>
             <div className="flex gap-2">
               <button className="flex-1 bg-white text-slate-900 py-3 rounded-xl font-bold text-sm hover:bg-slate-100">Edit Site</button>

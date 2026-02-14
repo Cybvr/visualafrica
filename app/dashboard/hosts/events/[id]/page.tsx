@@ -18,6 +18,7 @@ import PlanTab from '@/components/dashboard/event-tabs/PlanTab';
 import ItineraryTab from '@/components/dashboard/event-tabs/ItineraryTab';
 import GuestsTab from '@/components/dashboard/event-tabs/GuestsTab';
 import VendorsTab from '@/components/dashboard/event-tabs/VendorsTab';
+import ContractsTab from '@/components/dashboard/event-tabs/ContractsTab';
 
 // Helper to format date range (mock implementation based on previous usage)
 const formatEventDateRange = (startDate: string, endDate: string) => {
@@ -98,6 +99,12 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-3 font-bold text-muted-foreground data-[state=active]:text-foreground"
                     >
                         Guests
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="contracts"
+                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-3 font-bold text-muted-foreground data-[state=active]:text-foreground"
+                    >
+                        Contracts
                     </TabsTrigger>
                 </TabsList>
 
@@ -212,6 +219,11 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     {/* GUESTS TAB */}
                     <TabsContent value="guests">
                         <GuestsTab />
+                    </TabsContent>
+
+                    {/* CONTRACTS TAB */}
+                    <TabsContent value="contracts">
+                        <ContractsTab bookedVendors={eventData.bookedVendors} />
                     </TabsContent>
                 </div>
             </Tabs>

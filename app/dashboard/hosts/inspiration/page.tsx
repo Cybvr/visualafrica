@@ -12,7 +12,7 @@ const Inspiration: React.FC = () => {
     <div className="max-w-7xl mx-auto space-y-8">
       <div>
         <h2 className="text-3xl font-black tracking-tight text-slate-900">Community Inspiration</h2>
-        <p className="text-slate-500 mt-1">Discover public events organized by other VisualAfrica users.</p>
+        <p className="text-slate-500 mt-1">Discover public events organized by other Waddi users.</p>
       </div>
 
       <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">

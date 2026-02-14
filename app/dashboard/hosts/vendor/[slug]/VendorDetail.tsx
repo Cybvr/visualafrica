@@ -148,14 +148,14 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor, onBack }) => {
             </div>
 
             <p className="text-center text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">
-              Verified VisualAfrica Partner
+              Verified Waddi Partner
             </p>
           </div>
 
           <div className="bg-orange-50/50 border border-orange-100 p-8 rounded-[2.5rem] space-y-4 shadow-sm text-center">
             <Globe className="mx-auto text-orange-600" size={32} />
             <h4 className="font-black text-slate-900 text-lg leading-tight">Expert Planning Support</h4>
-            <p className="text-sm text-slate-500 leading-relaxed font-medium">VisualAfrica agents can negotiate this contract and manage logistics on your behalf.</p>
+            <p className="text-sm text-slate-500 leading-relaxed font-medium">Waddi agents can negotiate this contract and manage logistics on your behalf.</p>
             <button className="text-orange-600 font-black text-xs uppercase tracking-widest hover:underline pt-2">Unlock Pro Perks →</button>
           </div>
         </div>

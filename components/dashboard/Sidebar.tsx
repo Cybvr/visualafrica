@@ -41,36 +41,6 @@ type NavItemConfig = {
   matchPaths?: string[];
 };
 
-const hostPrimaryNavItems: NavItemConfig[] = [
-  { icon: LayoutDashboard, label: "Overview", href: "/dashboard/hosts" },
-  { icon: Calendar, label: "Events", href: "/dashboard/hosts/events" },
-  { icon: Mail, label: "Inbox", href: "/dashboard/hosts/inbox", count: 3 },
-  { icon: CreditCard, label: "Contracts", href: "/dashboard/hosts/contracts" },
-];
-
-const hostSecondaryNavItems: NavItemConfig[] = [
-  { icon: Search, label: "Vendors", href: "/dashboard/hosts/vendors", matchPaths: ["/dashboard/hosts/vendor/"] },
-  { icon: Lightbulb, label: "Experiences", href: "/dashboard/hosts/experiences" },
-  { icon: Lightbulb, label: "Inspiration", href: "/dashboard/hosts/inspiration" },
-  { icon: FileText, label: "Resources", href: "/dashboard/hosts/diy-content" },
-  { icon: Settings, label: "Settings", href: "/dashboard/hosts/settings" },
-  { icon: HelpCircle, label: "Support", href: "/support" },
-];
-
-const vendorPrimaryNavItems: NavItemConfig[] = [
-  { icon: LayoutDashboard, label: "Overview", href: "/dashboard/vendors" },
-  { icon: Search, label: "Offers", href: "/dashboard/vendors/offers", count: 8 },
-  { icon: FileText, label: "Contracts", href: "/dashboard/vendors/contracts" },
-  { icon: Mail, label: "Inbox", href: "/dashboard/vendors/inbox", count: 5 },
-];
-
-const vendorSecondaryNavItems: NavItemConfig[] = [
-  { icon: Search, label: "Events", href: "/dashboard/vendors/events" },
-  { icon: Calendar, label: "Calendar", href: "/dashboard/vendors/calendar" },
-  { icon: User, label: "Portfolio", href: "/dashboard/vendors/portfolio" },
-  { icon: Settings, label: "Settings", href: "/dashboard/vendors/settings" },
-  { icon: HelpCircle, label: "Support", href: "/support" },
-];
 
 type UserProfile = {
   displayName: string;
@@ -189,7 +159,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
           <Link href={mode === 'host' ? '/dashboard/vendors' : '/dashboard/hosts'}>
             <DropdownMenuItem className="py-2.5 cursor-pointer flex items-center gap-2 text-primary font-bold">
               <ClipboardList size={16} />
-              Switch to {mode === 'host' ? 'Vendor' : 'Host'} Dashboard
+              View as {mode === 'host' ? 'Vendor' : 'Host'}
             </DropdownMenuItem>
           </Link>
           <DropdownMenuSeparator />
@@ -254,9 +224,51 @@ const NavItem: React.FC<{
   </Link>
 );
 
+import { VENDOR_DASHBOARD_DATA } from "@/lib/vendor-dashboard-data";
+import { EVENTS } from "@/lib/events-data";
+
 const Sidebar: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) => {
   const pathname = usePathname();
   const mode = pathname?.startsWith("/dashboard/vendors") ? "vendor" : "host";
+
+  // Dynamic counts for Host
+  const hostInboxCount = 3; // Mock for now
+  const hostEventsCount = EVENTS.length;
+
+  // Dynamic counts for Vendor
+  const vendorOffersCount = VENDOR_DASHBOARD_DATA.leads.length;
+  const vendorInboxCount = VENDOR_DASHBOARD_DATA.chats.filter(c => c.unread).length;
+  const vendorEventsCount = VENDOR_DASHBOARD_DATA.bookings.length;
+
+  const hostPrimaryNavItems: NavItemConfig[] = [
+    { icon: LayoutDashboard, label: "Overview", href: "/dashboard/hosts" },
+    { icon: Calendar, label: "Events", href: "/dashboard/hosts/events", count: hostEventsCount },
+    { icon: Mail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
+  ];
+
+  const hostSecondaryNavItems: NavItemConfig[] = [
+    { icon: Search, label: "Vendors", href: "/dashboard/hosts/vendors", matchPaths: ["/dashboard/hosts/vendor/"] },
+    { icon: Lightbulb, label: "Experiences", href: "/dashboard/hosts/experiences" },
+    { icon: Lightbulb, label: "Inspiration", href: "/dashboard/hosts/inspiration" },
+    { icon: FileText, label: "Resources", href: "/dashboard/hosts/diy-content" },
+    { icon: Settings, label: "Settings", href: "/dashboard/hosts/settings" },
+    { icon: HelpCircle, label: "Support", href: "/support" },
+  ];
+
+  const vendorPrimaryNavItems: NavItemConfig[] = [
+    { icon: LayoutDashboard, label: "Overview", href: "/dashboard/vendors" },
+    { icon: Search, label: "Offers", href: "/dashboard/vendors/offers", count: vendorOffersCount },
+    { icon: FileText, label: "Contracts", href: "/dashboard/vendors/contracts" },
+    { icon: Mail, label: "Inbox", href: "/dashboard/vendors/inbox", count: vendorInboxCount },
+  ];
+
+  const vendorSecondaryNavItems: NavItemConfig[] = [
+    { icon: Search, label: "Events", href: "/dashboard/vendors/events", count: vendorEventsCount },
+    { icon: Calendar, label: "Calendar", href: "/dashboard/vendors/calendar" },
+    { icon: User, label: "Portfolio", href: "/dashboard/vendors/portfolio" },
+    { icon: Settings, label: "Settings", href: "/dashboard/vendors/settings" },
+    { icon: HelpCircle, label: "Support", href: "/support" },
+  ];
 
   const primaryNavItems = mode === "host" ? hostPrimaryNavItems : vendorPrimaryNavItems;
   const secondaryNavItems = mode === "host" ? hostSecondaryNavItems : vendorSecondaryNavItems;

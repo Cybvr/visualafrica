@@ -178,7 +178,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
             </div>
 
             <p className="text-center text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">
-              Verified VisualAfrica Event
+              Verified Waddi Event
             </p>
           </div>
 
