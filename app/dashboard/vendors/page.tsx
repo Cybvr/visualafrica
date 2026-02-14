@@ -9,12 +9,7 @@ import EventCard from '@/components/dashboard/EventCard';
 
 export default function VendorDashboardPage() {
   const router = useRouter();
-  // Filter events to show only Planning and Confirmed opportunities
-  const upcomingOpportunities = SHARED_EVENTS
-    .filter(event => event.status === 'Planning' || event.status === 'Confirmed')
-    .slice(0, 4);
-
-  const { stats, leads } = VENDOR_DASHBOARD_DATA;
+  const { stats, leads, bookings } = VENDOR_DASHBOARD_DATA;
 
   return (
     <div className="max-w-6xl mx-auto space-y-12 pb-20">
@@ -25,7 +20,7 @@ export default function VendorDashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Link href="/dashboard/vendors/leads" className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+          <Link href="/dashboard/vendors/offers" className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all group">
             <div className="flex items-start justify-between mb-4">
               <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
                 <Search size={24} />
@@ -34,7 +29,7 @@ export default function VendorDashboardPage() {
             </div>
             <div className="space-y-1">
               <h3 className="text-4xl font-black text-slate-900">{leads.length}</h3>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-wide">Active Leads</p>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-wide">Active Offers</p>
             </div>
           </Link>
 
@@ -79,29 +74,40 @@ export default function VendorDashboardPage() {
         </div>
       </div>
 
-      {/* Upcoming Opportunities */}
+      {/* Upcoming Events */}
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
-            Upcoming Opportunities <span className="text-lg">✨</span>
+            Upcoming Events <span className="text-lg">✨</span>
           </h3>
           <Link href="/dashboard/vendors/events" className="text-sm font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1">
-            Browse All <ArrowRight size={16} />
+            View All <ArrowRight size={16} />
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {upcomingOpportunities.length > 0 ? (
-            upcomingOpportunities.map(event => (
-              <EventCard
-                key={event.id}
-                event={event}
-                onClick={() => router.push(`/dashboard/vendors/event/${event.id}`)}
-              />
-            ))
+          {bookings.length > 0 ? (
+            bookings.slice(0, 4).map(booking => {
+              // Map booking back to a format EventCard expects or update EventCard
+              const eventFromShared = SHARED_EVENTS.find(e => e.id === booking.id.split('-')[1]);
+              return (
+                <EventCard
+                  key={booking.id}
+                  event={eventFromShared || {
+                    id: booking.id,
+                    eventName: booking.event,
+                    date: booking.date,
+                    location: booking.location,
+                    image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
+                    status: 'Confirmed'
+                  } as any}
+                  onClick={() => router.push(`/dashboard/vendors/event/${eventFromShared?.id || booking.id}`)}
+                />
+              )
+            })
           ) : (
             <div className="col-span-full text-center py-12 text-slate-400">
-              <p className="font-semibold">No upcoming opportunities at the moment.</p>
-              <p className="text-sm mt-1">Check back soon for new events!</p>
+              <p className="font-semibold">No upcoming events at the moment.</p>
+              <p className="text-sm mt-1">Check back soon for new bookings!</p>
             </div>
           )}
         </div>
