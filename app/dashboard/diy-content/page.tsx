@@ -1,38 +1,79 @@
 "use client";
 
 import React from 'react';
-import { FileText, Download, Play, BookOpen, Layers } from 'lucide-react';
-
-const RESOURCES = [
-  { title: 'Budget Tracker Template', type: 'Spreadsheet', icon: <Layers />, color: 'text-green-600 bg-green-50' },
-  { title: 'Venue Scouting Guide', type: 'PDF', icon: <BookOpen />, color: 'text-blue-600 bg-blue-50' },
-  { title: 'Choosing Catering', type: 'Video', icon: <Play />, color: 'text-orange-600 bg-orange-50' },
-  { title: 'Event Checklist', type: 'Checklist', icon: <FileText />, color: 'text-purple-600 bg-purple-50' },
-];
+import Link from 'next/link';
+import { Search, Filter, ArrowRight, Clock, User } from 'lucide-react';
+import { BLOG_POSTS } from '@/lib/blog-data';
 
 const DIYContent: React.FC = () => {
   return (
-    <div className="max-w-7xl mx-auto space-y-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="max-w-7xl mx-auto space-y-10 pb-20">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">DIY Content</h2>
-          <p className="text-slate-500 text-sm mt-1">Tools and guides to help you plan like a pro.</p>
+          <h2 className="text-4xl font-black tracking-tight text-slate-900">DIY Resources</h2>
+          <p className="text-slate-500 font-medium mt-1">Expert guides and templates to master your event planning.</p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-600 transition-colors" size={18} />
+            <input
+              type="text"
+              placeholder="Search resources..."
+              className="pl-12 pr-6 py-4 bg-white border border-slate-100 rounded-2xl w-full md:w-80 font-bold focus:ring-2 focus:ring-orange-600 outline-none transition-all shadow-sm"
+            />
+          </div>
+          <button className="p-4 bg-white border border-slate-100 rounded-2xl text-slate-600 hover:text-orange-600 transition-all shadow-sm">
+            <Filter size={20} />
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {RESOURCES.map((res, i) => (
-          <div key={i} className="bg-white p-8 rounded-[2rem] border border-slate-100 hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer group">
-            <div className={`w-14 h-14 rounded-2xl mb-6 flex items-center justify-center text-2xl ${res.color} group-hover:scale-110 transition-transform`}>
-              {res.icon}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {BLOG_POSTS.map((post) => (
+          <Link
+            href={`/dashboard/diy-content/${post.id}`}
+            key={post.id}
+            className="group flex flex-col bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
+          >
+            <div className="aspect-[16/10] relative overflow-hidden">
+              <img
+                src={post.image}
+                alt={post.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute top-6 left-6">
+                <span className="px-4 py-2 bg-white/90 backdrop-blur-md text-orange-600 text-[10px] font-black uppercase tracking-widest rounded-xl shadow-sm">
+                  {post.category}
+                </span>
+              </div>
             </div>
-            <h4 className="font-black text-slate-900 text-lg mb-2">{res.title}</h4>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-8">{res.type}</p>
-            <button className="w-full flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-slate-900 hover:text-white rounded-xl text-sm font-bold text-slate-600 transition-all">
-              <Download size={16} />
-              Access Resource
-            </button>
-          </div>
+
+            <div className="p-8 flex flex-col flex-grow">
+              <div className="flex items-center gap-4 text-slate-400 mb-4">
+                <div className="flex items-center gap-1.5">
+                  <Clock size={14} />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">{post.date}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <User size={14} />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">{post.author}</span>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-black text-slate-900 group-hover:text-orange-600 transition-colors mb-4 line-clamp-2 leading-tight">
+                {post.title}
+              </h3>
+
+              <p className="text-slate-500 text-sm font-medium mb-8 line-clamp-2 leading-relaxed">
+                {post.excerpt}
+              </p>
+
+              <div className="mt-auto flex items-center gap-2 text-orange-600 font-black text-xs uppercase tracking-widest">
+                Read Article <ArrowRight size={16} />
+              </div>
+            </div>
+          </Link>
         ))}
       </div>
     </div>

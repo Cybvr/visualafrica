@@ -4,16 +4,11 @@ import React from 'react';
 import { Calendar, FileText, Clock, Star, ArrowRight, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { vendors } from '@/lib/vendors-data';
-
-const RESOURCES = [
-  { id: 1, title: 'Wedding Budget Checklist', category: 'Planning', image: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&q=80&w=800' },
-  { id: 2, title: 'Top 10 Lagos Venues', category: 'Venues', image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800' },
-  { id: 3, title: 'DIY Decor Guide', category: 'Decor', image: 'https://images.unsplash.com/photo-1478146896981-b80c4635432c?auto=format&fit=crop&q=80&w=800' },
-  { id: 4, title: 'Catering Questions to Ask', category: 'Food & Drink', image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=800' },
-];
+import { BLOG_POSTS } from '@/lib/blog-data';
 
 export default function DashboardPage() {
   const trendingVendors = vendors.slice(0, 4); // Just take the first 4 for now
+  const recommendedPosts = BLOG_POSTS.slice(0, 4);
 
   return (
     <div className="max-w-6xl mx-auto space-y-12 pb-20">
@@ -74,16 +69,16 @@ export default function DashboardPage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {RESOURCES.map(resource => (
-            <div key={resource.id} className="group cursor-pointer">
+          {recommendedPosts.map(post => (
+            <Link href={`/dashboard/diy-content/${post.id}`} key={post.id} className="group cursor-pointer">
               <div className="rounded-2xl overflow-hidden aspect-[4/3] mb-3 relative">
-                <img src={resource.image} alt={resource.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute top-3 left-3 bg-black/50 backdrop-blur-md text-white text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider">
-                  {resource.category}
+                  {post.category}
                 </div>
               </div>
-              <h4 className="font-bold text-slate-900 group-hover:text-orange-600 transition-colors line-clamp-2">{resource.title}</h4>
-            </div>
+              <h4 className="font-bold text-slate-900 group-hover:text-orange-600 transition-colors line-clamp-2">{post.title}</h4>
+            </Link>
           ))}
         </div>
       </section>
