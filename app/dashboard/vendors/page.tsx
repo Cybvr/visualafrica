@@ -10,9 +10,12 @@ const Vendors: React.FC = () => {
   const router = useRouter();
   const [selectedCat, setSelectedCat] = useState('All Categories');
 
+  // Strictly exclude 'Experiences' from the general vendors list
+  const baseVendors = vendors.filter(v => !v.categories.includes('Experiences'));
+
   const filteredVendors = selectedCat === 'All Categories'
-    ? vendors
-    : vendors.filter(v => v.categories.includes(selectedCat as any));
+    ? baseVendors
+    : baseVendors.filter(v => v.categories.includes(selectedCat as any));
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
