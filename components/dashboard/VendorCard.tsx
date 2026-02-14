@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Vendor } from '../../lib/vendors-data';
 import { Star, MapPin, Heart } from 'lucide-react';
 
-const VendorCard: React.FC<Vendor> = ({ name, location, price, rating, image, categories, featured }) => {
+const VendorCard: React.FC<Vendor> = ({ name, location, price, rating, image, categories, featured, portfolio }) => {
   const [isLiked, setIsLiked] = useState(featured);
   const [imgSrc, setImgSrc] = useState(image && image.trim() !== '' ? image : '/placeholder.png');
 
