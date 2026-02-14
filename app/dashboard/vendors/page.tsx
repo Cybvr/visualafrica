@@ -37,7 +37,7 @@ const Vendors: React.FC = () => {
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
-        {VENDOR_CATEGORIES.map(cat => (
+        {VENDOR_CATEGORIES.filter(cat => cat !== 'Experiences').map(cat => (
           <button
             key={cat}
             onClick={() => setSelectedCat(cat)}

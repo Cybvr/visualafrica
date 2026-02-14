@@ -13,7 +13,6 @@ export type EventTheme =
 
 export type VendorCategory =
   | "All Categories"
-  | "Packages"
   | "Bar Tenders"
   | "Cakes & Sweets"
   | "Catering"
@@ -46,7 +45,6 @@ export const EVENT_THEMES: EventTheme[] = [
 
 export const VENDOR_CATEGORIES: VendorCategory[] = [
   "All Categories",
-  "Packages",
   "Bar Tenders",
   "Cakes & Sweets",
   "Catering",
@@ -66,7 +64,6 @@ export const VENDOR_CATEGORIES: VendorCategory[] = [
 ]
 
 export const CATEGORY_SLUG_MAP: Record<string, VendorCategory> = {
-  packages: "Packages",
   bartenders: "Bar Tenders",
   cakes: "Cakes & Sweets",
   catering: "Catering",
@@ -129,7 +126,7 @@ export const vendors: Vendor[] = [
     id: "v1",
     slug: "private-terrace-sunrise-proposal-lekki-view",
     name: "Private Terrace Sunrise Proposal | Lekki View",
-    categories: ["Packages"],
+    categories: ["Experiences"],
     eventThemes: ["Proposals"],
     description: "Propose at sunrise from a private terrace in Lekki...",
     shortDescription: "Propose at sunrise from a private terrace in Lekki...",
@@ -152,7 +149,7 @@ export const vendors: Vendor[] = [
     id: "v2",
     slug: "luxury-catamaran-cruise-proposal",
     name: "Luxury Catamaran | Cruise Proposal",
-    categories: ["Packages", "Yachts", "Experiences"],
+    categories: ["Experiences", "Yachts"],
     eventThemes: ["Proposals", "Social Gathering"],
     description: "Maritime experience on Lagos waters.",
     shortDescription: "Maritime experience on Lagos waters.",

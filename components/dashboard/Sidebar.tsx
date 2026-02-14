@@ -47,8 +47,8 @@ const primaryNavItems: NavItemConfig[] = [
 
 const secondaryNavItems: NavItemConfig[] = [
   { icon: Search, label: "Vendors", href: "/dashboard/vendors", matchPaths: ["/dashboard/vendor/"] },
-  { icon: Heart, label: "Saved", href: "/dashboard/shortlist", count: 13 },
   { icon: Lightbulb, label: "Experiences", href: "/dashboard/experiences" },
+  { icon: Heart, label: "Saved", href: "/dashboard/shortlist", count: 13 },
   { icon: Lightbulb, label: "Inspiration", href: "/dashboard/inspiration" },
   { icon: FileText, label: "Resources", href: "/dashboard/diy-content" },
   { icon: HelpCircle, label: "Support", href: "/support" },
