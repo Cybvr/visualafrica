@@ -162,7 +162,7 @@ export default function CreateEventPage() {
                                 <label className="text-sm font-black text-slate-700">Tell me about your event</label>
                                 <textarea
                                     rows={4}
-                                    placeholder="e.g. Plan a wedding for Mike and Whitney on December 12th in Lekki with 250 guests and 15M budget..."
+                                    placeholder="e.g. Plan a wedding for Chidi and Amaka on December 12th in Lekki with 250 guests and 15M budget..."
                                     className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-base font-medium outline-none focus:ring-4 focus:ring-orange-600/10 transition-all resize-none placeholder:text-slate-300"
                                     value={aiPrompt}
                                     onChange={(e) => setAiPrompt(e.target.value)}
@@ -251,7 +251,7 @@ export default function CreateEventPage() {
                                     <input
                                         type="text"
                                         required
-                                        placeholder="e.g. Mike & Whitney Wedding"
+                                        placeholder="e.g. Chidi & Amaka Wedding"
                                         className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-lg font-bold outline-none focus:ring-4 focus:ring-orange-600/10 transition-all placeholder:text-slate-300"
                                         value={formData.eventName}
                                         onChange={(e) => setFormData({ ...formData, eventName: e.target.value })}

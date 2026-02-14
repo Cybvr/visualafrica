@@ -32,7 +32,7 @@ export default function ContactPage() {
                                         id="name"
                                         name="name"
                                         className="mt-2 w-full rounded-lg border border-input bg-background px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                                        placeholder="John Doe"
+                                        placeholder="Tunde Bakare"
                                     />
                                 </div>
                                 <div>
@@ -44,7 +44,7 @@ export default function ContactPage() {
                                         id="email"
                                         name="email"
                                         className="mt-2 w-full rounded-lg border border-input bg-background px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                                        placeholder="john@example.com"
+                                        placeholder="tunde@example.com"
                                     />
                                 </div>
                                 <div>

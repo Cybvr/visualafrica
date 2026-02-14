@@ -79,7 +79,7 @@ const HostSettingsPage = () => {
                                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Email Address</label>
                                         <input
                                             type="email"
-                                            defaultValue="jide@example.com"
+                                            defaultValue="jide@visual.ng"
                                             className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                         />
                                     </div>

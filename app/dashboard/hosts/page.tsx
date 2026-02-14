@@ -23,7 +23,7 @@ export default function DashboardPage() {
       <div className="space-y-8">
         <div>
           <h2 className="text-3xl font-black tracking-tight text-slate-900">Dashboard Overview</h2>
-          <p className="text-slate-500 mt-1">Welcome back, John. Here's what's happening today.</p>
+          <p className="text-slate-500 mt-1">Welcome back, Tunde. Here's what's happening today.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button"
 
 const CHATS = [
   { id: 1, name: 'The Monarch', lastMsg: 'The quote is ready for your review.', time: '10:30 AM', unread: true, avatar: 'M', status: 'quoted', location: 'Lekki, Lagos', price: 'NGN 5,000,000' },
-  { id: 2, name: 'Gourmet Flavors', lastMsg: 'Tasting scheduled for next Tuesday.', time: 'Yesterday', unread: false, avatar: 'G', status: 'booked', location: 'Ikoyi, Lagos', price: 'NGN 15,000/Guest' },
-  { id: 3, name: 'Lagos Lens', lastMsg: 'Portfolio updated with new wedding samples.', time: 'Mon', unread: false, avatar: 'L', status: 'requested', location: 'Ikeja, Lagos', price: 'NGN 450,000' },
+  { id: 2, name: 'Naija Gourmet Flavors', lastMsg: 'Tasting scheduled for next Tuesday.', time: 'Yesterday', unread: false, avatar: 'N', status: 'booked', location: 'Ikoyi, Lagos', price: 'NGN 15,000/Guest' },
+  { id: 3, name: 'Eko Lens Studio', lastMsg: 'Portfolio updated with new wedding samples.', time: 'Mon', unread: false, avatar: 'E', status: 'requested', location: 'Ikeja, Lagos', price: 'NGN 450,000' },
 ];
 
 const Inbox: React.FC = () => {
@@ -110,7 +110,7 @@ const Inbox: React.FC = () => {
           <div className="flex items-start gap-3 max-w-lg">
             <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center text-[10px] font-bold shrink-0">{activeChat.avatar}</div>
             <div className="bg-white p-4 rounded-2xl rounded-tl-none border border-slate-100 shadow-sm text-sm text-slate-700 leading-relaxed font-medium">
-              Hello! We have reviewed your initial event brief. The Lagos hall is available on May 29th. Would you like to schedule a virtual tour?
+              Hello! We have reviewed your initial event brief. The venue in Lagos is available on May 29th. Would you like to schedule a virtual tour?
             </div>
           </div>
           <div className="flex items-start gap-3 justify-end">

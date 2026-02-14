@@ -11,8 +11,8 @@ const STATUS_MAP = {
 
 const REQUESTS = [
     { id: 1, vendor: 'The Monarch', type: 'Venue', status: 'Booked', date: 'Oct 12, 2024', price: 'NGN 5,000,000', location: 'Lekki, Lagos' },
-    { id: 2, vendor: 'Gourmet Flavors', type: 'Catering', status: 'Quoted', date: 'Oct 14, 2024', price: 'NGN 1,200,000', location: 'Ikoyi, Lagos' },
-    { id: 3, vendor: 'Lagos Lens', type: 'Photography', status: 'Sent', date: 'Oct 15, 2024', price: 'Pending', location: 'Ikeja, Lagos' },
+    { id: 2, vendor: 'Naija Gourmet Flavors', type: 'Catering', status: 'Quoted', date: 'Oct 14, 2024', price: 'NGN 1,200,000', location: 'Ikoyi, Lagos' },
+    { id: 3, vendor: 'Eko Lens Studio', type: 'Photography', status: 'Sent', date: 'Oct 15, 2024', price: 'Pending', location: 'Ikeja, Lagos' },
 ];
 
 const VendorsTab: React.FC = () => {

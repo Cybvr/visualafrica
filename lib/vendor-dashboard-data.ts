@@ -94,8 +94,8 @@ export const VENDOR_DASHBOARD_DATA = {
     bookings: derivedBookings,
 
     calendarEvents: {
-        14: { title: "Wedding - Johnson", type: "Wedding" },
-        22: { title: "Corporate Party", type: "Corporate" },
+        14: { title: "Wedding - Bello", type: "Wedding" },
+        22: { title: "Lagos Tech Mixer", type: "Corporate" },
     } as Record<number, CalendarEvent>,
 
     portfolioItems: getCurrentVendor()?.portfolio || [] as PortfolioItem[],
@@ -103,17 +103,17 @@ export const VENDOR_DASHBOARD_DATA = {
     chats: [
         {
             id: "c1",
-            name: "Sarah Williams",
+            name: "Folake Ademola",
             lastMessage: "Can we schedule a call for tomorrow?",
             time: "2m ago",
             unread: true,
             online: true,
             messages: [
-                { id: "m1", senderName: "Sarah Williams", text: "Hi there! I'm interested in your wedding photography package. Do you have availability for Oct 12th?", time: "10:45 AM", isMe: false },
-                { id: "m2", senderName: "Me", text: "Hello Sarah! Yes, I'm currently free on that date. I'd love to chat more about your vision for the day.", time: "10:48 AM", isMe: true }
+                { id: "m1", senderName: "Folake Ademola", text: "Hi there! I'm interested in your wedding photography package. Do you have availability for Oct 12th?", time: "10:45 AM", isMe: false },
+                { id: "m2", senderName: "Me", text: "Hello Folake! Yes, I'm currently free on that date. I'd love to chat more about your vision for the day.", time: "10:48 AM", isMe: true }
             ]
         },
-        { id: "c2", name: "Akin Fadey", lastMessage: "The contract looks good, thanks!", time: "1h ago", unread: false, online: false, messages: [] },
+        { id: "c2", name: "Akin Fadeyi", lastMessage: "The contract looks good, thanks!", time: "1h ago", unread: false, online: false, messages: [] },
         { id: "c3", name: "Modupe Alabi", lastMessage: "I've sent the payment receipt.", time: "4h ago", unread: false, online: true, messages: [] },
     ] as Chat[],
 
