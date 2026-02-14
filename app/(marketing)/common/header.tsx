@@ -15,6 +15,7 @@ import { offerings } from "@/lib/offerings-data"
 import { auth } from "@/lib/firebase"
 import { onAuthStateChanged, signOut, User } from "firebase/auth"
 import { useEffect } from "react"
+import { HiSparkles, HiBriefcase, HiInformationCircle, HiTicket, HiChatBubbleLeftRight, HiArrowRightOnRectangle } from "react-icons/hi2"
 
 // Build explore categories from vendor data (skip "All Categories")
 const categoryToSlug = Object.fromEntries(
@@ -53,8 +54,8 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
+    <header className=" sticky top-0 z-50 w-full pt-2">
+      <div className="py-2 px-4 rounded-full mx-auto flex  max-w-5xl items-center justify-between  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         {/* Logo and Desktop Nav */}
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
@@ -68,8 +69,9 @@ export function Header() {
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
             {/* Explore Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
-                Explore <ChevronDown className="h-3.5 w-3.5" />
+              <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+                <HiSparkles className="h-4 w-4" />
+                Explore <ChevronDown className="h-3.5 w-3.5 opacity-50" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-48">
                 <DropdownMenuItem asChild>
@@ -89,8 +91,9 @@ export function Header() {
 
             {/* Offerings Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
-                Offerings <ChevronDown className="h-3.5 w-3.5" />
+              <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+                <HiBriefcase className="h-4 w-4" />
+                Offerings <ChevronDown className="h-3.5 w-3.5 opacity-50" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-52">
                 <DropdownMenuItem asChild>
@@ -110,14 +113,16 @@ export function Header() {
 
             <Link
               href="/about"
-              className="rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
+              <HiInformationCircle className="h-4 w-4" />
               About
             </Link>
             <Link
               href="/pricing"
-              className="rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
+              <HiTicket className="h-4 w-4" />
               Pricing
             </Link>
           </nav>
@@ -126,7 +131,8 @@ export function Header() {
         {/* Desktop Actions */}
         <div className="hidden items-center gap-3 lg:flex">
           <Link href="/list-business">
-            <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+            <Button variant="outline" size="sm" className="flex items-center gap-2 text-primary hover:bg-primary hover:text-primary-foreground border-primary/20">
+              <HiChatBubbleLeftRight className="h-4 w-4" />
               Talk to an Expert
             </Button>
           </Link>
@@ -148,7 +154,8 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <Link href="/auth/login">
-              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button size="sm" className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+                <HiArrowRightOnRectangle className="h-4 w-4" />
                 Sign In
               </Button>
             </Link>
@@ -172,9 +179,10 @@ export function Header() {
             <nav className="flex flex-col px-4 py-4" aria-label="Mobile navigation">
               <Link
                 href="/explore/vendors"
-                className="rounded-md px-3 py-3 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
+                className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
                 onClick={() => setMobileOpen(false)}
               >
+                <HiSparkles className="h-5 w-5 text-primary" />
                 Explore Vendors
               </Link>
               <div className="ml-4 flex flex-col border-l border-border pl-2">
@@ -191,9 +199,10 @@ export function Header() {
               </div>
               <Link
                 href="/offerings"
-                className="rounded-md px-3 py-3 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
+                className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
                 onClick={() => setMobileOpen(false)}
               >
+                <HiBriefcase className="h-5 w-5 text-primary" />
                 Offerings
               </Link>
               <div className="ml-4 flex flex-col border-l border-border pl-2">
@@ -210,16 +219,18 @@ export function Header() {
               </div>
               <Link
                 href="/about"
-                className="rounded-md px-3 py-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                 onClick={() => setMobileOpen(false)}
               >
+                <HiInformationCircle className="h-5 w-5" />
                 About
               </Link>
               <Link
                 href="/pricing"
-                className="rounded-md px-3 py-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                 onClick={() => setMobileOpen(false)}
               >
+                <HiTicket className="h-5 w-5" />
                 Pricing
               </Link>
               <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
