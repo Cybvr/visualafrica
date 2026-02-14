@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { MapPin, Calendar, DollarSign, Users, Layout, Image, Eye, Target, Map, Clock } from 'lucide-react';
-import { eventData, formatEventDateRange, formatCurrency } from '../../../lib/event-data';
+import { eventData, formatEventDateRange, formatCurrency } from '@/lib/event-data';
 
 const PlanPage: React.FC = () => {
   const [isPublic, setIsPublic] = useState(eventData.showCommunityInspiration);

@@ -33,7 +33,7 @@ export function Hero() {
                     <Button size="lg" className="h-14 px-10 text-lg bg-primary hover:bg-primary/90">
                         Get started for free
                     </Button>
-                    <Button size="lg" variant="outline" className="h-14 px-10 text-lg border-white text-white hover:bg-white/10">
+                    <Button size="lg" variant="outline" className="h-14 px-10 text-lg border-white text-foreground hover:bg-white/10">
                         Talk to an expert
                     </Button>
                 </div>
