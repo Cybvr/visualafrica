@@ -1,33 +1,20 @@
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
+import { vendors } from "@/lib/vendors-data"
+
 export function HandpickedExperiences() {
-    const experiences = [
-        {
-            location: "Lagos, Nigeria",
-            title: "Yacht Retreat on the Atlantic",
-            price: "$472",
-            image: "/images/hero-yacht.jpg"
-        },
-        {
-            location: "Cape Town, South Africa",
-            title: "Wine Country Retreat",
-            price: "$1066",
-            image: "/images/hero-corporate.jpg"
-        },
-        {
-            location: "Marrakech, Morocco",
-            title: "Desert Offsite Oasis",
-            price: "$399",
-            image: "/images/hero-proposal.jpg"
-        },
-        {
-            location: "Nairobi, Kenya",
-            title: "Safari & Team Wellness",
-            price: "$434",
-            image: "/images/hero-wedding.jpg"
-        }
-    ]
+    const experiences = vendors
+        .filter(v => v.categories.includes("Experiences"))
+        .slice(0, 4)
+        .map(v => ({
+            id: v.id,
+            slug: v.slug,
+            location: v.location.split(",")[0], // Just the city
+            title: v.name,
+            price: v.price?.match(/NGN [\d,]+/)?.[0] || v.price,
+            image: v.image,
+            category: v.categories[0]
+        }))
 
     return (
         <section className="py-24 bg-muted/20">
@@ -49,27 +36,27 @@ export function HandpickedExperiences() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {experiences.map((exp) => (
                         <div key={exp.title} className="group cursor-pointer">
-                            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl mb-4">
-                                <Image
+                            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] mb-4">
+                                <img
                                     src={exp.image}
                                     alt={exp.title}
-                                    fill
-                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png'; }}
                                 />
                                 <div className="absolute top-4 left-4">
-                                    <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-foreground uppercase tracking-wider">
-                                        Tag
+                                    <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-black text-foreground uppercase tracking-wider">
+                                        {exp.category}
                                     </span>
                                 </div>
                             </div>
-                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">
+                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">
                                 {exp.location}
                             </p>
                             <h4 className="font-serif text-xl font-bold mb-2 group-hover:text-primary transition-colors">
                                 {exp.title}
                             </h4>
                             <p className="text-sm text-foreground">
-                                from <span className="font-bold text-lg">{exp.price}</span> / person
+                                from <span className="font-bold text-lg text-primary">{exp.price}</span>
                             </p>
                         </div>
                     ))}

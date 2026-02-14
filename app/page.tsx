@@ -3,6 +3,7 @@ import { Footer } from "@/app/(marketing)/common/footer"
 import { Hero } from "@/components/hero"
 import { FeaturesGrid } from "@/components/features-grid"
 import { HandpickedExperiences } from "@/components/handpicked-experiences"
+import { HottestVendors } from "@/components/hottest-vendors"
 import { EventExperts } from "@/components/event-experts"
 import { Testimonials } from "@/components/testimonials"
 import { Button } from "@/components/ui/button"
@@ -14,6 +15,7 @@ export default function HomePage() {
       <main className="flex-1">
         <Hero />
         <FeaturesGrid />
+        <HottestVendors />
         <HandpickedExperiences />
         <EventExperts />
         <Testimonials />
