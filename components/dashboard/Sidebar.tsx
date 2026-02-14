@@ -42,7 +42,7 @@ const primaryNavItems: NavItemConfig[] = [
   { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
   { icon: Calendar, label: "Events", href: "/dashboard/events" },
   { icon: Mail, label: "Inbox", href: "/dashboard/inbox", count: 3 },
-  { icon: CreditCard, label: "Payments & Contracts", href: "/dashboard/payments" },
+  { icon: CreditCard, label: "Contracts", href: "/dashboard/contracts" },
 ];
 
 const secondaryNavItems: NavItemConfig[] = [

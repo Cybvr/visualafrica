@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Eye, Heart, MessageSquare } from 'lucide-react';
+import Link from 'next/link';
 
 const COMMUNITY_EVENTS = [
   { id: 1, user: 'Amina J.', title: 'Lekki Sunrise Proposal', category: 'Proposals', image: 'https://images.unsplash.com/photo-1518135714426-c18f5fe26966?auto=format&fit=crop&q=80&w=800', likes: 242 },
@@ -22,7 +23,7 @@ const Inspiration: React.FC = () => {
 
       <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
         {COMMUNITY_EVENTS.map(item => (
-          <div key={item.id} className="relative rounded-[2rem] overflow-hidden group break-inside-avoid shadow-sm hover:shadow-2xl transition-all border border-slate-100 bg-white">
+          <Link href={`/dashboard/inspiration/${item.id}`} key={item.id} className="block relative rounded-[2rem] overflow-hidden group break-inside-avoid shadow-sm hover:shadow-2xl transition-all border border-slate-100 bg-white">
             <div className="p-4 flex items-center gap-3 border-b border-slate-50">
               <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px] font-black">{item.user[0]}</div>
               <span className="text-xs font-bold text-slate-900">{item.user}</span>
@@ -38,7 +39,7 @@ const Inspiration: React.FC = () => {
               </div>
               <h3 className="text-slate-900 font-black text-lg group-hover:text-orange-600 transition-colors">{item.title}</h3>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
