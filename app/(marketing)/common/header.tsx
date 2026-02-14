@@ -59,7 +59,7 @@ export function Header() {
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
-            <span className="font-serif text-xl font-bold text-foreground">
+            <span className="font-logo text-xl font-normal text-foreground">
               Waddi
             </span>
           </Link>

@@ -295,7 +295,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, isCollapsed, onToggleColl
         <Link href="/" className="flex items-center gap-2 overflow-hidden">
           <img src="/logo.png" alt="Logo" className="h-8 w-auto min-w-[32px] object-contain shrink-0" />
           {!isCollapsed && (
-            <span className="font-serif text-xl font-bold text-foreground truncate">
+            <span className="font-logo text-xl font-normal text-foreground truncate">
               Waddi
             </span>
           )}

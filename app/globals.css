@@ -6,6 +6,10 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .font-logo {
+    font-family: var(--font-logo);
+  }
 }
 
 @layer base {
