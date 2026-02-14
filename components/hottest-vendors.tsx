@@ -1,3 +1,4 @@
+"use client";
 import { vendors } from "@/lib/vendors-data"
 import { Star } from "lucide-react"
 

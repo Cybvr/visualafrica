@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import { SharedEvent } from '@/lib/shared-data';
 import { Calendar, MapPin, User, Users } from 'lucide-react';

@@ -1,4 +1,5 @@
 
+"use client";
 import React from 'react';
 import { ChevronLeft, Star, MapPin, CheckCircle2, MessageSquare, Heart, Share2, Calendar, Globe, Award, ShieldCheck, Zap, Video, Image as ImageIcon } from 'lucide-react';
 import { Vendor } from '@/lib/vendors-data';

@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import { Vendor } from '../../lib/vendors-data';
 import { Star, MapPin, Heart } from 'lucide-react';

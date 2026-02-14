@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import { ChevronLeft, Calendar, MapPin, Users, DollarSign, MessageSquare, Heart, Share2, Award, ShieldCheck, Zap, User } from 'lucide-react';
 import { SharedEvent } from '@/lib/shared-data';
