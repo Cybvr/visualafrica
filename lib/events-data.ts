@@ -8,6 +8,8 @@ export interface Event {
     image: string;
     budget: number;
     description: string;
+    publicGallery?: string[];
+    metrics?: { label: string; value: string }[];
 }
 
 export const EVENTS: Event[] = [
@@ -20,7 +22,17 @@ export const EVENTS: Event[] = [
         status: 'Planning',
         image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
         budget: 15000000,
-        description: 'A luxurious outdoor wedding with a modern African theme.'
+        description: 'A luxurious outdoor wedding with a modern African theme.',
+        publicGallery: [
+            'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800',
+            'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
+            'https://images.unsplash.com/photo-1519225421980-715cb0202128?auto=format&fit=crop&q=80&w=800',
+        ],
+        metrics: [
+            { label: 'Guest Count', value: '250' },
+            { label: 'Theme Match', value: '100%' },
+            { label: 'Vendor Performance', value: '4.8/5' },
+        ]
     },
     {
         id: '2',

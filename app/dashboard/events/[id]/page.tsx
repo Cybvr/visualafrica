@@ -196,7 +196,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
                     {/* DETAILS TAB */}
                     <TabsContent value="details">
-                        <PlanTab />
+                        <PlanTab event={event} />
                     </TabsContent>
 
                     {/* VENDORS TAB */}
