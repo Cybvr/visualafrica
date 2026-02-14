@@ -34,7 +34,7 @@ export function Hero() {
                         Get started for free
                     </Button>
                     <Button size="lg" variant="outline" className="h-14 px-10 text-lg border-white text-foreground hover:bg-white/10">
-                        Talk to an expert
+                        Book a Call
                     </Button>
                 </div>
             </div>

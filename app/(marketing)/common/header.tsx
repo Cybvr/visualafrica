@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Menu, X, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -14,24 +14,63 @@ import { VENDOR_CATEGORIES, CATEGORY_SLUG_MAP } from "@/lib/vendors-data"
 import { offerings } from "@/lib/offerings-data"
 import { auth } from "@/lib/firebase"
 import { onAuthStateChanged, signOut, User } from "firebase/auth"
-import { useEffect } from "react"
-import { HiSparkles, HiBriefcase, HiInformationCircle, HiTicket, HiChatBubbleLeftRight, HiArrowRightOnRectangle } from "react-icons/hi2"
+import {
+  HiSparkles,
+  HiBriefcase,
+  HiInformationCircle,
+  HiTicket,
+  HiChatBubbleLeftRight,
+  HiArrowRightOnRectangle,
+  HiHeart,
+  HiStar,
+  HiUsers,
+  HiBuildingOffice,
+  HiCalendarDays,
+  HiMap,
+  HiPresentationChartBar,
+  HiVideoCamera,
+  HiSquare3Stack3D,
+  HiBolt,
+  HiGlobeAlt
+} from "react-icons/hi2"
+import { EVENT_THEMES } from "@/lib/vendors-data"
 
-// Build explore categories from vendor data (skip "All Categories")
-const categoryToSlug = Object.fromEntries(
-  Object.entries(CATEGORY_SLUG_MAP).map(([slug, cat]) => [cat, slug])
-)
-const exploreCategories = VENDOR_CATEGORIES.filter(
-  (c) => c !== "All Categories"
-).map((cat) => ({
-  label: cat,
-  href: `/explore/vendors/${categoryToSlug[cat] ?? cat.toLowerCase().replace(/\s+/g, "-")}`,
+// Build themes nav (skip "All Themes")
+const themeLinks = EVENT_THEMES.filter(t => t !== "All Themes").map(theme => ({
+  label: theme,
+  href: `/explore/vendors?theme=${encodeURIComponent(theme)}`,
+  icon: theme === "Wedding" ? HiHeart :
+    theme === "Kids Birthday" ? HiStar :
+      theme === "Corporate Event" ? HiBuildingOffice :
+        theme === "Social Gathering" ? HiUsers :
+          theme === "Anniversary" ? HiCalendarDays :
+            HiSparkles
 }))
 
-// Build offerings nav from data file
-const offeringLinks = offerings.map((o) => ({
+// Split offerings for the dropdown
+const eventTypeSlugs = ["offsites-retreats", "client-events", "skos", "conferences", "incentive-trips"]
+const serviceOfferingSlugs = ["full-service-planning", "expedited-planning"]
+
+const offeringIconMap: Record<string, any> = {
+  "offsites-retreats": HiMap,
+  "client-events": HiUsers,
+  "skos": HiPresentationChartBar,
+  "conferences": HiVideoCamera,
+  "incentive-trips": HiGlobeAlt,
+  "full-service-planning": HiSquare3Stack3D,
+  "expedited-planning": HiBolt
+}
+
+const eventTypes = offerings.filter(o => eventTypeSlugs.includes(o.slug)).map(o => ({
   label: o.title,
   href: `/offerings/${o.slug}`,
+  icon: offeringIconMap[o.slug] || HiBriefcase
+}))
+
+const serviceOfferings = offerings.filter(o => serviceOfferingSlugs.includes(o.slug)).map(o => ({
+  label: o.title,
+  href: `/offerings/${o.slug}`,
+  icon: offeringIconMap[o.slug] || HiBriefcase
 }))
 
 export function Header() {
@@ -67,47 +106,79 @@ export function Header() {
 
           {/* Desktop Nav - Now beside the logo */}
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
-            {/* Explore Dropdown */}
+            {/* Themes Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+              <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
                 <HiSparkles className="h-4 w-4" />
-                Explore <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                Themes <ChevronDown className="h-3.5 w-3.5 opacity-50" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
-                <DropdownMenuItem asChild>
-                  <Link href="/explore/vendors" className="cursor-pointer font-bold">
-                    All Vendors
-                  </Link>
-                </DropdownMenuItem>
-                {exploreCategories.map((cat) => (
-                  <DropdownMenuItem key={cat.label} asChild>
-                    <Link href={cat.href} className="cursor-pointer font-bold">
-                      {cat.label}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
+              <DropdownMenuContent align="start" className="w-[500px] p-4 bg-white rounded-3xl shadow-2xl border-none">
+                <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+                  <div className="col-span-2 pb-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Choose a Theme</span>
+                  </div>
+                  {themeLinks.map((theme) => (
+                    <DropdownMenuItem key={theme.label} asChild className="p-0 focus:bg-transparent">
+                      <Link href={theme.href} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-secondary/50 group transition-all">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-xl border border-border bg-white group-hover:border-primary/30 group-hover:bg-primary/5 transition-colors">
+                          <theme.icon className="h-5 w-5 text-primary" />
+                        </div>
+                        <span className="text-sm font-bold text-foreground">
+                          {theme.label}
+                        </span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
 
             {/* Offerings Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+              <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
                 <HiBriefcase className="h-4 w-4" />
                 Offerings <ChevronDown className="h-3.5 w-3.5 opacity-50" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-52">
-                <DropdownMenuItem asChild>
-                  <Link href="/offerings" className="cursor-pointer font-bold">
-                    All Offerings
-                  </Link>
-                </DropdownMenuItem>
-                {offeringLinks.map((item) => (
-                  <DropdownMenuItem key={item.label} asChild>
-                    <Link href={item.href} className="cursor-pointer font-bold">
-                      {item.label}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
+              <DropdownMenuContent align="start" className="w-[600px] p-6 bg-white rounded-3xl shadow-2xl border-none">
+                <div className="grid grid-cols-2 gap-8">
+                  {/* Event Types Column */}
+                  <div className="space-y-3">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block pb-1 border-b border-border/50">Event Types</span>
+                    <div className="space-y-1">
+                      {eventTypes.map((item) => (
+                        <DropdownMenuItem key={item.label} asChild className="p-0 focus:bg-transparent">
+                          <Link href={item.href} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-secondary/50 group transition-all">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-xl border border-border bg-white group-hover:border-primary/30 group-hover:bg-primary/5 transition-colors">
+                              <item.icon className="h-5 w-5 text-primary" />
+                            </div>
+                            <span className="text-sm font-bold text-foreground leading-tight">
+                              {item.label}
+                            </span>
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Service Offerings Column */}
+                  <div className="space-y-3">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block pb-1 border-b border-border/50">Service Offerings</span>
+                    <div className="space-y-1">
+                      {serviceOfferings.map((item) => (
+                        <DropdownMenuItem key={item.label} asChild className="p-0 focus:bg-transparent">
+                          <Link href={item.href} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-secondary/50 group transition-all">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-xl border border-border bg-white group-hover:border-primary/30 group-hover:bg-primary/5 transition-colors">
+                              <item.icon className="h-5 w-5 text-primary" />
+                            </div>
+                            <span className="text-sm font-bold text-foreground leading-tight">
+                              {item.label}
+                            </span>
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -133,7 +204,7 @@ export function Header() {
           <Link href="/list-business">
             <Button variant="outline" size="sm" className="flex items-center gap-2 text-primary hover:bg-primary hover:text-primary-foreground border-primary/20">
               <HiChatBubbleLeftRight className="h-4 w-4" />
-              Talk to an Expert
+              Book a Call
             </Button>
           </Link>
           {user ? (
@@ -183,17 +254,18 @@ export function Header() {
                 onClick={() => setMobileOpen(false)}
               >
                 <HiSparkles className="h-5 w-5 text-primary" />
-                Explore Vendors
+                Themes
               </Link>
               <div className="ml-4 flex flex-col border-l border-border pl-2">
-                {exploreCategories.slice(0, 6).map((cat) => (
+                {themeLinks.slice(0, 6).map((item) => (
                   <Link
-                    key={cat.label}
-                    href={cat.href}
-                    className="rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    key={item.label}
+                    href={item.href}
+                    className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                     onClick={() => setMobileOpen(false)}
                   >
-                    {cat.label}
+                    <item.icon size={16} />
+                    {item.label}
                   </Link>
                 ))}
               </div>
@@ -206,13 +278,14 @@ export function Header() {
                 Offerings
               </Link>
               <div className="ml-4 flex flex-col border-l border-border pl-2">
-                {offeringLinks.slice(0, 5).map((item) => (
+                {eventTypes.concat(serviceOfferings).slice(0, 7).map((item) => (
                   <Link
                     key={item.label}
                     href={item.href}
-                    className="rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                     onClick={() => setMobileOpen(false)}
                   >
+                    <item.icon size={16} />
                     {item.label}
                   </Link>
                 ))}
@@ -236,7 +309,7 @@ export function Header() {
               <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
                 <Link href="/list-business" onClick={() => setMobileOpen(false)}>
                   <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                    Talk to an Expert
+                    Book a Call
                   </Button>
                 </Link>
                 {user ? (

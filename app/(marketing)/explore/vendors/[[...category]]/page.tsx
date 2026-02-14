@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Search, ChevronRight } from "lucide-react"
 import { Input } from "@/components/ui/input"
@@ -51,7 +51,11 @@ function VendorListingContent({
     ? CATEGORY_SLUG_MAP[categorySlug] ?? "All Categories"
     : "All Categories"
 
-  const [selectedTheme, setSelectedTheme] = useState<EventTheme>("All Themes")
+  const searchParams = useSearchParams()
+  const themeParam = searchParams.get("theme") as EventTheme | null
+  const initialTheme = themeParam && EVENT_THEMES.includes(themeParam) ? themeParam : "All Themes"
+
+  const [selectedTheme, setSelectedTheme] = useState<EventTheme>(initialTheme)
   const [selectedCategory, setSelectedCategory] =
     useState<VendorCategory>(initialCategory)
   const [selectedLocation, setSelectedLocation] = useState("All Locations")

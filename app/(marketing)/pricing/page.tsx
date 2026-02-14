@@ -41,8 +41,8 @@ export default function PricingPage() {
               <div
                 key={tier.name}
                 className={`relative flex flex-col rounded-lg border p-8 transition-shadow hover:shadow-lg ${tier.highlighted
-                    ? "border-primary bg-primary/5 shadow-md ring-2 ring-primary"
-                    : "border-border bg-card"
+                  ? "border-primary bg-primary/5 shadow-md ring-2 ring-primary"
+                  : "border-border bg-card"
                   }`}
               >
                 {tier.highlighted && (
@@ -80,10 +80,10 @@ export default function PricingPage() {
                 <Link href={tier.ctaHref} className="mt-6 block">
                   <Button
                     className={`w-full ${tier.highlighted
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                        : tier.name === "Starter"
-                          ? "bg-foreground text-background hover:bg-foreground/90"
-                          : "border-primary bg-card text-primary hover:bg-primary hover:text-primary-foreground"
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : tier.name === "Starter"
+                        ? "bg-foreground text-background hover:bg-foreground/90"
+                        : "border-primary bg-card text-primary hover:bg-primary hover:text-primary-foreground"
                       }`}
                     variant={
                       tier.highlighted || tier.name === "Starter"
@@ -116,8 +116,8 @@ export default function PricingPage() {
                 {/* Features */}
                 <ul
                   className={`flex flex-1 flex-col gap-4 ${tier.inheritsFrom || tier.name === "Full Service"
-                      ? "mt-4"
-                      : "mt-6"
+                    ? "mt-4"
+                    : "mt-6"
                     }`}
                 >
                   {tier.features.map((feature) => (
@@ -161,7 +161,7 @@ export default function PricingPage() {
               size="lg"
               className="mt-8 bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              Talk to an expert
+              Book a Call
             </Button>
           </Link>
         </section>
