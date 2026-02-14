@@ -54,7 +54,12 @@ export default function VendorPortfolioPage() {
                 {items.map(item => (
                     <div key={item.id} className="group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden hover:shadow-lg transition-all">
                         <div className="aspect-[4/3] relative overflow-hidden">
-                            <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                            <img
+                                src={item.image}
+                                alt={item.title}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png'; }}
+                            />
                             <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5">
                                 {item.type === 'Video' ? <Video size={12} /> : <ImageIcon size={12} />}
                                 {item.type}

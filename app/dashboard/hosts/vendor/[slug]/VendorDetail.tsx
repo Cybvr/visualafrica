@@ -31,13 +31,23 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor, onBack }) => {
           {/* Main Hero & Gallery */}
           <div className="space-y-4">
             <div className="aspect-[16/9] rounded-[3rem] overflow-hidden shadow-2xl shadow-slate-200 border-4 border-white">
-              <img src={vendor.image} alt={vendor.name} className="w-full h-full object-cover" />
+              <img
+                src={vendor.image}
+                alt={vendor.name}
+                className="w-full h-full object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png'; }}
+              />
             </div>
             {vendor.gallery.length > 0 && (
               <div className="grid grid-cols-4 gap-4">
                 {vendor.gallery.map((img, idx) => (
                   <div key={idx} className="aspect-square rounded-2xl overflow-hidden border-2 border-white shadow-sm hover:scale-105 transition-transform cursor-pointer">
-                    <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
+                    <img
+                      src={img.url}
+                      alt={img.alt}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png'; }}
+                    />
                   </div>
                 ))}
               </div>
@@ -100,7 +110,12 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor, onBack }) => {
                 {vendor.portfolio.map(item => (
                   <div key={item.id} className="group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden hover:shadow-lg transition-all">
                     <div className="aspect-[4/3] relative overflow-hidden">
-                      <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png'; }}
+                      />
                       <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 text-xs">
                         {item.type === 'Video' ? <Video size={12} /> : <ImageIcon size={12} />}
                         {item.type}
