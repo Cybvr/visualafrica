@@ -17,7 +17,7 @@ export default function VendorDetailPage() {
             <div className="flex flex-col items-center justify-center h-full space-y-4">
                 <h1 className="text-2xl font-bold">Vendor not found</h1>
                 <button
-                    onClick={() => router.push('/dashboard/explore')}
+                    onClick={() => router.push('/dashboard/vendors')}
                     className="text-orange-600 font-bold"
                 >
                     Back to Explore
@@ -26,5 +26,5 @@ export default function VendorDetailPage() {
         );
     }
 
-    return <VendorDetail vendor={vendor} onBack={() => router.push('/dashboard/explore')} />;
+    return <VendorDetail vendor={vendor} onBack={() => router.push('/dashboard/vendors')} />;
 }

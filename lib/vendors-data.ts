@@ -29,6 +29,7 @@ export type VendorCategory =
   | "Photo Booths"
   | "Venues"
   | "Yachts"
+  | "Experiences"
 
 export const EVENT_THEMES: EventTheme[] = [
   "All Themes",
@@ -61,6 +62,7 @@ export const VENDOR_CATEGORIES: VendorCategory[] = [
   "Photo Booths",
   "Venues",
   "Yachts",
+  "Experiences",
 ]
 
 export const CATEGORY_SLUG_MAP: Record<string, VendorCategory> = {
@@ -80,6 +82,7 @@ export const CATEGORY_SLUG_MAP: Record<string, VendorCategory> = {
   photobooths: "Photo Booths",
   venues: "Venues",
   yachts: "Yachts",
+  experiences: "Experiences",
 }
 
 export interface VendorImage {
@@ -149,7 +152,7 @@ export const vendors: Vendor[] = [
     id: "v2",
     slug: "luxury-catamaran-cruise-proposal",
     name: "Luxury Catamaran | Cruise Proposal",
-    categories: ["Packages", "Yachts"],
+    categories: ["Packages", "Yachts", "Experiences"],
     eventThemes: ["Proposals", "Social Gathering"],
     description: "Maritime experience on Lagos waters.",
     shortDescription: "Maritime experience on Lagos waters.",

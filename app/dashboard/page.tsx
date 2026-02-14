@@ -89,7 +89,7 @@ export default function DashboardPage() {
           <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
             Hottest New Vendors <span className="text-lg">🔥</span>
           </h3>
-          <Link href="/dashboard/search" className="text-sm font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1">
+          <Link href="/dashboard/vendors" className="text-sm font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1">
             Browse All <ArrowRight size={16} />
           </Link>
         </div>
