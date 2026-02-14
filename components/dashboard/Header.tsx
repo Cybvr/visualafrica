@@ -1,8 +1,8 @@
-
 "use client";
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ChevronLeft, Bell, Search, Plus, Menu } from 'lucide-react';
 
 interface HeaderProps {
@@ -10,6 +10,9 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onOpenMenu }) => {
+  const pathname = usePathname();
+  const mode = pathname?.startsWith("/dashboard/vendors") ? "vendor" : "host";
+
   return (
     <div className="h-full flex items-center justify-between px-6">
       <div className="flex items-center gap-4">
@@ -20,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenMenu }) => {
           <Menu size={20} />
         </button>
 
-        <Link href="/dashboard" className="flex items-center gap-3 cursor-pointer group">
+        <Link href={mode === 'host' ? '/dashboard/hosts' : '/dashboard/vendors'} className="flex items-center gap-3 cursor-pointer group">
           <span className="font-black text-lg tracking-tighter text-slate-900">Dashboard</span>
         </Link>
       </div>

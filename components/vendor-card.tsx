@@ -10,12 +10,16 @@ export function VendorCard({ vendor }: { vendor: Vendor }) {
   return (
     <Card className="group overflow-hidden border-border bg-card transition-shadow hover:shadow-lg">
       <div className="relative aspect-[4/3] overflow-hidden">
-        <Image
-          src={vendor.image}
-          alt={vendor.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+        {vendor.image ? (
+          <Image
+            src={vendor.image}
+            alt={vendor.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="h-full w-full bg-muted" />
+        )}
         {vendor.featured && (
           <Badge className="absolute left-3 top-3 bg-accent text-accent-foreground">
             Featured
@@ -66,28 +70,27 @@ export function VendorCard({ vendor }: { vendor: Vendor }) {
           </p>
         )}
 
-        {/* Location */}
         <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
           <MapPin className="h-4 w-4 shrink-0 text-primary" />
           <span className="truncate">{vendor.location}</span>
         </div>
 
-        {/* Vendor info */}
         <div className="mt-3 flex items-center gap-2 border-t border-border pt-3">
           <div className="relative h-7 w-7 overflow-hidden rounded-full bg-muted">
-            <Image
-              src={vendor.vendor.logo}
-              alt={vendor.vendor.name}
-              fill
-              className="object-cover"
-            />
+            {vendor.vendor.logo ? (
+              <Image
+                src={vendor.vendor.logo}
+                alt={vendor.vendor.name}
+                fill
+                className="object-cover"
+              />
+            ) : null}
           </div>
           <span className="text-xs font-medium text-muted-foreground">
             {vendor.vendor.name}
           </span>
         </div>
 
-        {/* Theme tags */}
         <div className="mt-3 flex flex-wrap gap-1.5">
           {vendor.eventThemes.map((theme) => (
             <Badge

@@ -1,3 +1,5 @@
+import { SHARED_EVENTS } from './shared-data';
+
 export interface Event {
     id: string;
     name: string;
@@ -12,48 +14,14 @@ export interface Event {
     metrics?: { label: string; value: string }[];
 }
 
-export const EVENTS: Event[] = [
-    {
-        id: '1',
-        name: 'Mike & Whitney Wedding',
-        date: 'Dec 12, 2025',
-        location: 'Lekki Phase 1, Lagos',
-        guestCount: 250,
-        status: 'Planning',
-        image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
-        budget: 15000000,
-        description: 'A luxurious outdoor wedding with a modern African theme.',
-        publicGallery: [
-            'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800',
-            'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
-            'https://images.unsplash.com/photo-1519225421980-715cb0202128?auto=format&fit=crop&q=80&w=800',
-        ],
-        metrics: [
-            { label: 'Guest Count', value: '250' },
-            { label: 'Theme Match', value: '100%' },
-            { label: 'Vendor Performance', value: '4.8/5' },
-        ]
-    },
-    {
-        id: '2',
-        name: 'John & Alice Anniversary',
-        date: 'Mar 15, 2026',
-        location: 'Victoria Island, Lagos',
-        guestCount: 100,
-        status: 'Confirmed',
-        image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80&w=800',
-        budget: 5000000,
-        description: 'Intimate golden jubilee anniversary celebration.'
-    },
-    {
-        id: '3',
-        name: 'Tech Corp Gala',
-        date: 'Nov 20, 2025',
-        location: 'Eko Hotels & Suites',
-        guestCount: 500,
-        status: 'Planning',
-        image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800',
-        budget: 25000000,
-        description: 'Annual end-of-year gala for Tech Corp employees and partners.'
-    }
-];
+export const EVENTS: Event[] = SHARED_EVENTS.map(event => ({
+    id: event.id,
+    name: event.eventName,
+    date: event.date,
+    location: event.location,
+    guestCount: event.guestCount,
+    status: event.status,
+    image: event.image,
+    budget: event.budget,
+    description: event.description,
+}));
