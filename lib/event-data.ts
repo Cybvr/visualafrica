@@ -13,6 +13,8 @@ export interface EventData {
   theme: string;
   showCommunityInspiration: boolean;
   thumbnail: string;
+  publicGallery?: string[];
+  metrics?: { label: string; value: string }[];
 }
 
 export const eventData: EventData = {
@@ -47,6 +49,16 @@ export const MOCK_EVENTS: EventData[] = [
     theme: 'Tropical Luxury',
     showCommunityInspiration: true,
     thumbnail: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
+    publicGallery: [
+      'https://images.unsplash.com/photo-1519225421980-715cb0202128?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800',
+    ],
+    metrics: [
+      { label: 'Guest Satisfaction', value: '4.9/5' },
+      { label: 'Photos Shared', value: '2.5k+' },
+      { label: 'Vendor Rating', value: '98%' },
+    ],
   },
   {
     id: 'event-125',

@@ -73,12 +73,38 @@ export default function InspirationDetailsPage() {
                         </button>
                     </div>
 
+                    {/* Gallery Grid */}
+                    {event.publicGallery && event.publicGallery.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {event.publicGallery.map((img, i) => (
+                                <div key={i} className="aspect-square rounded-2xl overflow-hidden bg-slate-100 relative group">
+                                    <img src={img} alt={`Gallery ${i}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-slate-100">
-                        <div className="md:col-span-2 space-y-6">
+                        <div className="md:col-span-2 space-y-8">
                             <div>
                                 <h3 className="text-lg font-black text-slate-900 mb-2">About this Inspiration</h3>
-                                <p className="text-slate-600 leading-relaxed">{event.description}</p>
+                                <p className="text-slate-600 leading-relaxed text-lg">{event.description}</p>
                             </div>
+
+                            {/* Success Metrics */}
+                            {event.metrics && event.metrics.length > 0 && (
+                                <div>
+                                    <h3 className="text-lg font-black text-slate-900 mb-4">Success Metrics</h3>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                        {event.metrics.map((metric, i) => (
+                                            <div key={i} className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{metric.label}</p>
+                                                <p className="text-xl font-black text-slate-900">{metric.value}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             <div>
                                 <h3 className="text-lg font-black text-slate-900 mb-4">Vendors Used</h3>
@@ -96,7 +122,7 @@ export default function InspirationDetailsPage() {
                                     <Calendar size={18} className="text-slate-400" />
                                     <span className="font-bold text-slate-900">Duration</span>
                                 </div>
-                                <p className="text-sm text-slate-500 pl-8">2 Days</p>
+                                <p className="text-sm text-slate-500 pl-8">4-6 Hours</p>
                             </div>
                             <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
                                 <div className="flex items-center gap-3 mb-1">
@@ -104,6 +130,13 @@ export default function InspirationDetailsPage() {
                                     <span className="font-bold text-slate-900">Location</span>
                                 </div>
                                 <p className="text-sm text-slate-500 pl-8">{event.location}</p>
+                            </div>
+                            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                                <div className="flex items-center gap-3 mb-1">
+                                    <MapPin size={18} className="text-slate-400" />
+                                    <span className="font-bold text-slate-900">Attendance</span>
+                                </div>
+                                <p className="text-sm text-slate-500 pl-8">{event.guestCount ? event.guestCount.toLocaleString() : 'N/A'}</p>
                             </div>
                         </div>
                     </div>
