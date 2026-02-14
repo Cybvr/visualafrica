@@ -11,12 +11,16 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const [open, setOpen] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     return (
         <div className="flex min-h-screen bg-white text-slate-900">
             {/* Desktop Sidebar */}
-            <aside className="hidden md:block w-64 border-r border-slate-100 shrink-0 h-screen sticky top-0">
-                <Sidebar />
+            <aside
+                className={`hidden md:block border-r border-slate-100 shrink-0 h-screen sticky top-0 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'
+                    }`}
+            >
+                <Sidebar isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
             </aside>
 
             {/* Mobile Sidebar */}
@@ -28,7 +32,7 @@ export default function DashboardLayout({
 
             <div className="flex-1 flex flex-col min-w-0 min-h-screen">
                 <header className="border-b border-slate-100 h-16 shrink-0 bg-white sticky top-0 z-20">
-                    <Header onOpenMenu={() => setOpen(true)} />
+                    <Header onOpenMenu={() => setOpen(true)} isCollapsed={isCollapsed} />
                 </header>
 
                 <main className="flex-1 bg-slate-50/50 p-6 md:p-10">

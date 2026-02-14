@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react';
 import { Plus, Video, Image as ImageIcon, MoreHorizontal, Pencil, Trash2, X } from 'lucide-react';
 import { VENDOR_DASHBOARD_DATA, PortfolioItem } from '@/lib/vendor-dashboard-data';

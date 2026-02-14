@@ -21,6 +21,8 @@ import {
   User,
   Briefcase,
   LucideIcon,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -32,6 +34,8 @@ import {
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, signOut, User as FirebaseUser } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { VENDOR_DASHBOARD_DATA } from "@/lib/vendor-dashboard-data";
+import { EVENTS } from "@/lib/events-data";
 
 type NavItemConfig = {
   icon: LucideIcon;
@@ -41,14 +45,13 @@ type NavItemConfig = {
   matchPaths?: string[];
 };
 
-
 type UserProfile = {
   displayName: string;
   email: string;
   photoURL?: string;
 };
 
-const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
+const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor', isCollapsed?: boolean }> = ({ mode, isCollapsed }) => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,7 +62,6 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
 
       if (currentUser) {
         try {
-          // Try to fetch additional profile data from Firestore
           const userDocRef = doc(db, "users", currentUser.uid);
           const userDoc = await getDoc(userDocRef);
 
@@ -71,7 +73,6 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
               photoURL: data.photoURL || currentUser.photoURL || undefined,
             });
           } else {
-            // Fallback to Firebase Auth data
             setUserProfile({
               displayName: currentUser.displayName || "User",
               email: currentUser.email || "",
@@ -80,7 +81,6 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
           }
         } catch (error) {
           console.error("Error fetching user profile:", error);
-          // Fallback to Firebase Auth data
           setUserProfile({
             displayName: currentUser.displayName || "User",
             email: currentUser.email || "",
@@ -107,12 +107,14 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
   if (loading || !userProfile) {
     return (
       <div className="p-4 border-t border-slate-100">
-        <div className="w-full px-4 py-3 rounded-xl flex items-center gap-3">
+        <div className={`w-full ${isCollapsed ? 'justify-center' : 'px-4 py-3'} rounded-xl flex items-center gap-3`}>
           <div className="w-9 h-9 bg-slate-200 rounded-full animate-pulse flex-shrink-0" />
-          <div className="flex-1 min-w-0">
-            <div className="h-4 bg-slate-200 rounded animate-pulse mb-1" />
-            <div className="h-3 bg-slate-200 rounded animate-pulse w-2/3" />
-          </div>
+          {!isCollapsed && (
+            <div className="flex-1 min-w-0">
+              <div className="h-4 bg-slate-200 rounded animate-pulse mb-1" />
+              <div className="h-3 bg-slate-200 rounded animate-pulse w-2/3" />
+            </div>
+          )}
         </div>
       </div>
     );
@@ -121,9 +123,9 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
   return (
     <div className="p-4 border-t border-slate-100">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className="w-full px-4 py-3 hover:bg-sidebar-accent rounded-xl flex items-center justify-between transition-colors group text-left">
-            <div className="flex items-center gap-3 min-w-0">
+        <DropdownMenuTrigger asChild title={isCollapsed ? userProfile.displayName : undefined}>
+          <button className={`w-full hover:bg-sidebar-accent rounded-xl flex items-center justify-between transition-colors group text-left ${isCollapsed ? 'p-1.5 justify-center' : 'px-4 py-3'}`}>
+            <div className={`flex items-center min-w-0 ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
               {userProfile.photoURL ? (
                 <img
                   src={userProfile.photoURL}
@@ -135,26 +137,30 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
                   {getInitials(userProfile.displayName)}
                 </div>
               )}
-              <div className="text-left min-w-0">
-                <div className="text-sm font-semibold text-sidebar-foreground truncate">
-                  {userProfile.displayName}
+              {!isCollapsed && (
+                <div className="text-left min-w-0 ml-3">
+                  <div className="text-sm font-semibold text-sidebar-foreground truncate">
+                    {userProfile.displayName}
+                  </div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    {mode === 'host' ? 'Host Account' : 'Vendor Account'}
+                  </div>
                 </div>
-                <div className="text-xs text-muted-foreground truncate">
-                  {mode === 'host' ? 'Host Account' : 'Vendor Account'}
-                </div>
-              </div>
+              )}
             </div>
-            <ChevronDown
-              size={16}
-              className="text-slate-400 transition-transform flex-shrink-0 group-data-[state=open]:rotate-180"
-            />
+            {!isCollapsed && (
+              <ChevronDown
+                size={16}
+                className="text-slate-400 transition-transform flex-shrink-0 group-data-[state=open]:rotate-180"
+              />
+            )}
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className="w-[calc(100%-2rem)] mx-4 rounded-xl shadow-lg border-slate-200"
-          side="top"
-          align="end"
-          sideOffset={12}
+          className={`${isCollapsed ? 'w-48 ml-2' : 'w-[calc(100%-2rem)] mx-4'} rounded-xl shadow-lg border-slate-200`}
+          side={isCollapsed ? "right" : "top"}
+          align={isCollapsed ? "end" : "end"}
+          sideOffset={isCollapsed ? 12 : 12}
         >
           <Link href={mode === 'host' ? '/dashboard/vendors' : '/dashboard/hosts'}>
             <DropdownMenuItem className="py-2.5 cursor-pointer flex items-center gap-2 text-primary font-bold">
@@ -198,22 +204,24 @@ const NavItem: React.FC<{
   href: string;
   count?: number;
   onNavigate?: () => void;
-}> = ({ icon, label, active, href, count, onNavigate }) => (
+  isCollapsed?: boolean;
+}> = ({ icon, label, active, href, count, onNavigate, isCollapsed }) => (
   <Link
     href={href}
     onClick={onNavigate}
-    className={`flex items-center justify-between px-4 py-2.5 text-sm transition-all rounded-xl group ${active
+    title={isCollapsed ? label : undefined}
+    className={`flex items-center transition-all rounded-xl group ${isCollapsed ? "justify-center p-2.5 mx-2" : "justify-between px-4 py-2.5"} ${active
       ? "text-primary bg-primary/10 font-black shadow-sm"
       : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
       }`}
   >
-    <div className="flex items-center gap-3">
+    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"}`}>
       <span className={active ? "text-primary" : "text-slate-400 group-hover:text-sidebar-foreground"}>
         {icon}
       </span>
-      <span>{label}</span>
+      {!isCollapsed && <span className="text-sm">{label}</span>}
     </div>
-    {count !== undefined && (
+    {!isCollapsed && count !== undefined && (
       <span
         className={`text-[10px] font-black px-2 py-0.5 rounded-full ${active ? "bg-primary text-primary-foreground" : "bg-sidebar-accent text-muted-foreground"
           }`}
@@ -224,18 +232,19 @@ const NavItem: React.FC<{
   </Link>
 );
 
-import { VENDOR_DASHBOARD_DATA } from "@/lib/vendor-dashboard-data";
-import { EVENTS } from "@/lib/events-data";
+interface SidebarProps {
+  onNavigate?: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+}
 
-const Sidebar: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onNavigate, isCollapsed, onToggleCollapse }) => {
   const pathname = usePathname();
   const mode = pathname?.startsWith("/dashboard/vendors") ? "vendor" : "host";
 
-  // Dynamic counts for Host
-  const hostInboxCount = 3; // Mock for now
+  const hostInboxCount = 3;
   const hostEventsCount = EVENTS.length;
 
-  // Dynamic counts for Vendor
   const vendorOffersCount = VENDOR_DASHBOARD_DATA.leads.length;
   const vendorInboxCount = VENDOR_DASHBOARD_DATA.chats.filter(c => c.unread).length;
   const vendorEventsCount = VENDOR_DASHBOARD_DATA.bookings.length;
@@ -280,19 +289,39 @@ const Sidebar: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-sidebar border-r border-sidebar-border">
-      <div className="px-4 mt-4 mb-3">
-        <Link
-          href={mode === "host" ? "/dashboard/hosts/events/new" : "/dashboard/vendors/portfolio/new"}
-          onClick={onNavigate}
-          className="w-full px-4 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl flex items-center justify-center gap-2 transition-colors"
-        >
-          <Plus size={18} />
-          {mode === "host" ? "Create an event" : "Add portfolio item"}
+    <div className="flex flex-col h-full bg-sidebar transition-all duration-300">
+      {/* Sidebar Header with Logo */}
+      <div className={`px-4 mt-6 mb-8 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+        <Link href="/" className="flex items-center gap-2 overflow-hidden">
+          <img src="/logo.png" alt="Logo" className="h-8 w-auto min-w-[32px] object-contain shrink-0" />
+          {!isCollapsed && (
+            <span className="font-serif text-xl font-bold text-foreground truncate">
+              Waddi
+            </span>
+          )}
         </Link>
+        {!isCollapsed && onToggleCollapse && (
+          <button
+            onClick={onToggleCollapse}
+            className="p-1.5 hover:bg-sidebar-accent rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            <PanelLeftClose size={18} />
+          </button>
+        )}
       </div>
 
-      <div className="flex-1 px-4 overflow-y-auto scrollbar-hide pb-1">
+      {isCollapsed && onToggleCollapse && (
+        <div className="px-4 mb-4 flex justify-center">
+          <button
+            onClick={onToggleCollapse}
+            className="p-1.5 hover:bg-sidebar-accent rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            <PanelLeftOpen size={18} />
+          </button>
+        </div>
+      )}
+
+      <div className="flex-1 px-4 overflow-y-auto scrollbar-hide pb-4">
         <SidebarSection divider>
           {primaryNavItems.map((item) => (
             <NavItem
@@ -303,6 +332,7 @@ const Sidebar: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) => {
               href={item.href}
               count={item.count}
               onNavigate={onNavigate}
+              isCollapsed={isCollapsed}
             />
           ))}
         </SidebarSection>
@@ -317,12 +347,13 @@ const Sidebar: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) => {
               href={item.href}
               count={item.count}
               onNavigate={onNavigate}
+              isCollapsed={isCollapsed}
             />
           ))}
         </SidebarSection>
       </div>
 
-      <ProfileDropdown mode={mode} />
+      <ProfileDropdown mode={mode} isCollapsed={isCollapsed} />
     </div>
   );
 };

@@ -7,9 +7,10 @@ import { ChevronLeft, Bell, Search, Plus, Menu } from 'lucide-react';
 
 interface HeaderProps {
   onOpenMenu?: () => void;
+  isCollapsed?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ onOpenMenu }) => {
+const Header: React.FC<HeaderProps> = ({ onOpenMenu, isCollapsed }) => {
   const pathname = usePathname();
   const mode = pathname?.startsWith("/dashboard/vendors") ? "vendor" : "host";
 
@@ -23,8 +24,9 @@ const Header: React.FC<HeaderProps> = ({ onOpenMenu }) => {
           <Menu size={20} />
         </button>
 
-        <Link href={mode === 'host' ? '/dashboard/hosts' : '/dashboard/vendors'} className="flex items-center gap-3 cursor-pointer group">
-          <span className="font-black text-lg tracking-tighter text-slate-900">Dashboard</span>
+        <Link href={mode === 'host' ? '/dashboard/hosts' : '/dashboard/vendors'} className="flex items-center gap-2 cursor-pointer group">
+          <img src="/logo.png" alt="Waddi" className="h-7 w-auto object-contain" />
+          <span className="font-serif text-lg font-bold text-slate-900 tracking-tight">Waddi</span>
         </Link>
       </div>
 
