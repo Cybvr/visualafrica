@@ -83,6 +83,10 @@ const derivedBookings: Booking[] = SHARED_EVENTS.flatMap(event =>
         }))
 );
 
+export function getCurrentVendor(): Vendor | undefined {
+    return vendors.find(v => v.id === CURRENT_VENDOR_ID);
+}
+
 // Global Vendor Dashboard Data
 export const VENDOR_DASHBOARD_DATA = {
     currentVendorId: CURRENT_VENDOR_ID,
@@ -120,7 +124,3 @@ export const VENDOR_DASHBOARD_DATA = {
         avgRating: 4.9
     }
 };
-
-export function getCurrentVendor(): Vendor | undefined {
-    return vendors.find(v => v.id === VENDOR_DASHBOARD_DATA.currentVendorId);
-}
