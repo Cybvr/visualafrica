@@ -6,7 +6,7 @@ import { MapPin, Calendar, Users, Briefcase, Search, Filter, SlidersHorizontal }
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 import { SHARED_EVENTS } from '@/lib/shared-data';
 import { Button } from '@/components/ui/button';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
 
 export default function VendorJobsPage() {
     const { bookings } = VENDOR_DASHBOARD_DATA;

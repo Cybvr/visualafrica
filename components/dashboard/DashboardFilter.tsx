@@ -20,35 +20,35 @@ export const DashboardFilter = ({
     onFilterClick
 }: DashboardFilterProps) => {
     return (
-        <div className="flex flex-col md:flex-row gap-3 items-center">
-            <div className="relative flex-1 w-full">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+        <div className="flex items-center gap-2 w-full max-w-2xl">
+            <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" size={16} />
                 <Input
                     placeholder={placeholder}
                     onChange={(e) => onSearchChange?.(e.target.value)}
-                    className="w-full pl-11 pr-4 h-11 bg-card border-border rounded-xl text-sm font-medium focus:ring-primary/20 transition-all"
+                    className="w-full pl-9 pr-4 h-10 bg-transparent border-slate-200 rounded-lg text-sm font-medium focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/40"
                 />
             </div>
-            <div className="flex items-center gap-2 w-full md:w-auto">
+            <div className="flex items-center gap-1.5 shrink-0">
                 <button
                     onClick={onStatusClick}
-                    className="flex items-center gap-2 h-11 px-4 bg-card border border-border rounded-xl text-xs font-bold hover:bg-slate-50 transition-all text-muted-foreground hover:text-foreground"
+                    className="flex items-center gap-1.5 h-10 px-3 border border-slate-200 rounded-lg text-xs font-bold text-muted-foreground hover:bg-slate-50 hover:text-foreground transition-all"
                 >
-                    <Filter size={14} className="text-primary" />
+                    <Filter size={12} />
                     Status
                 </button>
                 <button
                     onClick={onDateClick}
-                    className="flex items-center gap-2 h-11 px-4 bg-card border border-border rounded-xl text-xs font-bold hover:bg-slate-50 transition-all text-muted-foreground hover:text-foreground"
+                    className="flex items-center gap-1.5 h-10 px-3 border border-slate-200 rounded-lg text-xs font-bold text-muted-foreground hover:bg-slate-50 hover:text-foreground transition-all"
                 >
-                    <Calendar size={14} className="text-primary" />
+                    <Calendar size={12} />
                     Date
                 </button>
                 <button
                     onClick={onFilterClick}
-                    className="flex items-center justify-center w-11 h-11 bg-primary text-white rounded-xl hover:bg-primary/90 transition-all shadow-md shadow-primary/10"
+                    className="flex items-center justify-center w-10 h-10 bg-slate-900 text-white rounded-lg hover:bg-black transition-all shadow-sm"
                 >
-                    <SlidersHorizontal size={16} />
+                    <SlidersHorizontal size={14} />
                 </button>
             </div>
         </div>

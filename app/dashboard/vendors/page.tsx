@@ -7,8 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
-import { SHARED_EVENTS } from '@/lib/shared-data';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
 import Image from 'next/image';
 import { MapPin, Calendar, Users, Briefcase, Star, Clock } from 'lucide-react';
 
