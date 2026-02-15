@@ -83,12 +83,6 @@ export default function VendorJobDetailsPage() {
                         Overview
                     </TabsTrigger>
                     <TabsTrigger
-                        value="details"
-                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-3 font-bold text-muted-foreground data-[state=active]:text-foreground"
-                    >
-                        Event Details
-                    </TabsTrigger>
-                    <TabsTrigger
                         value="contract"
                         className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-3 font-bold text-muted-foreground data-[state=active]:text-foreground"
                     >
@@ -138,6 +132,12 @@ export default function VendorJobDetailsPage() {
                             <div className="absolute top-0 right-0 w-96 h-96 bg-primary opacity-10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
                         </div>
 
+                        {/* Event Description */}
+                        <div className="bg-card p-10 rounded-[3rem] border border-border shadow-sm">
+                            <h3 className="text-xl font-black text-foreground mb-4 font-serif">Event Description</h3>
+                            <p className="text-muted-foreground leading-relaxed text-lg">{event.description}</p>
+                        </div>
+
                         {/* Status Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div className="bg-card p-6 rounded-[2rem] border border-border shadow-sm flex flex-col items-center text-center group">
@@ -181,54 +181,6 @@ export default function VendorJobDetailsPage() {
                         </div>
                     </TabsContent>
 
-                    {/* DETAILS TAB */}
-                    <TabsContent value="details" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="bg-card p-10 rounded-[3rem] border border-border shadow-sm">
-                            <h3 className="text-2xl font-black text-foreground mb-4">Event Description</h3>
-                            <p className="text-muted-foreground leading-relaxed text-lg">{event.description}</p>
-
-                            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-10">
-                                <div className="space-y-6">
-                                    <h4 className="text-lg font-black text-foreground uppercase tracking-widest text-sm border-b pb-2">Location & Schedule</h4>
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-3">
-                                            <MapPin className="text-primary" size={20} />
-                                            <div>
-                                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Venue</p>
-                                                <p className="font-bold">{event.location}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <Calendar className="text-primary" size={20} />
-                                            <div>
-                                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Date</p>
-                                                <p className="font-bold">{event.date}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="space-y-6">
-                                    <h4 className="text-lg font-black text-foreground uppercase tracking-widest text-sm border-b pb-2">Logistics</h4>
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-3">
-                                            <Users className="text-primary" size={20} />
-                                            <div>
-                                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Expected Attendance</p>
-                                                <p className="font-bold">{event.guestCount} Guests</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <Target className="text-primary" size={20} />
-                                            <div>
-                                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Event Type</p>
-                                                <p className="font-bold">Premium Experience</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </TabsContent>
 
                     {/* CONTRACT TAB */}
                     <TabsContent value="contract" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
