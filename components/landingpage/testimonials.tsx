@@ -52,11 +52,7 @@ export function Testimonials() {
                     ))}
                 </div>
 
-                <div className="mt-24 pt-24 border-t border-border text-center">
-                    <h4 className="font-serif text-3xl font-bold mb-6">Protecting your data & privacy</h4>
-                    <p className="text-muted-foreground mb-8">Visual Africa has the highest security and privacy standards in the industry.</p>
-                    <Button variant="link" className="text-primary font-bold">Learn more →</Button>
-                </div>
+
             </div>
         </section>
     )

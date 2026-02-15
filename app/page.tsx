@@ -19,9 +19,9 @@ export default function HomePage() {
         <HottestVendors />
         <HandpickedExperiences />
         <FeaturesGrid />
-        <Testimonials />
         <TrustSection />
         <EventInsights />
+        <Testimonials />
 
         {/* Final CTA Section */}
         <section className="py-24 bg-primary text-primary-foreground text-center">

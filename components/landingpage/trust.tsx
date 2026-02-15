@@ -2,15 +2,14 @@
 
 import { Button } from "@/components/ui/button"
 import { Shield, CheckCircle, Users, LucideIcon } from "lucide-react"
-import Image from "next/image"
 
-interface TrustFeature {
+interface Feature {
     icon: LucideIcon
     title: string
     description: string
 }
 
-const trustFeatures: TrustFeature[] = [
+const features: Feature[] = [
     {
         icon: Shield,
         title: "Vetted vendors only",
@@ -18,28 +17,27 @@ const trustFeatures: TrustFeature[] = [
     },
     {
         icon: CheckCircle,
-        title: "Payment protection",
-        description: "Your payment is held securely until your event is successfully completed."
+        title: "Everything in one place",
+        description: "Coordinate with all your vendors, manage timelines, and track progress from a single dashboard."
     },
     {
         icon: Users,
         title: "Dedicated support",
-        description: "Our team coordinates with vendors in Nigeria so you can plan from anywhere with confidence."
+        description: "Our team helps coordinate with vendors in Nigeria so you can plan from anywhere."
     }
 ]
 
 export function TrustSection() {
     return (
         <section className="py-20 px-4 lg:px-8 bg-white">
-            <div className="mx-auto max-w-7xl">
+            <div className="mx-auto max-w-4xl">
                 <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
                     {/* Image Side */}
                     <div className="relative aspect-[4/5] overflow-hidden rounded-3xl">
-                        <Image
-                            src="/images/planning-event.jpg"
-                            alt="Planning event from abroad"
-                            fill
-                            className="object-cover"
+                        <img
+                            src="https://images.pexels.com/photos/30952836/pexels-photo-30952836.jpeg"
+                            alt="Professional chef vendor"
+                            className="absolute inset-0 w-full h-full object-cover"
                         />
                         <div className="absolute bottom-8 left-8 bg-white rounded-full px-6 py-4 shadow-lg flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
@@ -52,7 +50,7 @@ export function TrustSection() {
                     {/* Content Side */}
                     <div>
                         <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">
-                            TRUSTED AT EVERY STEP
+                            PLAN WITHOUT THE STRESS
                         </h2>
                         <p className="text-lg text-gray-600 mb-12">
                             Hundreds of events planned across Nigeria by people living abroad.
@@ -60,7 +58,7 @@ export function TrustSection() {
                         </p>
 
                         <div className="space-y-8">
-                            {trustFeatures.map((feature) => {
+                            {features.map((feature) => {
                                 const Icon = feature.icon
                                 return (
                                     <div key={feature.title} className="flex gap-4">
