@@ -17,7 +17,7 @@ export interface PricingTier {
 
 export const pricingTiers: PricingTier[] = [
   {
-    name: "Starter",
+    name: "Free",
     tagline: "For teams doing 1-2 events per year.",
     price: "Free",
     priceNote: null,
@@ -74,14 +74,14 @@ export const pricingTiers: PricingTier[] = [
     ],
   },
   {
-    name: "Enterprise",
+    name: "Pro",
     tagline: "For teams doing 3+ events per year.",
     price: "NGN 150,000",
     priceNote: "per month / Annual subscription",
     cta: "Book a Call",
     ctaHref: "/contact",
     highlighted: true,
-    inheritsFrom: "Starter",
+    inheritsFrom: "Free",
     features: [
       {
         title: "Dedicated CSM",
@@ -111,49 +111,39 @@ export const pricingTiers: PricingTier[] = [
     ],
   },
   {
-    name: "Full Service",
-    tagline: "We plan and run your event end-to-end.",
-    price: "NGN 20,000",
-    priceNote: "per person / As low as",
+    name: "Enterprise",
+    tagline: "For teams with compliance & integration needs.",
+    price: "Custom",
+    priceNote: null,
     cta: "Book a Call",
     ctaHref: "/contact",
     highlighted: false,
-    inheritsFrom: "Enterprise",
+    inheritsFrom: "Pro",
     features: [
       {
-        title: "Rate Negotiations",
+        title: "Custom Contract Workflows",
         description:
-          "Our dedicated sourcing team negotiates the best rates with venues and vendors on your behalf.",
+          "Seamlessly set up approval workflows that ensure everyone is adhering to company policies.",
       },
       {
-        title: "Timeline & deadline tracking",
+        title: "SSO Integration",
         description:
-          "Keep every milestone, cutoff, and deliverable on track with built-in timeline and deadline management.",
+          "Streamline your team's access and security with SSO integration, enabling seamless single sign-on for your entire organization.",
       },
       {
-        title: "Itinerary crafting",
+        title: "Implementation Support",
         description:
-          "We design detailed itineraries that organize every activity, meeting, and experience in one place.",
+          "Our dedicated team provides hands-on implementation support to ensure a smooth setup and help your organization get the most out of the platform from day one.",
       },
       {
-        title: "Budget management",
+        title: "Custom Integrations",
         description:
-          "Track spend in real time, manage approvals, and stay on budget across every event.",
+          "We build tailored integrations with your existing tools so Visual Africa fits seamlessly into your workflow.",
       },
       {
-        title: "Venue & vendor management",
+        title: "Multi-Entry Billing",
         description:
-          "Manage venue contracts, room blocks, and all vendors from a single dashboard.",
-      },
-      {
-        title: "Transportation needs",
-        description:
-          "Coordinate shuttles, flights, and on-site transportation to move your group smoothly.",
-      },
-      {
-        title: "Swag distribution",
-        description:
-          "Collect sizes, manage shipping, and distribute swag to attendees before, during, or after your event.",
+          "Split charges across cost centers, cards, or departments with flexible multi-source billing.",
       },
     ],
   },

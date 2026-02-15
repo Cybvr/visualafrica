@@ -36,7 +36,7 @@ export default function PricingPage() {
 
         {/* Pricing Cards */}
         <section className="mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-24">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {pricingTiers.map((tier) => (
               <div
                 key={tier.name}
@@ -81,12 +81,12 @@ export default function PricingPage() {
                   <Button
                     className={`w-full ${tier.highlighted
                       ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : tier.name === "Starter"
+                      : tier.name === "Free"
                         ? "bg-foreground text-background hover:bg-foreground/90"
                         : "border-primary bg-card text-primary hover:bg-primary hover:text-primary-foreground"
                       }`}
                     variant={
-                      tier.highlighted || tier.name === "Starter"
+                      tier.highlighted || tier.name === "Free"
                         ? "default"
                         : "outline"
                     }
@@ -106,16 +106,16 @@ export default function PricingPage() {
                   </p>
                 )}
 
-                {/* Subtitle for Full Service */}
-                {tier.name === "Full Service" && (
+                {/* Subtitle for Enterprise */}
+                {tier.name === "Enterprise" && (
                   <p className="mt-6 border-b border-border pb-4 text-sm font-medium text-muted-foreground">
-                    A dedicated event planner and sourcing team who handle:
+                    Tailored for organizations with complex requirements:
                   </p>
                 )}
 
                 {/* Features */}
                 <ul
-                  className={`flex flex-1 flex-col gap-4 ${tier.inheritsFrom || tier.name === "Full Service"
+                  className={`flex flex-1 flex-col gap-4 ${tier.inheritsFrom || tier.name === "Enterprise"
                     ? "mt-4"
                     : "mt-6"
                     }`}
@@ -184,15 +184,15 @@ export default function PricingPage() {
                 },
                 {
                   q: "What payment methods do you accept?",
-                  a: "We accept all major credit cards, bank transfers, and can issue invoices for Enterprise and Full Service plans.",
+                  a: "We accept all major credit cards, bank transfers, and can issue invoices for Enterprise plans.",
                 },
                 {
                   q: "Do you offer discounts for non-profits?",
                   a: "Yes, we offer special pricing for registered non-profit organizations. Contact our team to learn more.",
                 },
                 {
-                  q: "How does the per-person pricing work for Full Service?",
-                  a: "Full Service pricing is based on the number of expected attendees. The per-person rate decreases as event size increases. Contact us for a custom quote.",
+                  q: "How does the per-person pricing work for custom plans?",
+                  a: "For large enterprise events, we offer flexible pricing models including per-person or per-event rates. Contact us for a custom quote.",
                 },
               ].map((item, i) => (
                 <div
