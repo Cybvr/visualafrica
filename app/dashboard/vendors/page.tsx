@@ -7,6 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
+import { SHARED_EVENTS } from '@/lib/shared-data';
 import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
 import Image from 'next/image';
 import { MapPin, Calendar, Users, Briefcase, Star, Clock } from 'lucide-react';
@@ -69,26 +70,37 @@ export default function VendorDashboardPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-12 pb-20">
       <div className="space-y-8">
-        <DashboardHeader
-          title="Search"
-          description="Find and discover upcoming events that need your services."
-          searchPlaceholder="Search for event themes, locations, or hosts..."
-          onSearchChange={setSearchQuery}
-          tabs={[
-            {
-              id: 'all',
-              label: 'All Opportunities',
-              active: activeTab === 'all',
-              onClick: () => setActiveTab('all')
-            },
-            {
-              id: 'saved',
-              label: 'Saved Events',
-              active: activeTab === 'saved',
-              onClick: () => setActiveTab('saved')
-            }
-          ]}
-        />
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+          <div>
+            <h2 className="text-4xl font-black tracking-tight text-foreground">Search</h2>
+            <p className="text-muted-foreground mt-1 font-medium italic">Discover upcoming events and opportunities.</p>
+          </div>
+          <DashboardFilter
+            placeholder="Search for event themes, locations, or hosts..."
+            onSearchChange={setSearchQuery}
+          />
+        </div>
+
+        <div className="flex items-center gap-3 border-b border-border mb-8">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`px-8 py-4 text-sm font-black transition-all border-b-2 -mb-[2px] ${activeTab === 'all'
+              ? 'border-primary text-foreground'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+          >
+            All Opportunities
+          </button>
+          <button
+            onClick={() => setActiveTab('saved')}
+            className={`px-8 py-4 text-sm font-black transition-all border-b-2 -mb-[2px] ${activeTab === 'saved'
+              ? 'border-primary text-foreground'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+          >
+            Saved Events
+          </button>
+        </div>
 
         {activeTab === 'all' && (
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
