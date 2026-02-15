@@ -25,7 +25,7 @@ export default function HomePage() {
         <section className="py-24 bg-primary text-primary-foreground text-center">
           <div className="container mx-auto px-4">
             <h2 className="font-serif text-4xl md:text-6xl font-bold mb-8">
-              Get started in <br /> 2 minutes or less
+              Ready to plan your <br /> next event?
             </h2>
             <Button asChild size="lg" variant="secondary" className="h-14 px-10 text-lg bg-white text-primary hover:bg-gray-100">
               <Link href="/auth/login">Get started</Link>

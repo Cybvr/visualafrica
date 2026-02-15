@@ -8,16 +8,22 @@ import { BLOG_POSTS } from "@/lib/blog-data"
 export function FeaturesGrid() {
     const features = [
         {
-            title: "Itinerary Builder",
-            description: "Build your itinerary in minutes, not days, with Visual Africa's AI-powered Itinerary Builder.",
+            title: "Customizable Tasklists",
+            description: "Stay organized with event-level task templates. Track every deadline and milestone in one place.",
             icon: Calendar,
-            cta: "Get started"
+            cta: "Try tasklists"
         },
         {
-            title: "Easy Guest Management",
-            description: "Easily manage event attendees with attendee management tools.",
+            title: "Guest & RSVP Management",
+            description: "Create custom guest websites and manage RSVPs with personalized preferences automatically.",
             icon: Users,
-            cta: "Get started"
+            cta: "Explore guest tools"
+        },
+        {
+            title: "AI Itinerary Builder",
+            description: "Build a minute-by-minute itinerary in seconds with our AI-powered planning assistant.",
+            icon: Calendar,
+            cta: "Generate itinerary"
         }
     ]
 
@@ -38,10 +44,10 @@ export function FeaturesGrid() {
                             High touch and high tech
                         </h2>
                         <h3 className="font-serif text-4xl md:text-5xl font-bold">
-                            Service unlike <br /> anywhere else
+                            Plan it all <br /> in one place
                         </h3>
                         <p className="mt-6 text-lg text-white/90">
-                            Take the hassle out of event planning with our team of expert event planners.
+                            From venue sourcing to contract management, we give you the tools and expert support to run flawless events.
                         </p>
                         <Button asChild className="mt-8 bg-primary hover:bg-primary/90" size="lg">
                             <Link href="/auth/login">Get started</Link>

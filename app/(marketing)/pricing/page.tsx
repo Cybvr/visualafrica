@@ -8,7 +8,7 @@ import { pricingTiers } from "@/lib/pricing-data"
 export const metadata = {
   title: "Pricing | Visual Africa",
   description:
-    "Choose the right plan for your event planning needs. From free self-service to full-service expert planning.",
+    "Choose the right plan for your event planning needs. Flexible pricing for teams of all sizes.",
 }
 
 export default function PricingPage() {
@@ -192,7 +192,7 @@ export default function PricingPage() {
                 },
                 {
                   q: "How does the per-person pricing work for custom plans?",
-                  a: "For large enterprise events, we offer flexible pricing models including per-person or per-event rates. Contact us for a custom quote.",
+                  a: "For large enterprise events, we offer flexible pricing models. Pricing depends on event complexity and requirements. Contact us for a custom quote.",
                 },
               ].map((item, i) => (
                 <div

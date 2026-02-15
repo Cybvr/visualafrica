@@ -76,8 +76,8 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Pro",
     tagline: "For teams doing 3+ events per year.",
-    price: "NGN 150,000",
-    priceNote: "per month / Annual subscription",
+    price: "$100",
+    priceNote: "per month / Billed annually",
     cta: "Book a Call",
     ctaHref: "/contact",
     highlighted: true,

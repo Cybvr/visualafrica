@@ -22,12 +22,12 @@ export function Hero() {
             {/* Content */}
             <div className="relative z-10 mx-auto max-w-4xl">
                 <h1 className="mb-6 font-serif text-5xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl">
-                    Africa's Events <br />
-                    <span className="text-primary italic">made easy.</span>
+                    The easiest way <br />
+                    <span className="text-primary italic">to plan your event.</span>
                 </h1>
                 <p className="mx-auto mb-10 max-w-2xl text-lg text-white/90 md:text-xl">
-                    Expert planners, unbeatable prices, and <br className="hidden md:block" />
-                    AI-powered event software for extraordinary results.
+                    From tasklists to vendor bookings, manage every detail of <br className="hidden md:block" />
+                    your event in one AI-powered platform.
                 </p>
                 <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                     <Button asChild size="lg" className="h-14 px-10 text-lg bg-primary hover:bg-primary/90">
