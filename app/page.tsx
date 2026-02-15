@@ -1,11 +1,12 @@
 import { Header } from "@/app/(marketing)/common/header"
 import { Footer } from "@/app/(marketing)/common/footer"
-import { Hero } from "@/components/hero"
-import { FeaturesGrid } from "@/components/features-grid"
+import { Hero } from "@/components/landingpage/hero"
+import { FeaturesGrid } from "@/components/landingpage/features-grid"
 import { HandpickedExperiences } from "@/components/handpicked-experiences"
-import { HottestVendors } from "@/components/hottest-vendors"
-import { EventInsights } from "@/components/event-insights"
-import { Testimonials } from "@/components/testimonials"
+import { HottestVendors } from "@/components/landingpage/hottest-vendors"
+import { EventInsights } from "@/components/landingpage/event-insights"
+import { Testimonials } from "@/components/landingpage/testimonials"
+import { TrustSection } from "@/components/landingpage/trust"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
@@ -18,8 +19,9 @@ export default function HomePage() {
         <HottestVendors />
         <HandpickedExperiences />
         <FeaturesGrid />
-        <EventInsights />
         <Testimonials />
+        <TrustSection />
+        <EventInsights />
 
         {/* Final CTA Section */}
         <section className="py-24 bg-primary text-primary-foreground text-center">

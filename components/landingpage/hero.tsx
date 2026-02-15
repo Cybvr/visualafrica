@@ -21,13 +21,11 @@ export function Hero() {
 
             {/* Content */}
             <div className="relative z-10 mx-auto max-w-4xl">
-                <h1 className="mb-6 font-serif text-5xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl">
-                    Plan your Nigeria event <br />
-                    <span className="text-primary italic">from anywhere.</span>
+                <h1 className="mb-6 font-serif text-4xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl">
+                    Plan your Nigeria event from abroad.
                 </h1>
                 <p className="mx-auto mb-10 max-w-2xl text-lg text-white/90 md:text-xl">
-                    Trusted local experts and secure escrow payments <br className="hidden md:block" />
-                    for the Nigerian diaspora.
+                    Find trusted vendors, coordinate everything, and book in one place.
                 </p>
                 <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                     <Button asChild size="lg" className="h-14 px-10 text-lg bg-primary hover:bg-primary/90">
