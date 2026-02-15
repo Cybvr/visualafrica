@@ -179,8 +179,8 @@ export default function PricingPage() {
                   a: "Yes, you can upgrade or downgrade your plan at any time. Changes take effect at the start of your next billing cycle.",
                 },
                 {
-                  q: "Is there a free trial for Pro?",
-                  a: "We offer a 14-day free trial of Pro features. No credit card required to start.",
+                  q: "Is there a free trial for Enterprise?",
+                  a: "We offer a 14-day free trial of Enterprise features. No credit card required to start.",
                 },
                 {
                   q: "What payment methods do you accept?",

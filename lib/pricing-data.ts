@@ -74,7 +74,7 @@ export const pricingTiers: PricingTier[] = [
     ],
   },
   {
-    name: "Pro",
+    name: "Enterprise",
     tagline: "For teams doing 3+ events per year.",
     price: "NGN 150,000",
     priceNote: "per month / Annual subscription",
@@ -111,43 +111,6 @@ export const pricingTiers: PricingTier[] = [
     ],
   },
   {
-    name: "Enterprise",
-    tagline: "For teams with compliance & integration needs.",
-    price: "Custom",
-    priceNote: null,
-    cta: "Book a Call",
-    ctaHref: "/contact",
-    highlighted: false,
-    inheritsFrom: "Pro",
-    features: [
-      {
-        title: "Custom Contract Workflows",
-        description:
-          "Seamlessly set up approval workflows that ensure everyone is adhering to company policies.",
-      },
-      {
-        title: "SSO Integration",
-        description:
-          "Streamline your team's access and security with SSO integration, enabling seamless single sign-on for your entire organization.",
-      },
-      {
-        title: "Implementation Support",
-        description:
-          "Our dedicated team provides hands-on implementation support to ensure a smooth setup and help your organization get the most out of the platform from day one.",
-      },
-      {
-        title: "Custom Integrations",
-        description:
-          "We build tailored integrations with your existing tools so Visual Africa fits seamlessly into your workflow.",
-      },
-      {
-        title: "Multi-Entry Billing",
-        description:
-          "Split charges across cost centers, cards, or departments with flexible multi-source billing.",
-      },
-    ],
-  },
-  {
     name: "Full Service",
     tagline: "We plan and run your event end-to-end.",
     price: "NGN 20,000",
@@ -155,7 +118,7 @@ export const pricingTiers: PricingTier[] = [
     cta: "Book a Call",
     ctaHref: "/contact",
     highlighted: false,
-    inheritsFrom: "Pro",
+    inheritsFrom: "Enterprise",
     features: [
       {
         title: "Rate Negotiations",
