@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Search, FileText, TrendingUp, Star, ArrowRight, Filter } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
@@ -9,7 +8,6 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 import { SHARED_EVENTS } from '@/lib/shared-data';
-import EventCard from '@/components/dashboard/EventCard';
 import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
 import Image from 'next/image';
 import { MapPin, Calendar, Users, Briefcase, Star, Clock } from 'lucide-react';
@@ -72,41 +70,35 @@ export default function VendorDashboardPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-12 pb-20">
       <div className="space-y-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-center border-b border-border w-full md:w-auto">
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-4xl font-black tracking-tight text-foreground">Search</h2>
+            <p className="text-muted-foreground mt-1 text-lg font-medium">Find and discover upcoming events that need your services.</p>
+          </div>
+
+          <DashboardFilter
+            placeholder="Search for event themes, locations, or hosts..."
+            onSearchChange={setSearchQuery}
+          />
+
+          <div className="flex items-center gap-3 border-b border-border">
             <button
               onClick={() => setActiveTab('all')}
               className={`px-8 py-4 text-sm font-black transition-all border-b-2 ${activeTab === 'all'
-                ? 'border-primary text-accent'
-                : 'border-transparent text-muted-foreground hover:text-muted-foreground'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
             >
-              All Events
+              All Opportunities
             </button>
             <button
               onClick={() => setActiveTab('saved')}
               className={`px-8 py-4 text-sm font-black transition-all border-b-2 ${activeTab === 'saved'
-                ? 'border-primary text-accent'
-                : 'border-transparent text-muted-foreground hover:text-muted-foreground'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
             >
-              Saved
-            </button>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1 md:flex-none">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search events..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-4 py-2.5 bg-card border border-border rounded-full text-sm w-full md:w-64"
-              />
-            </div>
-            <button className="p-2.5 bg-card border border-border rounded-full text-muted-foreground hover:text-accent transition-colors">
-              <Filter size={20} />
+              Saved Events
             </button>
           </div>
         </div>

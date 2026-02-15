@@ -5,6 +5,7 @@ import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Calendar, Users, Briefcase, MessageSquare, MoreVertical, Archive, CheckCircle2 } from 'lucide-react';
+import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 
 export default function VendorOffersPage() {
     const { leads } = VENDOR_DASHBOARD_DATA;
@@ -17,7 +18,7 @@ export default function VendorOffersPage() {
     const displayOffers = activeTab === 'active' ? activeOffers : archivedOffers;
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="max-w-6xl mx-auto space-y-12">
             <div className="space-y-6">
                 <div>
                     <h2 className="text-4xl font-black tracking-tight text-foreground">Offers</h2>
@@ -32,8 +33,8 @@ export default function VendorOffersPage() {
                 <button
                     onClick={() => setActiveTab('active')}
                     className={`px-8 py-4 text-sm font-black transition-all border-b-2 flex items-center gap-2 ${activeTab === 'active'
-                        ? 'border-primary text-accent'
-                        : 'border-transparent text-muted-foreground hover:text-muted-foreground'
+                        ? 'border-primary text-foreground'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
                         }`}
                 >
                     <CheckCircle2 size={16} />
@@ -42,8 +43,8 @@ export default function VendorOffersPage() {
                 <button
                     onClick={() => setActiveTab('archived')}
                     className={`px-8 py-4 text-sm font-black transition-all border-b-2 flex items-center gap-2 ${activeTab === 'archived'
-                        ? 'border-primary text-accent'
-                        : 'border-transparent text-muted-foreground hover:text-muted-foreground'
+                        ? 'border-primary text-foreground'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
                         }`}
                 >
                     <Archive size={16} />
@@ -65,8 +66,8 @@ export default function VendorOffersPage() {
                             <div>
                                 <div className="flex items-center justify-between mb-2">
                                     <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${offer.status === 'New' ? 'bg-blue-100 text-blue-700' :
-                                            offer.status === 'Contacted' ? 'bg-accent text-foreground' :
-                                                'bg-green-100 text-green-700'
+                                        offer.status === 'Contacted' ? 'bg-accent text-foreground' :
+                                            'bg-green-100 text-green-700'
                                         }`}>
                                         {offer.status}
                                     </span>
@@ -117,6 +118,5 @@ export default function VendorOffersPage() {
                 </div>
             )}
         </div>
-        </div >
     );
 }
