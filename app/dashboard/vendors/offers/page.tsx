@@ -19,38 +19,27 @@ export default function VendorOffersPage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-12">
-            <div className="space-y-6">
-                <div>
-                    <h2 className="text-4xl font-black tracking-tight text-foreground">Offers</h2>
-                    <p className="text-muted-foreground mt-1 text-lg font-medium">Manage your incoming inquiries and potential clients.</p>
-                </div>
-
-                <DashboardFilter placeholder="Search offers or clients..." />
-            </div>
-
-            {/* Tabs */}
-            <div className="flex items-center border-b border-border">
-                <button
-                    onClick={() => setActiveTab('active')}
-                    className={`px-8 py-4 text-sm font-black transition-all border-b-2 flex items-center gap-2 ${activeTab === 'active'
-                        ? 'border-primary text-foreground'
-                        : 'border-transparent text-muted-foreground hover:text-foreground'
-                        }`}
-                >
-                    <CheckCircle2 size={16} />
-                    Active ({activeOffers.length})
-                </button>
-                <button
-                    onClick={() => setActiveTab('archived')}
-                    className={`px-8 py-4 text-sm font-black transition-all border-b-2 flex items-center gap-2 ${activeTab === 'archived'
-                        ? 'border-primary text-foreground'
-                        : 'border-transparent text-muted-foreground hover:text-foreground'
-                        }`}
-                >
-                    <Archive size={16} />
-                    Archived ({archivedOffers.length})
-                </button>
-            </div>
+            <DashboardHeader
+                title="Offers"
+                description="Manage your incoming inquiries and potential clients."
+                searchPlaceholder="Search offers or clients..."
+                tabs={[
+                    {
+                        id: 'active',
+                        label: `Active`,
+                        count: activeOffers.length,
+                        active: activeTab === 'active',
+                        onClick: () => setActiveTab('active')
+                    },
+                    {
+                        id: 'archived',
+                        label: `Archived`,
+                        count: archivedOffers.length,
+                        active: activeTab === 'archived',
+                        onClick: () => setActiveTab('archived')
+                    }
+                ]}
+            />
 
             <div className="grid grid-cols-1 gap-6">
                 {displayOffers.map((offer) => (
