@@ -93,7 +93,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed opacity-70">
-              Event Planner in Lagos? Plan It with Visual Africa.
+              We connect Nigerian vendors with diaspora clients planning events back home.
             </p>
             <div className="mt-4">
               <p className="text-xs font-semibold uppercase tracking-wider opacity-50">
