@@ -281,6 +281,74 @@ export const vendors: Vendor[] = [
     yearEstablished: 2018,
     responseTime: "Within 3 hours",
     portfolio: []
+  },
+  {
+    id: "v-exp-3",
+    slug: "rooftop-dinner-proposal-ikoyi",
+    name: "Rooftop Dinner Proposal | Ikoyi Skyline",
+    categories: ["Experiences"],
+    eventThemes: ["Proposals", "Anniversary"],
+    description: "Intimate rooftop dining experience with panoramic city views and private chef service.",
+    shortDescription: "Intimate rooftop dining with panoramic city views.",
+    price: "From NGN 950,000",
+    rating: 4.9,
+    featured: true,
+    image: "https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&q=80&w=800",
+    gallery: [
+      { url: "https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&q=80&w=800", alt: "rooftop setup" }
+    ],
+    vendor: { name: "Olu & Co Events", logo: "", slug: "olu-and-co" },
+    whatsIncluded: ["Private rooftop venue", "4-course dinner", "Live violinist", "Professional photography", "Customized decor"],
+    services: ["Event Planning", "Catering"],
+    about: "Specialists in luxury African experiences.",
+    stats: {
+      eventsPlanned: "100+",
+      satisfiedClients: "100+",
+      corporateEvents: "45+",
+      yearsExperience: "20+",
+      uniqueLocations: "15+"
+    },
+    location: "Ikoyi, Lagos",
+    areaServed: ["Lagos"],
+    yearEstablished: 2019,
+    responseTime: "Within 24 hours",
+    portfolio: [
+      { id: "p5", title: "Rooftop Engagement", type: "Gallery", date: "Jan 2026", image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800" }
+    ]
+  },
+  {
+    id: "v-exp-4",
+    slug: "beach-bonfire-proposal-takwa-bay",
+    name: "Beach Bonfire Proposal | Takwa Bay",
+    categories: ["Experiences"],
+    eventThemes: ["Proposals", "Social Gathering"],
+    description: "Secluded beach proposal with bonfire, acoustic music, and oceanfront setting.",
+    shortDescription: "Secluded beach proposal with bonfire and acoustic music.",
+    price: "From NGN 650,000",
+    rating: 4.7,
+    featured: false,
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800",
+    gallery: [
+      { url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800", alt: "beach bonfire" }
+    ],
+    vendor: { name: "Olu & Co Events", logo: "", slug: "olu-and-co" },
+    whatsIncluded: ["Private beach section", "Bonfire setup", "Acoustic guitarist", "Champagne & light bites", "Floral pathway", "Photography"],
+    services: ["Event Planning"],
+    about: "Specialists in luxury African experiences.",
+    stats: {
+      eventsPlanned: "100+",
+      satisfiedClients: "100+",
+      corporateEvents: "45+",
+      yearsExperience: "20+",
+      uniqueLocations: "15+"
+    },
+    location: "Takwa Bay, Lagos",
+    areaServed: ["Lagos"],
+    yearEstablished: 2019,
+    responseTime: "Within 24 hours",
+    portfolio: [
+      { id: "p6", title: "Beach Sunset Proposal", type: "Video", date: "Dec 2025", image: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&q=80&w=800" }
+    ]
   }
 ]
 

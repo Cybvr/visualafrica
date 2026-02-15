@@ -5,19 +5,19 @@ export function Testimonials() {
     const reviews = [
         {
             quote: "Every facet of the experience was executed with a level of precision that left us in awe... Their meticulous attention to detail was truly unparalleled...",
-            author: "Elizabeth M.",
+            author: "Chioma Okafor",
             title: "CEO",
             company: "A+ Digital"
         },
         {
             quote: "Visual Africa did a lot of the decision making for us in terms of things to try, and gave us better options than I could have found on my own.",
-            author: "Alan C.",
+            author: "Adebayo Adeleke",
             title: "Principal Engineer",
             company: "Atomic Tech"
         },
         {
             quote: "Visual Africa is an absolute game changer for planning events. The event went without a hitch and will be using them again. Fantastic folks working there!",
-            author: "David Kennedy",
+            author: "Ngozi Eze",
             title: "Founder",
             company: "TrustedSec"
         }
@@ -41,7 +41,7 @@ export function Testimonials() {
                             <div>
                                 <Quote className="h-8 w-8 text-primary/20 mb-6" />
                                 <p className="text-lg leading-relaxed text-foreground italic mb-8">
-                                    “{review.quote}”
+                                    "{review.quote}"
                                 </p>
                             </div>
                             <div className="border-t border-border pt-6">
@@ -50,12 +50,6 @@ export function Testimonials() {
                             </div>
                         </div>
                     ))}
-                </div>
-
-                <div className="mt-16 text-center">
-                    <Button variant="outline" className="border-primary text-primary hover:bg-primary/5">
-                        View all reviews
-                    </Button>
                 </div>
 
                 <div className="mt-24 pt-24 border-t border-border text-center">

@@ -1,12 +1,15 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Calendar, Users, Sparkles } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { BLOG_POSTS } from "@/lib/blog-data"
 
 export function FeaturesGrid() {
     const features = [
         {
             title: "Itinerary Builder",
-            description: "Build your itinerary in minutes, not days, with Visual Africa’s AI-powered Itinerary Builder.",
+            description: "Build your itinerary in minutes, not days, with Visual Africa's AI-powered Itinerary Builder.",
             icon: Calendar,
             cta: "Get started"
         },
@@ -27,19 +30,29 @@ export function FeaturesGrid() {
     return (
         <section className="py-24 bg-background">
             <div className="container mx-auto px-4">
-                <div className="mb-16">
-                    <h2 className="text-sm font-semibold uppercase tracking-widest text-primary mb-4">
-                        High touch and high tech
-                    </h2>
-                    <h3 className="font-serif text-4xl md:text-5xl font-bold text-foreground">
-                        Service unlike <br /> anywhere else
-                    </h3>
-                    <p className="mt-6 text-lg text-muted-foreground max-w-xl">
-                        Take the hassle out of event planning with our team of expert event planners.
-                    </p>
-                    <Button className="mt-8 bg-primary hover:bg-primary/90" size="lg">
-                        Get started
-                    </Button>
+                <div className="relative mb-16 rounded-2xl overflow-hidden min-h-[500px] flex items-center">
+                    <Image
+                        src="/images/waddi2.png"
+                        alt="Visual Africa Event Planning"
+                        fill
+                        className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40" />
+
+                    <div className="relative z-10 max-w-xl p-8 md:p-12 text-white">
+                        <h2 className="text-sm font-semibold uppercase tracking-widest mb-4">
+                            High touch and high tech
+                        </h2>
+                        <h3 className="font-serif text-4xl md:text-5xl font-bold">
+                            Service unlike <br /> anywhere else
+                        </h3>
+                        <p className="mt-6 text-lg text-white/90">
+                            Take the hassle out of event planning with our team of expert event planners.
+                        </p>
+                        <Button className="mt-8 bg-primary hover:bg-primary/90" size="lg">
+                            Get started
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -61,13 +74,30 @@ export function FeaturesGrid() {
                     ))}
                 </div>
 
-                <div className="mt-16 bg-primary text-primary-foreground rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
-                    <div className="max-w-md">
-                        <h4 className="text-3xl font-bold font-serif mb-4">Get a budget estimate in 1 minute or less</h4>
-                    </div>
-                    <Button size="lg" variant="secondary" className="whitespace-nowrap bg-white text-primary hover:bg-gray-100">
-                        Try free budget tool
-                    </Button>
+                <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {BLOG_POSTS.slice(0, 3).map((post) => (
+                        <Link
+                            key={post.id}
+                            href={`/blog/${post.id}`}
+                            className="group block"
+                        >
+                            <div className="relative aspect-[16/9] rounded-2xl overflow-hidden mb-6 shadow-lg transition-all group-hover:shadow-2xl group-hover:-translate-y-1">
+                                <Image
+                                    src={post.image}
+                                    alt={post.title}
+                                    fill
+                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
+                            </div>
+                            <h4 className="font-serif text-xl font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
+                                {post.title}
+                            </h4>
+                            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                                {post.excerpt}
+                            </p>
+                        </Link>
+                    ))}
                 </div>
             </div>
         </section>

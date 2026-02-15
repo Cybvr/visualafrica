@@ -1,20 +1,19 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 export function Hero() {
     return (
         <section className="relative flex min-h-[80vh] flex-col items-center justify-center px-4 py-20 text-center lg:px-8 overflow-hidden bg-black">
-            {/* Video Background */}
-            <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute inset-0 h-full w-full object-cover"
-            >
-                <source src="/video/about.mp4" type="video/mp4" />
-            </video>
+            {/* Image Background */}
+            <Image
+                src="/images/waddiup.png"
+                alt="Visual Africa Events"
+                fill
+                className="object-cover"
+                priority
+            />
 
             {/* Overlay for better text readability */}
             <div className="absolute inset-0 bg-black/50" />
@@ -40,4 +39,4 @@ export function Hero() {
             </div>
         </section>
     )
-}   
+}

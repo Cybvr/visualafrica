@@ -4,11 +4,11 @@ import { Star } from "lucide-react"
 
 export function HottestVendors() {
     const featuredVendors = vendors
-        .filter(v => v.featured && !v.categories.includes("Experiences"))
+        .filter(v => v.featured)
         .slice(0, 4)
 
     return (
-        <section className="py-24 bg-white">
+        <section className="py-12 bg-white">
             <div className="container mx-auto px-4">
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
                     <div>
@@ -18,9 +18,7 @@ export function HottestVendors() {
                         </div>
                         <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground">
                             Hottest Vendors
-                        </h2>
-                        <p className="text-muted-foreground font-medium mt-2">The most sought-after professionals this month.</p>
-                    </div>
+                        </h2></div>
                     <button className="text-primary font-black uppercase tracking-widest text-xs hover:tracking-[0.2em] transition-all">
                         Discover all vendors →
                     </button>

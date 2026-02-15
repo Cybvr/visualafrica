@@ -1,42 +1,73 @@
 "use client"
 
 import Link from "next/link"
-import { HiArrowRight } from "react-icons/hi2"
 import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react"
 
 export function EventInsights() {
+    const [currentSlide, setCurrentSlide] = useState(0)
+
+    const slides = [
+        {
+            title: "Lagos generates 30-35% of Nigeria's GDP and hosts more celebrations than any other African city.",
+            source: "Lagos State Government, World Bank 2022",
+            image: "https://images.pexels.com/photos/20367607/pexels-photo-20367607.jpeg?auto=compress&cs=tinysrgb&w=1200"
+        },
+        {
+            title: "Nigeria's wedding industry alone generates over ₦100 billion annually in economic activity.",
+            source: "THISDAY, National Bureau of Statistics 2023",
+            image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=1200"
+        },
+        {
+            title: "Over 80% of event vendors in Nigeria are informal micro-businesses thriving on referrals.",
+            source: "SMEDAN Industry Report 2024",
+            image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=1200"
+        }
+    ]
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % slides.length)
+        }, 5000)
+        return () => clearInterval(timer)
+    }, [slides.length])
+
     return (
         <section className="py-24 bg-background">
             <div className="mx-auto max-w-7xl px-4 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
 
-                    {/* Card 1: Image Fact */}
+                    {/* Card 1: Image Fact with Carousel */}
                     <div className="relative group overflow-hidden rounded-[2rem] min-h-[450px] flex flex-col justify-between">
                         <img
-                            src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1200"
-                            alt="Celebration in Lagos"
-                            className="absolute inset-0 w-full h-full object-cover"
+                            src={slides[currentSlide].image}
+                            alt="Celebration in Nigeria"
+                            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
                         />
                         <div className="absolute inset-0 bg-black/40" />
 
                         <div className="relative p-8 z-10">
-                            <h3 className="text-2xl font-bold text-white leading-tight">
-                                "THE ULTIMATE PARTY HUB!!! <br />Lagos hosts more events than <br />any other African city."
+                            <h3 className="text-2xl font-bold text-white leading-tight transition-opacity duration-500">
+                                {slides[currentSlide].title}
                             </h3>
                         </div>
 
                         <div className="relative p-8 z-10">
                             <div className="text-white">
-                                <p className="text-sm font-bold underline decoration-2 underline-offset-4 mb-4">
-                                    Fact: Lagos Weekend Economy <br />Drive, 2025 Reports
+                                <p className="text-xs text-white/80 mb-4">
+                                    Source: {slides[currentSlide].source}
                                 </p>
                                 {/* Pagination Indicators */}
                                 <div className="flex gap-1.5">
-                                    <div className="h-1 w-6 rounded-full bg-white" />
-                                    <div className="h-1 w-3 rounded-full bg-white/40" />
-                                    <div className="h-1 w-3 rounded-full bg-white/40" />
-                                    <div className="h-1 w-3 rounded-full bg-white/40" />
-                                    <div className="h-1 w-3 rounded-full bg-white/40" />
+                                    {slides.map((_, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setCurrentSlide(index)}
+                                            className={`h-1 rounded-full transition-all ${index === currentSlide ? 'w-6 bg-white' : 'w-3 bg-white/40'
+                                                }`}
+                                            aria-label={`Go to slide ${index + 1}`}
+                                        />
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -51,10 +82,13 @@ export function EventInsights() {
 
                         <div className="relative z-10">
                             <h2 className="text-3xl font-bold text-white mb-6 leading-tight">
-                                Over NGN 2.3 Trillion industry for an unforgettable culture.
+                                Nigeria's event industry contributes over ₦100 billion to GDP annually.
                             </h2>
-                            <p className="text-lg text-white/90 mb-8 leading-relaxed font-medium">
-                                Nigeria's event sector remains a powerhouse. From grand weddings to major festivals, we provide the digital infrastructure to book, plan, and celebrate with ease.
+                            <p className="text-lg text-white/90 mb-6 leading-relaxed font-medium">
+                                From grand weddings averaging 1,000 guests to major corporate events, Nigeria's celebration economy is a powerhouse. Over 80% of event vendors are informal micro-businesses thriving on referrals and social media.
+                            </p>
+                            <p className="text-xs text-white/70">
+                                Source: THISDAY, SMEDAN Industry Report 2024
                             </p>
                         </div>
 
@@ -79,10 +113,13 @@ export function EventInsights() {
                     <div className="relative bg-primary rounded-[2rem] p-10 flex flex-col justify-between overflow-hidden">
                         <div className="relative z-10">
                             <h2 className="text-3xl font-bold text-white mb-6 leading-tight">
-                                5,000+ Vetted Professionals in one marketplace.
+                                Average Nigerian wedding: ₦5M-₦20M budget, 1,000 guests.
                             </h2>
-                            <p className="text-lg text-white/90 mb-8 leading-relaxed font-medium">
-                                We've curated Nigeria's top-tier caterers, decorators, and planners. Every vendor on Visual Africa is verified to ensure your party is as seamless as it is spectacular.
+                            <p className="text-lg text-white/90 mb-6 leading-relaxed font-medium">
+                                Nigerian weddings are multi-funded cultural performances. Lagos hotel bookings alone generate ₦7 billion annually from wedding-related stays, while Instagram has become the new exhibition hall for vendors.
+                            </p>
+                            <p className="text-xs text-white/70">
+                                Source: CNN Africa, Hospitality Association of Nigeria 2023
                             </p>
                         </div>
 
