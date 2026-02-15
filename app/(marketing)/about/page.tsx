@@ -9,11 +9,11 @@ export default function AboutPage() {
                 <div className="mx-auto max-w-7xl px-4 py-16 lg:px-8">
                     {/* Hero Section */}
                     <div className="text-center">
-                        <h1 className="font-serif text-4xl font-bold md:text-5xl lg:text-6xl">
-                            About Visual<span className="text-primary">Africa</span>
+                        <h1 className="font-serif text-4xl font-bold md:text-5xl lg:text-6xl text-balance">
+                            Bridging the gap between the <span className="text-primary italic">diaspora</span> and Lagos.
                         </h1>
                         <p className="mx-auto mt-6 max-w-3xl text-lg text-muted-foreground md:text-xl">
-                            Lagos's trusted event planner marketplace connecting you with the finest vendors for unforgettable celebrations.
+                            The trust, transparency, and local expertise you need to plan world-class events in Nigeria, from anywhere in the world.
                         </p>
                     </div>
 
@@ -21,7 +21,7 @@ export default function AboutPage() {
                     <div className="mt-20">
                         <h2 className="font-serif text-3xl font-bold md:text-4xl">Our Mission</h2>
                         <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                            At Visual Africa, we believe every celebration deserves to be extraordinary. Our mission is to simplify event planning by connecting you with Lagos's most talented vendors—from photographers and caterers to decorators and entertainers. We're here to transform your vision into reality, one unforgettable event at a time.
+                            At Visual Africa, we believe distance shouldn't compromise the quality of your celebration. Our mission is to provide the global Nigerian diaspora with a secure, transparent platform to orchestrate extraordinary events in Lagos. We combine cutting-edge technology with high-touch local coordination to ensure your vision is executed flawlessly, no matter where you are.
                         </p>
                     </div>
 
@@ -30,21 +30,21 @@ export default function AboutPage() {
                         <h2 className="font-serif text-3xl font-bold md:text-4xl">What We Do</h2>
                         <div className="mt-8 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                             <div className="rounded-lg border border-border bg-card p-6">
-                                <h3 className="font-serif text-xl font-bold">Curated Vendors</h3>
-                                <p className="mt-4 text-muted-foreground">
-                                    We handpick the best event vendors in Lagos, ensuring quality and professionalism for your special day.
+                                <h3 className="font-serif text-xl font-bold">Secure Escrow</h3>
+                                <p className="mt-4 text-muted-foreground text-sm">
+                                    Pay with international cards. We hold funds in escrow until the vendor delivers, protecting your investment.
                                 </p>
                             </div>
                             <div className="rounded-lg border border-border bg-card p-6">
-                                <h3 className="font-serif text-xl font-bold">Effortless Browsing</h3>
-                                <p className="mt-4 text-muted-foreground">
-                                    Browse inspiring video reels and portfolios to find vendors that match your style and vision.
+                                <h3 className="font-serif text-xl font-bold">Remote Orchestration</h3>
+                                <p className="mt-4 text-muted-foreground text-sm">
+                                    Manage your guest list and itinerary from abroad while our local experts handle the orchestration on the ground.
                                 </p>
                             </div>
                             <div className="rounded-lg border border-border bg-card p-6">
-                                <h3 className="font-serif text-xl font-bold">Seamless Quotes</h3>
-                                <p className="mt-4 text-muted-foreground">
-                                    Request and receive quotes from multiple vendors effortlessly, all in one place.
+                                <h3 className="font-serif text-xl font-bold">Vetted Excellence</h3>
+                                <p className="mt-4 text-muted-foreground text-sm">
+                                    Access a handpicked network of Lagos's most professional vendors, vetted for quality and reliability.
                                 </p>
                             </div>
                         </div>
@@ -59,9 +59,9 @@ export default function AboutPage() {
                                     ✓
                                 </div>
                                 <div>
-                                    <h3 className="font-bold">Trusted Network</h3>
+                                    <h3 className="font-bold">Diaspora-First trust</h3>
                                     <p className="mt-2 text-muted-foreground">
-                                        Access a vetted network of professional vendors with proven track records.
+                                        Designed specifically for the needs of Nigerians abroad, with secure payments and platform guarantees.
                                     </p>
                                 </div>
                             </div>
@@ -70,9 +70,9 @@ export default function AboutPage() {
                                     ✓
                                 </div>
                                 <div>
-                                    <h3 className="font-bold">Time-Saving</h3>
+                                    <h3 className="font-bold">End-to-End Coordination</h3>
                                     <p className="mt-2 text-muted-foreground">
-                                        Compare vendors, view portfolios, and get quotes—all without endless phone calls and emails.
+                                        From venue scouting to on-site management, we provide the local feet on the ground you need.
                                     </p>
                                 </div>
                             </div>
@@ -81,9 +81,9 @@ export default function AboutPage() {
                                     ✓
                                 </div>
                                 <div>
-                                    <h3 className="font-bold">Local Expertise</h3>
+                                    <h3 className="font-bold">Cultural Expertise</h3>
                                     <p className="mt-2 text-muted-foreground">
-                                        We know Lagos. Our vendors understand the local culture and deliver authentic experiences.
+                                        We understand the nuance of Nigerian celebrations and how to deliver world-class service locally.
                                     </p>
                                 </div>
                             </div>

@@ -26,8 +26,8 @@ export function Hero() {
                     <span className="text-primary italic">from anywhere.</span>
                 </h1>
                 <p className="mx-auto mb-10 max-w-2xl text-lg text-white/90 md:text-xl">
-                    Vetted vendors, transparent pricing, and secure escrow payments. <br className="hidden md:block" />
-                    You handle the guest list from abroad, we handle the orchestration in Lagos.
+                    Trusted local experts and secure escrow payments <br className="hidden md:block" />
+                    for the Nigerian diaspora.
                 </p>
                 <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                     <Button asChild size="lg" className="h-14 px-10 text-lg bg-primary hover:bg-primary/90">
