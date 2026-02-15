@@ -48,7 +48,7 @@ const VendorsTab: React.FC = () => {
                                     </td>
                                     <td className="px-8 py-6">
                                         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                                            <MapPin size={14} className="text-orange-600" />
+                                            <MapPin size={14} className="text-accent" />
                                             {req.location}
                                         </div>
                                     </td>
@@ -59,7 +59,7 @@ const VendorsTab: React.FC = () => {
                                         </div>
                                     </td>
                                     <td className="px-8 py-6 font-black text-foreground">{req.priceDisplay}</td>
-                                    <td className="px-8 py-6 text-right"><ChevronRight size={18} className="text-slate-200 group-hover:text-orange-600 transition-colors inline" /></td>
+                                    <td className="px-8 py-6 text-right"><ChevronRight size={18} className="text-slate-200 group-hover:text-accent transition-colors inline" /></td>
                                 </tr>
                             );
                         })}

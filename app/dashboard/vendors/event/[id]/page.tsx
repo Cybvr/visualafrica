@@ -18,7 +18,7 @@ export default function EventDetailPage() {
                 <h1 className="text-2xl font-bold">Event not found</h1>
                 <button
                     onClick={() => router.push('/dashboard/vendors/events')}
-                    className="text-orange-600 font-bold"
+                    className="text-accent font-bold"
                 >
                     Back to Events
                 </button>

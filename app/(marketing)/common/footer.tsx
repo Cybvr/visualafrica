@@ -42,7 +42,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-foreground text-background">
       {/* CTA Banner */}
-      <div className="bg-primary px-4 py-16 text-center text-primary-foreground">
+      <div className="bg-primary px-4 py-16 text-center text-white">
         <h2 className="font-serif text-3xl font-bold md:text-4xl">
           Connect | Create | Celebrate
         </h2>
@@ -88,9 +88,9 @@ export function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <img src="/logo.png" alt="Waddi Logo" className="h-8 w-auto object-contain" />
+              <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
               <span className="font-serif text-xl font-bold">
-                Waddi
+                Visual Africa
               </span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed opacity-70">
@@ -196,7 +196,7 @@ export function Footer() {
               />
               <button
                 type="submit"
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-primary/90"
               >
                 Subscribe
               </button>

@@ -84,7 +84,7 @@ export default async function SolutionDetailPage({
           <Link href="/contact">
             <Button
               size="lg"
-              className="mt-8 bg-primary text-primary-foreground hover:bg-primary/90"
+              className="mt-8 bg-primary text-foreground hover:bg-primary/90"
             >
               Get Started <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -135,7 +135,7 @@ export default async function SolutionDetailPage({
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {solution.process.map((step, i) => (
               <div key={i} className="relative flex flex-col">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-foreground">
                   {i + 1}
                 </div>
                 {i < solution.process.length - 1 && (
@@ -210,7 +210,7 @@ export default async function SolutionDetailPage({
       )}
 
       {/* CTA */}
-      <section className="bg-primary px-4 py-16 text-center text-primary-foreground">
+      <section className="bg-primary px-4 py-16 text-center text-foreground">
         <h2 className="font-serif text-3xl font-bold md:text-4xl">
           Ready to get started?
         </h2>

@@ -45,14 +45,14 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors font-black text-[10px] uppercase tracking-widest"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-black text-[10px] uppercase tracking-widest"
         >
           <ChevronLeft size={16} />
           Back to Events
         </button>
         <div className="flex items-center gap-2">
-          <button className="p-3 rounded-2xl bg-white border border-slate-100 hover:bg-slate-50 text-slate-500 transition-all"><Share2 size={18} /></button>
-          <button className="p-3 rounded-2xl bg-white border border-slate-100 hover:bg-slate-50 text-slate-500 transition-all"><Heart size={18} /></button>
+          <button className="p-3 rounded-2xl bg-white border border-border hover:bg-slate-50 text-muted-foreground transition-all"><Share2 size={18} /></button>
+          <button className="p-3 rounded-2xl bg-white border border-border hover:bg-slate-50 text-muted-foreground transition-all"><Heart size={18} /></button>
         </div>
       </div>
 
@@ -72,57 +72,57 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
                 {event.status}
               </span>
             </div>
-            <h1 className="text-5xl font-black text-slate-900 tracking-tight leading-tight">{event.eventName}</h1>
+            <h1 className="text-5xl font-black text-foreground tracking-tight leading-tight">{event.eventName}</h1>
             <div className="flex flex-wrap items-center gap-6">
-              <div className="flex items-center gap-2 text-slate-500 font-bold">
-                <User size={24} className="text-orange-600" />
-                <span className="text-slate-900 font-black">{event.hostName}</span>
+              <div className="flex items-center gap-2 text-muted-foreground font-bold">
+                <User size={24} className="text-accent" />
+                <span className="text-foreground font-black">{event.hostName}</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-500 font-bold">
-                <Calendar size={24} className="text-orange-600" />
+              <div className="flex items-center gap-2 text-muted-foreground font-bold">
+                <Calendar size={24} className="text-accent" />
                 {event.date}
               </div>
-              <div className="flex items-center gap-2 text-slate-500 font-bold">
-                <MapPin size={24} className="text-orange-600" />
+              <div className="flex items-center gap-2 text-muted-foreground font-bold">
+                <MapPin size={24} className="text-accent" />
                 {event.location}
               </div>
             </div>
           </div>
 
-          <hr className="border-slate-100" />
+          <hr className="border-border" />
 
           {/* Stats Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 bg-white p-10 rounded-[2.5rem] border border-border shadow-sm">
             <div className="text-center space-y-1">
-              <Users className="mx-auto text-orange-600 mb-2" size={28} />
-              <p className="text-2xl font-black text-slate-900">{event.guestCount}</p>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Expected Guests</p>
+              <Users className="mx-auto text-accent mb-2" size={28} />
+              <p className="text-2xl font-black text-foreground">{event.guestCount}</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Expected Guests</p>
             </div>
             <div className="text-center space-y-1 border-x border-slate-50">
-              <DollarSign className="mx-auto text-orange-600 mb-2" size={28} />
-              <p className="text-2xl font-black text-slate-900">{formatBudget(event.budget)}</p>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Budget</p>
+              <DollarSign className="mx-auto text-accent mb-2" size={28} />
+              <p className="text-2xl font-black text-foreground">{formatBudget(event.budget)}</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Total Budget</p>
             </div>
             <div className="text-center space-y-1">
-              <Calendar className="mx-auto text-orange-600 mb-2" size={28} />
-              <p className="text-2xl font-black text-slate-900">{event.date}</p>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Event Date</p>
+              <Calendar className="mx-auto text-accent mb-2" size={28} />
+              <p className="text-2xl font-black text-foreground">{event.date}</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Event Date</p>
             </div>
           </div>
 
           {/* Description */}
           <section className="space-y-6">
-            <h3 className="text-2xl font-black text-slate-900 flex items-center gap-3">
-              <Award size={24} className="text-orange-600" />
+            <h3 className="text-2xl font-black text-foreground flex items-center gap-3">
+              <Award size={24} className="text-accent" />
               About This Event
             </h3>
-            <p className="text-slate-600 leading-relaxed text-lg font-medium">{event.description}</p>
+            <p className="text-muted-foreground leading-relaxed text-lg font-medium">{event.description}</p>
           </section>
 
           {/* Booked Vendors */}
           {event.bookedVendors.length > 0 && (
-            <section className="bg-white p-12 rounded-[3rem] border border-slate-100 space-y-8 shadow-sm">
-              <h3 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+            <section className="bg-white p-12 rounded-[3rem] border border-border space-y-8 shadow-sm">
+              <h3 className="text-2xl font-black text-foreground flex items-center gap-3">
                 <ShieldCheck size={24} className="text-green-600" />
                 Current Vendors
               </h3>
@@ -130,10 +130,10 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
                 {event.bookedVendors.map((vendor, idx) => (
                   <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
                     <div className="space-y-1">
-                      <p className="font-black text-slate-900">{vendor.service}</p>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-wide">{vendor.status}</p>
+                      <p className="font-black text-foreground">{vendor.service}</p>
+                      <p className="text-xs text-muted-foreground font-bold uppercase tracking-wide">{vendor.status}</p>
                     </div>
-                    <p className="text-lg font-black text-orange-600">{vendor.amount}</p>
+                    <p className="text-lg font-black text-accent">{vendor.amount}</p>
                   </div>
                 ))}
               </div>
@@ -143,33 +143,33 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
 
         {/* Sidebar Sticky */}
         <div className="space-y-8">
-          <div className="sticky top-24 bg-slate-900 text-white p-10 rounded-[3rem] space-y-8 shadow-2xl shadow-slate-900/30">
+          <div className="sticky top-24 bg-background text-white p-10 rounded-[3rem] space-y-8 shadow-2xl shadow-slate-900/30">
             <div>
-              <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Event Budget</p>
-              <p className="text-4xl font-black text-orange-500">{formatBudget(event.budget)}</p>
+              <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-1">Event Budget</p>
+              <p className="text-4xl font-black text-primary">{formatBudget(event.budget)}</p>
             </div>
 
             <div className="space-y-4 pt-4 border-t border-white/10">
               <div className="flex items-center justify-between text-xs py-1">
-                <span className="text-slate-400 font-bold uppercase tracking-widest">Status</span>
+                <span className="text-muted-foreground font-bold uppercase tracking-widest">Status</span>
                 <span className={`font-black px-3 py-1 rounded-full text-[9px] ${getStatusColor(event.status)}`}>
                   {event.status}
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs py-1">
-                <span className="text-slate-400 font-bold uppercase tracking-widest">Guest Count</span>
+                <span className="text-muted-foreground font-bold uppercase tracking-widest">Guest Count</span>
                 <span className="font-black flex items-center gap-1.5">
-                  <Users size={14} className="text-orange-500" /> {event.guestCount}
+                  <Users size={14} className="text-primary" /> {event.guestCount}
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs py-1">
-                <span className="text-slate-400 font-bold uppercase tracking-widest">Location</span>
+                <span className="text-muted-foreground font-bold uppercase tracking-widest">Location</span>
                 <span className="font-black text-right">{event.location}</span>
               </div>
             </div>
 
             <div className="space-y-4 pt-6">
-              <button className="w-full bg-orange-600 hover:bg-orange-700 text-white py-5 rounded-2xl font-black shadow-lg shadow-orange-600/20 transition-all hover:scale-[1.02] active:scale-95">
+              <button className="w-full bg-primary hover:bg-primary text-white py-5 rounded-2xl font-black shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95">
                 Express Interest
               </button>
               <button className="w-full bg-white/5 hover:bg-white/10 text-white py-5 rounded-2xl font-black flex items-center justify-center gap-3 transition-all border border-white/10">
@@ -178,16 +178,16 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
               </button>
             </div>
 
-            <p className="text-center text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">
+            <p className="text-center text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
               Verified Waddi Event
             </p>
           </div>
 
-          <div className="bg-orange-50/50 border border-orange-100 p-8 rounded-[2.5rem] space-y-4 shadow-sm text-center">
-            <Zap className="mx-auto text-orange-600" size={32} />
-            <h4 className="font-black text-slate-900 text-lg leading-tight">Quick Response Required</h4>
-            <p className="text-sm text-slate-500 leading-relaxed font-medium">This host is actively reviewing proposals. Submit your interest early to stand out.</p>
-            <button className="text-orange-600 font-black text-xs uppercase tracking-widest hover:underline pt-2">Learn More →</button>
+          <div className="bg-accent/50 border border-border p-8 rounded-[2.5rem] space-y-4 shadow-sm text-center">
+            <Zap className="mx-auto text-accent" size={32} />
+            <h4 className="font-black text-foreground text-lg leading-tight">Quick Response Required</h4>
+            <p className="text-sm text-muted-foreground leading-relaxed font-medium">This host is actively reviewing proposals. Submit your interest early to stand out.</p>
+            <button className="text-accent font-black text-xs uppercase tracking-widest hover:underline pt-2">Learn More →</button>
           </div>
         </div>
       </div>

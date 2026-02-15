@@ -45,14 +45,14 @@ export function HottestVendors() {
                                 <p className="text-[10px] font-black text-primary uppercase tracking-widest">
                                     {vendor.categories[0]}
                                 </p>
-                                <h4 className="font-serif text-2xl font-bold text-slate-900 group-hover:text-primary transition-colors">
+                                <h4 className="font-serif text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
                                     {vendor.name}
                                 </h4>
                                 <div className="flex items-center justify-between pt-2">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                                         {vendor.location.split(",")[0]}
                                     </p>
-                                    <p className="text-sm font-black text-slate-900">
+                                    <p className="text-sm font-black text-foreground">
                                         {vendor.price}
                                     </p>
                                 </div>

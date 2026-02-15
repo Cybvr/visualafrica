@@ -40,7 +40,7 @@ export function VendorSpotlight() {
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <Badge className="absolute left-3 top-3 bg-primary text-primary-foreground">
+                <Badge className="absolute left-3 top-3 bg-primary text-foreground">
                   {vendor.category}
                 </Badge>
               </div>
@@ -62,7 +62,7 @@ export function VendorSpotlight() {
                   </Button>
                   <Button
                     size="sm"
-                    className="flex-1 gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+                    className="flex-1 gap-2 bg-primary text-foreground hover:bg-primary/90"
                   >
                     <MessageSquare className="h-4 w-4" />
                     Contact Vendor

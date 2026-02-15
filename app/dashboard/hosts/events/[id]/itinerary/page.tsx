@@ -57,39 +57,39 @@ const EditModal: React.FC<EditModalProps> = ({ event, dayDate, onClose, onSave }
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-white rounded-3xl max-w-md w-full p-8" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-slate-900">Edit Event</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+          <h3 className="text-2xl font-bold text-foreground">Edit Event</h3>
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground">
             <X size={24} />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Event Title</label>
+            <label className="block text-sm font-semibold text-foreground mb-2">Event Title</label>
             <input
               type="text"
               value={formData.title}
               onChange={e => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Time</label>
+            <label className="block text-sm font-semibold text-foreground mb-2">Time</label>
             <input
               type="time"
               value={formData.time}
               onChange={e => setFormData({ ...formData, time: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Location</label>
+            <label className="block text-sm font-semibold text-foreground mb-2">Location</label>
             <input
               type="text"
               value={formData.loc}
               onChange={e => setFormData({ ...formData, loc: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>
@@ -97,13 +97,13 @@ const EditModal: React.FC<EditModalProps> = ({ event, dayDate, onClose, onSave }
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 rounded-full border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50"
+              className="flex-1 px-6 py-3 rounded-full border border-border text-foreground font-semibold hover:bg-slate-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-6 py-3 rounded-full bg-orange-600 text-white font-semibold hover:bg-orange-700"
+              className="flex-1 px-6 py-3 rounded-full bg-primary text-white font-semibold hover:bg-primary"
             >
               Save Changes
             </button>
@@ -134,20 +134,20 @@ const DayEditModal: React.FC<DayEditModalProps> = ({ day, onClose, onSave }) => 
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-white rounded-3xl max-w-md w-full p-8" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-slate-900">Edit Date</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+          <h3 className="text-2xl font-bold text-foreground">Edit Date</h3>
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground">
             <X size={24} />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Date</label>
+            <label className="block text-sm font-semibold text-foreground mb-2">Date</label>
             <input
               type="text"
               value={date}
               onChange={e => setDate(e.target.value)}
               placeholder="Thursday, May 29"
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>
@@ -155,13 +155,13 @@ const DayEditModal: React.FC<DayEditModalProps> = ({ day, onClose, onSave }) => 
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 rounded-full border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50"
+              className="flex-1 px-6 py-3 rounded-full border border-border text-foreground font-semibold hover:bg-slate-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-6 py-3 rounded-full bg-orange-600 text-white font-semibold hover:bg-orange-700"
+              className="flex-1 px-6 py-3 rounded-full bg-primary text-white font-semibold hover:bg-primary"
             >
               Save Changes
             </button>
@@ -257,18 +257,18 @@ const Itinerary: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto space-y-10">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900">Full Itinerary</h2>
+        <h2 className="text-3xl font-bold tracking-tight text-foreground">Full Itinerary</h2>
         <div className="flex gap-3">
           <button
             onClick={handleShare}
-            className="bg-white border border-slate-200 text-slate-700 px-6 py-2 rounded-full text-sm font-semibold hover:bg-slate-50 transition-colors flex items-center gap-2"
+            className="bg-white border border-border text-foreground px-6 py-2 rounded-full text-sm font-semibold hover:bg-slate-50 transition-colors flex items-center gap-2"
           >
             <Share2 size={16} />
             Share
           </button>
           <button
             onClick={handlePrint}
-            className="bg-slate-900 text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-slate-800 transition-colors flex items-center gap-2"
+            className="bg-background text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-slate-800 transition-colors flex items-center gap-2"
           >
             <Printer size={16} />
             Print
@@ -282,29 +282,29 @@ const Itinerary: React.FC = () => {
             <div className="md:grid md:grid-cols-[160px_1fr] gap-8">
               <div className="mb-6 md:mb-0 group">
                 <div className="flex items-center gap-2 md:justify-end">
-                  <h3 className="text-orange-600 font-black text-xl md:text-right sticky top-24">{day.date}</h3>
+                  <h3 className="text-foreground font-black text-xl md:text-right sticky top-24">{day.date}</h3>
                   <button
                     onClick={() => setEditingDay(day)}
-                    className="opacity-0 group-hover:opacity-100 text-orange-400 hover:text-orange-600 transition-opacity"
+                    className="opacity-0 group-hover:opacity-100 text-primary hover:text-muted-foreground transition-opacity"
                   >
                     <Pencil size={16} />
                   </button>
                 </div>
               </div>
-              <div className="space-y-6 border-l-2 border-slate-100 pl-8 relative pb-8">
+              <div className="space-y-6 border-l-2 border-border pl-8 relative pb-8">
                 {day.events.map(event => (
                   <div key={event.id} className="relative group">
-                    <div className="absolute left-[-41px] top-1 w-5 h-5 bg-white border-4 border-orange-600 rounded-full z-10" />
-                    <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="absolute left-[-41px] top-1 w-5 h-5 bg-white border-4 border-primary rounded-full z-10" />
+                    <div className="bg-white p-6 rounded-3xl border border-border shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between">
                         <div className="flex gap-6 items-center flex-1">
-                          <div className="bg-slate-50 p-3 rounded-2xl text-slate-500 font-bold text-xs uppercase flex flex-col items-center min-w-[70px]">
+                          <div className="bg-slate-50 p-3 rounded-2xl text-muted-foreground font-bold text-xs uppercase flex flex-col items-center min-w-[70px]">
                             <Clock size={16} className="mb-1" />
                             {event.time}
                           </div>
                           <div className="flex-1">
-                            <h4 className="font-bold text-slate-900 text-lg">{event.title}</h4>
-                            <div className="flex items-center gap-1.5 text-slate-500 text-sm mt-1">
+                            <h4 className="font-bold text-foreground text-lg">{event.title}</h4>
+                            <div className="flex items-center gap-1.5 text-muted-foreground text-sm mt-1">
                               <MapPin size={14} />
                               {event.loc}
                             </div>
@@ -313,7 +313,7 @@ const Itinerary: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setEditingEvent({ dayId: day.id, event })}
-                            className="p-2 text-slate-300 hover:text-orange-600 transition-colors"
+                            className="p-2 text-slate-300 hover:text-muted-foreground transition-colors"
                           >
                             <Pencil size={18} />
                           </button>
@@ -330,7 +330,7 @@ const Itinerary: React.FC = () => {
                 ))}
                 <button
                   onClick={() => handleAddEvent(day.id)}
-                  className="w-full p-4 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 hover:text-orange-600 hover:border-orange-300 transition-colors flex items-center justify-center gap-2 text-sm font-semibold"
+                  className="w-full p-4 border-2 border-dashed border-border rounded-3xl text-muted-foreground hover:text-foreground  hover:border-primary transition-colors flex items-center justify-center gap-2 text-sm font-semibold"
                 >
                   <Plus size={18} />
                   Add Event
@@ -342,7 +342,7 @@ const Itinerary: React.FC = () => {
 
         <button
           onClick={handleAddDay}
-          className="w-full p-6 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 hover:text-orange-600 hover:border-orange-300 transition-colors flex items-center justify-center gap-2 font-semibold"
+          className="w-full p-6 border-2 border-dashed border-border rounded-3xl text-muted-foreground hover:text-foreground hover:border-primary transition-colors flex items-center justify-center gap-2 font-semibold"
         >
           <Plus size={20} />
           Add Day

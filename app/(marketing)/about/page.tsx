@@ -55,7 +55,7 @@ export default function AboutPage() {
                         <h2 className="font-serif text-3xl font-bold md:text-4xl">Why Choose Us</h2>
                         <div className="mt-8 space-y-6">
                             <div className="flex gap-4">
-                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary text-foreground">
                                     ✓
                                 </div>
                                 <div>
@@ -66,7 +66,7 @@ export default function AboutPage() {
                                 </div>
                             </div>
                             <div className="flex gap-4">
-                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary text-foreground">
                                     ✓
                                 </div>
                                 <div>
@@ -77,7 +77,7 @@ export default function AboutPage() {
                                 </div>
                             </div>
                             <div className="flex gap-4">
-                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary text-foreground">
                                     ✓
                                 </div>
                                 <div>
@@ -91,7 +91,7 @@ export default function AboutPage() {
                     </div>
 
                     {/* CTA Section */}
-                    <div className="mt-20 rounded-lg bg-primary px-8 py-12 text-center text-primary-foreground">
+                    <div className="mt-20 rounded-lg bg-primary px-8 py-12 text-center text-foreground">
                         <h2 className="font-serif text-3xl font-bold md:text-4xl">
                             Ready to Plan Your Event?
                         </h2>

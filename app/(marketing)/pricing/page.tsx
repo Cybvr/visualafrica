@@ -46,7 +46,7 @@ export default function PricingPage() {
                   }`}
               >
                 {tier.highlighted && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-foreground">
                     Most Popular
                   </div>
                 )}
@@ -80,10 +80,10 @@ export default function PricingPage() {
                 <Link href={tier.ctaHref} className="mt-6 block">
                   <Button
                     className={`w-full ${tier.highlighted
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      ? "bg-primary text-foreground hover:bg-primary/90"
                       : tier.name === "Free"
                         ? "bg-foreground text-background hover:bg-foreground/90"
-                        : "border-primary bg-card text-primary hover:bg-primary hover:text-primary-foreground"
+                        : "border-primary bg-card text-primary hover:bg-primary hover:text-foreground"
                       }`}
                     variant={
                       tier.highlighted || tier.name === "Free"
@@ -159,7 +159,7 @@ export default function PricingPage() {
           <Link href="/contact">
             <Button
               size="lg"
-              className="mt-8 bg-primary text-primary-foreground hover:bg-primary/90"
+              className="mt-8 bg-primary text-foreground hover:bg-primary/90"
             >
               Book a Call
             </Button>
@@ -208,7 +208,7 @@ export default function PricingPage() {
         </section>
 
         {/* CTA */}
-        <section className="bg-primary px-4 py-16 text-center text-primary-foreground">
+        <section className="bg-primary px-4 py-16 text-center text-foreground">
           <h2 className="font-serif text-3xl font-bold md:text-4xl">
             Ready to simplify event planning?
           </h2>

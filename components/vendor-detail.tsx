@@ -382,7 +382,7 @@ export function VendorDetail({ vendor }: { vendor: Vendor }) {
                       Interested in services from {vendor.vendor.name}? Fill out
                       this form to request pricing and availability.
                     </p>
-                    <Button className="mt-4 w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                    <Button className="mt-4 w-full bg-primary text-foreground hover:bg-primary/90">
                       Get a Quote
                     </Button>
                   </CardContent>
@@ -397,28 +397,28 @@ export function VendorDetail({ vendor }: { vendor: Vendor }) {
                     <div className="mt-4 flex items-center gap-3">
                       <a
                         href="#"
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-foreground transition-colors hover:bg-primary hover:text-foreground"
                         aria-label="WhatsApp"
                       >
                         <MessageCircle className="h-5 w-5" />
                       </a>
                       <a
                         href="#"
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-foreground transition-colors hover:bg-primary hover:text-foreground"
                         aria-label="Instagram"
                       >
                         <Instagram className="h-5 w-5" />
                       </a>
                       <a
                         href="#"
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-foreground transition-colors hover:bg-primary hover:text-foreground"
                         aria-label="LinkedIn"
                       >
                         <Linkedin className="h-5 w-5" />
                       </a>
                       <a
                         href="#"
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-foreground transition-colors hover:bg-primary hover:text-foreground"
                         aria-label="Website"
                       >
                         <Globe className="h-5 w-5" />

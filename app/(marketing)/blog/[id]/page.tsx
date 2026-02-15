@@ -62,7 +62,7 @@ export default function BlogDetailPage() {
 
                                 <div className="flex items-center justify-between py-6 border-y border-border">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-black text-xs">
+                                        <div className="w-10 h-10 rounded-full bg-primary text-foreground flex items-center justify-center font-black text-xs">
                                             {post.author[0]}
                                         </div>
                                         <div>
@@ -72,10 +72,10 @@ export default function BlogDetailPage() {
                                     </div>
 
                                     <div className="flex items-center gap-4">
-                                        <button className="p-3 bg-secondary/50 rounded-xl text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+                                        <button className="p-3 bg-secondary/50 rounded-xl text-primary hover:bg-primary hover:text-foreground transition-all">
                                             <Share2 size={18} />
                                         </button>
-                                        <button className="p-3 bg-secondary/50 rounded-xl text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+                                        <button className="p-3 bg-secondary/50 rounded-xl text-primary hover:bg-primary hover:text-foreground transition-all">
                                             <Bookmark size={18} />
                                         </button>
                                     </div>
@@ -104,7 +104,7 @@ export default function BlogDetailPage() {
                                 </p>
                                 <Link
                                     href="/explore/vendors"
-                                    className="flex items-center justify-between w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 px-6 rounded-2xl font-black transition-all group shadow-xl"
+                                    className="flex items-center justify-between w-full bg-primary hover:bg-primary/90 text-foreground py-4 px-6 rounded-2xl font-black transition-all group shadow-xl"
                                 >
                                     Explore Vendors
                                     <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />

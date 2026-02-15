@@ -92,12 +92,6 @@ export const VENDOR_DASHBOARD_DATA = {
     currentVendorId: CURRENT_VENDOR_ID,
     leads: derivedLeads,
     bookings: derivedBookings,
-
-    calendarEvents: {
-        14: { title: "Wedding - Bello", type: "Wedding" },
-        22: { title: "Lagos Tech Mixer", type: "Corporate" },
-    } as Record<number, CalendarEvent>,
-
     portfolioItems: getCurrentVendor()?.portfolio || [] as PortfolioItem[],
 
     chats: [
@@ -118,7 +112,7 @@ export const VENDOR_DASHBOARD_DATA = {
     ] as Chat[],
 
     stats: {
-        monthlyRevenue: "₦2,400,000",
+        monthlyRevenue: "$15,250",
         growth: 12,
         activeBookings: derivedBookings.length,
         avgRating: 4.9

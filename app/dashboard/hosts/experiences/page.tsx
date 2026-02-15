@@ -24,32 +24,32 @@ const ExperiencesPage: React.FC = () => {
                         <Sparkles className="text-primary" size={20} />
                         <span className="text-primary text-[10px] font-black uppercase tracking-widest">Premium Branded</span>
                     </div>
-                    <h2 className="text-4xl font-serif font-black tracking-tight text-slate-900">Experiences</h2>
-                    <p className="text-slate-500 font-medium mt-1">Ultra-exclusive curated events and activity packages.</p>
+                    <h2 className="text-4xl font-serif font-black tracking-tight text-foreground">Experiences</h2>
+                    <p className="text-muted-foreground font-medium mt-1">Ultra-exclusive curated events and activity packages.</p>
                 </div>
 
                 <div className="flex items-center gap-3">
                     <div className="relative group">
-                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" />
+                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
                         <input
                             type="text"
                             placeholder="Search experiences..."
-                            className="pl-12 pr-6 py-4 bg-white border border-slate-100 rounded-2xl w-full md:w-80 font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm"
+                            className="pl-12 pr-6 py-4 bg-white border border-border rounded-2xl w-full md:w-80 font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm"
                         />
                     </div>
-                    <button className="p-4 bg-white border border-slate-100 rounded-2xl text-slate-600 hover:text-primary transition-all shadow-sm">
+                    <button className="p-4 bg-white border border-border rounded-2xl text-muted-foreground hover:text-primary transition-all shadow-sm">
                         <Filter size={20} />
                     </button>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center border-b border-slate-100">
+            <div className="flex items-center border-b border-border">
                 <button
                     onClick={() => setActiveTab('all')}
                     className={`px-8 py-4 text-sm font-black transition-all border-b-2 ${activeTab === 'all'
                         ? 'border-primary text-primary'
-                        : 'border-transparent text-slate-400 hover:text-slate-600'
+                        : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                         }`}
                 >
                     All Experiences
@@ -58,7 +58,7 @@ const ExperiencesPage: React.FC = () => {
                     onClick={() => setActiveTab('saved')}
                     className={`px-8 py-4 text-sm font-black transition-all border-b-2 ${activeTab === 'saved'
                         ? 'border-primary text-primary'
-                        : 'border-transparent text-slate-400 hover:text-slate-600'
+                        : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                         }`}
                 >
                     Saved
@@ -77,7 +77,7 @@ const ExperiencesPage: React.FC = () => {
                         <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
                             <Search className="text-slate-300" size={32} />
                         </div>
-                        <p className="text-slate-400 font-bold">No experiences found at the moment.</p>
+                        <p className="text-muted-foreground font-bold">No experiences found at the moment.</p>
                     </div>
                 )}
             </div>

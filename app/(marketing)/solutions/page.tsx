@@ -64,7 +64,7 @@ export default function SolutionsPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-primary px-4 py-16 text-center text-primary-foreground">
+      <section className="bg-primary px-4 py-16 text-center text-foreground">
         <h2 className="font-serif text-3xl font-bold md:text-4xl">
           Not sure which service fits?
         </h2>

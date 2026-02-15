@@ -174,7 +174,7 @@ function VendorListingContent({
                 key={cat}
                 onClick={() => setSelectedCategory(cat as VendorCategory)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${selectedCategory === cat
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-foreground"
                   : "bg-background text-foreground hover:bg-secondary"
                   }`}
               >
@@ -208,13 +208,13 @@ function VendorListingContent({
       <section className="bg-background px-4 py-8 lg:px-8">
         <div className="mx-auto max-w-7xl">
           {/* Search */}
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative max-w-md text-foreground">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground" />
             <Input
               placeholder="Search vendors..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
+              className="pl-10 text-foreground"
             />
           </div>
 

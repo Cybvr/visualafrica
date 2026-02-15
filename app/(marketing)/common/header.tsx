@@ -41,7 +41,7 @@ import {
 import { VENDOR_CATEGORIES, CATEGORY_SLUG_MAP } from "@/lib/vendors-data"
 import { solutions } from "@/lib/solutions-data"
 import { auth } from "@/lib/firebase"
-import { onAuthStateChanged, signOut } from "firebase/auth"
+import { onAuthStateChanged, signOut, User as FirebaseUser } from "firebase/auth"
 import { EVENT_THEMES } from "@/lib/vendors-data"
 import { platformFeatures } from "@/lib/platform-data"
 
@@ -94,7 +94,7 @@ const serviceSolutions = solutions.filter(o => serviceOfferingSlugs.includes(o.s
   slug: o.slug,
 }))
 
-type AuthUser = Parameters<Parameters<typeof onAuthStateChanged>[1]>[0]
+type AuthUser = FirebaseUser | null
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -123,7 +123,7 @@ export function Header() {
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
             <span className="font-logo text-xl font-normal text-foreground">
-              Waddi
+              Visual Africa
             </span>
           </Link>
         </div>
@@ -166,7 +166,7 @@ export function Header() {
 
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
-              Themes
+              Discover
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-[500px] border-none bg-white p-4 shadow-2xl rounded-3xl">
               <div className="grid grid-cols-2 gap-x-8 gap-y-2">
@@ -196,7 +196,7 @@ export function Header() {
 
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
-              Offerings
+              Solutions
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-[600px] border-none bg-white p-6 shadow-2xl rounded-3xl">
               <div className="grid grid-cols-2 gap-8">
@@ -259,14 +259,14 @@ export function Header() {
 
         <div className="hidden w-[180px] flex-shrink-0 items-center justify-end gap-3 lg:flex">
           <Link href="/request-demo">
-            <Button variant="outline" size="sm" className="flex items-center gap-2 border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground">
+            <Button variant="outline" size="sm" className="flex items-center gap-2 border-primary/20 text-primary hover:bg-primary hover:text-foreground">
               Request a Demo
             </Button>
           </Link>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Button size="sm" className="bg-primary text-white hover:bg-primary/90">
                   Account <ChevronDown className="ml-1 h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
@@ -281,7 +281,7 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <Link href="/auth/login">
-              <Button size="sm" className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button size="sm" className="flex items-center gap-2 bg-primary text-foreground hover:bg-primary/90">
                 Sign In
               </Button>
             </Link>
@@ -321,7 +321,7 @@ export function Header() {
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
                 onClick={() => setMobileOpen(false)}
               >
-                Themes
+                Discover
               </Link>
               <div className="ml-4 flex flex-col gap-2 border-l border-border pl-4">
                 {themeLinks.slice(0, 6).map((item) => (
@@ -363,7 +363,7 @@ export function Header() {
               </Link>
               <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
                 <Link href="/request-demo" onClick={() => setMobileOpen(false)}>
-                  <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                  <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-foreground">
                     Request a Demo
                   </Button>
                 </Link>
@@ -380,7 +380,7 @@ export function Header() {
                   </>
                 ) : (
                   <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
-                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                    <Button className="w-full bg-primary text-foreground hover:bg-primary/90">
                       Sign In
                     </Button>
                   </Link>

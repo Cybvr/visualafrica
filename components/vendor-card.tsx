@@ -21,7 +21,7 @@ export function VendorCard({ vendor }: { vendor: Vendor }) {
           <div className="h-full w-full bg-muted" />
         )}
         {vendor.featured && (
-          <Badge className="absolute left-3 top-3 bg-accent text-accent-foreground">
+          <Badge className="absolute left-3 top-3 bg-accent text-accent">
             Featured
           </Badge>
         )}
@@ -104,7 +104,7 @@ export function VendorCard({ vendor }: { vendor: Vendor }) {
         </div>
 
         <Link href={`/explore/vendors/${vendor.slug}`} className="mt-4 block">
-          <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button className="w-full bg-primary text-foreground hover:bg-primary/90">
             View Details
           </Button>
         </Link>

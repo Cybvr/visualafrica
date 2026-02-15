@@ -13,7 +13,7 @@ export default function EventsPage() {
                     <p className="text-muted-foreground mt-1">Manage all your upcoming and past events.</p>
                 </div>
                 <Link href="/dashboard/hosts/events/new">
-                    <Button className="rounded-full gap-2">
+                    <Button className="rounded-full gap-2 text-primary-foreground">
                         <Plus size={18} />
                         Create Event
                     </Button>
@@ -33,7 +33,7 @@ export default function EventsPage() {
                                 src={event.image}
                                 alt={event.name}
                                 fill
-                                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                className="object-cover transition-transform duration-500 "
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:hidden" />
                             <div className="absolute bottom-4 left-4 text-white md:hidden">

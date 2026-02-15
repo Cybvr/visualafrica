@@ -49,7 +49,7 @@ export function FeaturesGrid() {
                         <p className="mt-6 text-lg text-white/90">
                             Remote planning with local feet on the ground. We provide the trust and coordination you need for peace of mind.
                         </p>
-                        <Button asChild className="mt-8 bg-primary hover:bg-primary/90" size="lg">
+                        <Button asChild className="mt-8 bg-primary hover:bg-primary/90 text-white" size="lg">
                             <Link href="/auth/login">Get started</Link>
                         </Button>
                     </div>

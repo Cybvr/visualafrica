@@ -40,8 +40,8 @@ export default function VendorPortfolioPage() {
         <div className="max-w-6xl mx-auto space-y-8">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-3xl font-serif font-black tracking-tight text-slate-900">Portfolio</h2>
-                    <p className="text-slate-500 mt-1">Showcase your best work to potential clients.</p>
+                    <h2 className="text-3xl font-serif font-black tracking-tight text-foreground">Portfolio</h2>
+                    <p className="text-muted-foreground mt-1">Showcase your best work to potential clients.</p>
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
@@ -54,7 +54,7 @@ export default function VendorPortfolioPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {items.map(item => (
-                    <div key={item.id} className="group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden hover:shadow-lg transition-all">
+                    <div key={item.id} className="group bg-card rounded-[2.5rem] border border-border shadow-sm overflow-hidden hover:shadow-lg transition-all">
                         <div className="aspect-[4/3] relative overflow-hidden">
                             <img
                                 src={item.image}
@@ -69,7 +69,7 @@ export default function VendorPortfolioPage() {
                             <div className="absolute top-4 right-4">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <button className="p-2 bg-white rounded-xl shadow-lg text-slate-900 hover:bg-slate-50 transition-colors">
+                                        <button className="p-2 bg-card rounded-xl shadow-lg text-foreground hover:bg-slate-50 transition-colors">
                                             <MoreHorizontal size={18} />
                                         </button>
                                     </DropdownMenuTrigger>
@@ -85,8 +85,8 @@ export default function VendorPortfolioPage() {
                             </div>
                         </div>
                         <div className="p-6">
-                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.date}</div>
-                            <h3 className="text-lg font-bold text-slate-900 group-hover:text-primary transition-colors">{item.title}</h3>
+                            <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">{item.date}</div>
+                            <h3 className="text-lg font-bold text-foreground  transition-colors">{item.title}</h3>
                         </div>
                     </div>
                 ))}
@@ -95,58 +95,58 @@ export default function VendorPortfolioPage() {
             {/* CRUD Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-                    <div className="relative bg-white w-full max-w-md rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
+                    <div className="relative bg-card w-full max-w-md rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in zoom-in-95 duration-200">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-2xl font-serif font-black text-slate-900">{isEditing ? 'Edit Portfolio Item' : 'New Portfolio Item'}</h3>
+                            <h3 className="text-2xl font-serif font-black text-foreground">{isEditing ? 'Edit Portfolio Item' : 'New Portfolio Item'}</h3>
                             <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors">
-                                <X size={20} className="text-slate-400" />
+                                <X size={20} className="text-muted-foreground" />
                             </button>
                         </div>
 
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Title</label>
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Title</label>
                                 <input
                                     type="text"
                                     value={currentItem.title || ''}
                                     onChange={e => setCurrentItem({ ...currentItem, title: e.target.value })}
-                                    className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold"
+                                    className="w-full px-5 py-3 bg-slate-50 border border-border rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                                     placeholder="e.g. Wedding Ceremony Highlights"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Type</label>
+                                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Type</label>
                                     <select
                                         value={currentItem.type}
                                         onChange={e => setCurrentItem({ ...currentItem, type: e.target.value as any })}
-                                        className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold appearance-none"
+                                        className="w-full px-5 py-3 bg-slate-50 border border-border rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold appearance-none"
                                     >
                                         <option value="Gallery">Gallery</option>
                                         <option value="Video">Video</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</label>
+                                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Date</label>
                                     <input
                                         type="text"
                                         value={currentItem.date || ''}
                                         onChange={e => setCurrentItem({ ...currentItem, date: e.target.value })}
-                                        className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold"
+                                        className="w-full px-5 py-3 bg-slate-50 border border-border rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                                         placeholder="Jan 2026"
                                     />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Image URL</label>
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Image URL</label>
                                 <input
                                     type="text"
                                     value={currentItem.image || ''}
                                     onChange={e => setCurrentItem({ ...currentItem, image: e.target.value })}
-                                    className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold"
+                                    className="w-full px-5 py-3 bg-slate-50 border border-border rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                                     placeholder="https://images.unsplash.com/..."
                                 />
                             </div>

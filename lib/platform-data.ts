@@ -7,7 +7,7 @@ import {
     Zap,
     Globe,
     Users,
-    LayoutDashboard,
+    Home,
     FileText,
     MessageSquare
 } from "lucide-react"
@@ -108,7 +108,7 @@ export const platformFeatures: PlatformFeature[] = [
             {
                 title: "Live Dashboard",
                 description: "A centralized command center for your event. See status updates, pending tasks, and budget usage at a glance.",
-                icon: LayoutDashboard
+                icon: Home
             },
             {
                 title: "Milestone Tracking",

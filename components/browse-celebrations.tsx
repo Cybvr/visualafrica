@@ -23,7 +23,7 @@ const celebrations = [
   { title: "Graduation", icon: GraduationCap, href: "/social", color: "bg-green-500/10 text-green-600" },
   { title: "Proposals", icon: Gem, href: "/concierge", color: "bg-primary/10 text-primary" },
   { title: "Anniversary Parties", icon: Cake, href: "/social", color: "bg-amber-500/10 text-amber-600" },
-  { title: "Private Chef / Home Events", icon: ChefHat, href: "/social", color: "bg-orange-500/10 text-orange-600" },
+  { title: "Private Chef / Home Events", icon: ChefHat, href: "/social", color: "bg-accent0/10 text-accent" },
 ]
 
 export function BrowseCelebrations() {

@@ -19,6 +19,7 @@ import ItineraryTab from '@/components/dashboard/event-tabs/ItineraryTab';
 import GuestsTab from '@/components/dashboard/event-tabs/GuestsTab';
 import VendorsTab from '@/components/dashboard/event-tabs/VendorsTab';
 import ContractsTab from '@/components/dashboard/event-tabs/ContractsTab';
+import InboxTab from '@/components/dashboard/event-tabs/InboxTab';
 
 // Helper to format date range (mock implementation based on previous usage)
 const formatEventDateRange = (startDate: string, endDate: string) => {
@@ -106,22 +107,28 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     >
                         Contracts
                     </TabsTrigger>
+                    <TabsTrigger
+                        value="inbox"
+                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-3 font-bold text-muted-foreground data-[state=active]:text-foreground"
+                    >
+                        Inbox
+                    </TabsTrigger>
                 </TabsList>
 
                 <div className="mt-8">
                     {/* OVERVIEW TAB */}
                     <TabsContent value="overview" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {/* Visual Summary Banner */}
-                        <div className="bg-slate-900 rounded-[3rem] p-10 text-white relative overflow-hidden shadow-2xl shadow-slate-900/20">
+                        <div className="bg-background rounded-[3rem] p-10 text-white relative overflow-hidden shadow-2xl shadow-slate-900/20">
                             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
                                 <div className="space-y-4">
-                                    <div className="flex flex-wrap gap-6 text-slate-400">
+                                    <div className="flex flex-wrap gap-6 text-muted-foreground">
                                         <div className="flex items-center gap-2">
-                                            <MapPin size={20} className="text-orange-600" />
+                                            <MapPin size={20} className="text-accent" />
                                             <span className="font-bold text-lg text-white">{eventData.location}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <Calendar size={20} className="text-orange-600" />
+                                            <Calendar size={20} className="text-accent" />
                                             <span className="font-bold text-lg text-white">{formatEventDateRange(eventData.startDate, eventData.endDate)}</span>
                                         </div>
                                     </div>
@@ -129,24 +136,24 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
                                 <div className="flex gap-4">
                                     <div className="bg-white/5 border border-white/10 px-6 py-4 rounded-3xl backdrop-blur-md text-center">
-                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Guests</p>
+                                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Guests</p>
                                         <p className="text-2xl font-black">{eventData.guestCount}</p>
                                     </div>
                                     <div className="bg-white/5 border border-white/10 px-6 py-4 rounded-3xl backdrop-blur-md text-center">
-                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Budget</p>
+                                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Budget</p>
                                         <p className="text-2xl font-black text-green-500">₦{(eventData.budgetTotal || 0).toLocaleString()}</p>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Background decorative element */}
-                            <div className="absolute top-0 right-0 w-96 h-96 bg-orange-600 opacity-10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
+                            <div className="absolute top-0 right-0 w-96 h-96 bg-primary opacity-10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
                         </div>
 
                         {/* Status Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div className="bg-card p-6 rounded-[2rem] border border-border shadow-sm flex flex-col items-center text-center group">
-                                <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center mb-4"><Target size={20} /></div>
+                                <div className="w-12 h-12 bg-accent text-accent rounded-2xl flex items-center justify-center mb-4"><Target size={20} /></div>
                                 <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Status</h4>
                                 <p className="text-lg font-bold text-foreground">{eventData.status}</p>
                             </div>
@@ -187,12 +194,12 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
                         {/* Secondary Row: Itinerary and Guest Management */}
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                            <div className="lg:col-span-12 xl:col-span-7 cursor-pointer hover:scale-[1.01] transition-transform">
+                            <div className="lg:col-span-12 xl:col-span-7 cursor-pointer">
                                 <Link href="/dashboard/hosts/itinerary">
                                     <ItineraryCard />
                                 </Link>
                             </div>
-                            <div className="lg:col-span-12 xl:col-span-5 cursor-pointer hover:scale-[1.01] transition-transform">
+                            <div className="lg:col-span-12 xl:col-span-5 cursor-pointer">
                                 <Link href="/dashboard/hosts/guest-website">
                                     <GuestManagementCard />
                                 </Link>
@@ -224,6 +231,11 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     {/* CONTRACTS TAB */}
                     <TabsContent value="contracts">
                         <ContractsTab bookedVendors={eventData.bookedVendors} />
+                    </TabsContent>
+
+                    {/* INBOX TAB */}
+                    <TabsContent value="inbox">
+                        <InboxTab />
                     </TabsContent>
                 </div>
             </Tabs>

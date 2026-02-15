@@ -42,7 +42,7 @@ export default function LoginPage() {
           <Link href="/" className="absolute left-8 top-8 flex items-center gap-2">
             <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
             <span className="font-logo text-xl font-normal text-background">
-              Waddi
+              Visual Africa
             </span>
           </Link>
           <div className="max-w-md space-y-8">
@@ -88,7 +88,7 @@ export default function LoginPage() {
             <Link href="/" className="flex items-center gap-2">
               <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
               <span className="font-logo text-xl font-normal text-foreground">
-                Waddi
+                Visual Africa
               </span>
             </Link>
           </div>
@@ -113,7 +113,7 @@ export default function LoginPage() {
             <CardContent>
               <div className="flex flex-col gap-3">
                 <Button
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="w-full bg-primary text-foreground hover:bg-primary/90"
                   onClick={handleGoogleSignIn}
                   disabled={isLoading}
                 >

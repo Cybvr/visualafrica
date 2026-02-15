@@ -1,117 +1,158 @@
 "use client";
 
-import { Search, FileText, TrendingUp, Star, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, FileText, TrendingUp, Star, ArrowRight, Filter } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { doc, getDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth, db } from '@/lib/firebase';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 import { SHARED_EVENTS } from '@/lib/shared-data';
 import EventCard from '@/components/dashboard/EventCard';
+import { Input } from '@/components/ui/input';
+
+type EventStatus = 'All Events' | 'Planning' | 'Confirmed' | 'Completed';
 
 export default function VendorDashboardPage() {
   const router = useRouter();
+  const [displayName, setDisplayName] = useState<string>('');
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        setDisplayName('');
+        return;
+      }
+      try {
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        const name = userDoc.exists()
+          ? (userDoc.data().displayName || currentUser.displayName || '')
+          : (currentUser.displayName || '');
+        setDisplayName(name);
+      } catch {
+        setDisplayName(currentUser.displayName || '');
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   const { stats, leads, bookings } = VENDOR_DASHBOARD_DATA;
+  const [activeTab, setActiveTab] = useState<'all' | 'saved'>('all');
+  const [selectedStatus, setSelectedStatus] = useState<EventStatus>('All Events');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const statusOptions: EventStatus[] = ['All Events', 'Planning', 'Confirmed', 'Completed'];
+
+  // Filter events by selected status
+  const filteredByStatus = selectedStatus === 'All Events'
+    ? SHARED_EVENTS
+    : SHARED_EVENTS.filter(event => event.status === selectedStatus);
+
+  // Further filter by search query
+  const filteredEvents = searchQuery.trim() === ''
+    ? filteredByStatus
+    : filteredByStatus.filter(event =>
+      event.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.hostName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.location.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+  // For demo purposes, we'll just show a subset if tab is 'saved'
+  const displayEvents = activeTab === 'all' ? filteredEvents : filteredEvents.slice(0, 2);
+
+  const firstName = displayName.trim().split(/\s+/)[0] || displayName;
+  const welcomeText = displayName
+    ? `Welcome back, ${firstName}. Here's your business at a glance.`
+    : "Welcome back. Here's your business at a glance.";
 
   return (
-    <div className="max-w-6xl mx-auto space-y-12 pb-20">
+    <div className="max-w-7xl mx-auto space-y-12 pb-20">
       <div className="space-y-8">
         <div>
-          <h2 className="text-3xl font-black tracking-tight text-slate-900">Dashboard Overview</h2>
-          <p className="text-slate-500 mt-1">Welcome back. Here's your business at a glance.</p>
+          <h2 className="text-3xl font-black tracking-tight text-foreground">Home</h2>
+          <p className="text-muted-foreground mt-1">{welcomeText}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Link href="/dashboard/vendors/offers" className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                <Search size={24} />
-              </div>
-              <span className="bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider">New</span>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-4xl font-black text-slate-900">{leads.length}</h3>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-wide">Active Offers</p>
-            </div>
-          </Link>
-
-          <Link href="/dashboard/vendors/contracts" className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                <FileText size={24} />
-              </div>
-              <span className="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider">Active</span>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-4xl font-black text-slate-900">{stats.activeBookings}</h3>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-wide">Active Contracts</p>
-            </div>
-          </Link>
-
-          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all group cursor-pointer">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-colors">
-                <TrendingUp size={24} />
-              </div>
-              <span className="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider">+{stats.growth}%</span>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-4xl font-black text-slate-900">{stats.monthlyRevenue}</h3>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-wide">Monthly Revenue</p>
-            </div>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center border-b border-border w-full md:w-auto">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`px-8 py-4 text-sm font-black transition-all border-b-2 ${activeTab === 'all'
+                ? 'border-primary text-accent'
+                : 'border-transparent text-muted-foreground hover:text-muted-foreground'
+                }`}
+            >
+              All Events
+            </button>
+            <button
+              onClick={() => setActiveTab('saved')}
+              className={`px-8 py-4 text-sm font-black transition-all border-b-2 ${activeTab === 'saved'
+                ? 'border-primary text-accent'
+                : 'border-transparent text-muted-foreground hover:text-muted-foreground'
+                }`}
+            >
+              Saved
+            </button>
           </div>
 
-          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all group cursor-pointer">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 bg-yellow-50 text-yellow-600 rounded-2xl flex items-center justify-center group-hover:bg-yellow-600 group-hover:text-white transition-colors">
-                <Star size={24} />
-              </div>
-              <span className="bg-yellow-100 text-yellow-700 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider">Excellent</span>
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1 md:flex-none">
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search events..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 pr-4 py-2.5 bg-card border border-border rounded-full text-sm w-full md:w-64"
+              />
             </div>
-            <div className="space-y-1">
-              <h3 className="text-4xl font-black text-slate-900">{stats.avgRating}</h3>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-wide">Average Rating</p>
-            </div>
+            <button className="p-2.5 bg-card border border-border rounded-full text-muted-foreground hover:text-accent transition-colors">
+              <Filter size={20} />
+            </button>
           </div>
         </div>
+
+        {activeTab === 'all' && (
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {statusOptions.map(status => (
+              <button
+                key={status}
+                onClick={() => setSelectedStatus(status)}
+                className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all border ${selectedStatus === status
+                  ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105'
+                  : 'bg-card border-border text-muted-foreground hover:border-primary'
+                  }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {displayEvents.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {displayEvents.map(event => (
+              <EventCard
+                key={event.id}
+                event={event}
+                onClick={() => router.push(`/dashboard/vendors/event/${event.id}`)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16 bg-card rounded-[2rem] border border-border">
+            <div className="text-muted-foreground space-y-2">
+              <p className="text-lg font-bold text-foreground">No events found</p>
+              <p className="text-sm">
+                {activeTab === 'saved' ? "You haven't saved any events yet." : 'Check back soon for new opportunities!'}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Upcoming Events */}
-      <section className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
-            Upcoming Events <span className="text-lg">✨</span>
-          </h3>
-          <Link href="/dashboard/vendors/events" className="text-sm font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1">
-            View All <ArrowRight size={16} />
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {bookings.length > 0 ? (
-            bookings.slice(0, 4).map(booking => {
-              // Map booking back to a format EventCard expects or update EventCard
-              const eventFromShared = SHARED_EVENTS.find(e => e.id === booking.id.split('-')[1]);
-              return (
-                <EventCard
-                  key={booking.id}
-                  event={eventFromShared || {
-                    id: booking.id,
-                    eventName: booking.event,
-                    date: booking.date,
-                    location: booking.location,
-                    image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
-                    status: 'Confirmed'
-                  } as any}
-                  onClick={() => router.push(`/dashboard/vendors/event/${eventFromShared?.id || booking.id}`)}
-                />
-              )
-            })
-          ) : (
-            <div className="col-span-full text-center py-12 text-slate-400">
-              <p className="font-semibold">No upcoming events at the moment.</p>
-              <p className="text-sm mt-1">Check back soon for new bookings!</p>
-            </div>
-          )}
-        </div>
-      </section>
     </div>
   );
 }

@@ -18,7 +18,7 @@ export default function VendorDetailPage() {
                 <h1 className="text-2xl font-bold">Vendor not found</h1>
                 <button
                     onClick={() => router.push('/dashboard/hosts/vendors')}
-                    className="text-orange-600 font-bold"
+                    className="text-accent font-bold"
                 >
                     Back to Explore
                 </button>

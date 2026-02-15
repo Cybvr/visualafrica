@@ -24,9 +24,9 @@ export default function HomePage() {
         <Testimonials />
 
         {/* Final CTA Section */}
-        <section className="py-24 bg-primary text-primary-foreground text-center">
+        <section className="py-24 bg-primary text-foreground text-center">
           <div className="container mx-auto px-4">
-            <h2 className="font-serif text-4xl md:text-6xl font-bold mb-8">
+            <h2 className="font-serif text-4xl md:text-6xl font-bold mb-8 text-white">
               Ready to plan your <br /> next event?
             </h2>
             <Button asChild size="lg" variant="secondary" className="h-14 px-10 text-lg bg-white text-primary hover:bg-gray-100">

@@ -4,8 +4,9 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
+  Home,
   Settings,
+  BriefcaseBusiness,
   Lightbulb,
   Search,
   Heart,
@@ -21,8 +22,6 @@ import {
   User,
   Briefcase,
   LucideIcon,
-  PanelLeftClose,
-  PanelLeftOpen,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -30,10 +29,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from "../ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, signOut, User as FirebaseUser } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { useTheme } from "next-themes";
+import { Sun, Moon, Monitor } from "lucide-react";
 import { VENDOR_DASHBOARD_DATA } from "@/lib/vendor-dashboard-data";
 import { EVENTS } from "@/lib/events-data";
 
@@ -51,10 +62,11 @@ type UserProfile = {
   photoURL?: string;
 };
 
-const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor', isCollapsed?: boolean }> = ({ mode, isCollapsed }) => {
+const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const { setTheme, theme } = useTheme();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -106,69 +118,97 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor', isCollapsed?: boolean
 
   if (loading || !userProfile) {
     return (
-      <div className="p-4 border-t border-slate-100">
-        <div className={`w-full ${isCollapsed ? 'justify-center' : 'px-4 py-3'} rounded-xl flex items-center gap-3`}>
-          <div className="w-9 h-9 bg-slate-200 rounded-full animate-pulse flex-shrink-0" />
-          {!isCollapsed && (
-            <div className="flex-1 min-w-0">
-              <div className="h-4 bg-slate-200 rounded animate-pulse mb-1" />
-              <div className="h-3 bg-slate-200 rounded animate-pulse w-2/3" />
-            </div>
-          )}
+      <div className="p-4 border-t border-border">
+        <div className="w-full rounded-xl flex flex-col items-center gap-2">
+          <div className="w-9 h-9 bg-muted rounded-full animate-pulse flex-shrink-0" />
+          <div className="h-3 bg-muted rounded animate-pulse w-12" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 border-t border-slate-100">
+    <div className="p-4 border-t">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild title={isCollapsed ? userProfile.displayName : undefined}>
-          <button className={`w-full hover:bg-sidebar-accent rounded-xl flex items-center justify-between transition-colors group text-left ${isCollapsed ? 'p-1.5 justify-center' : 'px-4 py-3'}`}>
-            <div className={`flex items-center min-w-0 ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
-              {userProfile.photoURL ? (
-                <img
-                  src={userProfile.photoURL}
-                  alt={userProfile.displayName}
-                  className="w-9 h-9 rounded-full object-cover flex-shrink-0"
-                />
-              ) : (
-                <div className="w-9 h-9 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 text-sm font-semibold flex-shrink-0">
-                  {getInitials(userProfile.displayName)}
-                </div>
-              )}
-              {!isCollapsed && (
-                <div className="text-left min-w-0 ml-3">
-                  <div className="text-sm font-semibold text-sidebar-foreground truncate">
-                    {userProfile.displayName}
-                  </div>
-                  <div className="text-xs text-muted-foreground truncate">
-                    {mode === 'host' ? 'Host Account' : 'Vendor Account'}
-                  </div>
-                </div>
-              )}
-            </div>
-            {!isCollapsed && (
-              <ChevronDown
-                size={16}
-                className="text-slate-400 transition-transform flex-shrink-0 group-data-[state=open]:rotate-180"
+        <DropdownMenuTrigger asChild>
+          <button className="w-full hover:bg-card rounded-xl flex flex-col items-center transition-colors group text-center py-3 px-2">
+            {userProfile.photoURL ? (
+              <img
+                src={userProfile.photoURL}
+                alt={userProfile.displayName}
+                className="w-9 h-9 rounded-full object-cover"
               />
+            ) : (
+              <div className="w-9 h-9 bg-secondary rounded-full flex items-center justify-center text-muted-foreground text-sm font-semibold">
+                {getInitials(userProfile.displayName)}
+              </div>
             )}
+            <div className="mt-1">
+              <div className="text-[10px] font-semibold text-sidebar-foreground truncate max-w-full">
+                {userProfile.displayName}
+              </div>
+            </div>
+            <ChevronDown
+              size={12}
+              className="text-muted-foreground transition-transform mt-1 group-data-[state=open]:rotate-180"
+            />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className={`${isCollapsed ? 'w-48 ml-2' : 'w-[calc(100%-2rem)] mx-4'} rounded-xl shadow-lg border-slate-200`}
-          side={isCollapsed ? "right" : "top"}
-          align={isCollapsed ? "end" : "end"}
-          sideOffset={isCollapsed ? 12 : 12}
+          className="w-48 rounded-xl shadow-lg bg-background"
+          side="right"
+          align="end"
+          sideOffset={12}
         >
+          <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+            Account
+          </div>
           <Link href={mode === 'host' ? '/dashboard/vendors' : '/dashboard/hosts'}>
-            <DropdownMenuItem className="py-2.5 cursor-pointer flex items-center gap-2 text-primary font-bold">
+            <DropdownMenuItem className="py-2.5 cursor-pointer flex items-center gap-2 text-foreground font-medium">
               <ClipboardList size={16} />
               View as {mode === 'host' ? 'Vendor' : 'Host'}
             </DropdownMenuItem>
           </Link>
+          <DropdownMenuItem className="py-2.5 cursor-pointer flex items-center gap-2 text-foreground font-medium">
+            <User size={16} />
+            Profile Settings
+          </DropdownMenuItem>
+
           <DropdownMenuSeparator />
+
+          <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+            Preferences
+          </div>
+
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger className="py-2.5 cursor-pointer flex items-center gap-2 text-foreground font-medium">
+              {theme === "light" ? <Sun size={16} /> : theme === "dark" ? <Moon size={16} /> : <Monitor size={16} />}
+              Theme
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent className="min-w-[120px]">
+                <DropdownMenuItem onClick={() => setTheme("light")} className="cursor-pointer gap-2">
+                  <Sun size={14} /> Light
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")} className="cursor-pointer gap-2">
+                  <Moon size={14} /> Dark
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("system")} className="cursor-pointer gap-2">
+                  <Monitor size={14} /> System
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+
+          <Link href="/support">
+            <DropdownMenuItem className="py-2.5 cursor-pointer flex items-center gap-2 text-foreground font-medium">
+              <HelpCircle size={16} />
+              Support
+            </DropdownMenuItem>
+          </Link>
+
+          <DropdownMenuSeparator />
+
           <DropdownMenuItem
             onClick={async () => {
               try {
@@ -188,11 +228,8 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor', isCollapsed?: boolean
   );
 };
 
-const SidebarSection: React.FC<{ children: React.ReactNode; divider?: boolean }> = ({
-  children,
-  divider,
-}) => (
-  <div className={divider ? "mb-4 pb-4 border-b border-sidebar-border" : "mb-4"}>
+const SidebarSection: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div>
     <nav className="space-y-0.5">{children}</nav>
   </div>
 );
@@ -200,83 +237,73 @@ const SidebarSection: React.FC<{ children: React.ReactNode; divider?: boolean }>
 const NavItem: React.FC<{
   icon: React.ReactNode;
   label: string;
-  active?: boolean;
+  active: boolean;
   href: string;
   count?: number;
   onNavigate?: () => void;
-  isCollapsed?: boolean;
-}> = ({ icon, label, active, href, count, onNavigate, isCollapsed }) => (
-  <Link
-    href={href}
-    onClick={onNavigate}
-    title={isCollapsed ? label : undefined}
-    className={`flex items-center transition-all rounded-xl group ${isCollapsed ? "justify-center p-2.5 mx-2" : "justify-between px-4 py-2.5"} ${active
-      ? "text-primary bg-primary/10 font-black shadow-sm"
-      : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-      }`}
-  >
-    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"}`}>
-      <span className={active ? "text-primary" : "text-slate-400 group-hover:text-sidebar-foreground"}>
+}> = ({ icon, label, active, href, count, onNavigate }) => {
+  return (
+    <Link
+      href={href}
+      onClick={onNavigate}
+      className={`flex flex-col items-center transition-all rounded-xl group relative py-3 px-2 ${active
+        ? "text-foreground bg-secondary font-black shadow-sm"
+        : "text-muted-foreground hover:bg-card hover:text-foreground"
+        }`}
+    >
+      <span className={active ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"}>
         {icon}
       </span>
-      {!isCollapsed && <span className="text-sm">{label}</span>}
-    </div>
-    {!isCollapsed && count !== undefined && (
-      <span
-        className={`text-[10px] font-black px-2 py-0.5 rounded-full ${active ? "bg-primary text-primary-foreground" : "bg-sidebar-accent text-muted-foreground"
-          }`}
-      >
-        {count}
+      <span className="text-[10px] font-bold mt-1 text-center leading-tight">
+        {label}
       </span>
-    )}
-  </Link>
-);
+      {count !== undefined && (
+        <span
+          className={`absolute top-1 right-1 text-[8px] font-black px-1.5 py-0.5 rounded-full ${active ? "bg-primary text-primary-foreground" : "bg-sidebar text-muted-foreground"
+            }`}
+        >
+          {count}
+        </span>
+      )}
+    </Link>
+  );
+};
 
 interface SidebarProps {
   onNavigate?: () => void;
-  isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onNavigate, isCollapsed, onToggleCollapse }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const pathname = usePathname();
   const mode = pathname?.startsWith("/dashboard/vendors") ? "vendor" : "host";
 
   const hostInboxCount = 3;
   const hostEventsCount = EVENTS.length;
-
   const vendorOffersCount = VENDOR_DASHBOARD_DATA.leads.length;
   const vendorInboxCount = VENDOR_DASHBOARD_DATA.chats.filter(c => c.unread).length;
   const vendorEventsCount = VENDOR_DASHBOARD_DATA.bookings.length;
 
   const hostPrimaryNavItems: NavItemConfig[] = [
-    { icon: LayoutDashboard, label: "Overview", href: "/dashboard/hosts" },
-    { icon: Calendar, label: "Events", href: "/dashboard/hosts/events", count: hostEventsCount },
-    { icon: Mail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
+    { icon: Home, label: "Home", href: "/dashboard/hosts" },
+    { icon: Search, label: "Discover", href: "/dashboard/hosts/vendors", matchPaths: ["/dashboard/hosts/vendor/"] },
+    { icon: Calendar, label: "Manage", href: "/dashboard/hosts/events", count: hostEventsCount },
   ];
 
   const hostSecondaryNavItems: NavItemConfig[] = [
-    { icon: Search, label: "Vendors", href: "/dashboard/hosts/vendors", matchPaths: ["/dashboard/hosts/vendor/"] },
-    { icon: Lightbulb, label: "Experiences", href: "/dashboard/hosts/experiences" },
     { icon: Lightbulb, label: "Inspiration", href: "/dashboard/hosts/inspiration" },
     { icon: FileText, label: "Resources", href: "/dashboard/hosts/diy-content" },
     { icon: Settings, label: "Settings", href: "/dashboard/hosts/settings" },
-    { icon: HelpCircle, label: "Support", href: "/support" },
   ];
 
   const vendorPrimaryNavItems: NavItemConfig[] = [
-    { icon: LayoutDashboard, label: "Overview", href: "/dashboard/vendors" },
-    { icon: Search, label: "Offers", href: "/dashboard/vendors/offers", count: vendorOffersCount },
-    { icon: FileText, label: "Contracts", href: "/dashboard/vendors/contracts" },
-    { icon: Mail, label: "Inbox", href: "/dashboard/vendors/inbox", count: vendorInboxCount },
+    { icon: Home, label: "Home", href: "/dashboard/vendors" },
+    { icon: BriefcaseBusiness, label: "Offers", href: "/dashboard/vendors/offers", count: vendorOffersCount },
+    { icon: ClipboardList, label: "Jobs", href: "/dashboard/vendors/jobs", count: vendorEventsCount },
   ];
 
   const vendorSecondaryNavItems: NavItemConfig[] = [
-    { icon: Search, label: "Events", href: "/dashboard/vendors/events", count: vendorEventsCount },
-    { icon: Calendar, label: "Calendar", href: "/dashboard/vendors/calendar" },
     { icon: User, label: "Portfolio", href: "/dashboard/vendors/portfolio" },
     { icon: Settings, label: "Settings", href: "/dashboard/vendors/settings" },
-    { icon: HelpCircle, label: "Support", href: "/support" },
   ];
 
   const primaryNavItems = mode === "host" ? hostPrimaryNavItems : vendorPrimaryNavItems;
@@ -291,38 +318,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, isCollapsed, onToggleColl
   return (
     <div className="flex flex-col h-full bg-sidebar transition-all duration-300">
       {/* Sidebar Header with Logo */}
-      <div className={`px-4 mt-6 mb-8 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-        <Link href="/" className="flex items-center gap-2 overflow-hidden">
+      <div className="px-4 mt-6 mb-8 flex flex-col items-center">
+        <Link href="/" className="flex flex-col items-center gap-2">
           <img src="/logo.png" alt="Logo" className="h-8 w-auto min-w-[32px] object-contain shrink-0" />
-          {!isCollapsed && (
-            <span className="font-logo text-xl font-normal text-foreground truncate">
-              Waddi
-            </span>
-          )}
         </Link>
-        {!isCollapsed && onToggleCollapse && (
-          <button
-            onClick={onToggleCollapse}
-            className="p-1.5 hover:bg-sidebar-accent rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
-          >
-            <PanelLeftClose size={18} />
-          </button>
-        )}
       </div>
 
-      {isCollapsed && onToggleCollapse && (
-        <div className="px-4 mb-4 flex justify-center">
-          <button
-            onClick={onToggleCollapse}
-            className="p-1.5 hover:bg-sidebar-accent rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
-          >
-            <PanelLeftOpen size={18} />
-          </button>
-        </div>
-      )}
-
       <div className="flex-1 px-4 overflow-y-auto scrollbar-hide pb-4">
-        <SidebarSection divider>
+        <SidebarSection>
           {primaryNavItems.map((item) => (
             <NavItem
               key={item.href}
@@ -332,7 +335,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, isCollapsed, onToggleColl
               href={item.href}
               count={item.count}
               onNavigate={onNavigate}
-              isCollapsed={isCollapsed}
             />
           ))}
         </SidebarSection>
@@ -347,13 +349,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, isCollapsed, onToggleColl
               href={item.href}
               count={item.count}
               onNavigate={onNavigate}
-              isCollapsed={isCollapsed}
             />
           ))}
         </SidebarSection>
       </div>
 
-      <ProfileDropdown mode={mode} isCollapsed={isCollapsed} />
+      <ProfileDropdown mode={mode} />
     </div>
   );
 };

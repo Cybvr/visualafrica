@@ -34,7 +34,7 @@ const VendorPreviewCard: React.FC<VendorPreviewCardProps> = ({
   return (
     <Link
       href={`${basePath}/${vendor.slug}`}
-      className="bg-white p-4 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-lg transition-all group"
+      className="bg-card p-4 rounded-[2rem] border border-border shadow-sm hover:shadow-lg transition-all group"
     >
       <div className="rounded-2xl overflow-hidden aspect-square mb-4 relative">
         <img
@@ -44,22 +44,22 @@ const VendorPreviewCard: React.FC<VendorPreviewCardProps> = ({
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         {vendor.featured && (
-          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-orange-600 p-1.5 rounded-full shadow-sm">
+          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-accent p-1.5 rounded-full shadow-sm">
             <Star size={12} fill="currentColor" />
           </div>
         )}
       </div>
       <div>
-        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+        <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">
           {vendor.categories[0]}
         </div>
-        <h4 className="font-bold text-slate-900 group-hover:text-orange-600 transition-colors truncate">
+        <h4 className="font-bold text-foreground group-hover:text-accent transition-colors truncate">
           {vendor.name}
         </h4>
         <div className="flex items-center gap-1 mt-1">
           <Star size={14} className="text-yellow-400" fill="currentColor" />
-          <span className="text-xs font-bold text-slate-700">{vendor.rating}</span>
-          <span className="text-xs text-slate-400">• {vendor.location.split(',')[0]}</span>
+          <span className="text-xs font-bold text-foreground">{vendor.rating}</span>
+          <span className="text-xs text-muted-foreground">• {vendor.location.split(',')[0]}</span>
         </div>
       </div>
     </Link>

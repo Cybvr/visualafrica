@@ -12,44 +12,44 @@ const DashboardContent: React.FC = () => {
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Overview Heading */}
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900">Overview</h2>
+        <h2 className="text-3xl font-bold tracking-tight text-foreground">Overview</h2>
         <div className="flex items-center gap-2">
-          <button className="border border-orange-600 text-orange-600 px-6 py-2 rounded-full text-sm font-semibold hover:bg-orange-50 transition-colors">
+          <button className="border border-primary text-accent px-6 py-2 rounded-full text-sm font-semibold hover:bg-accent transition-colors">
             Learn more
           </button>
-          <button className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
+          <button className="p-2 text-muted-foreground hover:text-muted-foreground transition-colors">
             <X size={20} />
           </button>
         </div>
       </div>
 
       {/* Upgrade Banner */}
-      <div className="bg-orange-50/50 border border-orange-100 p-4 rounded-2xl flex items-center gap-4 relative overflow-hidden group">
-        <div className="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center shrink-0 relative z-10">
+      <div className="bg-accent/50 border border-border p-4 rounded-2xl flex items-center gap-4 relative overflow-hidden group">
+        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shrink-0 relative z-10">
           <Rocket size={24} className="text-white" />
         </div>
         <div className="relative z-10">
-          <h3 className="font-bold text-slate-900">Upgrade to Full Service Planning</h3>
-          <p className="text-slate-500 text-sm">Want someone else to handle the details? We can help take care of everything for you.</p>
+          <h3 className="font-bold text-foreground">Upgrade to Full Service Planning</h3>
+          <p className="text-muted-foreground text-sm">Want someone else to handle the details? We can help take care of everything for you.</p>
         </div>
         {/* Background decorative circles */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-200 rounded-full opacity-10 translate-x-10 -translate-y-10" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-accent rounded-full opacity-10 translate-x-10 -translate-y-10" />
       </div>
 
       {/* Booked Vendors Section */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-slate-900">Your booked vendors</h3>
+          <h3 className="text-lg font-bold text-foreground">Your booked vendors</h3>
           <div className="flex items-center gap-2">
-            <button className="p-1 text-slate-400 hover:text-slate-600 border border-slate-200 rounded-full">
+            <button className="p-1 text-muted-foreground hover:text-muted-foreground border border-border rounded-full">
               <ChevronLeft size={16} />
             </button>
-            <button className="p-1 text-slate-400 hover:text-slate-600 border border-slate-200 rounded-full">
+            <button className="p-1 text-muted-foreground hover:text-muted-foreground border border-border rounded-full">
               <ChevronRight size={16} />
             </button>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Fix: Use data from lib/vendors-data.ts to satisfy Vendor type requirements */}
           {vendors.slice(0, 4).map(vendor => (

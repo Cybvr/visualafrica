@@ -83,7 +83,7 @@ export function HeroCarousel() {
         </h1>
         <Button
           size="lg"
-          className="mt-8 bg-primary px-8 text-primary-foreground hover:bg-primary/90"
+          className="mt-8 bg-primary px-8 text-foreground hover:bg-primary/90"
           asChild
         >
           <a href={slides[current].href}>{slides[current].cta}</a>

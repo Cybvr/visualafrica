@@ -33,10 +33,10 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                 <span className="flex h-2 w-2 rounded-full bg-primary mr-2"></span>
                                 {feature.title} Platform
                             </div>
-                            <h1 className="mb-6 font-serif text-4xl font-bold tracking-tight text-slate-900 md:text-5xl lg:text-6xl">
+                            <h1 className="mb-6 font-serif text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
                                 {feature.heroTitle}
                             </h1>
-                            <p className="mb-10 text-lg leading-relaxed text-slate-600 md:text-xl">
+                            <p className="mb-10 text-lg leading-relaxed text-muted-foreground md:text-xl">
                                 {feature.heroSubtitle}
                             </p>
                             <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -56,7 +56,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                         {/* Hero Image Mockup Area */}
                         {/* <div className="mt-16 md:mt-24 relative mx-auto max-w-5xl rounded-2xl border bg-white p-2 shadow-2xl lg:rounded-3xl lg:p-4">
                 <div className="aspect-[16/9] overflow-hidden rounded-xl bg-slate-100 relative">
-                   <div className="absolute inset-0 flex items-center justify-center text-slate-400">
+                   <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                       Feature Preview Image
                    </div>
                 </div>
@@ -68,10 +68,10 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                 <section className="py-24">
                     <div className="container mx-auto px-4">
                         <div className="mb-16 md:text-center max-w-3xl mx-auto">
-                            <h2 className="font-serif text-3xl font-bold md:text-4xl text-slate-900 mb-4">
+                            <h2 className="font-serif text-3xl font-bold md:text-4xl text-foreground mb-4">
                                 Built for modern event planning
                             </h2>
-                            <p className="text-lg text-slate-600">
+                            <p className="text-lg text-muted-foreground">
                                 Everything you need to execute flawless events, integrated into one powerful platform.
                             </p>
                         </div>
@@ -80,15 +80,15 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                             {feature.features.map((item, index) => (
                                 <div
                                     key={index}
-                                    className="group rounded-2xl border border-slate-100 bg-white p-8 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
+                                    className="group rounded-2xl border border-border bg-white p-8 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
                                 >
                                     <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                                         <item.icon className="h-6 w-6" />
                                     </div>
-                                    <h3 className="mb-3 text-xl font-bold text-slate-900">
+                                    <h3 className="mb-3 text-xl font-bold text-foreground">
                                         {item.title}
                                     </h3>
-                                    <p className="leading-relaxed text-slate-600">
+                                    <p className="leading-relaxed text-muted-foreground">
                                         {item.description}
                                     </p>
                                 </div>
@@ -98,7 +98,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                 </section>
 
                 {/* Benefits Section */}
-                <section className="bg-slate-900 py-24 text-white">
+                <section className="bg-background py-24 text-white">
                     <div className="container mx-auto px-4">
                         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
                             <div>
@@ -121,7 +121,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                 </ul>
 
                                 <div className="mt-10">
-                                    <Button asChild size="lg" className="h-14 px-8 text-base bg-white text-slate-900 hover:bg-slate-100">
+                                    <Button asChild size="lg" className="h-14 px-8 text-base bg-white text-foreground hover:bg-slate-100">
                                         <Link href="/auth/login">
                                             Get Started Now <ArrowRight className="ml-2 h-4 w-4" />
                                         </Link>
@@ -139,7 +139,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                             <Zap className="h-10 w-10 text-primary" />
                                         </div>
                                         <h3 className="text-2xl font-bold mb-2">Powering Your Success</h3>
-                                        <p className="text-slate-400">Advanced tools for professional results</p>
+                                        <p className="text-muted-foreground">Advanced tools for professional results</p>
                                     </div>
                                 </div>
                             </div>
@@ -148,7 +148,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                 </section>
 
                 {/* CTA Section */}
-                <section className="py-24 bg-primary text-primary-foreground text-center">
+                <section className="py-24 bg-primary text-foreground text-center">
                     <div className="container mx-auto px-4">
                         <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">
                             Ready to transform your event planning?
