@@ -19,7 +19,7 @@ export default function VendorOffersPage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-12">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+            <div className="space-y-6 mb-10">
                 <div>
                     <h2 className="text-4xl font-black tracking-tight text-foreground">Offers</h2>
                     <p className="text-muted-foreground mt-1 font-medium italic">Manage your incoming inquiries and potential clients.</p>

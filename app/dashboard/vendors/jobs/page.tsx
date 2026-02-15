@@ -13,7 +13,7 @@ export default function VendorJobsPage() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-10 pb-20">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+            <div className="space-y-6 mb-10">
                 <div>
                     <h2 className="text-4xl font-black tracking-tight text-foreground">My Jobs</h2>
                     <p className="text-muted-foreground mt-1 font-medium italic">Manage all your confirmed bookings and upcoming events.</p>
