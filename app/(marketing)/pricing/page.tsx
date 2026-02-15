@@ -106,16 +106,16 @@ export default function PricingPage() {
                   </p>
                 )}
 
-                {/* Subtitle for Enterprise */}
-                {tier.name === "Enterprise" && (
+                {/* Subtitle for Concierge */}
+                {tier.name === "Concierge" && (
                   <p className="mt-6 border-b border-border pb-4 text-sm font-medium text-muted-foreground">
-                    Tailored for organizations with complex requirements:
+                    Full orchestration for peace of mind from abroad:
                   </p>
                 )}
 
                 {/* Features */}
                 <ul
-                  className={`flex flex-1 flex-col gap-4 ${tier.inheritsFrom || tier.name === "Enterprise"
+                  className={`flex flex-1 flex-col gap-4 ${tier.inheritsFrom || tier.name === "Concierge"
                     ? "mt-4"
                     : "mt-6"
                     }`}
@@ -139,22 +139,22 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* Expert Event Support Label */}
+        {/* Expert On-The-Ground Support Label */}
         <div className="bg-secondary px-4 py-4 text-center">
           <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            Expert Event Support
+            Expert On-The-Ground Support
           </p>
         </div>
 
         {/* Full Service Detail */}
         <section className="mx-auto max-w-4xl px-4 py-16 text-center lg:px-8 lg:py-24">
           <h2 className="font-serif text-3xl font-bold text-foreground md:text-4xl">
-            Need a team to run your event?
+            Need local feet on the ground?
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-            Our Full Service plan gives you a dedicated event planner and
-            sourcing team who handle everything from rate negotiations to swag
-            distribution. You focus on your guests, we focus on every detail.
+            Our Concierge plan gives you a dedicated local orchestration team
+            in Lagos. We handle every detail from vendor vetting to guest
+            logistics, so you can focus on your celebration while we manage the execution.
           </p>
           <Link href="/contact">
             <Button
@@ -179,20 +179,16 @@ export default function PricingPage() {
                   a: "Yes, you can upgrade or downgrade your plan at any time. Changes take effect at the start of your next billing cycle.",
                 },
                 {
-                  q: "Is there a free trial for Enterprise?",
-                  a: "We offer a 14-day free trial of Enterprise features. No credit card required to start.",
+                  q: "How do I pay vendors from abroad?",
+                  a: "We accept all major international credit cards via Stripe and PayPal. We hold your funds in a secure escrow system and only release payment to local vendors once they deliver on their contract.",
                 },
                 {
-                  q: "What payment methods do you accept?",
-                  a: "We accept all major credit cards, bank transfers, and can issue invoices for Enterprise plans.",
+                  q: "How do I know I can trust the vendors?",
+                  a: "Every vendor in our Concierge network is personally vetted by our local team and must pass a strict quality and reliability check before being listed.",
                 },
                 {
-                  q: "Do you offer discounts for non-profits?",
-                  a: "Yes, we offer special pricing for registered non-profit organizations. Contact our team to learn more.",
-                },
-                {
-                  q: "How does the per-person pricing work for custom plans?",
-                  a: "For large enterprise events, we offer flexible pricing models. Pricing depends on event complexity and requirements. Contact us for a custom quote.",
+                  q: "Can you handle guest logistics?",
+                  a: "Yes, our Concierge tier includes full guest support, including hotel block bookings, airport pickups (Eko/Lekki), and local transport coordination.",
                 },
               ].map((item, i) => (
                 <div

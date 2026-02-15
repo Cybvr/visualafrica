@@ -22,12 +22,12 @@ export function Hero() {
             {/* Content */}
             <div className="relative z-10 mx-auto max-w-4xl">
                 <h1 className="mb-6 font-serif text-5xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl">
-                    The easiest way <br />
-                    <span className="text-primary italic">to plan your event.</span>
+                    Plan your Nigeria event <br />
+                    <span className="text-primary italic">from anywhere.</span>
                 </h1>
                 <p className="mx-auto mb-10 max-w-2xl text-lg text-white/90 md:text-xl">
-                    From tasklists to vendor bookings, manage every detail of <br className="hidden md:block" />
-                    your event in one AI-powered platform.
+                    Vetted vendors, transparent pricing, and secure escrow payments. <br className="hidden md:block" />
+                    You handle the guest list from abroad, we handle the orchestration in Lagos.
                 </p>
                 <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                     <Button asChild size="lg" className="h-14 px-10 text-lg bg-primary hover:bg-primary/90">

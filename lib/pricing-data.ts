@@ -111,39 +111,39 @@ export const pricingTiers: PricingTier[] = [
     ],
   },
   {
-    name: "Enterprise",
-    tagline: "For teams with compliance & integration needs.",
-    price: "Custom",
-    priceNote: null,
+    name: "Concierge",
+    tagline: "High-touch coordination for international clients.",
+    price: "$2,500",
+    priceNote: "Starting per event / Full service",
     cta: "Book a Call",
     ctaHref: "/contact",
     highlighted: false,
     inheritsFrom: "Pro",
     features: [
       {
-        title: "Custom Contract Workflows",
+        title: "Dedicated Event Director",
         description:
-          "Seamlessly set up approval workflows that ensure everyone is adhering to company policies.",
+          "Full orchestration of your event with a senior director on the ground in Lagos.",
       },
       {
-        title: "SSO Integration",
+        title: "Vendor Vetting & Selection",
         description:
-          "Streamline your team's access and security with SSO integration, enabling seamless single sign-on for your entire organization.",
+          "We narrow down the best vendors to 3 options per category and handle all site visits.",
       },
       {
-        title: "Implementation Support",
+        title: "Secure Escrow Management",
         description:
-          "Our dedicated team provides hands-on implementation support to ensure a smooth setup and help your organization get the most out of the platform from day one.",
+          "Manage all local payments through our secure escrow system with full transparency.",
       },
       {
-        title: "Custom Integrations",
+        title: "Guest Concierge",
         description:
-          "We build tailored integrations with your existing tools so Visual Africa fits seamlessly into your workflow.",
+          "Dedicated support for your guests, from hotel bookings to airport pickups in Lagos.",
       },
       {
-        title: "Multi-Entry Billing",
+        title: "On-site Orchestration",
         description:
-          "Split charges across cost centers, cards, or departments with flexible multi-source billing.",
+          "Day-of coordination team ensuring every detail is executed flawlessly according to your plan.",
       },
     ],
   },

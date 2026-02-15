@@ -8,22 +8,22 @@ import { BLOG_POSTS } from "@/lib/blog-data"
 export function FeaturesGrid() {
     const features = [
         {
-            title: "Customizable Tasklists",
-            description: "Stay organized with event-level task templates. Track every deadline and milestone in one place.",
+            title: "Secure Escrow Payments",
+            description: "Pay with international cards. We hold funds until the job is done, ensuring your money and vendors are protected.",
             icon: Calendar,
-            cta: "Try tasklists"
+            cta: "How escrow works"
         },
         {
-            title: "Guest & RSVP Management",
-            description: "Create custom guest websites and manage RSVPs with personalized preferences automatically.",
+            title: "Vetted Local Experts",
+            description: "Access our network of top-tier Lagos vendors, thoroughly vetted for quality and reliability.",
             icon: Users,
-            cta: "Explore guest tools"
+            cta: "View vetted vendors"
         },
         {
-            title: "AI Itinerary Builder",
-            description: "Build a minute-by-minute itinerary in seconds with our AI-powered planning assistant.",
+            title: "Remote Guest Tools",
+            description: "Manage invitations, RSVPs, and guest inquiries from anywhere in the world with ease.",
             icon: Calendar,
-            cta: "Generate itinerary"
+            cta: "Explore guest tools"
         }
     ]
 
@@ -44,10 +44,10 @@ export function FeaturesGrid() {
                             High touch and high tech
                         </h2>
                         <h3 className="font-serif text-4xl md:text-5xl font-bold">
-                            Plan it all <br /> in one place
+                            Brooklyn to Lagos <br /> orchestration
                         </h3>
                         <p className="mt-6 text-lg text-white/90">
-                            From venue sourcing to contract management, we give you the tools and expert support to run flawless events.
+                            Remote planning with local feet on the ground. We provide the trust and coordination you need for peace of mind.
                         </p>
                         <Button asChild className="mt-8 bg-primary hover:bg-primary/90" size="lg">
                             <Link href="/auth/login">Get started</Link>
