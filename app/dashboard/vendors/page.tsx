@@ -40,20 +40,11 @@ export default function VendorDashboardPage() {
 
   const { stats, leads, bookings } = VENDOR_DASHBOARD_DATA;
   const [activeTab, setActiveTab] = useState<'all' | 'saved'>('all');
-  const [selectedStatus, setSelectedStatus] = useState<EventStatus>('All Events');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const statusOptions: EventStatus[] = ['All Events', 'Planning', 'Confirmed', 'Completed'];
-
-  // Filter events by selected status
-  const filteredByStatus = selectedStatus === 'All Events'
-    ? SHARED_EVENTS
-    : SHARED_EVENTS.filter(event => event.status === selectedStatus);
-
-  // Further filter by search query
   const filteredEvents = searchQuery.trim() === ''
-    ? filteredByStatus
-    : filteredByStatus.filter(event =>
+    ? SHARED_EVENTS
+    : SHARED_EVENTS.filter(event =>
       event.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.hostName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.location.toLowerCase().includes(searchQuery.toLowerCase())
@@ -102,22 +93,7 @@ export default function VendorDashboardPage() {
           </button>
         </div>
 
-        {activeTab === 'all' && (
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {statusOptions.map(status => (
-              <button
-                key={status}
-                onClick={() => setSelectedStatus(status)}
-                className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all border ${selectedStatus === status
-                  ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105'
-                  : 'bg-card border-border text-muted-foreground hover:border-primary'
-                  }`}
-              >
-                {status}
-              </button>
-            ))}
-          </div>
-        )}
+
 
         {displayEvents.length > 0 ? (
           <div className="grid grid-cols-1 gap-6">
