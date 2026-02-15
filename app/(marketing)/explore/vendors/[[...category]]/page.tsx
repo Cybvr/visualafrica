@@ -12,8 +12,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { VendorCard } from "@/components/vendor-card"
-import { VendorDetail } from "@/components/vendor-detail"
+import { VendorCard } from "@/components/dashboard/vendor-card"
+import { VendorDetail } from "@/components/dashboard/vendor-detail"
 import {
   vendors,
   getVendorBySlug,

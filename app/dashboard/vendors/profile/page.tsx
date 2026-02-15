@@ -13,7 +13,6 @@ export default function VendorProfilePage() {
     const [currentItem, setCurrentItem] = React.useState<Partial<PortfolioItem> | null>(null);
     const [dragActive, setDragActive] = React.useState(false);
 
-    // Business Profile State (moved from settings)
     const [businessProfile, setBusinessProfile] = React.useState({
         name: "Eko Catamaran Charters",
         location: "Victoria Island, Lagos",
@@ -95,7 +94,7 @@ export default function VendorProfilePage() {
 
     const FormField = ({ label, children }: { label: string; children: React.ReactNode }) => (
         <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+            <Label className="text-xs font-medium text-muted-foreground">
                 {label}
             </Label>
             {children}
@@ -103,57 +102,57 @@ export default function VendorProfilePage() {
     );
 
     return (
-        <div className="max-w-7xl mx-auto space-y-12 pb-20">
+        <div className="max-w-7xl mx-auto space-y-8 pb-16">
             {/* Business Profile Section */}
-            <section className="bg-card border border-border rounded-[3rem] p-10 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="space-y-10">
+            <section className="bg-card border border-border rounded p-6">
+                <div className="space-y-6">
                     <div>
-                        <h2 className="text-3xl font-serif font-black tracking-tight text-foreground mb-2">My Profile</h2>
-                        <p className="text-sm text-muted-foreground font-medium">Manage your business information and how clients see you.</p>
+                        <h2 className="text-2xl font-semibold text-foreground mb-1">Business Profile</h2>
+                        <p className="text-sm text-muted-foreground">Manage your business information and how clients see you.</p>
                     </div>
 
-                    <div className="flex flex-col md:flex-row items-center gap-8 pb-10 border-b border-border/50">
+                    <div className="flex flex-col md:flex-row items-start gap-6 pb-6 border-b border-border">
                         <div className="relative group shrink-0">
-                            <div className="w-40 h-40 bg-slate-100 rounded-[2.5rem] overflow-hidden">
+                            <div className="w-24 h-24 bg-secondary rounded overflow-hidden">
                                 <img
                                     src={businessProfile.logo}
                                     alt="business logo"
                                     className="w-full h-full object-cover"
                                 />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                                    <Briefcase className="text-white" size={24} />
+                                <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                                    <Briefcase className="text-foreground" size={20} />
                                 </div>
                             </div>
                         </div>
-                        <div className="space-y-4 flex-1">
-                            <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Branding</h5>
-                            <div className="flex gap-3">
-                                <button className="px-6 py-2.5 bg-primary text-white text-xs font-black rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                        <div className="space-y-3 flex-1">
+                            <p className="text-xs text-muted-foreground font-medium">Business Logo</p>
+                            <div className="flex gap-2">
+                                <button className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded hover:bg-primary/90 transition-colors">
                                     Update Logo
                                 </button>
-                                <button className="px-6 py-2.5 bg-card border border-border text-muted-foreground text-xs font-black rounded-full hover:bg-slate-50 transition-all">
+                                <button className="px-4 py-2 bg-card border border-border text-foreground text-sm font-medium rounded hover:bg-secondary transition-colors">
                                     Remove
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div className="space-y-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <FormField label="Business Name">
                                 <Input
                                     value={businessProfile.name}
                                     onChange={(e) => setBusinessProfile({ ...businessProfile, name: e.target.value })}
-                                    className="px-6 py-4 rounded-2xl text-sm font-bold bg-slate-50/50"
+                                    className="text-sm"
                                 />
                             </FormField>
                             <FormField label="Location">
                                 <div className="relative">
-                                    <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                                     <Input
                                         value={businessProfile.location}
                                         onChange={(e) => setBusinessProfile({ ...businessProfile, location: e.target.value })}
-                                        className="pl-14 pr-6 py-4 rounded-2xl text-sm font-bold bg-slate-50/50"
+                                        className="pl-10 text-sm"
                                     />
                                 </div>
                             </FormField>
@@ -164,13 +163,13 @@ export default function VendorProfilePage() {
                                 rows={4}
                                 value={businessProfile.description}
                                 onChange={(e) => setBusinessProfile({ ...businessProfile, description: e.target.value })}
-                                className="px-6 py-4 rounded-2xl text-sm font-bold resize-none bg-slate-50/50"
+                                className="text-sm resize-none"
                             />
                         </FormField>
 
                         <div className="flex justify-end pt-4">
-                            <button className="flex items-center gap-2 px-12 py-5 bg-primary text-white rounded-[2rem] text-sm font-black hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 hover:scale-105 active:scale-95">
-                                <Save size={20} />
+                            <button className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded text-sm font-medium hover:bg-primary/90 transition-colors">
+                                <Save size={16} />
                                 Save Changes
                             </button>
                         </div>
@@ -179,34 +178,34 @@ export default function VendorProfilePage() {
             </section>
 
             {/* Portfolio Section */}
-            <section className="space-y-8">
+            <section className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-3xl font-serif font-black tracking-tight text-foreground">Portfolio Items</h2>
-                        <p className="text-muted-foreground mt-1 text-sm font-medium">Showcase your best work to potential clients.</p>
+                        <h2 className="text-2xl font-semibold text-foreground">Portfolio</h2>
+                        <p className="text-muted-foreground mt-1 text-sm">Showcase your best work to potential clients.</p>
                     </div>
                     {!currentItem && (
                         <button
                             onClick={() => handleOpenForm()}
-                            className="bg-primary hover:bg-primary/90 text-white px-8 py-3.5 rounded-[2rem] font-black flex items-center gap-2 transition-all shadow-lg shadow-primary/20 hover:scale-105"
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded font-medium flex items-center gap-2 transition-colors text-sm"
                         >
-                            <Plus size={18} />
+                            <Plus size={16} />
                             Add Item
                         </button>
                     )}
                 </div>
 
-                {/* Flat Form for New/Edit */}
+                {/* Form for New/Edit */}
                 {currentItem && (
-                    <div className="bg-card border border-border rounded-[3rem] p-10 space-y-8 animate-in zoom-in-95 duration-200">
+                    <div className="bg-card border border-border rounded p-6 space-y-6">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-2xl font-serif font-black text-foreground">
+                            <h3 className="text-lg font-semibold text-foreground">
                                 {currentItem.id ? 'Edit Portfolio Item' : 'New Portfolio Item'}
                             </h3>
                         </div>
 
                         <div
-                            className={`relative border-2 border-dashed rounded-[2rem] p-12 transition-all ${dragActive ? 'border-primary bg-primary/5' : 'border-border bg-slate-50/50'
+                            className={`relative border-2 border-dashed rounded p-8 transition-colors ${dragActive ? 'border-primary bg-secondary' : 'border-border bg-secondary'
                                 }`}
                             onDragEnter={handleDrag}
                             onDragLeave={handleDrag}
@@ -215,20 +214,20 @@ export default function VendorProfilePage() {
                         >
                             {currentItem.image ? (
                                 <div className="relative">
-                                    <img src={currentItem.image} alt="Preview" className="w-full h-64 object-cover rounded-2xl" />
+                                    <img src={currentItem.image} alt="Preview" className="w-full h-48 object-cover rounded" />
                                     <button
                                         onClick={() => setCurrentItem({ ...currentItem, image: '' })}
-                                        className="absolute top-4 right-4 p-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors shadow-lg"
+                                        className="absolute top-2 right-2 p-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded transition-colors"
                                     >
-                                        <Trash2 size={16} />
+                                        <Trash2 size={14} />
                                     </button>
                                 </div>
                             ) : (
                                 <div className="text-center">
-                                    <Upload className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-                                    <p className="text-lg font-bold text-foreground mb-1">Drop image or video here</p>
-                                    <p className="text-sm text-muted-foreground mb-6">or click to browse your files</p>
-                                    <label className="inline-block px-8 py-3 bg-white border border-border hover:bg-slate-50 rounded-[2rem] font-black text-sm cursor-pointer transition-all shadow-sm">
+                                    <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+                                    <p className="text-sm font-medium text-foreground mb-1">Drop image or video here</p>
+                                    <p className="text-xs text-muted-foreground mb-4">or click to browse your files</p>
+                                    <label className="inline-block px-4 py-2 bg-card border border-border hover:bg-secondary rounded font-medium text-sm cursor-pointer transition-colors">
                                         Browse Files
                                         <input type="file" accept="image/*,video/*" onChange={handleFileInput} className="hidden" />
                                     </label>
@@ -236,53 +235,53 @@ export default function VendorProfilePage() {
                             )}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Project Title</label>
+                                <label className="text-xs font-medium text-muted-foreground">Project Title</label>
                                 <input
                                     type="text"
                                     value={currentItem.title || ''}
                                     onChange={e => setCurrentItem({ ...currentItem, title: e.target.value })}
-                                    className="w-full px-6 py-4 bg-slate-50 border border-border rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold"
+                                    className="w-full px-3 py-2 bg-background border border-input rounded outline-none focus:ring-2 focus:ring-ring transition-all text-sm text-foreground"
                                     placeholder="e.g. Waterfront Wedding Gala"
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Date</label>
+                                <label className="text-xs font-medium text-muted-foreground">Date</label>
                                 <input
                                     type="text"
                                     value={currentItem.date || ''}
                                     onChange={e => setCurrentItem({ ...currentItem, date: e.target.value })}
-                                    className="w-full px-6 py-4 bg-slate-50 border border-border rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold"
+                                    className="w-full px-3 py-2 bg-background border border-input rounded outline-none focus:ring-2 focus:ring-ring transition-all text-sm text-foreground"
                                     placeholder="Jan 2026"
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Content Type</label>
+                            <label className="text-xs font-medium text-muted-foreground">Content Type</label>
                             <select
                                 value={currentItem.type}
                                 onChange={e => setCurrentItem({ ...currentItem, type: e.target.value as any })}
-                                className="w-full px-6 py-4 bg-slate-50 border border-border rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold"
+                                className="w-full px-3 py-2 bg-background border border-input rounded outline-none focus:ring-2 focus:ring-ring transition-all text-sm text-foreground"
                             >
                                 <option value="Gallery">Image Gallery</option>
                                 <option value="Video">Video Project</option>
                             </select>
                         </div>
 
-                        <div className="flex gap-4 pt-4">
+                        <div className="flex gap-3 pt-4">
                             <button
                                 onClick={handleSave}
                                 disabled={!currentItem.title || !currentItem.image}
-                                className="flex-1 bg-primary hover:bg-primary/90 disabled:bg-slate-200 disabled:text-slate-400 text-white py-5 rounded-[2rem] font-black transition-all shadow-xl shadow-primary/20 hover:scale-[1.02]"
+                                className="flex-1 bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground text-primary-foreground py-2.5 rounded font-medium transition-colors text-sm"
                             >
                                 {currentItem.id ? 'Save Changes' : 'Create Item'}
                             </button>
                             <button
                                 onClick={() => setCurrentItem(null)}
-                                className="px-12 py-5 bg-slate-100 hover:bg-slate-200 rounded-[2rem] font-black transition-all"
+                                className="px-6 py-2.5 bg-secondary hover:bg-secondary/80 text-foreground rounded font-medium transition-colors text-sm"
                             >
                                 Cancel
                             </button>
@@ -291,41 +290,41 @@ export default function VendorProfilePage() {
                 )}
 
                 {/* Portfolio Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {items.map(item => (
-                        <div key={item.id} className="group bg-card rounded-[3rem] border border-border shadow-sm overflow-hidden hover:shadow-2xl transition-all duration-500">
+                        <div key={item.id} className="group bg-card rounded border border-border overflow-hidden hover:shadow-lg transition-all">
                             <div className="aspect-[4/3] relative overflow-hidden">
                                 <img
                                     src={item.image}
                                     alt={item.title}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png'; }}
                                 />
-                                <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 border border-white/10">
+                                <div className="absolute top-3 left-3 bg-background/80 backdrop-blur-sm text-foreground text-xs font-medium px-2 py-1 rounded flex items-center gap-1.5">
                                     {item.type === 'Video' ? <Video size={12} /> : <ImageIcon size={12} />}
                                     {item.type}
                                 </div>
-                                <div className="absolute top-4 right-4">
+                                <div className="absolute top-3 right-3">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <button className="p-2 bg-card/90 backdrop-blur-md rounded-xl shadow-lg text-foreground hover:bg-primary hover:text-white transition-all">
-                                                <MoreHorizontal size={18} />
+                                            <button className="p-2 bg-card/90 backdrop-blur-sm rounded shadow text-foreground hover:bg-card transition-all">
+                                                <MoreHorizontal size={16} />
                                             </button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[140px] border-border">
-                                            <DropdownMenuItem onClick={() => handleOpenForm(item)} className="rounded-xl flex items-center gap-2 font-bold cursor-pointer py-3">
-                                                <Pencil size={14} className="text-primary" /> Edit Item
+                                        <DropdownMenuContent align="end" className="rounded p-1 min-w-[120px]">
+                                            <DropdownMenuItem onClick={() => handleOpenForm(item)} className="rounded flex items-center gap-2 font-medium cursor-pointer text-sm">
+                                                <Pencil size={14} /> Edit
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleDelete(item.id)} className="rounded-xl flex items-center gap-2 text-red-600 font-bold focus:text-red-600 focus:bg-red-50 cursor-pointer py-3">
-                                                <Trash2 size={14} /> Delete Item
+                                            <DropdownMenuItem onClick={() => handleDelete(item.id)} className="rounded flex items-center gap-2 text-destructive font-medium focus:text-destructive focus:bg-destructive/10 cursor-pointer text-sm">
+                                                <Trash2 size={14} /> Delete
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
                             </div>
-                            <div className="p-8">
-                                <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2">{item.date}</div>
-                                <h3 className="text-xl font-bold text-foreground leading-tight group-hover:text-primary transition-colors">{item.title}</h3>
+                            <div className="p-4">
+                                <div className="text-xs text-muted-foreground mb-1">{item.date}</div>
+                                <h3 className="text-base font-semibold text-foreground leading-tight">{item.title}</h3>
                             </div>
                         </div>
                     ))}

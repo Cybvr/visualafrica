@@ -5,10 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Home,
+  Search,
   Settings,
   BriefcaseBusiness,
   Lightbulb,
-  Search,
   Heart,
   Calendar,
   FileText,
@@ -296,9 +296,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   ];
 
   const vendorPrimaryNavItems: NavItemConfig[] = [
-    { icon: Home, label: "Home", href: "/dashboard/vendors" },
-    { icon: BriefcaseBusiness, label: "Offers", href: "/dashboard/vendors/offers", count: vendorOffersCount },
+    { icon: Search, label: "Search", href: "/dashboard/vendors" },
     { icon: ClipboardList, label: "Jobs", href: "/dashboard/vendors/jobs", count: vendorEventsCount },
+    { icon: BriefcaseBusiness, label: "Offers", href: "/dashboard/vendors/offers", count: vendorOffersCount },
   ];
 
   const vendorSecondaryNavItems: NavItemConfig[] = [

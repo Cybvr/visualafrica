@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Search, Filter, MessageSquare, MoreVertical, Archive, CheckCircle2 } from 'lucide-react';
-import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
-import { Input } from '@/components/ui/input';
+import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
+import Link from 'next/link';
+import Image from 'next/image';
+import { MapPin, Calendar, Users, Briefcase, MessageSquare, MoreVertical, Archive, CheckCircle2 } from 'lucide-react';
 
 export default function VendorOffersPage() {
     const { leads } = VENDOR_DASHBOARD_DATA;
@@ -17,24 +18,13 @@ export default function VendorOffersPage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-6">
                 <div>
-                    <h2 className="text-3xl font-black tracking-tight text-foreground">Offers</h2>
-                    <p className="text-muted-foreground mt-1">Manage your incoming inquiries and potential clients.</p>
+                    <h2 className="text-4xl font-black tracking-tight text-foreground">Offers</h2>
+                    <p className="text-muted-foreground mt-1 text-lg font-medium">Manage your incoming inquiries and potential clients.</p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-                        <Input
-                            type="text"
-                            placeholder="Search offers..."
-                            className="pl-10 pr-4 py-2 bg-card border border-border rounded-xl text-sm w-full md:w-64"
-                        />
-                    </div>
-                    <button className="p-2 bg-card border border-border rounded-xl text-muted-foreground hover:bg-slate-50">
-                        <Filter size={20} />
-                    </button>
-                </div>
+
+                <DashboardFilter placeholder="Search offers or clients..." />
             </div>
 
             {/* Tabs */}
@@ -61,71 +51,72 @@ export default function VendorOffersPage() {
                 </button>
             </div>
 
-            <div className="bg-card rounded-[2.5rem] border border-border shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="border-b border-slate-50">
-                                <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Client</th>
-                                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Inquiry Type</th>
-                                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Event Date</th>
-                                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Status</th>
-                                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-50">
-                            {displayOffers.map((offer) => (
-                                <tr key={offer.id} className="hover:bg-slate-50/50 transition-colors group">
-                                    <td className="px-8 py-5">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-accent rounded-full flex-shrink-0 flex items-center justify-center text-accent font-black text-xs">
-                                                {offer.name.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <div className="font-bold text-foreground">{offer.name}</div>
-                                                <div className="text-xs text-muted-foreground truncate max-w-[200px]">{offer.detail}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <span className="text-sm font-medium text-foreground">{offer.event}</span>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <span className="text-sm text-muted-foreground">{offer.date}</span>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${offer.status === 'New' ? 'bg-blue-100 text-blue-700' :
+            <div className="grid grid-cols-1 gap-6">
+                {displayOffers.map((offer) => (
+                    <div
+                        key={offer.id}
+                        className="group bg-card border border-border rounded-3xl p-4 flex flex-col md:flex-row gap-6 hover:shadow-lg transition-all hover:border-primary/50"
+                    >
+                        <div className="relative w-full md:w-48 h-48 md:h-auto rounded-2xl overflow-hidden shrink-0 bg-slate-100 flex items-center justify-center">
+                            <Users size={48} className="text-slate-300" />
+                        </div>
+
+                        <div className="flex-1 py-2 flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${offer.status === 'New' ? 'bg-blue-100 text-blue-700' :
                                             offer.status === 'Contacted' ? 'bg-accent text-foreground' :
                                                 'bg-green-100 text-green-700'
-                                            }`}>
-                                            {offer.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-5 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button className="p-2 text-muted-foreground hover:text-primary transition-colors">
-                                                <MessageSquare size={18} />
-                                            </button>
-                                            <button className="p-2 text-muted-foreground hover:text-muted-foreground transition-colors">
-                                                <MoreVertical size={18} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                                        }`}>
+                                        {offer.status}
+                                    </span>
+                                    <p className="text-xs font-bold text-muted-foreground italic">Inquiry Received</p>
+                                </div>
+                                <h3 className="text-2xl font-bold text-foreground mb-1">
+                                    {offer.event}
+                                </h3>
+                                <p className="text-muted-foreground text-sm font-medium">
+                                    Requested by <span className="text-foreground font-black">{offer.name}</span>
+                                </p>
+                                <p className="text-muted-foreground text-sm mt-3 line-clamp-2 italic">
+                                    "{offer.detail}"
+                                </p>
+                            </div>
 
-                {displayOffers.length === 0 && (
-                    <div className="py-20 text-center space-y-4">
-                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
-                            <Archive className="text-slate-300" size={32} />
+                            <div className="flex items-center justify-between mt-6 pt-6 border-t border-border">
+                                <div className="flex items-center gap-6">
+                                    <div className="flex items-center gap-2 text-sm font-bold text-foreground/80">
+                                        <Calendar size={16} className="text-primary" />
+                                        {offer.date}
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm font-bold text-foreground/80">
+                                        <MessageSquare size={16} className="text-primary" />
+                                        Contact Client
+                                    </div>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button className="px-6 py-2 bg-primary text-white text-xs font-black rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                                        Accept Offer
+                                    </button>
+                                    <button className="p-2.5 bg-background border border-border rounded-full text-muted-foreground hover:text-red-600 transition-colors">
+                                        <Archive size={18} />
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <p className="text-muted-foreground font-bold">No {activeTab} offers found.</p>
                     </div>
-                )}
+                ))}
             </div>
+
+            {displayOffers.length === 0 && (
+                <div className="py-20 text-center space-y-4">
+                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
+                        <Archive className="text-slate-300" size={32} />
+                    </div>
+                    <p className="text-muted-foreground font-bold">No {activeTab} offers found.</p>
+                </div>
+            )}
         </div>
+        </div >
     );
 }

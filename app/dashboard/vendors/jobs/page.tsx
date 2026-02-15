@@ -6,7 +6,7 @@ import { MapPin, Calendar, Users, Briefcase, Search, Filter, SlidersHorizontal }
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 import { SHARED_EVENTS } from '@/lib/shared-data';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
 
 export default function VendorJobsPage() {
     const { bookings } = VENDOR_DASHBOARD_DATA;
@@ -20,29 +20,7 @@ export default function VendorJobsPage() {
                 </div>
             </div>
 
-            {/* Filter Bar */}
-            <div className="flex flex-col lg:flex-row gap-4 items-center p-3 bg-card border border-border rounded-[2.5rem] shadow-sm">
-                <div className="relative flex-1 w-full lg:w-auto">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-                    <Input
-                        placeholder="Search jobs by event or client..."
-                        className="w-full pl-16 pr-6 h-14 bg-background border-border rounded-[2rem] text-sm font-bold focus:ring-primary/20"
-                    />
-                </div>
-                <div className="flex items-center gap-3 w-full lg:w-auto">
-                    <button className="flex items-center gap-2 h-14 px-8 bg-background border border-border rounded-[2rem] text-sm font-black hover:bg-slate-50 transition-all">
-                        <Filter size={18} className="text-primary" />
-                        Status
-                    </button>
-                    <button className="flex items-center gap-2 h-14 px-8 bg-background border border-border rounded-[2rem] text-sm font-black hover:bg-slate-50 transition-all">
-                        <Calendar size={18} className="text-primary" />
-                        Date
-                    </button>
-                    <button className="flex items-center justify-center w-14 h-14 bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
-                        <SlidersHorizontal size={20} />
-                    </button>
-                </div>
-            </div>
+            <DashboardFilter placeholder="Search jobs by event or client..." />
 
             <div className="grid grid-cols-1 gap-6">
                 {bookings.length > 0 ? (

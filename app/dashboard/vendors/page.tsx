@@ -10,7 +10,9 @@ import { auth, db } from '@/lib/firebase';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 import { SHARED_EVENTS } from '@/lib/shared-data';
 import EventCard from '@/components/dashboard/EventCard';
-import { Input } from '@/components/ui/input';
+import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
+import Image from 'next/image';
+import { MapPin, Calendar, Users, Briefcase, Star, Clock } from 'lucide-react';
 
 type EventStatus = 'All Events' | 'Planning' | 'Confirmed' | 'Completed';
 
@@ -70,11 +72,6 @@ export default function VendorDashboardPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-12 pb-20">
       <div className="space-y-8">
-        <div>
-          <h2 className="text-3xl font-black tracking-tight text-foreground">Home</h2>
-          <p className="text-muted-foreground mt-1">{welcomeText}</p>
-        </div>
-
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center border-b border-border w-full md:w-auto">
             <button
@@ -132,13 +129,63 @@ export default function VendorDashboardPage() {
         )}
 
         {displayEvents.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             {displayEvents.map(event => (
-              <EventCard
+              <Link
                 key={event.id}
-                event={event}
-                onClick={() => router.push(`/dashboard/vendors/event/${event.id}`)}
-              />
+                href={`/dashboard/vendors/event/${event.id}`}
+                className="group bg-card border border-border rounded-3xl p-4 flex flex-col md:flex-row gap-6 hover:shadow-lg transition-all hover:border-primary/50 cursor-pointer"
+              >
+                <div className="relative w-full md:w-72 h-48 md:h-auto rounded-2xl overflow-hidden shrink-0">
+                  <Image
+                    src={event.image || '/placeholder.png'}
+                    alt={event.eventName}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute top-4 right-4 z-10">
+                    <button className="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-muted-foreground hover:text-primary shadow-lg transition-colors">
+                      <Star size={20} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex-1 py-2 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest rounded-full">
+                        {event.status}
+                      </span>
+                      <span className="text-xs font-bold text-primary italic">Verified Opportunity</span>
+                    </div>
+                    <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                      {event.eventName}
+                    </h3>
+                    <p className="text-muted-foreground text-sm line-clamp-2 max-w-2xl">
+                      {event.description}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-6 mt-6 pt-6 border-t border-border">
+                    <div className="flex items-center gap-2 text-sm font-bold text-foreground/80">
+                      <Calendar size={16} className="text-primary" />
+                      {event.date}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm font-bold text-foreground/80">
+                      <MapPin size={16} className="text-primary" />
+                      {event.location}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm font-bold text-foreground/80">
+                      <Users size={16} className="text-primary" />
+                      {event.guestCount} Guests
+                    </div>
+                    <div className="flex items-center gap-2 text-sm font-bold text-foreground/80">
+                      <Briefcase size={16} className="text-primary" />
+                      {event.hostName}
+                    </div>
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         ) : (

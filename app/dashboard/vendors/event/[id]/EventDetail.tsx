@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { ChevronLeft, Calendar, MapPin, Users, DollarSign, MessageSquare, Heart, Share2, Award, ShieldCheck, Zap, User } from 'lucide-react';
+import { ChevronLeft, Calendar, MapPin, Users, DollarSign, MessageSquare, Heart, Share2 } from 'lucide-react';
 import { SharedEvent } from '@/lib/shared-data';
 
 interface EventDetailProps {
@@ -20,13 +20,13 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Planning':
-        return 'bg-blue-600 text-white';
+        return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'Confirmed':
-        return 'bg-green-600 text-white';
+        return 'bg-green-50 text-green-700 border-green-200';
       case 'Completed':
-        return 'bg-slate-600 text-white';
+        return 'bg-slate-50 text-slate-700 border-slate-200';
       default:
-        return 'bg-slate-600 text-white';
+        return 'bg-slate-50 text-slate-700 border-slate-200';
     }
   };
 
@@ -40,154 +40,149 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 pb-32">
-      {/* Header / Breadcrumb */}
-      <div className="flex items-center justify-between">
+    <div className="max-w-7xl mx-auto space-y-6 pb-16">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-border pb-4">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-black text-[10px] uppercase tracking-widest"
+          className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
         >
           <ChevronLeft size={16} />
           Back to Events
         </button>
         <div className="flex items-center gap-2">
-          <button className="p-3 rounded-2xl bg-white border border-border hover:bg-slate-50 text-muted-foreground transition-all"><Share2 size={18} /></button>
-          <button className="p-3 rounded-2xl bg-white border border-border hover:bg-slate-50 text-muted-foreground transition-all"><Heart size={18} /></button>
+          <button className="p-2 hover:bg-slate-50 text-muted-foreground transition-all">
+            <Share2 size={16} />
+          </button>
+          <button className="p-2 hover:bg-slate-50 text-muted-foreground transition-all">
+            <Heart size={16} />
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <div className="lg:col-span-2 space-y-12">
-          {/* Main Hero Image */}
-          <div className="space-y-4">
-            <div className="aspect-[16/9] rounded-[3rem] overflow-hidden shadow-2xl shadow-slate-200 border-4 border-white">
-              <img src={imgSrc} alt={event.eventName} onError={handleImageError} className="w-full h-full object-cover" />
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Hero Image */}
+          <div className="aspect-[16/9] rounded overflow-hidden border border-border">
+            <img
+              src={imgSrc}
+              alt={event.eventName}
+              onError={handleImageError}
+              className="w-full h-full object-cover"
+            />
           </div>
 
-          {/* Identity */}
-          <div className="space-y-6">
-            <div className="flex flex-wrap gap-2">
-              <span className={`px-4 py-1 ${getStatusColor(event.status)} rounded-full text-[10px] font-black uppercase tracking-widest`}>
+          {/* Title & Meta */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className={`px-3 py-1 border ${getStatusColor(event.status)} rounded text-xs font-medium`}>
                 {event.status}
               </span>
             </div>
-            <h1 className="text-5xl font-black text-foreground tracking-tight leading-tight">{event.eventName}</h1>
-            <div className="flex flex-wrap items-center gap-6">
-              <div className="flex items-center gap-2 text-muted-foreground font-bold">
-                <User size={24} className="text-accent" />
-                <span className="text-foreground font-black">{event.hostName}</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground font-bold">
-                <Calendar size={24} className="text-accent" />
+
+            <h1 className="text-3xl font-semibold text-foreground">{event.eventName}</h1>
+
+            <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Calendar size={16} />
                 {event.date}
               </div>
-              <div className="flex items-center gap-2 text-muted-foreground font-bold">
-                <MapPin size={24} className="text-accent" />
+              <div className="flex items-center gap-2">
+                <MapPin size={16} />
                 {event.location}
+              </div>
+              <div className="flex items-center gap-2">
+                <Users size={16} />
+                {event.guestCount} guests
               </div>
             </div>
           </div>
 
-          <hr className="border-border" />
-
-          {/* Stats Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 bg-white p-10 rounded-[2.5rem] border border-border shadow-sm">
-            <div className="text-center space-y-1">
-              <Users className="mx-auto text-accent mb-2" size={28} />
-              <p className="text-2xl font-black text-foreground">{event.guestCount}</p>
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Expected Guests</p>
-            </div>
-            <div className="text-center space-y-1 border-x border-slate-50">
-              <DollarSign className="mx-auto text-accent mb-2" size={28} />
-              <p className="text-2xl font-black text-foreground">{formatBudget(event.budget)}</p>
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Total Budget</p>
-            </div>
-            <div className="text-center space-y-1">
-              <Calendar className="mx-auto text-accent mb-2" size={28} />
-              <p className="text-2xl font-black text-foreground">{event.date}</p>
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Event Date</p>
-            </div>
+          {/* Host Info */}
+          <div className="bg-slate-50 p-4 rounded border border-border">
+            <p className="text-xs text-muted-foreground mb-1">Event Host</p>
+            <p className="font-medium text-foreground">{event.hostName}</p>
           </div>
 
           {/* Description */}
-          <section className="space-y-6">
-            <h3 className="text-2xl font-black text-foreground flex items-center gap-3">
-              <Award size={24} className="text-accent" />
-              About This Event
-            </h3>
-            <p className="text-muted-foreground leading-relaxed text-lg font-medium">{event.description}</p>
-          </section>
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-foreground">Event Overview</h3>
+            <p className="text-muted-foreground leading-relaxed">{event.description}</p>
+          </div>
 
-          {/* Booked Vendors */}
+          {/* Vendors */}
           {event.bookedVendors.length > 0 && (
-            <section className="bg-white p-12 rounded-[3rem] border border-border space-y-8 shadow-sm">
-              <h3 className="text-2xl font-black text-foreground flex items-center gap-3">
-                <ShieldCheck size={24} className="text-green-600" />
-                Current Vendors
-              </h3>
-              <div className="space-y-4">
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-foreground">Contracted Vendors</h3>
+              <div className="border border-border rounded divide-y divide-border">
                 {event.bookedVendors.map((vendor, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
-                    <div className="space-y-1">
-                      <p className="font-black text-foreground">{vendor.service}</p>
-                      <p className="text-xs text-muted-foreground font-bold uppercase tracking-wide">{vendor.status}</p>
+                  <div key={idx} className="flex items-center justify-between p-4">
+                    <div>
+                      <p className="font-medium text-foreground">{vendor.service}</p>
+                      <p className="text-xs text-muted-foreground">{vendor.status}</p>
                     </div>
-                    <p className="text-lg font-black text-accent">{vendor.amount}</p>
+                    <p className="font-semibold text-foreground">{vendor.amount}</p>
                   </div>
                 ))}
               </div>
-            </section>
+            </div>
           )}
         </div>
 
-        {/* Sidebar Sticky */}
-        <div className="space-y-8">
-          <div className="sticky top-24 bg-background text-white p-10 rounded-[3rem] space-y-8 shadow-2xl shadow-slate-900/30">
-            <div>
-              <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-1">Event Budget</p>
-              <p className="text-4xl font-black text-primary">{formatBudget(event.budget)}</p>
+        {/* Sidebar */}
+        <div className="space-y-4">
+          <div className="sticky top-6 border border-border rounded p-6 space-y-6 bg-white">
+            {/* Budget */}
+            <div className="pb-6 border-b border-border">
+              <p className="text-xs text-muted-foreground mb-1">Total Budget</p>
+              <p className="text-2xl font-semibold text-foreground">{formatBudget(event.budget)}</p>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-white/10">
-              <div className="flex items-center justify-between text-xs py-1">
-                <span className="text-muted-foreground font-bold uppercase tracking-widest">Status</span>
-                <span className={`font-black px-3 py-1 rounded-full text-[9px] ${getStatusColor(event.status)}`}>
+            {/* Key Details */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Status</span>
+                <span className={`px-2 py-0.5 border ${getStatusColor(event.status)} rounded text-xs font-medium`}>
                   {event.status}
                 </span>
               </div>
-              <div className="flex items-center justify-between text-xs py-1">
-                <span className="text-muted-foreground font-bold uppercase tracking-widest">Guest Count</span>
-                <span className="font-black flex items-center gap-1.5">
-                  <Users size={14} className="text-primary" /> {event.guestCount}
-                </span>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Expected Guests</span>
+                <span className="font-medium">{event.guestCount}</span>
               </div>
-              <div className="flex items-center justify-between text-xs py-1">
-                <span className="text-muted-foreground font-bold uppercase tracking-widest">Location</span>
-                <span className="font-black text-right">{event.location}</span>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Date</span>
+                <span className="font-medium">{event.date}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Location</span>
+                <span className="font-medium text-right">{event.location}</span>
               </div>
             </div>
 
-            <div className="space-y-4 pt-6">
-              <button className="w-full bg-primary hover:bg-primary text-white py-5 rounded-2xl font-black shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95">
-                Express Interest
+            {/* Actions */}
+            <div className="space-y-3 pt-4 border-t border-border">
+              <button className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded font-medium transition-colors">
+                Submit Proposal
               </button>
-              <button className="w-full bg-white/5 hover:bg-white/10 text-white py-5 rounded-2xl font-black flex items-center justify-center gap-3 transition-all border border-white/10">
-                <MessageSquare size={18} />
+              <button className="w-full border border-border hover:bg-slate-50 text-foreground py-3 rounded font-medium flex items-center justify-center gap-2 transition-colors">
+                <MessageSquare size={16} />
                 Contact Host
               </button>
             </div>
 
-            <p className="text-center text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-              Verified Waddi Event
+            <p className="text-center text-xs text-muted-foreground pt-4 border-t border-border">
+              Verified Event
             </p>
           </div>
 
-          <div className="bg-accent/50 border border-border p-8 rounded-[2.5rem] space-y-4 shadow-sm text-center">
-            <Zap className="mx-auto text-accent" size={32} />
-            <h4 className="font-black text-foreground text-lg leading-tight">Quick Response Required</h4>
-            <p className="text-sm text-muted-foreground leading-relaxed font-medium">This host is actively reviewing proposals. Submit your interest early to stand out.</p>
-            <button className="text-accent font-black text-xs uppercase tracking-widest hover:underline pt-2">Learn More →</button>
+          {/* Info Box */}
+          <div className="border border-border rounded p-4 bg-slate-50">
+            <p className="text-sm font-medium text-foreground mb-2">Response Time Matters</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              This host is actively reviewing proposals. Early submissions receive priority consideration.
+            </p>
           </div>
         </div>
       </div>
