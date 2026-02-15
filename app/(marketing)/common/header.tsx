@@ -10,6 +10,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import { VENDOR_CATEGORIES, CATEGORY_SLUG_MAP } from "@/lib/vendors-data"
 import { offerings } from "@/lib/offerings-data"
 import { auth } from "@/lib/firebase"
@@ -172,98 +177,100 @@ export function Header() {
           )}
         </div>
 
-        <button
-          className="flex h-10 w-10 items-center justify-center rounded-md text-foreground lg:hidden"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
-
-      {mobileOpen && (
-        <div className="border-t border-border bg-background lg:hidden">
-          <nav className="flex flex-col px-4 py-4" aria-label="Mobile navigation">
-            <Link
-              href="/explore/vendors"
-              className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
-              onClick={() => setMobileOpen(false)}
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              aria-label="Open menu"
             >
-              Themes
-            </Link>
-            <div className="ml-4 flex flex-col border-l border-border pl-2">
-              {themeLinks.slice(0, 6).map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-            <Link
-              href="/offerings"
-              className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
-              onClick={() => setMobileOpen(false)}
-            >
-              Offerings
-            </Link>
-            <div className="ml-4 flex flex-col border-l border-border pl-2">
-              {eventTypes.concat(serviceOfferings).slice(0, 7).map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-            <Link
-              href="/about"
-              className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              onClick={() => setMobileOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              href="/pricing"
-              className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              onClick={() => setMobileOpen(false)}
-            >
-              Pricing
-            </Link>
-            <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
-              <Link href="/book-a-call" onClick={() => setMobileOpen(false)}>
-                <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                  Book a Call
-                </Button>
+              <Menu className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+            <nav className="flex flex-col gap-4 mt-8" aria-label="Mobile navigation">
+              <Link
+                href="/explore/vendors"
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
+                onClick={() => setMobileOpen(false)}
+              >
+                Themes
               </Link>
-              {user ? (
-                <>
-                  <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
-                    <Button className="w-full bg-secondary text-secondary-foreground">
-                      Dashboard
+              <div className="ml-4 flex flex-col border-l border-border pl-4 gap-2">
+                {themeLinks.slice(0, 6).map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+              <Link
+                href="/offerings"
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
+                onClick={() => setMobileOpen(false)}
+              >
+                Offerings
+              </Link>
+              <div className="ml-4 flex flex-col border-l border-border pl-4 gap-2">
+                {eventTypes.concat(serviceOfferings).slice(0, 7).map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+              <Link
+                href="/about"
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
+                onClick={() => setMobileOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="/pricing"
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
+                onClick={() => setMobileOpen(false)}
+              >
+                Pricing
+              </Link>
+              <div className="mt-4 flex flex-col gap-2 pt-4 border-t border-border">
+                <Link href="/book-a-call" onClick={() => setMobileOpen(false)}>
+                  <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                    Book a Call
+                  </Button>
+                </Link>
+                {user ? (
+                  <>
+                    <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
+                      <Button className="w-full bg-secondary text-secondary-foreground">
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <Button onClick={() => { handleLogout(); setMobileOpen(false); }} variant="destructive" className="w-full">
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
+                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                      Sign In
                     </Button>
                   </Link>
-                  <Button onClick={() => { handleLogout(); setMobileOpen(false); }} variant="destructive" className="w-full">
-                    Sign Out
-                  </Button>
-                </>
-              ) : (
-                <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
-                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                    Sign In
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </nav>
-        </div>
-      )}
+                )}
+              </div>
+            </nav>
+          </SheetContent>
+        </Sheet>
+      </div>
     </header>
   )
 }
