@@ -6,21 +6,18 @@ import { MapPin, Calendar, Users, Briefcase, Search, Filter, SlidersHorizontal }
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 import { SHARED_EVENTS } from '@/lib/shared-data';
 import { Button } from '@/components/ui/button';
-import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 
 export default function VendorJobsPage() {
     const { bookings } = VENDOR_DASHBOARD_DATA;
 
     return (
         <div className="max-w-7xl mx-auto space-y-10 pb-20">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <h2 className="text-4xl font-black tracking-tight text-foreground">My Jobs</h2>
-                    <p className="text-muted-foreground mt-1 text-lg font-medium">Manage all your confirmed bookings and upcoming events.</p>
-                </div>
-            </div>
-
-            <DashboardFilter placeholder="Search jobs by event or client..." />
+            <DashboardHeader
+                title="My Jobs"
+                description="Manage all your confirmed bookings and upcoming events."
+                searchPlaceholder="Search jobs by event or client..."
+            />
 
             <div className="grid grid-cols-1 gap-6">
                 {bookings.length > 0 ? (

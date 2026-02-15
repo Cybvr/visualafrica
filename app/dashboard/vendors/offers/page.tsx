@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Calendar, Users, Briefcase, MessageSquare, MoreVertical, Archive, CheckCircle2 } from 'lucide-react';
