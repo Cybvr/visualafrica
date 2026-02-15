@@ -2,20 +2,45 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, Calendar, Users, Briefcase } from 'lucide-react';
+import { MapPin, Calendar, Users, Briefcase, Search, Filter, SlidersHorizontal } from 'lucide-react';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 import { SHARED_EVENTS } from '@/lib/shared-data';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export default function VendorJobsPage() {
     const { bookings } = VENDOR_DASHBOARD_DATA;
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8">
-            <div className="flex items-center justify-between">
+        <div className="max-w-7xl mx-auto space-y-10 pb-20">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h2 className="text-3xl font-black tracking-tight text-foreground">My Jobs</h2>
-                    <p className="text-muted-foreground mt-1">Manage all your confirmed bookings and upcoming events.</p>
+                    <h2 className="text-4xl font-black tracking-tight text-foreground">My Jobs</h2>
+                    <p className="text-muted-foreground mt-1 text-lg font-medium">Manage all your confirmed bookings and upcoming events.</p>
+                </div>
+            </div>
+
+            {/* Filter Bar */}
+            <div className="flex flex-col lg:flex-row gap-4 items-center p-3 bg-card border border-border rounded-[2.5rem] shadow-sm">
+                <div className="relative flex-1 w-full lg:w-auto">
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+                    <Input
+                        placeholder="Search jobs by event or client..."
+                        className="w-full pl-16 pr-6 h-14 bg-background border-border rounded-[2rem] text-sm font-bold focus:ring-primary/20"
+                    />
+                </div>
+                <div className="flex items-center gap-3 w-full lg:w-auto">
+                    <button className="flex items-center gap-2 h-14 px-8 bg-background border border-border rounded-[2rem] text-sm font-black hover:bg-slate-50 transition-all">
+                        <Filter size={18} className="text-primary" />
+                        Status
+                    </button>
+                    <button className="flex items-center gap-2 h-14 px-8 bg-background border border-border rounded-[2rem] text-sm font-black hover:bg-slate-50 transition-all">
+                        <Calendar size={18} className="text-primary" />
+                        Date
+                    </button>
+                    <button className="flex items-center justify-center w-14 h-14 bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                        <SlidersHorizontal size={20} />
+                    </button>
                 </div>
             </div>
 

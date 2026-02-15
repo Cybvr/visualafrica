@@ -290,7 +290,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   ];
 
   const hostSecondaryNavItems: NavItemConfig[] = [
-    { icon: Lightbulb, label: "Inspiration", href: "/dashboard/hosts/inspiration" },
+    { icon: Lightbulb, label: "Community", href: "/dashboard/hosts/community" },
     { icon: FileText, label: "Resources", href: "/dashboard/hosts/diy-content" },
     { icon: Settings, label: "Settings", href: "/dashboard/hosts/settings" },
   ];
@@ -302,7 +302,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   ];
 
   const vendorSecondaryNavItems: NavItemConfig[] = [
-    { icon: User, label: "Portfolio", href: "/dashboard/vendors/portfolio" },
+    { icon: User, label: "Profile", href: "/dashboard/vendors/profile" },
     { icon: Settings, label: "Settings", href: "/dashboard/vendors/settings" },
   ];
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Calendar, FileText, Clock, Star, ArrowRight, ExternalLink } from 'lucide-react';
+import { Calendar, FileText, Clock, Star, ArrowRight, ExternalLink, Heart } from 'lucide-react';
 import Link from 'next/link';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -10,6 +10,7 @@ import { vendors } from '@/lib/vendors-data';
 import { BLOG_POSTS } from '@/lib/blog-data';
 import { EVENTS } from '@/lib/events-data';
 import { SHARED_EVENTS } from '@/lib/shared-data';
+import { MOCK_EVENTS } from '@/lib/event-data';
 import BlogPostCard from '@/components/dashboard/BlogPostCard';
 import VendorPreviewCard from '@/components/dashboard/VendorPreviewCard';
 
@@ -38,10 +39,7 @@ export default function DashboardPage() {
 
   const trendingVendors = vendors.slice(0, 4);
   const recommendedPosts = BLOG_POSTS.slice(0, 4);
-
-  // Dynamic data calculation
-  const upcomingEventsCount = EVENTS.length;
-  const activeContractsCount = SHARED_EVENTS.reduce((acc, event) => acc + event.bookedVendors.length, 0);
+  const publicEvents = MOCK_EVENTS.filter(event => event.showCommunityInspiration).slice(0, 3);
 
   const firstName = displayName.trim().split(/\s+/)[0] || displayName;
   const welcomeText = displayName
@@ -49,56 +47,13 @@ export default function DashboardPage() {
     : "Welcome back. Here's what's happening today.";
 
   return (
-    <div className="max-w-6xl mx-auto space-y-12 pb-20">
-      <div className="space-y-8">
+    <div className="max-w-7xl mx-auto space-y-16 pb-20">
+      <div className="space-y-4">
         <div>
-          <h2 className="text-3xl font-black tracking-tight text-foreground">Home</h2>
-          <p className="text-muted-foreground mt-1">{welcomeText}</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Link href="/dashboard/hosts/events" className="bg-card p-6 rounded-[2rem] border border-border shadow-sm hover:shadow-md transition-all group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 bg-secondary text-primary rounded-2xl flex items-center justify-center   transition-colors">
-                <Calendar size={24} />
-              </div>
-              <span className="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider">Active</span>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-4xl font-black text-foreground">{upcomingEventsCount}</h3>
-              <p className="text-sm font-bold text-muted-foreground uppercase tracking-wide">Upcoming Events</p>
-            </div>
-          </Link>
-
-          <Link href="/dashboard/hosts/events" className="bg-card p-6 rounded-[2rem] border border-border shadow-sm hover:shadow-md transition-all group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 bg-secondary text-primary rounded-2xl flex items-center justify-center  transition-colors">
-                <FileText size={24} />
-              </div>
-              <span className="bg-slate-100 text-muted-foreground text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider">Signed</span>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-4xl font-black text-foreground">{activeContractsCount}</h3>
-              <p className="text-sm font-bold text-muted-foreground uppercase tracking-wide">Active Contracts</p>
-            </div>
-          </Link>
+          <h2 className="text-4xl font-black tracking-tight text-foreground">Home</h2>
+          <p className="text-muted-foreground mt-1 text-lg font-medium">{welcomeText}</p>
         </div>
       </div>
-
-      {/* Recommended Resources */}
-      <section className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-black text-foreground">Recommended Resources</h3>
-          <Link href="/dashboard/hosts/diy-content" className="text-sm font-bold text-accent  flex items-center gap-1">
-            View All <ArrowRight size={16} />
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {recommendedPosts.map(post => (
-            <BlogPostCard key={post.id} post={post} variant="compact" />
-          ))}
-        </div>
-      </section>
 
       {/* Hottest New Vendors */}
       <section className="space-y-6">
@@ -113,6 +68,56 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {trendingVendors.map(vendor => (
             <VendorPreviewCard key={vendor.id} vendor={vendor} />
+          ))}
+        </div>
+      </section>
+
+      {/* Community */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-black text-foreground flex items-center gap-2">
+            Community <span className="text-lg">✨</span>
+          </h3>
+          <Link href="/dashboard/hosts/community" className="text-sm font-bold text-accent flex items-center gap-1">
+            View More <ArrowRight size={16} />
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {publicEvents.map(item => (
+            <Link href={`/dashboard/hosts/community/${item.id}`} key={item.id} className="block relative rounded-[2.5rem] overflow-hidden group shadow-sm hover:shadow-2xl transition-all border border-border bg-card">
+              <div className="p-4 flex items-center gap-3 border-b border-border">
+                <div className="w-8 h-8 rounded-full bg-background text-foreground flex items-center justify-center text-[10px] font-black">{item.name[0]}</div>
+                <span className="text-xs font-bold text-foreground">Visual User</span>
+              </div>
+              <div className="aspect-[16/10] overflow-hidden">
+                <img src={item.thumbnail} alt={item.name} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700" />
+              </div>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-accent text-[10px] font-black uppercase tracking-widest text-ellipsis overflow-hidden whitespace-nowrap max-w-[100px]">{item.theme}</span>
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <Heart size={14} />
+                    <span className="text-[10px] font-bold">{Math.floor(Math.random() * 500) + 50}</span>
+                  </div>
+                </div>
+                <h3 className="text-foreground font-black text-lg group-hover:text-accent transition-colors">{item.name}</h3>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Recommended Resources */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-black text-foreground">Recommended Resources</h3>
+          <Link href="/dashboard/hosts/diy-content" className="text-sm font-bold text-accent  flex items-center gap-1">
+            View All <ArrowRight size={16} />
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {recommendedPosts.map(post => (
+            <BlogPostCard key={post.id} post={post} variant="compact" />
           ))}
         </div>
       </section>
