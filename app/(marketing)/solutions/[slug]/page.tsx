@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
-import { offerings, getOfferingBySlug } from "@/lib/offerings-data"
+import { solutions, getSolutionBySlug } from "@/lib/solutions-data"
 import { Button } from "@/components/ui/button"
 import {
   Accordion,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/accordion"
 
 export function generateStaticParams() {
-  return offerings.map((o) => ({ slug: o.slug }))
+  return solutions.map((s) => ({ slug: s.slug }))
 }
 
 export async function generateMetadata({
@@ -21,22 +21,22 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const offering = getOfferingBySlug(slug)
-  if (!offering) return { title: "Not Found" }
+  const solution = getSolutionBySlug(slug)
+  if (!solution) return { title: "Not Found" }
   return {
-    title: `${offering.title} | Visual Africa`,
-    description: offering.description,
+    title: `${solution.title} | Visual Africa`,
+    description: solution.description,
   }
 }
 
-export default async function OfferingDetailPage({
+export default async function SolutionDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const offering = getOfferingBySlug(slug)
-  if (!offering) notFound()
+  const solution = getSolutionBySlug(slug)
+  if (!solution) notFound()
 
   return (
     <>
@@ -44,8 +44,8 @@ export default async function OfferingDetailPage({
       <section className="relative overflow-hidden bg-foreground text-background">
         <div className="absolute inset-0">
           <Image
-            src={offering.image}
-            alt={offering.title}
+            src={solution.image}
+            alt={solution.title}
             fill
             className="object-cover opacity-30"
             priority
@@ -64,22 +64,22 @@ export default async function OfferingDetailPage({
             </Link>
             <span>/</span>
             <Link
-              href="/offerings"
+              href="/solutions"
               className="transition-colors hover:text-background/90"
             >
-              Offerings
+              Solutions
             </Link>
             <span>/</span>
-            <span className="text-background/90">{offering.title}</span>
+            <span className="text-background/90">{solution.title}</span>
           </nav>
           <h1 className="max-w-3xl font-serif text-4xl font-bold text-balance md:text-5xl lg:text-6xl">
-            {offering.title}
+            {solution.title}
           </h1>
           <p className="mt-2 text-lg font-medium text-primary">
-            {offering.tagline}
+            {solution.tagline}
           </p>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-background/80">
-            {offering.description}
+            {solution.description}
           </p>
           <Link href="/contact">
             <Button
@@ -98,11 +98,11 @@ export default async function OfferingDetailPage({
           What we deliver
         </h2>
         <p className="mt-2 text-muted-foreground">
-          Everything you need for a successful {offering.title.toLowerCase()}{" "}
+          Everything you need for a successful {solution.title.toLowerCase()}{" "}
           experience.
         </p>
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {offering.features.map((feature, i) => (
+          {solution.features.map((feature, i) => (
             <div
               key={i}
               className="rounded-lg border border-border bg-card p-6 transition-shadow hover:shadow-md"
@@ -133,12 +133,12 @@ export default async function OfferingDetailPage({
             A proven approach to delivering exceptional events.
           </p>
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {offering.process.map((step, i) => (
+            {solution.process.map((step, i) => (
               <div key={i} className="relative flex flex-col">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
                   {i + 1}
                 </div>
-                {i < offering.process.length - 1 && (
+                {i < solution.process.length - 1 && (
                   <div className="absolute left-6 top-12 hidden h-0.5 w-[calc(100%-1.5rem)] bg-primary/20 lg:block" />
                 )}
                 <h3 className="mt-4 text-base font-semibold text-secondary-foreground">
@@ -162,10 +162,10 @@ export default async function OfferingDetailPage({
             </h2>
             <p className="mt-2 text-muted-foreground">
               The trusted partner for{" "}
-              {offering.title.toLowerCase()} in Lagos and beyond.
+              {solution.title.toLowerCase()} in Lagos and beyond.
             </p>
             <ul className="mt-8 flex flex-col gap-4">
-              {offering.whyChooseUs.map((item, i) => (
+              {solution.whyChooseUs.map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <span className="text-sm leading-relaxed text-foreground">
@@ -177,8 +177,8 @@ export default async function OfferingDetailPage({
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
             <Image
-              src={offering.image}
-              alt={`${offering.title} by Visual Africa`}
+              src={solution.image}
+              alt={`${solution.title} by Visual Africa`}
               fill
               className="object-cover"
             />
@@ -187,14 +187,14 @@ export default async function OfferingDetailPage({
       </section>
 
       {/* FAQ */}
-      {offering.faq.length > 0 && (
+      {solution.faq.length > 0 && (
         <section className="bg-secondary px-4 py-16 lg:py-24">
           <div className="mx-auto max-w-3xl lg:px-8">
             <h2 className="text-center font-serif text-3xl font-bold text-secondary-foreground md:text-4xl">
               Frequently Asked Questions
             </h2>
             <Accordion type="single" collapsible className="mt-10">
-              {offering.faq.map((item, i) => (
+              {solution.faq.map((item, i) => (
                 <AccordionItem key={i} value={`faq-${i}`}>
                   <AccordionTrigger className="text-left text-base font-medium text-secondary-foreground">
                     {item.question}
@@ -215,7 +215,7 @@ export default async function OfferingDetailPage({
           Ready to get started?
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed opacity-90 md:text-base">
-          Let us plan your next {offering.title.toLowerCase()} event. Get in
+          Let us plan your next {solution.title.toLowerCase()} event. Get in
           touch today for a free consultation.
         </p>
         <Link href="/contact">

@@ -20,7 +20,8 @@ export interface Offering {
   faq: OfferingFaq[]
 }
 
-export const offerings: Offering[] = [
+// Export as solutions to match new naming convention
+export const solutions: Offering[] = [
   {
     slug: "offsites-retreats",
     title: "Offsites & Retreats",
@@ -418,8 +419,8 @@ export const offerings: Offering[] = [
   },
 ]
 
-export function getOfferingBySlug(slug: string): Offering | undefined {
-  return offerings.find((o) => o.slug === slug)
+export function getSolutionBySlug(slug: string): Offering | undefined {
+  return solutions.find((s) => s.slug === slug)
 }
 
-export const OFFERING_SLUGS = offerings.map((o) => o.slug)
+export const SOLUTION_SLUGS = solutions.map((s) => s.slug)

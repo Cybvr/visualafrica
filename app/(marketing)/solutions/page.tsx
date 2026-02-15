@@ -1,23 +1,23 @@
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight } from "lucide-react"
-import { offerings } from "@/lib/offerings-data"
+import { solutions } from "@/lib/solutions-data"
 import { Button } from "@/components/ui/button"
 
 export const metadata = {
-  title: "Our Offerings | Visual Africa",
+  title: "Our Solutions | Visual Africa",
   description:
-    "Explore our full range of event planning services. From corporate offsites and conferences to full-service planning, we handle it all.",
+    "Explore our full range of event planning solutions. From corporate offsites and conferences to full-service planning, we handle it all.",
 }
 
-export default function OfferingsPage() {
+export default function SolutionsPage() {
   return (
     <>
       {/* Hero */}
       <section className="bg-foreground px-4 py-20 text-background lg:py-28">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="font-serif text-4xl font-bold text-balance md:text-5xl lg:text-6xl">
-            Our Offerings
+            Our Solutions
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed opacity-80">
             From corporate retreats to full-service event planning, Visual
@@ -26,19 +26,19 @@ export default function OfferingsPage() {
         </div>
       </section>
 
-      {/* Offerings Grid */}
+      {/* Solutions Grid */}
       <section className="mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-24">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {offerings.map((offering) => (
+          {solutions.map((solution) => (
             <Link
-              key={offering.slug}
-              href={`/offerings/${offering.slug}`}
+              key={solution.slug}
+              href={`/solutions/${solution.slug}`}
               className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-lg"
             >
               <div className="relative aspect-[16/10] overflow-hidden">
                 <Image
-                  src={offering.image}
-                  alt={offering.title}
+                  src={solution.image}
+                  alt={solution.title}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -46,13 +46,13 @@ export default function OfferingsPage() {
               </div>
               <div className="flex flex-1 flex-col p-6">
                 <h3 className="font-serif text-xl font-bold text-card-foreground">
-                  {offering.title}
+                  {solution.title}
                 </h3>
                 <p className="mt-1 text-sm font-medium text-primary">
-                  {offering.tagline}
+                  {solution.tagline}
                 </p>
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">
-                  {offering.description}
+                  {solution.description}
                 </p>
                 <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-primary transition-colors group-hover:text-accent">
                   Learn more <ArrowRight className="h-4 w-4" />

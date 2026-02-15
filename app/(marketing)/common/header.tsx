@@ -1,8 +1,31 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import type { ComponentType } from "react"
 import Link from "next/link"
-import { Menu, X, ChevronDown } from "lucide-react"
+import {
+  Menu,
+  X,
+  ChevronDown,
+  Search,
+  CalendarCheck,
+  Activity,
+  CreditCard,
+  Heart,
+  Cake,
+  Users,
+  Building2,
+  Gem,
+  Calendar,
+  User,
+  Sparkles,
+  Map,
+  Presentation,
+  Video,
+  Globe,
+  LayoutGrid,
+  Zap,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -16,10 +39,11 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { VENDOR_CATEGORIES, CATEGORY_SLUG_MAP } from "@/lib/vendors-data"
-import { offerings } from "@/lib/offerings-data"
+import { solutions } from "@/lib/solutions-data"
 import { auth } from "@/lib/firebase"
-import { onAuthStateChanged, signOut, User } from "firebase/auth"
+import { onAuthStateChanged, signOut } from "firebase/auth"
 import { EVENT_THEMES } from "@/lib/vendors-data"
+import { platformFeatures } from "@/lib/platform-data"
 
 const themeLinks = EVENT_THEMES.filter(t => t !== "All Themes").map(theme => ({
   label: theme,
@@ -29,19 +53,52 @@ const themeLinks = EVENT_THEMES.filter(t => t !== "All Themes").map(theme => ({
 const eventTypeSlugs = ["offsites-retreats", "client-events", "skos", "conferences", "incentive-trips"]
 const serviceOfferingSlugs = ["full-service-planning", "expedited-planning"]
 
-const eventTypes = offerings.filter(o => eventTypeSlugs.includes(o.slug)).map(o => ({
+const platformIconMap: Record<string, ComponentType<{ className?: string }>> = {
+  Discover: Search,
+  Book: CalendarCheck,
+  Track: Activity,
+  Pay: CreditCard,
+}
+
+const themeIconMap: Record<string, ComponentType<{ className?: string }>> = {
+  Wedding: Heart,
+  "Kids Birthday": Cake,
+  "Social Gathering": Users,
+  "Corporate Event": Building2,
+  Proposals: Gem,
+  Anniversary: Calendar,
+  Bachelor: User,
+  Bachelorette: User,
+  Bridal: Sparkles,
+}
+
+const offeringIconMap: Record<string, ComponentType<{ className?: string }>> = {
+  "offsites-retreats": Map,
+  "client-events": Users,
+  skos: Presentation,
+  conferences: Video,
+  "incentive-trips": Globe,
+  "full-service-planning": LayoutGrid,
+  "expedited-planning": Zap,
+}
+
+const eventTypes = solutions.filter(o => eventTypeSlugs.includes(o.slug)).map(o => ({
   label: o.title,
-  href: `/offerings/${o.slug}`,
+  href: `/solutions/${o.slug}`,
+  slug: o.slug,
 }))
 
-const serviceOfferings = offerings.filter(o => serviceOfferingSlugs.includes(o.slug)).map(o => ({
+const serviceSolutions = solutions.filter(o => serviceOfferingSlugs.includes(o.slug)).map(o => ({
   label: o.title,
-  href: `/offerings/${o.slug}`,
+  href: `/solutions/${o.slug}`,
+  slug: o.slug,
 }))
+
+type AuthUser = Parameters<Parameters<typeof onAuthStateChanged>[1]>[0]
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<AuthUser>(null)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -49,6 +106,7 @@ export function Header() {
     })
     return () => unsubscribe()
   }, [])
+
 
   const handleLogout = async () => {
     try {
@@ -61,95 +119,148 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full pt-2">
       <div className="mx-auto flex w-[95%] max-w-5xl items-center justify-between rounded-full bg-background/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="flex items-center gap-6">
+        <div className="flex w-[180px] flex-shrink-0 items-center">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
             <span className="font-logo text-xl font-normal text-foreground">
               Waddi
             </span>
           </Link>
+        </div>
 
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
-                Themes <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-[500px] border-none bg-white p-4 shadow-2xl rounded-3xl">
-                <div className="grid grid-cols-2 gap-x-8 gap-y-2">
-                  <div className="col-span-2 pb-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Choose a Theme</span>
-                  </div>
-                  {themeLinks.map((theme) => (
+        <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex" aria-label="Main navigation">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
+              Platform
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-[500px] border-none bg-white p-4 shadow-2xl rounded-3xl">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+                <div className="col-span-2 pb-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Platform Features</span>
+                </div>
+                {platformFeatures.map((feature) => {
+                  const Icon = platformIconMap[feature.title]
+                  return (
+                    <DropdownMenuItem key={feature.title} asChild className="p-0 focus:bg-transparent">
+                      <Link href={feature.href} className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
+                        {Icon && (
+                          <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <Icon className="h-4 w-4" />
+                          </span>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <span className="text-sm font-bold text-foreground">
+                            {feature.title}
+                          </span>
+                          <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                            {feature.description}
+                          </p>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                  )
+                })}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
+              Themes
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-[500px] border-none bg-white p-4 shadow-2xl rounded-3xl">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+                <div className="col-span-2 pb-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Choose a Theme</span>
+                </div>
+                {themeLinks.map((theme) => {
+                  const Icon = themeIconMap[theme.label]
+                  return (
                     <DropdownMenuItem key={theme.label} asChild className="p-0 focus:bg-transparent">
                       <Link href={theme.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
+                        {Icon && (
+                          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <Icon className="h-4 w-4" />
+                          </span>
+                        )}
                         <span className="text-sm font-bold text-foreground">
                           {theme.label}
                         </span>
                       </Link>
                     </DropdownMenuItem>
-                  ))}
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  )
+                })}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
-                Offerings <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-[600px] border-none bg-white p-6 shadow-2xl rounded-3xl">
-                <div className="grid grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Event Types</span>
-                    <div className="space-y-1">
-                      {eventTypes.map((item) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
+              Offerings
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-[600px] border-none bg-white p-6 shadow-2xl rounded-3xl">
+              <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Event Types</span>
+                  <div className="space-y-1">
+                    {eventTypes.map((item) => {
+                      const Icon = "slug" in item ? offeringIconMap[item.slug] : null
+                      return (
                         <DropdownMenuItem key={item.label} asChild className="p-0 focus:bg-transparent">
                           <Link href={item.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
+                            {Icon && (
+                              <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <Icon className="h-4 w-4" />
+                              </span>
+                            )}
                             <span className="text-sm font-bold leading-tight text-foreground">
                               {item.label}
                             </span>
                           </Link>
                         </DropdownMenuItem>
-                      ))}
-                    </div>
+                      )
+                    })}
                   </div>
+                </div>
 
-                  <div className="space-y-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Service Offerings</span>
-                    <div className="space-y-1">
-                      {serviceOfferings.map((item) => (
+                <div className="space-y-3">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Service Solutions</span>
+                  <div className="space-y-1">
+                    {serviceSolutions.map((item) => {
+                      const Icon = "slug" in item ? offeringIconMap[item.slug] : null
+                      return (
                         <DropdownMenuItem key={item.label} asChild className="p-0 focus:bg-transparent">
                           <Link href={item.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
+                            {Icon && (
+                              <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <Icon className="h-4 w-4" />
+                              </span>
+                            )}
                             <span className="text-sm font-bold leading-tight text-foreground">
                               {item.label}
                             </span>
                           </Link>
                         </DropdownMenuItem>
-                      ))}
-                    </div>
+                      )
+                    })}
                   </div>
                 </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-            <Link
-              href="/about"
-              className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            >
-              About
-            </Link>
-            <Link
-              href="/pricing"
-              className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            >
-              Pricing
-            </Link>
-          </nav>
-        </div>
+          <Link
+            href="/pricing"
+            className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            Pricing
+          </Link>
+        </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
-          <Link href="/book-a-call">
+        <div className="hidden w-[180px] flex-shrink-0 items-center justify-end gap-3 lg:flex">
+          <Link href="/request-demo">
             <Button variant="outline" size="sm" className="flex items-center gap-2 border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground">
-              Book a Call
+              Request a Demo
             </Button>
           </Link>
           {user ? (
@@ -190,6 +301,21 @@ export function Header() {
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] overflow-y-auto sm:w-[400px]">
             <nav className="mt-8 flex flex-col gap-4" aria-label="Mobile navigation">
+              <div className="flex flex-col gap-2">
+                <span className="px-3 text-sm font-bold text-foreground">Platform</span>
+                <div className="ml-4 flex flex-col gap-2 border-l border-border pl-4">
+                  {platformFeatures.map((feature) => (
+                    <Link
+                      key={feature.title}
+                      href={feature.href}
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {feature.title}
+                    </Link>
+                  ))}
+                </div>
+              </div>
               <Link
                 href="/explore/vendors"
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
@@ -210,14 +336,14 @@ export function Header() {
                 ))}
               </div>
               <Link
-                href="/offerings"
+                href="/solutions"
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
                 onClick={() => setMobileOpen(false)}
               >
-                Offerings
+                Solutions
               </Link>
               <div className="ml-4 flex flex-col gap-2 border-l border-border pl-4">
-                {eventTypes.concat(serviceOfferings).slice(0, 7).map((item) => (
+                {eventTypes.concat(serviceSolutions).slice(0, 7).map((item) => (
                   <Link
                     key={item.label}
                     href={item.href}
@@ -229,13 +355,6 @@ export function Header() {
                 ))}
               </div>
               <Link
-                href="/about"
-                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
-                onClick={() => setMobileOpen(false)}
-              >
-                About
-              </Link>
-              <Link
                 href="/pricing"
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
                 onClick={() => setMobileOpen(false)}
@@ -243,9 +362,9 @@ export function Header() {
                 Pricing
               </Link>
               <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
-                <Link href="/book-a-call" onClick={() => setMobileOpen(false)}>
+                <Link href="/request-demo" onClick={() => setMobileOpen(false)}>
                   <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                    Book a Call
+                    Request a Demo
                   </Button>
                 </Link>
                 {user ? (

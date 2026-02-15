@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { Facebook, Instagram, MessageCircle } from "lucide-react"
 import { VENDOR_CATEGORIES, CATEGORY_SLUG_MAP } from "@/lib/vendors-data"
-import { offerings } from "@/lib/offerings-data"
+import { solutions } from "@/lib/solutions-data"
+import { platformFeatures } from "@/lib/platform-data"
 
 const quickLinks = [
   { label: "Vendor Signup", href: "/vendor-signup" },
@@ -24,10 +25,10 @@ const exploreLinks = VENDOR_CATEGORIES.filter(
   href: `/explore/vendors/${categoryToSlug[cat] ?? cat.toLowerCase().replace(/\s+/g, "-")}`,
 }))
 
-// Build offerings links from data
-const offeringLinks = offerings.map((o) => ({
-  label: o.title,
-  href: `/offerings/${o.slug}`,
+// Build solutions links from data
+const solutionLinks = solutions.map((s) => ({
+  label: s.title,
+  href: `/solutions/${s.slug}`,
 }))
 
 const legalLinks = [
@@ -122,6 +123,25 @@ export function Footer() {
             </ul>
           </div>
 
+          {/* Platform */}
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
+              Platform
+            </h3>
+            <ul className="mt-4 flex flex-col gap-2">
+              {platformFeatures.map((feature) => (
+                <li key={feature.title}>
+                  <Link
+                    href={feature.href}
+                    className="text-sm opacity-70 transition-opacity hover:opacity-100"
+                  >
+                    {feature.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Explore */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
@@ -141,13 +161,13 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Offerings */}
+          {/* Solutions */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
-              Offerings
+              Solutions
             </h3>
             <ul className="mt-4 flex flex-col gap-2">
-              {offeringLinks.map((link) => (
+              {solutionLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}

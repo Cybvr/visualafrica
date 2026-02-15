@@ -6,7 +6,7 @@ import { Header } from "@/app/(marketing)/common/header"
 import { Footer } from "@/app/(marketing)/common/footer"
 import { Calendar, Phone, Mail } from "lucide-react"
 
-export default function BookACallPage() {
+export default function RequestDemoPage() {
   useEffect(() => {
     (async function () {
       const cal = await getCalApi({ namespace: "30min" })
@@ -22,7 +22,7 @@ export default function BookACallPage() {
           {/* Hero */}
           <div className="text-center">
             <h1 className="font-serif text-4xl font-bold md:text-5xl lg:text-6xl">
-              Book a Call
+              Request a Demo
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
               Schedule a free consultation with our team. Pick a time that works for you.

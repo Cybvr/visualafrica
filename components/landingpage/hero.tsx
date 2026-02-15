@@ -32,7 +32,7 @@ export function Hero() {
                         <Link href="/auth/login">Get started for free</Link>
                     </Button>
                     <Button asChild size="lg" variant="outline" className="h-14 px-10 text-lg border-white text-foreground hover:bg-white/10">
-                        <Link href="/book-a-call">Book a Call</Link>
+                        <Link href="/request-demo">Request a Demo</Link>
                     </Button>
                 </div>
             </div>
