@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import Link from "next/link"
 
 export function Hero() {
     return (
@@ -29,11 +30,11 @@ export function Hero() {
                     AI-powered event software for extraordinary results.
                 </p>
                 <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-                    <Button size="lg" className="h-14 px-10 text-lg bg-primary hover:bg-primary/90">
-                        Get started for free
+                    <Button asChild size="lg" className="h-14 px-10 text-lg bg-primary hover:bg-primary/90">
+                        <Link href="/auth/login">Get started for free</Link>
                     </Button>
-                    <Button size="lg" variant="outline" className="h-14 px-10 text-lg border-white text-foreground hover:bg-white/10">
-                        Book a Call
+                    <Button asChild size="lg" variant="outline" className="h-14 px-10 text-lg border-white text-foreground hover:bg-white/10">
+                        <Link href="/book-a-call">Book a Call</Link>
                     </Button>
                 </div>
             </div>

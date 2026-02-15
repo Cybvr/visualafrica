@@ -40,21 +40,43 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-foreground/50" />
         <div className="absolute inset-0 flex flex-col items-start justify-end p-12">
           <Link href="/" className="absolute left-8 top-8 flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-              <span className="text-sm font-bold text-primary-foreground">VA</span>
-            </div>
-            <span className="font-serif text-xl font-bold text-background">
-              Visual<span className="text-primary">Africa</span>
+            <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
+            <span className="font-logo text-xl font-normal text-background">
+              Waddi
             </span>
           </Link>
-          <blockquote className="max-w-md">
-            <p className="font-serif text-2xl font-semibold leading-snug text-background">
-              {"\"Visual Africa made planning our wedding in Lagos an absolute dream. The vendors were incredible!\""}
-            </p>
-            <footer className="mt-4 text-sm text-background/70">
-              -- Adunni & Chike, Lagos
-            </footer>
-          </blockquote>
+          <div className="max-w-md space-y-8">
+            <div className="space-y-5">
+              <p className="font-serif text-2xl font-semibold leading-snug text-background">
+                All-in-one event planning.
+              </p>
+              <ul className="space-y-3 text-sm text-background/90">
+                <li>
+                  <span className="font-semibold text-background">Discover venues in no time</span>
+                  <br />
+                  Browse and compare hotels, venues, and activities in minutes instead of weeks.
+                </li>
+                <li>
+                  <span className="font-semibold text-background">Guest management made simple</span>
+                  <br />
+                  Sites, RSVPs, room assignments, and announcements—unified in a single tool.
+                </li>
+                <li>
+                  <span className="font-semibold text-background">AI takes care of the grind</span>
+                  <br />
+                  Sourcing, quotes, and outreach run automatically in the background.
+                </li>
+              </ul>
+            </div>
+            <blockquote className="border-l-2 border-background/50 pl-4">
+              <p className="font-serif text-xl font-semibold leading-snug text-background">
+                {"\"Visual Africa made planning our wedding in Lagos an absolute dream. The vendors were incredible!\""}
+              </p>
+              <footer className="mt-3 text-sm text-background/70">
+                — Adunni & Chike, Lagos
+              </footer>
+            </blockquote>
+          </div>
         </div>
       </div>
 
@@ -64,11 +86,9 @@ export default function LoginPage() {
           {/* Mobile Logo */}
           <div className="mb-8 flex items-center justify-between lg:hidden">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-                <span className="text-sm font-bold text-primary-foreground">VA</span>
-              </div>
-              <span className="font-serif text-xl font-bold text-foreground">
-                Visual<span className="text-primary">Africa</span>
+              <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
+              <span className="font-logo text-xl font-normal text-foreground">
+                Waddi
               </span>
             </Link>
           </div>

@@ -7,6 +7,7 @@ import { HottestVendors } from "@/components/hottest-vendors"
 import { EventInsights } from "@/components/event-insights"
 import { Testimonials } from "@/components/testimonials"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export default function HomePage() {
   return (
@@ -26,8 +27,8 @@ export default function HomePage() {
             <h2 className="font-serif text-4xl md:text-6xl font-bold mb-8">
               Get started in <br /> 2 minutes or less
             </h2>
-            <Button size="lg" variant="secondary" className="h-14 px-10 text-lg bg-white text-primary hover:bg-gray-100">
-              Book a demo
+            <Button asChild size="lg" variant="secondary" className="h-14 px-10 text-lg bg-white text-primary hover:bg-gray-100">
+              <Link href="/auth/login">Get started</Link>
             </Button>
           </div>
         </section>

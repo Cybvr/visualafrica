@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, Users, Sparkles } from "lucide-react"
+import { Calendar, Users } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { BLOG_POSTS } from "@/lib/blog-data"
@@ -17,12 +17,6 @@ export function FeaturesGrid() {
             title: "Easy Guest Management",
             description: "Easily manage event attendees with attendee management tools.",
             icon: Users,
-            cta: "Get started"
-        },
-        {
-            title: "AI Event Assistant",
-            description: "Cutting-edge AI is there to assist you at every step to save you time.",
-            icon: Sparkles,
             cta: "Get started"
         }
     ]
@@ -49,8 +43,8 @@ export function FeaturesGrid() {
                         <p className="mt-6 text-lg text-white/90">
                             Take the hassle out of event planning with our team of expert event planners.
                         </p>
-                        <Button className="mt-8 bg-primary hover:bg-primary/90" size="lg">
-                            Get started
+                        <Button asChild className="mt-8 bg-primary hover:bg-primary/90" size="lg">
+                            <Link href="/auth/login">Get started</Link>
                         </Button>
                     </div>
                 </div>
@@ -66,8 +60,10 @@ export function FeaturesGrid() {
                                 <p className="text-muted-foreground mb-6 leading-relaxed">
                                     {feature.description}
                                 </p>
-                                <Button variant="link" className="p-0 h-auto text-primary font-semibold hover:no-underline group">
-                                    {feature.cta} <span className="ml-2 transition-transform group-hover:translate-x-1">→</span>
+                                <Button asChild variant="link" className="p-0 h-auto text-primary font-semibold hover:no-underline group">
+                                    <Link href="/auth/login">
+                                        {feature.cta} <span className="ml-2 transition-transform group-hover:translate-x-1">→</span>
+                                    </Link>
                                 </Button>
                             </CardContent>
                         </Card>

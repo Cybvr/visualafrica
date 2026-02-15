@@ -201,7 +201,7 @@ export function Header() {
 
         {/* Desktop Actions */}
         <div className="hidden items-center gap-3 lg:flex">
-          <Link href="/list-business">
+          <Link href="/book-a-call">
             <Button variant="outline" size="sm" className="flex items-center gap-2 text-primary hover:bg-primary hover:text-primary-foreground border-primary/20">
               <HiChatBubbleLeftRight className="h-4 w-4" />
               Book a Call
@@ -307,7 +307,7 @@ export function Header() {
                 Pricing
               </Link>
               <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
-                <Link href="/list-business" onClick={() => setMobileOpen(false)}>
+                <Link href="/book-a-call" onClick={() => setMobileOpen(false)}>
                   <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                     Book a Call
                   </Button>
