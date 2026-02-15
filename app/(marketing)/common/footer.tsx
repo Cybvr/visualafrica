@@ -5,7 +5,7 @@ import { offerings } from "@/lib/offerings-data"
 
 const quickLinks = [
   { label: "Vendor Signup", href: "/vendor-signup" },
-  { label: "About", href: "/about" },
+  { label: "About Us", href: "/about" },
   { label: "FAQs", href: "/faqs" },
   { label: "Blog", href: "/blog" },
   { label: "Explore", href: "/explore/vendors" },
@@ -82,8 +82,8 @@ export function Footer() {
       </div>
 
       {/* Footer Content */}
-      <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-6">
+      <div className="mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2">
@@ -109,22 +109,6 @@ export function Footer() {
               Thunder About
             </h3>
             <ul className="mt-4 flex flex-col gap-2">
-              <li>
-                <Link
-                  href="/about"
-                  className="text-sm opacity-70 transition-opacity hover:opacity-100"
-                >
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="text-sm opacity-70 transition-opacity hover:opacity-100"
-                >
-                  Contact
-                </Link>
-              </li>
               {quickLinks.map((link) => (
                 <li key={link.label}>
                   <Link

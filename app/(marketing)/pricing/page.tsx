@@ -233,7 +233,7 @@ export default function PricingPage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10"
+                className="border-primary-foreground text-foreground hover:bg-primary-foreground/10"
               >
                 Talk to Sales
               </Button>
