@@ -60,7 +60,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full pt-2">
-      <div className="py-2 px-4 rounded-full mx-auto flex max-w-5xl items-center justify-between bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <div className="mx-auto flex w-[95%] max-w-5xl items-center justify-between rounded-full bg-background/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
@@ -74,14 +74,14 @@ export function Header() {
               <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
                 Themes <ChevronDown className="h-3.5 w-3.5 opacity-50" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-[500px] p-4 bg-white rounded-3xl shadow-2xl border-none">
+              <DropdownMenuContent align="start" className="w-[500px] border-none bg-white p-4 shadow-2xl rounded-3xl">
                 <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                   <div className="col-span-2 pb-2">
                     <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Choose a Theme</span>
                   </div>
                   {themeLinks.map((theme) => (
                     <DropdownMenuItem key={theme.label} asChild className="p-0 focus:bg-transparent">
-                      <Link href={theme.href} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-secondary/50 group transition-all">
+                      <Link href={theme.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
                         <span className="text-sm font-bold text-foreground">
                           {theme.label}
                         </span>
@@ -96,15 +96,15 @@ export function Header() {
               <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
                 Offerings <ChevronDown className="h-3.5 w-3.5 opacity-50" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-[600px] p-6 bg-white rounded-3xl shadow-2xl border-none">
+              <DropdownMenuContent align="start" className="w-[600px] border-none bg-white p-6 shadow-2xl rounded-3xl">
                 <div className="grid grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block pb-1 border-b border-border/50">Event Types</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Event Types</span>
                     <div className="space-y-1">
                       {eventTypes.map((item) => (
                         <DropdownMenuItem key={item.label} asChild className="p-0 focus:bg-transparent">
-                          <Link href={item.href} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-secondary/50 group transition-all">
-                            <span className="text-sm font-bold text-foreground leading-tight">
+                          <Link href={item.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
+                            <span className="text-sm font-bold leading-tight text-foreground">
                               {item.label}
                             </span>
                           </Link>
@@ -114,12 +114,12 @@ export function Header() {
                   </div>
 
                   <div className="space-y-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block pb-1 border-b border-border/50">Service Offerings</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Service Offerings</span>
                     <div className="space-y-1">
                       {serviceOfferings.map((item) => (
                         <DropdownMenuItem key={item.label} asChild className="p-0 focus:bg-transparent">
-                          <Link href={item.href} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-secondary/50 group transition-all">
-                            <span className="text-sm font-bold text-foreground leading-tight">
+                          <Link href={item.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
+                            <span className="text-sm font-bold leading-tight text-foreground">
                               {item.label}
                             </span>
                           </Link>
@@ -148,7 +148,7 @@ export function Header() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <Link href="/book-a-call">
-            <Button variant="outline" size="sm" className="flex items-center gap-2 text-primary hover:bg-primary hover:text-primary-foreground border-primary/20">
+            <Button variant="outline" size="sm" className="flex items-center gap-2 border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground">
               Book a Call
             </Button>
           </Link>
@@ -188,8 +188,8 @@ export function Header() {
               <Menu className="h-6 w-6" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-            <nav className="flex flex-col gap-4 mt-8" aria-label="Mobile navigation">
+          <SheetContent side="right" className="w-[300px] overflow-y-auto sm:w-[400px]">
+            <nav className="mt-8 flex flex-col gap-4" aria-label="Mobile navigation">
               <Link
                 href="/explore/vendors"
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
@@ -197,7 +197,7 @@ export function Header() {
               >
                 Themes
               </Link>
-              <div className="ml-4 flex flex-col border-l border-border pl-4 gap-2">
+              <div className="ml-4 flex flex-col gap-2 border-l border-border pl-4">
                 {themeLinks.slice(0, 6).map((item) => (
                   <Link
                     key={item.label}
@@ -216,7 +216,7 @@ export function Header() {
               >
                 Offerings
               </Link>
-              <div className="ml-4 flex flex-col border-l border-border pl-4 gap-2">
+              <div className="ml-4 flex flex-col gap-2 border-l border-border pl-4">
                 {eventTypes.concat(serviceOfferings).slice(0, 7).map((item) => (
                   <Link
                     key={item.label}
@@ -242,7 +242,7 @@ export function Header() {
               >
                 Pricing
               </Link>
-              <div className="mt-4 flex flex-col gap-2 pt-4 border-t border-border">
+              <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
                 <Link href="/book-a-call" onClick={() => setMobileOpen(false)}>
                   <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                     Book a Call
