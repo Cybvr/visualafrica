@@ -3,16 +3,19 @@
 import React from 'react';
 import { Clock, CheckCircle, FileText, ChevronRight, Filter, MapPin } from 'lucide-react';
 
+import { vendors } from '@/lib/vendors-data';
+
 const STATUS_MAP = {
     'Sent': { color: 'text-blue-600 bg-blue-50', icon: <Clock size={16} /> },
     'Quoted': { color: 'text-amber-600 bg-amber-50', icon: <FileText size={16} /> },
     'Booked': { color: 'text-green-600 bg-green-50', icon: <CheckCircle size={16} /> },
 };
 
+// Map specific vendors to simulate requests state
 const REQUESTS = [
-    { id: 1, vendor: 'The Monarch', type: 'Venue', status: 'Booked', date: 'Oct 12, 2024', price: 'NGN 5,000,000', location: 'Lekki, Lagos' },
-    { id: 2, vendor: 'Naija Gourmet Flavors', type: 'Catering', status: 'Quoted', date: 'Oct 14, 2024', price: 'NGN 1,200,000', location: 'Ikoyi, Lagos' },
-    { id: 3, vendor: 'Eko Lens Studio', type: 'Photography', status: 'Sent', date: 'Oct 15, 2024', price: 'Pending', location: 'Ikeja, Lagos' },
+    { ...vendors.find(v => v.id === 'v-venue-1')!, status: 'Booked', date: 'Oct 12, 2024', priceDisplay: vendors.find(v => v.id === 'v-venue-1')?.price },
+    { ...vendors.find(v => v.id === 'v-catering-1')!, status: 'Quoted', date: 'Oct 14, 2024', priceDisplay: vendors.find(v => v.id === 'v-catering-1')?.price },
+    { ...vendors.find(v => v.id === 'v-photo-1')!, status: 'Sent', date: 'Oct 15, 2024', priceDisplay: 'Pending' },
 ];
 
 const VendorsTab: React.FC = () => {
@@ -40,7 +43,7 @@ const VendorsTab: React.FC = () => {
                             return (
                                 <tr key={req.id} className="group hover:bg-slate-50/50 transition-colors cursor-pointer">
                                     <td className="px-8 py-6">
-                                        <div className="font-bold text-foreground">{req.vendor}</div>
+                                        <div className="font-bold text-foreground">{req.name}</div>
                                         <div className="text-[10px] text-muted-foreground font-bold uppercase mt-0.5">Updated {req.date}</div>
                                     </td>
                                     <td className="px-8 py-6">
@@ -49,13 +52,13 @@ const VendorsTab: React.FC = () => {
                                             {req.location}
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6 font-medium text-muted-foreground text-sm">{req.type}</td>
+                                    <td className="px-8 py-6 font-medium text-muted-foreground text-sm">{req.categories[0]}</td>
                                     <td className="px-8 py-6">
                                         <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black ${status.color}`}>
                                             {status.icon} {req.status}
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6 font-black text-foreground">{req.price}</td>
+                                    <td className="px-8 py-6 font-black text-foreground">{req.priceDisplay}</td>
                                     <td className="px-8 py-6 text-right"><ChevronRight size={18} className="text-slate-200 group-hover:text-orange-600 transition-colors inline" /></td>
                                 </tr>
                             );
