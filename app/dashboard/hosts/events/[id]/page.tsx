@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
     MapPin, Calendar, Users, Target, Clock, Rocket,
     ChevronLeft, Share2, Printer
@@ -18,8 +18,27 @@ import InboxTab from '@/components/dashboard/event-tabs/InboxTab';
 
 export default function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    // Get active tab from URL or default to 'overview'
+    const currentTab = searchParams.get('tab') || 'overview';
+    const [activeTab, setActiveTab] = useState(currentTab);
+
+    // Sync state with URL
+    useEffect(() => {
+        setActiveTab(currentTab);
+    }, [currentTab]);
+
+    const handleTabChange = (value: string) => {
+        setActiveTab(value);
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('tab', value);
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
     const event = EVENTS.find(e => e.id === id);
-    const [activeTab, setActiveTab] = useState("overview");
 
     if (!event) {
         return notFound();
@@ -86,7 +105,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     </div>
                 </div>
 
-                <Tabs defaultValue="overview" onValueChange={setActiveTab}>
+                <Tabs value={activeTab} onValueChange={handleTabChange}>
                     <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b border-border rounded-none">
                         <TabsTrigger
                             value="overview"
