@@ -52,6 +52,26 @@ export interface Chat {
     messages: ChatMessage[];
 }
 
+export interface PaymentHistory {
+    id: string;
+    bookingId: string;
+    eventName: string;
+    client: string;
+    amount: string;
+    date: string;
+    status: 'completed' | 'pending' | 'processing';
+    method: string;
+}
+
+export interface PaymentMethod {
+    id: string;
+    type: 'bank' | 'card';
+    bankName?: string;
+    cardLast4?: string;
+    accountNumber?: string;
+    isDefault: boolean;
+}
+
 const CURRENT_VENDOR_ID = "v1";
 
 // Derive leads from shared events
@@ -83,8 +103,68 @@ const derivedBookings: Booking[] = SHARED_EVENTS.flatMap(event =>
         }))
 );
 
+// Derive payment history from bookings
+const derivedPayments: PaymentHistory[] = derivedBookings.map((booking, i) => {
+    // Map booking status to payment status
+    let paymentStatus: PaymentHistory['status'] = 'pending';
+    if (booking.status === 'Paid' || booking.status === 'Completed') {
+        paymentStatus = 'completed';
+    } else if (booking.status === 'Pending Payment') {
+        paymentStatus = 'processing';
+    }
+
+    return {
+        id: `pmt-${booking.id}`,
+        bookingId: booking.id,
+        eventName: booking.event,
+        client: booking.client,
+        amount: booking.amount,
+        date: booking.date,
+        status: paymentStatus,
+        method: 'Bank Transfer'
+    };
+});
+
+// Mock payment methods - in real app would come from user profile
+const paymentMethods: PaymentMethod[] = [
+    {
+        id: 'bank-001',
+        type: 'bank',
+        bankName: 'First Bank of Nigeria',
+        accountNumber: '****6789',
+        isDefault: true
+    },
+    {
+        id: 'bank-002',
+        type: 'bank',
+        bankName: 'GTBank',
+        accountNumber: '****1234',
+        isDefault: false
+    }
+];
+
 export function getCurrentVendor(): Vendor | undefined {
     return vendors.find(v => v.id === CURRENT_VENDOR_ID);
+}
+
+// Helper functions for payment calculations
+export function getPaymentStats() {
+    const completed = derivedPayments.filter(p => p.status === 'completed');
+    const pending = derivedPayments.filter(p => p.status === 'pending' || p.status === 'processing');
+
+    const parseAmount = (amount: string) => {
+        // Remove NGN, ₦, $, commas and parse
+        return parseFloat(amount.replace(/[NGN₦$,]/g, '').trim());
+    };
+
+    const totalEarned = completed.reduce((sum, p) => sum + parseAmount(p.amount), 0);
+    const pendingAmount = pending.reduce((sum, p) => sum + parseAmount(p.amount), 0);
+
+    return {
+        totalEarned,
+        pendingAmount,
+        thisMonth: totalEarned // For now, assume all is this month
+    };
 }
 
 // Global Vendor Dashboard Data
@@ -92,6 +172,8 @@ export const VENDOR_DASHBOARD_DATA = {
     currentVendorId: CURRENT_VENDOR_ID,
     leads: derivedLeads,
     bookings: derivedBookings,
+    payments: derivedPayments,
+    paymentMethods: paymentMethods,
     portfolioItems: getCurrentVendor()?.portfolio || [] as PortfolioItem[],
 
     chats: [

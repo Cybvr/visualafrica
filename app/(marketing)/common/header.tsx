@@ -135,7 +135,7 @@ export function Header() {
             <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
               Platform
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[500px] border-none bg-white p-4 shadow-2xl rounded-3xl">
+            <DropdownMenuContent align="start" className="w-[500px] border-none bg-background p-4 shadow-2xl rounded-3xl">
               <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                 <div className="col-span-2 pb-2">
                   <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Platform Features</span>
@@ -146,7 +146,7 @@ export function Header() {
                     <DropdownMenuItem key={feature.title} asChild className="p-0 focus:bg-transparent">
                       <Link href={feature.href} className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
                         {Icon && (
-                          <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                          <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-card text-primary">
                             <Icon className="h-4 w-4" />
                           </span>
                         )}
@@ -170,7 +170,7 @@ export function Header() {
             <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
               Discover
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[500px] border-none bg-white p-4 shadow-2xl rounded-3xl">
+            <DropdownMenuContent align="start" className="w-[500px] border-none bg-background p-4 shadow-2xl rounded-3xl">
               <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                 <div className="col-span-2 pb-2">
                   <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Choose a Theme</span>
@@ -200,7 +200,7 @@ export function Header() {
             <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
               Solutions
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[600px] border-none bg-white p-6 shadow-2xl rounded-3xl">
+            <DropdownMenuContent align="start" className="w-[600px] border-none bg-background p-6 shadow-2xl rounded-3xl">
               <div className="grid grid-cols-2 gap-8">
                 <div className="space-y-3">
                   <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Event Types</span>
@@ -255,7 +255,7 @@ export function Header() {
             <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
               Resources
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[280px] border-none bg-white p-4 shadow-2xl rounded-3xl">
+            <DropdownMenuContent align="start" className="w-[280px] border-none bg-background p-4 shadow-2xl rounded-3xl">
               <div className="space-y-2">
                 <div className="pb-2">
                   <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Learn More</span>
@@ -296,11 +296,11 @@ export function Header() {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="sm" className="bg-primary text-white hover:bg-primary/90">
+                <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                   Account <ChevronDown className="ml-1 h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className=" border-none bg-background p-6 shadow-2xl rounded-3xl">
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard" className="cursor-pointer font-bold">Dashboard</Link>
                 </DropdownMenuItem>

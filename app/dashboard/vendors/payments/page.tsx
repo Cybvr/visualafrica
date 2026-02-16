@@ -1,92 +1,17 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { CreditCard, DollarSign, Calendar, Download, Plus, Trash2, CheckCircle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-type PaymentStatus = 'completed' | 'pending' | 'processing';
-
-interface PaymentHistory {
-    id: string;
-    eventName: string;
-    client: string;
-    amount: string;
-    date: string;
-    status: PaymentStatus;
-    method: string;
-}
-
-interface PaymentMethod {
-    id: string;
-    type: 'bank' | 'card';
-    bankName?: string;
-    cardLast4?: string;
-    accountNumber?: string;
-    isDefault: boolean;
-}
+import { VENDOR_DASHBOARD_DATA, PaymentHistory, getPaymentStats } from '@/lib/vendor-dashboard-data';
 
 export default function VendorPaymentsPage() {
     const [activeTab, setActiveTab] = useState<'history' | 'methods'>('history');
+    const { payments, paymentMethods } = VENDOR_DASHBOARD_DATA;
+    const paymentStats = getPaymentStats();
 
-    // Mock payment history data
-    const paymentHistory: PaymentHistory[] = [
-        {
-            id: 'pmt-001',
-            eventName: 'Lagos Corporate Gala 2024',
-            client: 'TechCorp Nigeria',
-            amount: '$2,500.00',
-            date: 'Feb 10, 2024',
-            status: 'completed',
-            method: 'Bank Transfer'
-        },
-        {
-            id: 'pmt-002',
-            eventName: 'Abuja Wedding Reception',
-            client: 'Sarah & Michael',
-            amount: '$1,800.00',
-            date: 'Feb 5, 2024',
-            status: 'completed',
-            method: 'Bank Transfer'
-        },
-        {
-            id: 'pmt-003',
-            eventName: 'Port Harcourt Product Launch',
-            client: 'StartupXYZ',
-            amount: '$3,200.00',
-            date: 'Feb 15, 2024',
-            status: 'processing',
-            method: 'Bank Transfer'
-        },
-        {
-            id: 'pmt-004',
-            eventName: 'Kano Birthday Celebration',
-            client: 'Ahmed Family',
-            amount: '$950.00',
-            date: 'Feb 20, 2024',
-            status: 'pending',
-            method: 'Bank Transfer'
-        }
-    ];
-
-    // Mock payment methods
-    const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
-        {
-            id: 'bank-001',
-            type: 'bank',
-            bankName: 'First Bank of Nigeria',
-            accountNumber: '****6789',
-            isDefault: true
-        },
-        {
-            id: 'bank-002',
-            type: 'bank',
-            bankName: 'GTBank',
-            accountNumber: '****1234',
-            isDefault: false
-        }
-    ]);
-
-    const getStatusBadge = (status: PaymentStatus) => {
+    const getStatusBadge = (status: PaymentHistory['status']) => {
         const configs = {
             completed: {
                 icon: CheckCircle,
@@ -116,14 +41,6 @@ export default function VendorPaymentsPage() {
         );
     };
 
-    const totalEarned = paymentHistory
-        .filter(p => p.status === 'completed')
-        .reduce((sum, p) => sum + parseFloat(p.amount.replace('$', '').replace(',', '')), 0);
-
-    const pendingAmount = paymentHistory
-        .filter(p => p.status === 'pending' || p.status === 'processing')
-        .reduce((sum, p) => sum + parseFloat(p.amount.replace('$', '').replace(',', '')), 0);
-
     return (
         <div className="max-w-7xl mx-auto space-y-6 pb-16">
             {/* Header */}
@@ -140,7 +57,7 @@ export default function VendorPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">Total Earned</p>
                             <DollarSign size={20} className="text-green-600" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${totalEarned.toLocaleString()}</p>
+                        <p className="text-3xl font-black text-foreground">${paymentStats.totalEarned.toLocaleString()}</p>
                         <p className="text-xs text-muted-foreground mt-1">Lifetime earnings</p>
                     </div>
 
@@ -149,7 +66,7 @@ export default function VendorPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">Pending</p>
                             <Clock size={20} className="text-yellow-600" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${pendingAmount.toLocaleString()}</p>
+                        <p className="text-3xl font-black text-foreground">${paymentStats.pendingAmount.toLocaleString()}</p>
                         <p className="text-xs text-muted-foreground mt-1">Awaiting processing</p>
                     </div>
 
@@ -158,7 +75,7 @@ export default function VendorPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">This Month</p>
                             <Calendar size={20} className="text-primary" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">$8,450</p>
+                        <p className="text-3xl font-black text-foreground">${paymentStats.thisMonth.toLocaleString()}</p>
                         <p className="text-xs text-muted-foreground mt-1">February 2024</p>
                     </div>
                 </div>
@@ -201,36 +118,51 @@ export default function VendorPaymentsPage() {
 
                     {/* Payment History List */}
                     <div className="space-y-3">
-                        {paymentHistory.map((payment) => (
-                            <div
-                                key={payment.id}
-                                className="bg-card border border-border rounded-xl p-6 hover:shadow-md transition-all"
-                            >
-                                <div className="flex items-start justify-between">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <h3 className="text-lg font-bold text-foreground">{payment.eventName}</h3>
-                                            {getStatusBadge(payment.status)}
+                        {payments.length > 0 ? (
+                            payments.map((payment) => (
+                                <div
+                                    key={payment.id}
+                                    className="bg-card border border-border rounded-xl p-6 hover:shadow-md transition-all"
+                                >
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <Link
+                                                    href={`/dashboard/vendors/jobs/${payment.bookingId}`}
+                                                    className="text-lg font-bold text-foreground hover:text-primary transition-colors"
+                                                >
+                                                    {payment.eventName}
+                                                </Link>
+                                                {getStatusBadge(payment.status)}
+                                            </div>
+                                            <p className="text-sm text-muted-foreground mb-1">Client: {payment.client}</p>
+                                            <div className="flex items-center gap-4 text-xs text-muted-foreground mt-3">
+                                                <span className="flex items-center gap-1">
+                                                    <Calendar size={12} />
+                                                    {payment.date}
+                                                </span>
+                                                <span className="flex items-center gap-1">
+                                                    <CreditCard size={12} />
+                                                    {payment.method}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <p className="text-sm text-muted-foreground mb-1">Client: {payment.client}</p>
-                                        <div className="flex items-center gap-4 text-xs text-muted-foreground mt-3">
-                                            <span className="flex items-center gap-1">
-                                                <Calendar size={12} />
-                                                {payment.date}
-                                            </span>
-                                            <span className="flex items-center gap-1">
-                                                <CreditCard size={12} />
-                                                {payment.method}
-                                            </span>
+                                        <div className="text-right">
+                                            <p className="text-2xl font-black text-foreground">{payment.amount}</p>
+                                            <p className="text-xs text-muted-foreground mt-1">ID: {payment.id}</p>
                                         </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-2xl font-black text-foreground">{payment.amount}</p>
-                                        <p className="text-xs text-muted-foreground mt-1">ID: {payment.id}</p>
                                     </div>
                                 </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-20 bg-card border border-dashed border-border rounded-2xl">
+                                <CreditCard size={48} className="mx-auto text-muted-foreground mb-4" />
+                                <h3 className="text-xl font-bold text-foreground">No Payment History</h3>
+                                <p className="text-muted-foreground mt-2 font-medium">
+                                    Completed jobs will generate payment records here.
+                                </p>
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
             ) : (

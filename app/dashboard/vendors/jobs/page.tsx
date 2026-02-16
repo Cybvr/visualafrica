@@ -4,25 +4,47 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Calendar, Users, Briefcase, Search, Filter, SlidersHorizontal } from 'lucide-react';
-import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
+import { VENDOR_DASHBOARD_DATA, Booking } from '@/lib/vendor-dashboard-data';
 import { SHARED_EVENTS } from '@/lib/shared-data';
 import { Button } from '@/components/ui/button';
 import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
 
 type JobStatus = 'all' | 'pending' | 'offers' | 'active' | 'declined' | 'completed';
 
+// Map booking statuses to job filter categories
+function getJobCategory(booking: Booking): JobStatus[] {
+    const categories: JobStatus[] = ['all'];
+
+    switch (booking.status) {
+        case 'Confirmed':
+        case 'Upcoming':
+            categories.push('active');
+            break;
+        case 'Pending Payment':
+        case 'Unresolved':
+            categories.push('pending');
+            break;
+        case 'Paid':
+        case 'Completed':
+            categories.push('completed');
+            break;
+    }
+
+    return categories;
+}
+
 export default function VendorJobsPage() {
     const { bookings } = VENDOR_DASHBOARD_DATA;
     const [activeFilter, setActiveFilter] = useState<JobStatus>('all');
 
-    // Mock job counts - in real app, these would come from API
+    // Calculate real counts based on booking statuses
     const jobCounts = {
         all: bookings.length,
-        pending: 3, // Jobs awaiting vendor response
-        offers: 2,  // Proposals submitted to hosts
-        active: bookings.length,
-        declined: 1,
-        completed: 5
+        pending: bookings.filter(b => getJobCategory(b).includes('pending')).length,
+        offers: 0, // Would come from proposals system when implemented
+        active: bookings.filter(b => getJobCategory(b).includes('active')).length,
+        declined: 0, // Would track declined jobs
+        completed: bookings.filter(b => getJobCategory(b).includes('completed')).length
     };
 
     const statusConfig = [
@@ -37,7 +59,7 @@ export default function VendorJobsPage() {
     // Filter bookings based on active filter
     const filteredBookings = activeFilter === 'all'
         ? bookings
-        : bookings; // TODO: Implement actual filtering logic based on job status
+        : bookings.filter(booking => getJobCategory(booking).includes(activeFilter));
 
     return (
         <div className="max-w-7xl mx-auto space-y-6 pb-16">
@@ -57,15 +79,15 @@ export default function VendorJobsPage() {
                             key={status.key}
                             onClick={() => setActiveFilter(status.key)}
                             className={`pb-3 text-sm font-black transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${activeFilter === status.key
-                                    ? 'border-primary text-primary'
-                                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-muted-foreground hover:text-foreground'
                                 }`}
                         >
                             {status.label}
                             <span
                                 className={`px-2 py-0.5 rounded-full text-[10px] ${activeFilter === status.key
-                                        ? 'bg-primary/10 text-primary'
-                                        : 'bg-secondary text-muted-foreground'
+                                    ? 'bg-primary/10 text-primary'
+                                    : 'bg-secondary text-muted-foreground'
                                     }`}
                             >
                                 {status.count}
