@@ -14,13 +14,20 @@ export interface Event {
         vendorId: string;
         service: string;
         amount: string;
-        status: 'Pending' | 'Confirmed' | 'Paid';
+        status: 'Pending' | 'Confirmed' | 'Paid' | 'Pending Payment' | 'Unresolved';
     }[];
     categories: string[];
     themes: string[];
     itinerary?: string;
     publicGallery?: string[];
     metrics?: { label: string; value: string }[];
+    guests: {
+        id: string;
+        name: string;
+        email: string;
+        status: 'Confirmed' | 'Pending' | 'Declined';
+        type: 'Main Guest' | 'Plus One' | 'VIP';
+    }[];
 }
 
 export const EVENTS: Event[] = SHARED_EVENTS.map(event => ({
@@ -39,4 +46,5 @@ export const EVENTS: Event[] = SHARED_EVENTS.map(event => ({
     itinerary: event.itinerary,
     publicGallery: event.publicGallery,
     metrics: event.metrics,
+    guests: event.guests,
 }));

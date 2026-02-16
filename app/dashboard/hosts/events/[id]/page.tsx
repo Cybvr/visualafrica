@@ -111,7 +111,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         >
                             Guests
                             <span className="flex items-center justify-center min-w-[1.25rem] h-5 px-1 text-[10px] font-black bg-secondary text-muted-foreground rounded-full border border-border group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground group-data-[state=active]:border-primary transition-colors">
-                                {event.guestCount}
+                                {event.guests.length}
                             </span>
                         </TabsTrigger>
                         <TabsTrigger
@@ -146,12 +146,12 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
                     {/* Guests Tab */}
                     <TabsContent value="guests">
-                        <GuestsTab />
+                        <GuestsTab event={event} />
                     </TabsContent>
 
                     {/* Contracts Tab */}
                     <TabsContent value="contracts">
-                        <ContractsTab bookedVendors={eventData.bookedVendors} />
+                        <ContractsTab eventId={id} bookedVendors={event.bookedVendors} />
                     </TabsContent>
 
                     {/* Inbox Tab */}

@@ -28,19 +28,38 @@ export default function JobWorkspace({
     actionColumn,
     tabs
 }: JobWorkspaceProps) {
+    const [activeTab, setActiveTab] = React.useState(tabs[0]?.id);
+
     return (
         <div className="max-w-6xl mx-auto space-y-6 py-6 pb-24 px-4">
             {/* Header */}
             <div className="flex items-center justify-between">
-                <button
-                    onClick={onBack}
-                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
-                >
-                    <div className="p-2 bg-card rounded-full border border-border group-hover:bg-secondary transition-colors">
-                        <ChevronLeft size={16} />
+                <div className="flex items-center gap-6">
+                    <button
+                        onClick={onBack}
+                        className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
+                    >
+                        <div className="p-2 bg-card rounded-full border border-border group-hover:bg-secondary transition-colors">
+                            <ChevronLeft size={16} />
+                        </div>
+                        <span className="text-sm font-bold uppercase tracking-widest">Back</span>
+                    </button>
+                    <div className="h-4 w-px bg-border hidden md:block" />
+                    <h1 className="text-lg font-black uppercase tracking-widest text-foreground hidden md:block">
+                        {activeTab === 'contract' ? 'Contract' : title}
+                    </h1>
+                </div>
+
+                {activeTab === 'contract' && (
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" className="rounded-xl font-bold h-9">
+                            Share
+                        </Button>
+                        <Button variant="outline" size="sm" className="rounded-xl font-bold h-9">
+                            Print
+                        </Button>
                     </div>
-                    <span className="text-sm font-bold uppercase tracking-widest">Back</span>
-                </button>
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -51,7 +70,7 @@ export default function JobWorkspace({
 
                     {/* Tabs Section */}
                     <div className="space-y-6">
-                        <Tabs defaultValue={tabs[0]?.id} className="w-full">
+                        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                             <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b border-border rounded-none mb-6">
                                 {tabs.map(tab => (
                                     <TabsTrigger
@@ -97,8 +116,8 @@ export function StatusIndicator({ status, label }: { status: string, label: stri
     return (
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-2xl bg-secondary border border-border">
             <div className={`w-2 h-2 rounded-full ${isApproved ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' :
-                    isRejected ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' :
-                        'bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                isRejected ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' :
+                    'bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]'
                 }`} />
             <span className="text-[10px] font-black uppercase tracking-widest text-foreground">{label}</span>
         </div>

@@ -113,7 +113,16 @@ export default function VendorJobDetailsPage() {
 
     const tabs = [
         {
-            id: 'overview',
+            id: 'inbox',
+            label: 'Inbox',
+            content: (
+                <div className="overflow-hidden bg-card rounded-[2rem] border border-border">
+                    <VendorInboxTab focusedEventId={event.id} />
+                </div>
+            )
+        },
+        {
+            id: 'brief',
             label: 'Project Brief',
             content: (
                 <WorkspaceCard>
@@ -134,15 +143,6 @@ export default function VendorJobDetailsPage() {
                         )}
                     </div>
                 </WorkspaceCard>
-            )
-        },
-        {
-            id: 'inbox',
-            label: 'Inbox',
-            content: (
-                <div className="overflow-hidden bg-card rounded-[2rem] border border-border">
-                    <VendorInboxTab focusedEventId={event.id} />
-                </div>
             )
         },
         {

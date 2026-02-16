@@ -10,21 +10,24 @@ import { Button } from '@/components/ui/button';
 import { vendors as allVendors } from '@/lib/vendors-data';
 
 interface ContractsTabProps {
+    eventId: string;
     bookedVendors?: {
         vendorId: string;
         service: string;
         amount: string;
-        status: 'Pending' | 'Confirmed' | 'Paid';
+        status: 'Pending' | 'Confirmed' | 'Paid' | 'Pending Payment' | 'Unresolved';
     }[];
 }
 
-export default function ContractsTab({ bookedVendors }: ContractsTabProps) {
+export default function ContractsTab({ eventId, bookedVendors }: ContractsTabProps) {
     // Mock contract status mapping for demo
     const getStatusStyle = (status: string) => {
         const styles = {
             'Confirmed': 'bg-green-100 text-green-700',
             'Pending': 'bg-accent text-foreground',
             'Paid': 'bg-blue-100 text-blue-700',
+            'Pending Payment': 'bg-amber-100 text-amber-700',
+            'Unresolved': 'bg-red-100 text-red-700',
             'Draft': 'bg-card text-foreground',
         };
         return styles[status as keyof typeof styles] || styles['Draft'];
@@ -77,8 +80,9 @@ export default function ContractsTab({ bookedVendors }: ContractsTabProps) {
                 {displayVendors.map((item, index) => {
                     const style = getStatusStyle(item.status);
                     return (
-                        <div
+                        <Link
                             key={`${item.id}-${index}`}
+                            href={`/dashboard/hosts/events/${eventId}/vendors/${item.id}`}
                             className="bg-card p-5 rounded-[2rem] border border-border hover:shadow-md transition-all group flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
                         >
                             <div className="flex items-center gap-4">
@@ -117,7 +121,7 @@ export default function ContractsTab({ bookedVendors }: ContractsTabProps) {
                                     </Button>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     );
                 })}
             </div>

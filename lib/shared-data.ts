@@ -27,6 +27,13 @@ export interface SharedEvent {
     itinerary?: string;
     publicGallery?: string[];
     metrics?: { label: string; value: string }[];
+    guests: {
+        id: string;
+        name: string;
+        email: string;
+        status: 'Confirmed' | 'Pending' | 'Declined';
+        type: 'Main Guest' | 'Plus One' | 'VIP';
+    }[];
 }
 
 export const SHARED_EVENTS: SharedEvent[] = [
@@ -48,7 +55,15 @@ export const SHARED_EVENTS: SharedEvent[] = [
         leads: [], // Added leads
         categories: ['Corporate', 'Technology', 'Network'],
         themes: ['Modern Tech', 'Green Future'],
-        itinerary: '10:00 AM - Registration\n11:00 AM - Opening Keynote\n01:00 PM - Lunch Break\n02:00 PM - Panel Discussions'
+        itinerary: '10:00 AM - Registration\n11:00 AM - Opening Keynote\n01:00 PM - Lunch Break\n02:00 PM - Panel Discussions',
+        guests: [
+            { id: 'g1', name: 'Abigail Okafor', email: 'abigail@tech.com', status: 'Confirmed', type: 'VIP' },
+            { id: 'g2', name: 'Bode Thomas', email: 'bode@innovate.ng', status: 'Pending', type: 'Main Guest' },
+            { id: 'g3', name: 'Chiamaka Adeleke', email: 'chiamaka@design.io', status: 'Confirmed', type: 'Main Guest' },
+            { id: 'g4', name: 'David Wright', email: 'david@global.com', status: 'Pending', type: 'Main Guest' },
+            { id: 'g5', name: 'Emily Chen', email: 'emily@techconf.org', status: 'Confirmed', type: 'VIP' },
+            { id: 'g6', name: 'Femi Balogun', email: 'femi@fintech.ng', status: 'Declined', type: 'Main Guest' }
+        ]
     },
     {
         id: 'ev-001',
@@ -67,7 +82,8 @@ export const SHARED_EVENTS: SharedEvent[] = [
         ],
         leads: [],
         categories: ['Wedding', 'Outdoor'],
-        themes: ['Nigerian Royalty', 'Modern Luxury']
+        themes: ['Nigerian Royalty', 'Modern Luxury'],
+        guests: []
     },
     {
         id: 'ev-002',
@@ -85,7 +101,8 @@ export const SHARED_EVENTS: SharedEvent[] = [
             { vendorId: 'v1', status: 'New', message: 'Looking for a full-day wedding coverage in Lekki.' }
         ],
         categories: ['Workshop', 'Corporate'],
-        themes: ['Hands-on Learning', 'Professional Networking']
+        themes: ['Hands-on Learning', 'Professional Networking'],
+        guests: []
     },
     {
         id: 'ev-003',
@@ -111,6 +128,7 @@ export const SHARED_EVENTS: SharedEvent[] = [
         metrics: [
             { label: 'Guest Satisfaction', value: '4.9/5' },
             { label: 'Vendors Coordinated', value: '12' }
-        ]
+        ],
+        guests: []
     }
 ];

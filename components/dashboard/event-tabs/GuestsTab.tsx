@@ -3,7 +3,16 @@
 import React from 'react';
 import { Globe, Users, Mail, Plus, ExternalLink } from 'lucide-react';
 
-const GuestsTab: React.FC = () => {
+import { Event } from '@/lib/events-data';
+
+interface GuestsTabProps {
+    event: Event;
+}
+
+const GuestsTab: React.FC<GuestsTabProps> = ({ event }) => {
+    const confirmedCount = event.guests.filter(g => g.status === 'Confirmed').length;
+    const pendingCount = event.guests.filter(g => g.status === 'Pending').length;
+
     return (
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between">
@@ -20,35 +29,41 @@ const GuestsTab: React.FC = () => {
                         <div className="flex items-center justify-between mb-8">
                             <h3 className="text-xl font-bold text-foreground">Registration List</h3>
                             <div className="flex items-center gap-4 text-sm font-medium text-muted-foreground">
-                                <span className="flex items-center gap-1.5"><div className="w-2 h-2 bg-green-500 rounded-full" /> 12 Going</span>
-                                <span className="flex items-center gap-1.5"><div className="w-2 h-2 bg-amber-500 rounded-full" /> 48 Pending</span>
+                                <span className="flex items-center gap-1.5"><div className="w-2 h-2 bg-green-500 rounded-full" /> {confirmedCount} Going</span>
+                                <span className="flex items-center gap-1.5"><div className="w-2 h-2 bg-amber-500 rounded-full" /> {pendingCount} Pending</span>
                             </div>
                         </div>
 
                         <div className="space-y-4">
-                            {['Abigail Okafor', 'Bode Thomas', 'Chiamaka Adeleke', 'David Wright'].map((name, i) => (
-                                <div key={i} className="flex items-center justify-between p-4 bg-card rounded-2xl group hover:bg-white border border-transparent hover:border-border transition-all">
+                            {event.guests.length > 0 ? event.guests.map((guest, i) => (
+                                <div key={guest.id} className="flex items-center justify-between p-4 bg-card rounded-2xl group hover:bg-white border border-transparent hover:border-border transition-all">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-accent text-accent font-bold flex items-center justify-center rounded-full">
-                                            {name[0]}
+                                        <div className="w-10 h-10 bg-accent text-accent font-bold flex items-center justify-center rounded-full uppercase">
+                                            {guest.name[0]}
                                         </div>
                                         <div>
-                                            <p className="font-bold text-foreground">{name}</p>
-                                            <p className="text-xs text-foreground uppercase font-bold tracking-tight">Main Guest</p>
+                                            <p className="font-bold text-foreground">{guest.name}</p>
+                                            <p className="text-xs text-foreground uppercase font-bold tracking-tight">{guest.type}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${i % 2 === 0 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                                            {i % 2 === 0 ? 'Confirmed' : 'Pending'}
+                                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${guest.status === 'Confirmed' ? 'bg-green-100 text-green-700' : (guest.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700')}`}>
+                                            {guest.status}
                                         </span>
-                                        <button className="p-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"><Mail size={16} /></button>
+                                        <button title={`Email ${guest.email}`} className="p-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"><Mail size={16} /></button>
                                     </div>
                                 </div>
-                            ))}
+                            )) : (
+                                <div className="py-12 text-center text-muted-foreground font-medium">
+                                    No guests registered yet.
+                                </div>
+                            )}
                         </div>
-                        <button className="w-full mt-6 py-3 border border-border text-foreground font-bold text-sm rounded-2xl hover:bg-card transition-colors">
-                            Load more guests
-                        </button>
+                        {event.guests.length > 0 && (
+                            <button className="w-full mt-6 py-3 border border-border text-foreground font-bold text-sm rounded-2xl hover:bg-card transition-colors">
+                                Load more guests
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -60,7 +75,7 @@ const GuestsTab: React.FC = () => {
                         </div>
                         <div>
                             <h3 className="text-xl font-bold mb-2">RSVP Website</h3>
-                            <p className="text-muted-foreground text-sm leading-relaxed">Your custom guest portal is live at:<br /><span className="text-foreground font-medium">Waddi.events/may-offsite</span></p>
+                            <p className="text-muted-foreground text-sm leading-relaxed">Your custom guest portal is live at:<br /><span className="text-foreground font-medium">Waddi.events/{event.name.toLowerCase().replace(/\s+/g, '-')}</span></p>
                         </div>
                         <div className="flex gap-2">
                             <button className="flex-1 bg-white text-foreground py-3 rounded-xl font-bold text-sm hover:bg-card">Edit Site</button>
