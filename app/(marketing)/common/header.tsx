@@ -25,6 +25,8 @@ import {
   Globe,
   LayoutGrid,
   Zap,
+  FileText,
+  BookOpen,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -249,6 +251,34 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
+              Resources
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-[280px] border-none bg-white p-4 shadow-2xl rounded-3xl">
+              <div className="space-y-2">
+                <div className="pb-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Learn More</span>
+                </div>
+                <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
+                  <Link href="/blog" className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
+                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <BookOpen className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-sm font-bold text-foreground">
+                        Blog
+                      </span>
+                      <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                        Tips, guides, and inspiration for planning amazing events
+                      </p>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Link
             href="/pricing"
             className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
@@ -354,6 +384,13 @@ export function Header() {
                   </Link>
                 ))}
               </div>
+              <Link
+                href="/blog"
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
+                onClick={() => setMobileOpen(false)}
+              >
+                Resources
+              </Link>
               <Link
                 href="/pricing"
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"

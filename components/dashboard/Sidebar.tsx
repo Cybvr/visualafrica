@@ -297,7 +297,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const vendorPrimaryNavItems: NavItemConfig[] = [
     { icon: Search, label: "Search", href: "/dashboard/vendors" },
     { icon: ClipboardList, label: "Jobs", href: "/dashboard/vendors/jobs", count: vendorEventsCount },
-    { icon: BriefcaseBusiness, label: "Offers", href: "/dashboard/vendors/offers", count: vendorOffersCount },
+    { icon: CreditCard, label: "Payments", href: "/dashboard/vendors/payments" },
   ];
 
   const vendorSecondaryNavItems: NavItemConfig[] = [
