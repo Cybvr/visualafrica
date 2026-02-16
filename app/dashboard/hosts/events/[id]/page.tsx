@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EVENTS } from '@/lib/events-data';
 import PlanTab from '@/components/dashboard/event-tabs/PlanTab';
-import ItineraryTab from '@/components/dashboard/event-tabs/ItineraryTab';
 import GuestsTab from '@/components/dashboard/event-tabs/GuestsTab';
 import VendorsTab from '@/components/dashboard/event-tabs/VendorsTab';
 import ContractsTab from '@/components/dashboard/event-tabs/ContractsTab';
@@ -104,12 +103,6 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                             Vendors
                         </TabsTrigger>
                         <TabsTrigger
-                            value="itinerary"
-                            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm font-medium"
-                        >
-                            Itinerary
-                        </TabsTrigger>
-                        <TabsTrigger
                             value="guests"
                             className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm font-medium"
                         >
@@ -141,10 +134,6 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         <VendorsTab />
                     </TabsContent>
 
-                    {/* Itinerary Tab */}
-                    <TabsContent value="itinerary">
-                        <ItineraryTab />
-                    </TabsContent>
 
                     {/* Guests Tab */}
                     <TabsContent value="guests">

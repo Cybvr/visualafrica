@@ -67,7 +67,7 @@ export default function EventVendorDetailPage() {
                 {/* Left Column - Vendor Details */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Vendor Profile Card */}
-                    <div className="bg-card rounded-[2.5rem] border border-border p-8 space-y-8 shadow-sm">
+                    <div className="bg-card rounded-[2.5rem] border border-border p-8 space-y-6 shadow-sm">
                         <div className="flex flex-col md:flex-row gap-8 items-start">
                             <div className="space-y-4 shrink-0">
                                 <div className="w-32 h-32 rounded-3xl bg-secondary overflow-hidden border border-border shadow-inner">
@@ -76,14 +76,14 @@ export default function EventVendorDetailPage() {
                                 <div className="space-y-2 px-1">
                                     <Link
                                         href={`/vendors/${vendor.id}`}
-                                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+                                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-muted-foreground transition-colors"
                                     >
                                         <User size={12} />
                                         Visit Page
                                     </Link>
                                     <a
                                         href="#"
-                                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+                                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-muted-foreground transition-colors"
                                     >
                                         <Globe size={12} />
                                         Visit Website
@@ -91,31 +91,35 @@ export default function EventVendorDetailPage() {
                                 </div>
                             </div>
 
-                            <div className="flex-1 space-y-6 w-full">
-                                {/* 1st line: Title */}
+                            <div className="flex-1 space-y-4 w-full">
+                                {/* 1st line: Title and Status Badge */}
                                 <div>
                                     <h2 className="text-3xl font-black text-foreground tracking-tight">{vendor.name}</h2>
+                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-2xl bg-secondary border border-border mt-2">
+                                        <div className={`w-2 h-2 rounded-full ${currentStatus === 'Approved' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : currentStatus === 'Rejected' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`} />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-foreground">{currentStatus}</span>
+                                    </div>
                                 </div>
 
                                 {/* 2nd line: Category Icon, Rating, Location */}
                                 <div className="flex flex-wrap items-center gap-6 text-sm font-bold text-muted-foreground pt-1">
                                     <div className="flex items-center gap-2 px-3 py-1 bg-secondary rounded-full text-foreground uppercase tracking-widest text-[10px]">
-                                        <Zap size={14} className="text-primary" />
+                                        <Zap size={14} className="text-muted-foreground" />
                                         {vendor.categories[0]}
                                     </div>
                                     <div className="flex items-center gap-1.5">
-                                        <Star size={16} className="fill-primary text-primary" />
+                                        <Star size={16} className="fill-muted-foreground text-muted-foreground" />
                                         <span className="text-foreground">{vendor.rating}</span>
                                     </div>
                                     <div className="flex items-center gap-1.5">
-                                        <MapPin size={16} className="text-primary" />
+                                        <MapPin size={16} className="text-muted-foreground" />
                                         <span className="text-foreground">{vendor.location}</span>
                                     </div>
                                 </div>
 
                                 {/* 3rd line: Description Icon and Description */}
                                 <div className="flex items-start gap-3">
-                                    <div className="mt-1 bg-secondary p-1.5 rounded-lg text-primary">
+                                    <div className="mt-1 bg-secondary p-1.5 rounded-lg text-muted-foreground">
                                         <FileText size={16} />
                                     </div>
                                     <p className="text-sm text-muted-foreground leading-relaxed font-medium">
@@ -125,7 +129,7 @@ export default function EventVendorDetailPage() {
 
                                 {/* 4th line: Services Icon and Services */}
                                 <div className="flex items-start gap-3">
-                                    <div className="mt-1 bg-secondary p-1.5 rounded-lg text-primary">
+                                    <div className="mt-1 bg-secondary p-1.5 rounded-lg text-muted-foreground">
                                         <ShieldCheck size={16} />
                                     </div>
                                     <div className="flex-1">
@@ -135,17 +139,8 @@ export default function EventVendorDetailPage() {
                                         </p>
                                     </div>
                                 </div>
-
-                                {/* 5th line: Small status bar */}
-                                <div className="pt-2">
-                                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-secondary border border-border">
-                                        <div className={`w-2 h-2 rounded-full ${currentStatus === 'Approved' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : currentStatus === 'Rejected' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-foreground">Status: {currentStatus}</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
-
                     </div>
 
                     {/* Chat */}
@@ -255,7 +250,7 @@ export default function EventVendorDetailPage() {
                                 <hr className="border-border" />
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2">
-                                        <FileText size={16} className="text-primary" />
+                                        <FileText size={16} className="text-muted-foreground" />
                                         <h3 className="font-bold text-sm">Contract</h3>
                                     </div>
                                     <div className="flex items-center justify-between bg-secondary p-3 rounded-lg">
