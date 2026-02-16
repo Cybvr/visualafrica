@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { useParams, notFound } from 'next/navigation';
-import { ChevronLeft, Mail, Phone, FileText, Download, MapPin, Calendar, Users, Target, Clock } from 'lucide-react';
+import { useParams, notFound, useRouter } from 'next/navigation';
+import { Mail, Phone, FileText, Download, MapPin, Calendar, Users, Target, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SHARED_EVENTS } from '@/lib/shared-data';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 import VendorInboxTab from '@/components/dashboard/event-tabs/VendorInboxTab';
+import JobWorkspace, { WorkspaceCard, StatusIndicator } from '@/components/dashboard/JobWorkspace';
 
 export default function VendorJobDetailsPage() {
     const params = useParams();
+    const router = useRouter();
     const id = params.id as string;
     const booking = VENDOR_DASHBOARD_DATA.bookings.find(b => b.id === id);
     const parts = id.split('-');
@@ -25,188 +25,183 @@ export default function VendorJobDetailsPage() {
         bv => bv.vendorId === VENDOR_DASHBOARD_DATA.currentVendorId
     );
 
-    const statusVariant = booking.status === 'Confirmed'
-        ? 'bg-success/10 text-success border-success/20'
-        : 'bg-primary/10 text-primary border-primary/20';
-
-    return (
-        <div className="max-w-4xl mx-auto space-y-6 py-6">
-            {/* Header with navigation and actions */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex items-center gap-2">
-                    <Link href="/dashboard/vendors/jobs" className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-1">
-                        <ChevronLeft className="h-4 w-4" />
-                        Back to Jobs
-                    </Link>
-                    <span className="text-muted">•</span>
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded border ${statusVariant}`}>
-                        {booking.status}
-                    </span>
+    const contextCard = (
+        <WorkspaceCard className="space-y-6">
+            <div className="flex flex-col md:flex-row gap-8 items-start">
+                <div className="w-32 h-32 rounded-3xl bg-secondary overflow-hidden shrink-0 border border-border shadow-inner">
+                    <img src={event.image || '/placeholder.png'} alt={event.eventName} className="w-full h-full object-cover" />
                 </div>
 
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="gap-1">
-                        <Phone className="h-3.5 w-3.5" />
-                        <span className="sm:hidden">Call</span>
-                        <span className="hidden sm:inline">Call Host</span>
-                    </Button>
-                    <Button size="sm" className="gap-1">
-                        <Mail className="h-3.5 w-3.5" />
-                        <span className="sm:hidden">Message</span>
-                        <span className="hidden sm:inline">Message</span>
-                    </Button>
-                </div>
-            </div>
-
-            <div className="space-y-6">
-                {/* Event title and basic info first */}
-                <div className="space-y-2">
-                    <h1 className="text-2xl font-bold text-foreground">{event.eventName}</h1>
-                    <div className="flex flex-wrap gap-4">
-                        <div className="flex items-center gap-1 text-sm">
-                            <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                            <span>{event.location}</span>
+                <div className="flex-1 space-y-4 w-full">
+                    <div>
+                        <h2 className="text-3xl font-black text-foreground tracking-tight">{event.eventName}</h2>
+                        <div className="mt-2">
+                            <StatusIndicator status={booking.status} label={booking.status} />
                         </div>
-                        <div className="flex items-center gap-1 text-sm">
-                            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                            <span>{event.date}</span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-6 text-sm font-bold text-muted-foreground pt-1">
+                        <div className="flex items-center gap-2 px-3 py-1 bg-secondary rounded-full text-foreground uppercase tracking-widest text-[10px]">
+                            <Target size={14} className="text-muted-foreground" />
+                            {vendorBooking?.service || "Vendor"}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <MapPin size={16} className="text-muted-foreground" />
+                            <span className="text-foreground">{event.location}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <Calendar size={16} className="text-muted-foreground" />
+                            <span className="text-foreground">{event.date}</span>
+                        </div>
+                    </div>
+
+                    <div className="flex items-start gap-4 pt-4 border-t border-border/50">
+                        <div className="w-10 h-10 rounded-full bg-secondary overflow-hidden shrink-0 border border-border">
+                            <img src={event.image || '/placeholder.png'} alt={event.hostName} className="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Client</p>
+                            <h4 className="font-bold text-foreground">{event.hostName}</h4>
+                        </div>
+                        <div className="ml-auto flex gap-2">
+                            <Button variant="ghost" size="sm" className="h-8 text-[10px] font-black uppercase tracking-widest">Profile</Button>
                         </div>
                     </div>
                 </div>
+            </div>
+        </WorkspaceCard>
+    );
 
-                <Tabs defaultValue="overview" onValueChange={setActiveTab}>
-                    <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b border-border rounded-none mb-4">
-                        <TabsTrigger value="overview" className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm">
-                            Overview
-                        </TabsTrigger>
-                        <TabsTrigger value="contract" className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm">
-                            Contract
-                        </TabsTrigger>
-                        <TabsTrigger value="inbox" className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm">
-                            Inbox
-                        </TabsTrigger>
-                    </TabsList>
+    const actionColumn = (
+        <div className="sticky top-6 bg-card rounded-2xl border border-border p-6 space-y-6">
+            <div>
+                <p className="text-sm text-muted-foreground">Contract Value</p>
+                <p className="text-3xl font-black text-foreground">{booking.amount}</p>
+                <p className="text-xs text-muted-foreground mt-1">Payment: Net 30</p>
+            </div>
 
-                    {/* Overview Tab - Logical information flow */}
-                    <TabsContent value="overview">
-                        <div className="space-y-6">
-                            {/* 1. Event description first - what is this event about */}
-                            <div>
-                                <h3 className="text-base font-medium text-foreground mb-2">Event Description</h3>
-                                <p className="text-sm text-muted-foreground">{event.description}</p>
-                            </div>
+            <div className="space-y-2">
+                <Button className="w-full h-12 rounded-xl font-bold gap-2">
+                    <Mail size={18} />
+                    Message Host
+                </Button>
+                <Button variant="outline" className="w-full h-12 rounded-xl font-bold gap-2">
+                    <Phone size={18} />
+                    Call Host
+                </Button>
+            </div>
 
-                            <div className="border-t border-border pt-6">
-                                {/* 2. Client information - who is this for */}
-                                <h3 className="text-base font-medium text-foreground mb-4">Client Information</h3>
-                                <div className="flex items-center gap-4">
-                                    <img
-                                        src={event.image || '/placeholder.png'}
-                                        alt={event.hostName}
-                                        className="w-12 h-12 rounded-full object-cover"
-                                    />
-                                    <div className="flex-1">
-                                        <h4 className="font-medium">{event.hostName}</h4>
-                                        <p className="text-xs text-muted-foreground">Premium Event Host</p>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <Button variant="ghost" size="sm">View Profile</Button>
-                                        <Button variant="ghost" size="sm">Past Work</Button>
-                                    </div>
-                                </div>
-                            </div>
+            <hr className="border-border" />
 
-                            <div className="border-t border-border pt-6">
-                                {/* 3. Booking details - what's my role */}
-                                <h3 className="text-base font-medium text-foreground mb-4">Booking Details</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="space-y-1">
-                                        <div className="text-xs text-muted-foreground">Your Role</div>
-                                        <div className="flex items-center gap-1">
-                                            <Target className="h-3.5 w-3.5 text-muted-foreground" />
-                                            <span className="text-sm">{vendorBooking?.service || "Vendor"}</span>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <div className="text-xs text-muted-foreground">Payment Status</div>
-                                        <div className="flex items-center gap-1">
-                                            <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                                            <span className="text-sm">{booking.status === 'Confirmed' ? 'Scheduled' : 'Paid'}</span>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <div className="text-xs text-muted-foreground">Expected Guests</div>
-                                        <div className="flex items-center gap-1">
-                                            <Users className="h-3.5 w-3.5 text-muted-foreground" />
-                                            <span className="text-sm">{event.guestCount}</span>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <div className="text-xs text-muted-foreground">Contract Value</div>
-                                        <div className="text-sm font-medium text-success">{booking.amount}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </TabsContent>
-
-                    {/* Contract Tab - Logical flow for contract information */}
-                    <TabsContent value="contract">
-                        <div className="space-y-6">
-                            {/* 1. Contract summary first */}
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h3 className="text-lg font-medium">Service Agreement #{id.substring(2)}</h3>
-                                    <span className={`px-2 py-0.5 text-xs font-medium rounded border ${statusVariant}`}>
-                                        {booking.status}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* 2. Key contract terms */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                <div className="space-y-1">
-                                    <div className="text-xs text-muted-foreground">Contract Value</div>
-                                    <div className="font-medium">{booking.amount}</div>
-                                </div>
-                                <div className="space-y-1">
-                                    <div className="text-xs text-muted-foreground">Service Category</div>
-                                    <div className="font-medium">{vendorBooking?.service || "Standard"}</div>
-                                </div>
-                                <div className="space-y-1">
-                                    <div className="text-xs text-muted-foreground">Payment Terms</div>
-                                    <div className="font-medium">Net 30</div>
-                                </div>
-                            </div>
-
-                            {/* 3. Documents last - supporting materials */}
-                            <div className="border-t border-border pt-6">
-                                <h4 className="text-base font-medium mb-3">Contract Documents</h4>
-                                <div className="space-y-2">
-                                    {[
-                                        { name: 'Signed Contract.pdf', icon: FileText },
-                                        { name: 'Service Invoice.pdf', icon: FileText },
-                                        { name: 'Compliance Records.pdf', icon: FileText }
-                                    ].map((doc, i) => (
-                                        <div key={i} className="flex items-center justify-between p-2 hover:bg-muted/50 rounded">
-                                            <div className="flex items-center gap-3">
-                                                <doc.icon className="h-4 w-4 text-muted-foreground" />
-                                                <span className="text-sm">{doc.name}</span>
-                                            </div>
-                                            <Download className="h-4 w-4 text-muted-foreground" />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </TabsContent>
-
-                    {/* Inbox Tab */}
-                    <TabsContent value="inbox">
-                        <VendorInboxTab focusedEventId={event.id} />
-                    </TabsContent>
-                </Tabs>
+            <div className="space-y-4">
+                <h3 className="font-black uppercase tracking-widest text-[10px] text-muted-foreground">Quick Stats</h3>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-secondary/30 p-3 rounded-xl border border-border/50">
+                        <Users size={14} className="text-muted-foreground mb-1" />
+                        <p className="text-xs font-black">{event.guestCount}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Guests</p>
+                    </div>
+                    <div className="bg-secondary/30 p-3 rounded-xl border border-border/50">
+                        <Clock size={14} className="text-muted-foreground mb-1" />
+                        <p className="text-xs font-black">Scheduled</p>
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Timeline</p>
+                    </div>
+                </div>
             </div>
         </div>
+    );
+
+    const tabs = [
+        {
+            id: 'overview',
+            label: 'Event Brief',
+            content: (
+                <WorkspaceCard>
+                    <div className="space-y-6">
+                        <div>
+                            <h3 className="text-base font-black uppercase tracking-widest text-foreground mb-4">Description</h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                                {event.description}
+                            </p>
+                        </div>
+                    </div>
+                </WorkspaceCard>
+            )
+        },
+        {
+            id: 'inbox',
+            label: 'Inbox',
+            content: (
+                <div className="overflow-hidden bg-card rounded-[2rem] border border-border">
+                    <VendorInboxTab focusedEventId={event.id} />
+                </div>
+            )
+        },
+        {
+            id: 'contract',
+            label: 'Contract',
+            content: (
+                <WorkspaceCard>
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="text-lg font-black tracking-tight">Service Agreement #{id.substring(2)}</h3>
+                                <div className="mt-2">
+                                    <StatusIndicator status={booking.status} label={booking.status} />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-6 border-t border-border/50">
+                            <div className="space-y-1">
+                                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Value</div>
+                                <div className="font-bold">{booking.amount}</div>
+                            </div>
+                            <div className="space-y-1">
+                                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Service</div>
+                                <div className="font-bold">{vendorBooking?.service || "Standard"}</div>
+                            </div>
+                            <div className="space-y-1">
+                                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Payment</div>
+                                <div className="font-bold">Net 30</div>
+                            </div>
+                        </div>
+
+                        <div className="pt-6 border-t border-border/50">
+                            <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Documents</h4>
+                            <div className="space-y-2">
+                                {[
+                                    { name: 'Signed Contract.pdf', icon: FileText },
+                                    { name: 'Service Invoice.pdf', icon: FileText },
+                                ].map((doc, i) => (
+                                    <div key={i} className="flex items-center justify-between p-3 hover:bg-secondary/50 rounded-xl border border-transparent hover:border-border transition-all group">
+                                        <div className="flex items-center gap-3">
+                                            <doc.icon className="h-4 w-4 text-muted-foreground" />
+                                            <span className="text-sm font-medium">{doc.name}</span>
+                                        </div>
+                                        <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Download className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </WorkspaceCard>
+            )
+        }
+    ];
+
+    return (
+        <JobWorkspace
+            role="vendor"
+            onBack={() => router.push('/dashboard/vendors/jobs')}
+            title={event.eventName}
+            status={booking.status}
+            statusBadge={<StatusIndicator status={booking.status} label={booking.status} />}
+            contextCard={contextCard}
+            actionColumn={actionColumn}
+            tabs={tabs}
+        />
     );
 }
