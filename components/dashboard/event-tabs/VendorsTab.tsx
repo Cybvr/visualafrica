@@ -16,7 +16,7 @@ const INITIAL_REQUESTS = [
     { ...vendors.find(v => v.id === 'v-venue-1')!, status: 'Approved', date: 'Oct 12, 2024', priceDisplay: vendors.find(v => v.id === 'v-venue-1')?.price },
     { ...vendors.find(v => v.id === 'v-catering-1')!, status: 'Deciding', date: 'Oct 14, 2024', priceDisplay: vendors.find(v => v.id === 'v-catering-1')?.price },
     { ...vendors.find(v => v.id === 'v-photo-1')!, status: 'Deciding', date: 'Oct 15, 2024', priceDisplay: 'Pending' },
-    { ...vendors.find(v => v.id === 'v-decor-1')!, status: 'Rejected', date: 'Oct 10, 2024', priceDisplay: vendors.find(v => v.id === 'v-decor-1')?.price },
+    { ...vendors.find(v => v.id === 'v-makeup-1')!, status: 'Rejected', date: 'Oct 10, 2024', priceDisplay: vendors.find(v => v.id === 'v-makeup-1')?.price },
 ];
 
 const VendorsTab: React.FC = () => {
@@ -25,8 +25,10 @@ const VendorsTab: React.FC = () => {
 
     const filteredRequests = INITIAL_REQUESTS.filter(req => {
         const matchesStatus = activeStatus === 'All' || req.status === activeStatus;
-        const matchesSearch = req.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            req.categories.some(cat => cat.toLowerCase().includes(searchQuery.toLowerCase()));
+        const name = req.name || '';
+        const categories = req.categories || [];
+        const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            categories.some(cat => cat.toLowerCase().includes(searchQuery.toLowerCase()));
         return matchesStatus && matchesSearch;
     });
 
