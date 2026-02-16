@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-import { Search, Filter, ChevronDown, Calendar, FileText, Clock, Star, ArrowRight, ExternalLink, Heart } from 'lucide-react';
+import { Search, Filter, ChevronDown, Calendar, FileText, Clock, Star, ArrowRight, ExternalLink, Heart, Crown } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
@@ -27,7 +27,7 @@ const LOCATIONS = Array.from(new Set(vendors.flatMap(v => {
   return parts[parts.length - 1]; // Get the last part (city/state)
 }))).sort();
 
-const VENDOR_TYPES = ['All', 'Experiences', 'Regular Vendors', 'Suspended', 'New'];
+const VENDOR_TYPES = ['All', 'Regular Vendors', 'Suspended', 'New'];
 
 const FilterSidebar: React.FC<{
   searchQuery: string;
@@ -260,7 +260,7 @@ export default function DashboardPage() {
   const [displayName, setDisplayName] = useState<string>('');
 
   // Filter States
-  const [activeTab, setActiveTab] = useState<'all' | 'saved'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'experiences' | 'saved'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -325,9 +325,11 @@ export default function DashboardPage() {
   // Apply filters logic
   let filteredVendors = vendors;
 
-  if (selectedType === 'Experiences') {
+  if (activeTab === 'experiences') {
     filteredVendors = filteredVendors.filter(v => v.categories.includes('Experiences'));
-  } else if (selectedType === 'Regular Vendors') {
+  }
+
+  if (selectedType === 'Regular Vendors') {
     filteredVendors = filteredVendors.filter(v => !v.categories.includes('Experiences'));
   } else if (selectedType === 'New') {
     filteredVendors = filteredVendors.filter(v => v.isNew);
@@ -360,7 +362,7 @@ export default function DashboardPage() {
     );
   }
 
-  const displayVendors = activeTab === 'all' ? filteredVendors : filteredVendors.slice(0, 3); // Todo: filter saved
+  const displayVendors = activeTab === 'all' || activeTab === 'experiences' ? filteredVendors : filteredVendors.slice(0, 3); // Todo: filter saved
 
   const filterSidebar = (
     <FilterSidebar
@@ -425,6 +427,16 @@ export default function DashboardPage() {
                   }`}
               >
                 All Vendors
+              </button>
+              <button
+                onClick={() => setActiveTab('experiences')}
+                className={`p-2 text-sm font-black transition-all border-b-2 flex items-center gap-1.5 ${activeTab === 'experiences'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-muted-foreground'
+                  }`}
+              >
+                Experiences
+                <Crown size={14} className="text-amber-500 fill-amber-500" />
               </button>
               <button
                 onClick={() => setActiveTab('saved')}
