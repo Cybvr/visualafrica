@@ -62,10 +62,6 @@ export default function VendorDashboardPage() {
     <div className="max-w-7xl mx-auto space-y-12 pb-20">
       <div className="space-y-8">
         <div className="space-y-6 mb-10">
-          <div>
-            <h2 className="text-4xl font-black tracking-tight text-foreground">Search</h2>
-            <p className="text-muted-foreground mt-1 font-medium italic">Discover upcoming events and opportunities.</p>
-          </div>
           <DashboardFilter
             placeholder="Search for event themes, locations, or hosts..."
             onSearchChange={setSearchQuery}
@@ -80,7 +76,7 @@ export default function VendorDashboardPage() {
               : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
           >
-            All Opportunities
+            All
           </button>
           <button
             onClick={() => setActiveTab('saved')}
@@ -108,10 +104,10 @@ export default function VendorDashboardPage() {
                     src={event.image || '/placeholder.png'}
                     alt={event.eventName}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover transition-transform duration-500 "
                   />
                   <div className="absolute top-4 right-4 z-10">
-                    <button className="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-muted-foreground hover:text-primary shadow-lg transition-colors">
+                    <button className="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-muted-foreground shadow-lg transition-colors">
                       <Star size={20} />
                     </button>
                   </div>
@@ -123,14 +119,29 @@ export default function VendorDashboardPage() {
                       <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest rounded-full">
                         {event.status}
                       </span>
-                      <span className="text-xs font-bold text-primary italic">Verified Opportunity</span>
+
                     </div>
-                    <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                    <h3 className="text-2xl font-bold text-foreground mb-2 ">
                       {event.eventName}
                     </h3>
                     <p className="text-muted-foreground text-sm line-clamp-2 max-w-2xl">
                       {event.description}
                     </p>
+
+                    {(event.categories || event.themes) && (
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        {event.categories?.map((cat, idx) => (
+                          <span key={idx} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md">
+                            {cat}
+                          </span>
+                        ))}
+                        {event.themes?.map((theme, idx) => (
+                          <span key={idx} className="px-2 py-0.5 bg-primary/5 text-primary/70 text-[10px] font-bold rounded-md border border-primary/10 italic">
+                            {theme}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-wrap items-center gap-6 mt-6 pt-6 border-t border-border">

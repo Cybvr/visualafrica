@@ -43,22 +43,7 @@ const PlanPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Community Visibility */}
-      <section className="bg-white p-10 rounded-[3rem] border border-border shadow-sm flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-accent text-accent rounded-2xl flex items-center justify-center"><Eye size={24} /></div>
-          <div>
-            <h4 className="font-black text-foreground">Show in Community Inspiration</h4>
-            <p className="text-sm text-muted-foreground font-medium">Other users can see your theme and vendor choices.</p>
-          </div>
-        </div>
-        <button
-          onClick={() => setIsPublic(!isPublic)}
-          className={`relative w-14 h-8 rounded-full transition-colors ${isPublic ? 'bg-primary' : 'bg-slate-200'}`}
-        >
-          <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${isPublic ? 'translate-x-6' : ''}`} />
-        </button>
-      </section>
+
 
       <div className="flex justify-end gap-4">
         <button className="px-10 py-4 bg-primary text-white rounded-2xl font-black shadow-xl shadow-primary/20 hover:scale-105 transition-transform active:scale-95">

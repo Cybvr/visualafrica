@@ -83,7 +83,22 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
 
             <h1 className="text-3xl font-semibold text-foreground">{event.eventName}</h1>
 
-            <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+            {(event.categories || event.themes) && (
+              <div className="flex flex-wrap gap-2">
+                {event.categories?.map((cat, idx) => (
+                  <span key={idx} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md uppercase">
+                    {cat}
+                  </span>
+                ))}
+                {event.themes?.map((theme, idx) => (
+                  <span key={idx} className="px-2 py-0.5 bg-primary/5 text-primary/70 text-[10px] font-bold rounded-md border border-primary/10 italic">
+                    {theme}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground pt-2">
               <div className="flex items-center gap-2">
                 <Calendar size={16} />
                 {event.date}

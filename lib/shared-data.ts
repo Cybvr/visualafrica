@@ -22,6 +22,8 @@ export interface SharedEvent {
         status: 'New' | 'Contacted' | 'Qualified' | 'Closed';
         message: string;
     }[];
+    categories?: string[];
+    themes?: string[];
 }
 
 export const SHARED_EVENTS: SharedEvent[] = [
@@ -40,7 +42,9 @@ export const SHARED_EVENTS: SharedEvent[] = [
             { vendorId: 'v1', service: 'Event Planning', amount: '₦1,500,000', status: 'Confirmed' },
             { vendorId: 'v-catering-1', service: 'Catering', amount: '₦3,750,000', status: 'Pending' }
         ],
-        leads: []
+        leads: [],
+        categories: ['Wedding', 'Outdoor'],
+        themes: ['Nigerian Royalty', 'Modern Luxury']
     },
     {
         id: 'ev-002',
@@ -56,7 +60,9 @@ export const SHARED_EVENTS: SharedEvent[] = [
         bookedVendors: [],
         leads: [
             { vendorId: 'v1', status: 'New', message: 'Looking for a full-day wedding coverage in Lekki.' }
-        ]
+        ],
+        categories: ['Workshop', 'Corporate'],
+        themes: ['Hands-on Learning', 'Professional Networking']
     },
     {
         id: 'ev-003',
@@ -72,6 +78,8 @@ export const SHARED_EVENTS: SharedEvent[] = [
         bookedVendors: [
             { vendorId: 'v1', service: 'Full Coordination', amount: '₦2,500,000', status: 'Confirmed' }
         ],
-        leads: []
+        leads: [],
+        categories: ['Wedding', 'Traditional'],
+        themes: ['Grand Celebration', 'Classic Elegance']
     }
 ];

@@ -18,6 +18,8 @@ export interface Event {
     }[];
     publicGallery?: string[];
     metrics?: { label: string; value: string }[];
+    categories?: string[];
+    themes?: string[];
 }
 
 export const EVENTS: Event[] = SHARED_EVENTS.map(event => ({
@@ -31,4 +33,6 @@ export const EVENTS: Event[] = SHARED_EVENTS.map(event => ({
     budget: event.budget,
     description: event.description,
     bookedVendors: event.bookedVendors,
+    categories: event.categories,
+    themes: event.themes,
 }));
