@@ -29,7 +29,7 @@ const features: Feature[] = [
 
 export function TrustSection() {
     return (
-        <section className="py-20 px-4 lg:px-8 bg-white">
+        <section className="py-20 px-4 lg:px-8 bg-foreground">
             <div className="mx-auto max-w-4xl">
                 <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
                     {/* Image Side */}
@@ -39,11 +39,11 @@ export function TrustSection() {
                             alt="Professional chef vendor"
                             className="absolute inset-0 w-full h-full object-cover"
                         />
-                        <div className="absolute bottom-8 left-8 bg-white rounded-full px-6 py-4 shadow-lg flex items-center gap-3">
+                        <div className="absolute bottom-8 left-8 bg-foreground rounded-full px-6 py-4 shadow-lg flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                                <CheckCircle className="w-6 h-6 text-background" />
+                                <CheckCircle className="w-6 h-6 text-primary-foreground" />
                             </div>
-                            <span className="font-semibold text-lg">Vendor verified</span>
+                            <span className="font-semibold text-lg text-background">Vendor verified</span>
                         </div>
                     </div>
 
@@ -76,7 +76,7 @@ export function TrustSection() {
                             })}
                         </div>
 
-                        <Button size="lg" variant="outline" className="mt-12 h-14 px-10 text-lg">
+                        <Button size="lg" variant="outline" className="mt-12 h-14 px-10 text-lg hover:text-primary-foreground">
                             See how it works
                         </Button>
                     </div>

@@ -280,6 +280,13 @@ export function Header() {
           </DropdownMenu>
 
           <Link
+            href="/stories"
+            className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            Stories
+          </Link>
+
+          <Link
             href="/pricing"
             className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
           >
@@ -390,6 +397,13 @@ export function Header() {
                 onClick={() => setMobileOpen(false)}
               >
                 Resources
+              </Link>
+              <Link
+                href="/stories"
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
+                onClick={() => setMobileOpen(false)}
+              >
+                Stories
               </Link>
               <Link
                 href="/pricing"

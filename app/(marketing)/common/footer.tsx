@@ -88,8 +88,8 @@ export function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <img src="/logo.png" alt="Waddi Logo" className="h-8 w-auto object-contain" />
-              <span className="font-serif text-xl font-bold">
+              <img src="/logo.png" alt="Waddi Logo" className="h-12 w-auto object-contain" />
+              <span className="font-logo text-5xl font-normal">
                 Waddi
               </span>
             </Link>

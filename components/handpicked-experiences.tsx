@@ -37,7 +37,7 @@ export function HandpickedExperiences() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                     {experiences.map((exp) => (
                         <Link href={`/dashboard/hosts/vendor/${exp.slug}`} key={exp.title} className="group cursor-pointer">
                             <div>
