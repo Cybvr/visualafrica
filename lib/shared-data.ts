@@ -25,6 +25,8 @@ export interface SharedEvent {
     categories: string[];
     themes: string[];
     itinerary?: string;
+    publicGallery?: string[];
+    metrics?: { label: string; value: string }[];
 }
 
 export const SHARED_EVENTS: SharedEvent[] = [
@@ -101,6 +103,14 @@ export const SHARED_EVENTS: SharedEvent[] = [
         ],
         leads: [],
         categories: ['Wedding', 'Traditional'],
-        themes: ['Grand Celebration', 'Classic Elegance']
+        themes: ['Grand Celebration', 'Classic Elegance'],
+        publicGallery: [
+            'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
+            'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800'
+        ],
+        metrics: [
+            { label: 'Guest Satisfaction', value: '4.9/5' },
+            { label: 'Vendors Coordinated', value: '12' }
+        ]
     }
 ];

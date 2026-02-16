@@ -114,7 +114,7 @@ const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {event.publicGallery?.map((img, i) => (
+                    {event.publicGallery?.map((img: string, i: number) => (
                         <div key={i} className="aspect-square rounded-lg overflow-hidden bg-muted relative group">
                             <img
                                 src={img}
@@ -154,7 +154,7 @@ const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {event.metrics?.map((metric, i) => (
+                    {event.metrics?.map((metric: { label: string; value: string }, i: number) => (
                         <div key={i} className="bg-background p-4 rounded-lg border border-border group relative">
                             <div className="flex items-center gap-2">
                                 <p className="text-xs text-muted-foreground">{metric.label}</p>
