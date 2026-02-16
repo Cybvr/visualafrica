@@ -1,7 +1,9 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronLeft, Calendar, MapPin, Users, DollarSign, MessageSquare, Heart, Share2 } from 'lucide-react';
 import { SharedEvent } from '@/lib/shared-data';
+import { SubmitProposalModal, ProposalData } from '@/components/dashboard/SubmitProposalModal';
+import { useRouter } from 'next/navigation';
 
 interface EventDetailProps {
   event: SharedEvent;
@@ -9,12 +11,21 @@ interface EventDetailProps {
 }
 
 const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
+  const router = useRouter();
+  const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [imgSrc, setImgSrc] = React.useState(
     event.image && event.image.trim() !== '' ? event.image : '/placeholder.png'
   );
 
   const handleImageError = () => {
     setImgSrc('/placeholder.png');
+  };
+
+  const handleProposalSubmit = (proposalData: ProposalData) => {
+    console.log('Proposal submitted:', proposalData);
+    // TODO: Submit to backend/database
+    // Navigate to jobs page after submission
+    router.push('/dashboard/vendors/jobs');
   };
 
   const getStatusColor = (status: string) => {
@@ -178,10 +189,13 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
 
             {/* Actions */}
             <div className="space-y-3 pt-4 border-t border-border">
-              <button className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded font-medium transition-colors">
+              <button
+                onClick={() => setIsProposalModalOpen(true)}
+                className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded font-bold transition-colors"
+              >
                 Submit Proposal
               </button>
-              <button className="w-full border border-border hover:bg-secondary text-foreground py-3 rounded font-medium flex items-center justify-center gap-2 transition-colors">
+              <button className="w-full border border-border hover:bg-secondary text-foreground py-3 rounded font-bold flex items-center justify-center gap-2 transition-colors">
                 <MessageSquare size={16} />
                 Contact Host
               </button>
@@ -201,6 +215,15 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
           </div>
         </div>
       </div>
+
+      {/* Submit Proposal Modal */}
+      <SubmitProposalModal
+        isOpen={isProposalModalOpen}
+        onClose={() => setIsProposalModalOpen(false)}
+        eventName={event.eventName}
+        eventId={event.id}
+        onSubmit={handleProposalSubmit}
+      />
     </div>
   );
 };
