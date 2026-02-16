@@ -3,11 +3,18 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
     MapPin, Calendar, Users, Target, Clock, Rocket,
-    ChevronLeft, Share2
+    ChevronLeft, Share2, ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EVENTS } from '@/lib/events-data';
 import PlanTab from '@/components/dashboard/event-tabs/PlanTab';
@@ -16,27 +23,15 @@ import VendorsTab from '@/components/dashboard/event-tabs/VendorsTab';
 import ContractsTab from '@/components/dashboard/event-tabs/ContractsTab';
 import InboxTab from '@/components/dashboard/event-tabs/InboxTab';
 
-// Helper to format date range
-const formatEventDateRange = (startDate: string, endDate: string) => {
-    return `${startDate} - ${endDate}`;
-};
-
 export default function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
+    const router = useRouter();
     const event = EVENTS.find(e => e.id === id);
     const [activeTab, setActiveTab] = useState("overview");
 
     if (!event) {
         return notFound();
     }
-
-    // Mocking event data
-    const eventData = {
-        ...event,
-        startDate: 'May 28, 2025',
-        endDate: 'Jun 4, 2025',
-        budgetTotal: event.budget,
-    };
 
     return (
         <div className="max-w-4xl mx-auto space-y-6 py-6">
@@ -68,22 +63,46 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
             <div className="space-y-6">
                 {/* Event title and basic info */}
                 <div className="space-y-2">
-                    <h1 className="text-2xl font-bold text-foreground">{event.name}</h1>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="group flex items-center gap-2 text-2xl font-bold text-foreground hover:text-primary transition-colors text-left outline-none">
+                                {event.name}
+                                <ChevronDown size={24} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-[300px] p-2 rounded-2xl">
+                            {EVENTS.map((e) => (
+                                <DropdownMenuItem
+                                    key={e.id}
+                                    onClick={() => router.push(`/dashboard/hosts/events/${e.id}`)}
+                                    className={`rounded-xl p-3 cursor-pointer ${e.id === event.id ? 'bg-primary/5 text-primary' : ''}`}
+                                >
+                                    <div className="flex flex-col gap-1">
+                                        <div className="font-bold">{e.name}</div>
+                                        <div className="text-[10px] uppercase font-black tracking-widest text-muted-foreground">
+                                            {e.date} • {e.location}
+                                        </div>
+                                    </div>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
                     <div className="flex flex-wrap gap-4">
                         <div className="flex items-center gap-1 text-sm">
                             <MapPin size={16} className="text-muted-foreground" />
-                            <span>{eventData.location}</span>
+                            <span>{event.location}</span>
                         </div>
                         <div className="flex items-center gap-1 text-sm">
                             <Calendar size={16} className="text-muted-foreground" />
-                            <span>{formatEventDateRange(eventData.startDate, eventData.endDate)}</span>
+                            <span>{event.date}</span>
                         </div>
                         <div className="flex items-center gap-1 text-sm">
                             <Users size={16} className="text-muted-foreground" />
-                            <span>{eventData.guestCount} guests</span>
+                            <span>{event.guestCount} guests</span>
                         </div>
                         <div className="flex items-center gap-1 text-sm">
-                            <span className="font-medium text-success">₦{(eventData.budgetTotal || 0).toLocaleString()}</span>
+                            <span className="font-medium text-success">₦{(event.budget || 0).toLocaleString()}</span>
                         </div>
                     </div>
                 </div>
