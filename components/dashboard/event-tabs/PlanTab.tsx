@@ -79,7 +79,7 @@ const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
                             />
                         </div>
                         <div className="md:col-span-2 space-y-2">
-                            <label className="text-sm font-medium text-muted-foreground">Planning Brief</label>
+                            <label className="text-sm font-medium text-muted-foreground">Event Description</label>
                             <Textarea
                                 rows={4}
                                 defaultValue={event.description}
@@ -87,7 +87,7 @@ const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
                             />
                         </div>
                         <div className="md:col-span-2 space-y-2">
-                            <label className="text-sm font-medium text-muted-foreground">Itinerary Brief</label>
+                            <label className="text-sm font-medium text-muted-foreground">Itinerary</label>
                             <Textarea
                                 rows={4}
                                 defaultValue={event.itinerary}

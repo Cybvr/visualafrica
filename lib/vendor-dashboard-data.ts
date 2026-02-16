@@ -18,7 +18,7 @@ export interface Booking {
     location: string;
     client: string;
     amount: string;
-    status: 'Upcoming' | 'Confirmed' | 'Pending Payment' | 'Completed';
+    status: 'Upcoming' | 'Confirmed' | 'Pending Payment' | 'Completed' | 'Unresolved' | 'Paid';
 }
 
 export interface CalendarEvent {
@@ -79,7 +79,7 @@ const derivedBookings: Booking[] = SHARED_EVENTS.flatMap(event =>
             location: event.location,
             client: event.hostName,
             amount: bv.amount,
-            status: event.status === 'Confirmed' ? 'Confirmed' : (event.status === 'Completed' ? 'Completed' : 'Upcoming')
+            status: bv.status as Booking['status']
         }))
 );
 

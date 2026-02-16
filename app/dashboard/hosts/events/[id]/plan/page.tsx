@@ -45,11 +45,11 @@ const PlanPage: React.FC = () => {
             <input type="text" defaultValue={eventData.themes?.join(', ')} placeholder="Modern, Luxury..." className="w-full bg-secondary border-none px-6 py-4 rounded-2xl text-foreground font-bold focus:ring-2 focus:ring-primary outline-none transition-all" />
           </div>
           <div className="md:col-span-2 space-y-2 pt-4">
-            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Planning Brief</label>
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Event Description</label>
             <textarea rows={4} defaultValue={eventData.description} className="w-full bg-secondary border-none px-6 py-4 rounded-2xl text-foreground font-medium focus:ring-2 focus:ring-primary outline-none resize-none" />
           </div>
           <div className="md:col-span-2 space-y-2 pt-4">
-            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Itinerary Brief</label>
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Itinerary</label>
             <textarea rows={4} defaultValue={eventData.itinerary} placeholder="Outline the main events..." className="w-full bg-secondary border-none px-6 py-4 rounded-2xl text-foreground font-medium focus:ring-2 focus:ring-primary outline-none resize-none" />
           </div>
         </div>

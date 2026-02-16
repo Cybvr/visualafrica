@@ -124,6 +124,7 @@ export interface Vendor {
     uniqueLocations: string
   }
   location: string
+  phone: string
   areaServed: string[]
   yearEstablished: number
   responseTime: string
@@ -150,6 +151,7 @@ export const vendors: Vendor[] = [
     about: "Specialists in luxury African experiences.",
     stats: { eventsPlanned: "100+", satisfiedClients: "100+", corporateEvents: "45+", yearsExperience: "20+", uniqueLocations: "15+" },
     location: "Lekki Phase 1, Lagos",
+    phone: "+234 803 123 4567",
     areaServed: ["Lagos"],
     yearEstablished: 2019,
     responseTime: "Within 24 hours",
@@ -177,6 +179,7 @@ export const vendors: Vendor[] = [
     about: "Luxury sea events.",
     stats: { eventsPlanned: "100+", satisfiedClients: "100+", corporateEvents: "45+", yearsExperience: "20+", uniqueLocations: "15+" },
     location: "Victoria Island, Lagos",
+    phone: "+234 802 987 6543",
     areaServed: ["Lagos"],
     yearEstablished: 2019,
     responseTime: "Within 24 hours",
@@ -201,6 +204,7 @@ export const vendors: Vendor[] = [
     about: "Best in class catering.",
     stats: { eventsPlanned: "500+", satisfiedClients: "1000+", corporateEvents: "200+", yearsExperience: "15+", uniqueLocations: "30+" },
     location: "Ikoyi, Lagos",
+    phone: "+234 815 555 0192",
     areaServed: ["Lagos", "Abuja"],
     yearEstablished: 2010,
     responseTime: "Within 6 hours",
@@ -227,6 +231,7 @@ export const vendors: Vendor[] = [
     about: "Visual storytellers.",
     stats: { eventsPlanned: "300+", satisfiedClients: "300+", corporateEvents: "50+", yearsExperience: "8+", uniqueLocations: "100+" },
     location: "Ikeja, Lagos",
+    phone: "+234 701 444 8888",
     areaServed: ["Nationwide"],
     yearEstablished: 2016,
     responseTime: "Within 12 hours",
@@ -253,6 +258,7 @@ export const vendors: Vendor[] = [
     about: "Lagos' most prestigious venue.",
     stats: { eventsPlanned: "50+", satisfiedClients: "50+", corporateEvents: "20+", yearsExperience: "5+", uniqueLocations: "1" },
     location: "Lekki, Lagos",
+    phone: "+234 809 111 2222",
     areaServed: ["Lagos"],
     yearEstablished: 2020,
     responseTime: "Within 24 hours",
@@ -277,6 +283,7 @@ export const vendors: Vendor[] = [
     about: "Expert bridal artistry.",
     stats: { eventsPlanned: "400+", satisfiedClients: "400+", corporateEvents: "10+", yearsExperience: "6+", uniqueLocations: "400+" },
     location: "Surulere, Lagos",
+    phone: "+234 812 333 4444",
     areaServed: ["Lagos", "Ibadan"],
     yearEstablished: 2018,
     responseTime: "Within 3 hours",
@@ -309,6 +316,7 @@ export const vendors: Vendor[] = [
       uniqueLocations: "15+"
     },
     location: "Ikoyi, Lagos",
+    phone: "+234 805 000 7777",
     areaServed: ["Lagos"],
     yearEstablished: 2019,
     responseTime: "Within 24 hours",
@@ -343,6 +351,7 @@ export const vendors: Vendor[] = [
       uniqueLocations: "15+"
     },
     location: "Takwa Bay, Lagos",
+    phone: "+234 908 666 5555",
     areaServed: ["Lagos"],
     yearEstablished: 2019,
     responseTime: "Within 24 hours",

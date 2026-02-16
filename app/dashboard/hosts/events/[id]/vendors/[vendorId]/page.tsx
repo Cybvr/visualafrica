@@ -10,6 +10,7 @@ import {
     Clock, Send, FileText, Download, ShieldCheck
 } from 'lucide-react';
 import { vendors } from '@/lib/vendors-data';
+import { SHARED_EVENTS } from '@/lib/shared-data';
 import { Button } from '@/components/ui/button';
 import JobWorkspace, { WorkspaceCard, StatusIndicator } from '@/components/dashboard/JobWorkspace';
 
@@ -21,14 +22,20 @@ export default function EventVendorDetailPage() {
 
     const vendor = vendors.find(v => v.id === vendorId);
 
+    const event = SHARED_EVENTS.find(e => e.id === eventId);
+    const vendorBooking = event?.bookedVendors.find(bv => bv.vendorId === vendorId);
+
     const mockRequestData: Record<string, { status: string; price: string; date: string }> = {
-        'v-venue-1': { status: 'Approved', price: '₦5,250,500', date: 'Oct 12, 2024' },
+        'v-venue-1': { status: 'Paid', price: '₦5,250,500', date: 'Oct 12, 2024' },
         'v-catering-1': { status: 'Deciding', price: '₦1,250,000', date: 'Oct 14, 2024' },
         'v-photo-1': { status: 'Deciding', price: 'Pending', date: 'Oct 15, 2024' },
         'v-makeup-1': { status: 'Rejected', price: '₦150,000', date: 'Oct 10, 2024' },
     };
 
-    const request = mockRequestData[vendorId] || { status: 'Deciding', price: 'By Request', date: 'Today' };
+    const request = vendorBooking
+        ? { status: vendorBooking.status, price: vendorBooking.amount, date: event?.date || 'Today' }
+        : mockRequestData[vendorId] || { status: 'Deciding', price: 'By Request', date: 'Today' };
+
     const [currentStatus, setCurrentStatus] = useState(request.status);
 
     if (!vendor) {
@@ -243,15 +250,73 @@ export default function EventVendorDetailPage() {
         },
         {
             id: 'brief',
-            label: 'Service Brief',
+            label: 'Project Brief',
+            content: (
+                <WorkspaceCard>
+                    <div className="space-y-8">
+                        <div>
+                            <h3 className="text-base font-black uppercase tracking-widest text-foreground mb-4">Event Description</h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                                {event?.description || `Professional ${vendor.categories[0]} services for your special event. We handle all aspects of the service to ensure a seamless experience.`}
+                            </p>
+                        </div>
+                        {event?.itinerary && (
+                            <div>
+                                <h3 className="text-base font-black uppercase tracking-widest text-foreground mb-4">Itinerary</h3>
+                                <p className="text-sm text-muted-foreground leading-relaxed font-medium whitespace-pre-wrap">
+                                    {event.itinerary}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </WorkspaceCard>
+            )
+        },
+        {
+            id: 'contract',
+            label: 'Contract',
             content: (
                 <WorkspaceCard>
                     <div className="space-y-6">
-                        <div>
-                            <h3 className="text-base font-black uppercase tracking-widest text-foreground mb-4">Event Description</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                Professional {vendor.categories[0]} services for your special event. We handle all aspects of the service to ensure a seamless experience.
-                            </p>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="text-lg font-black tracking-tight">Service Agreement #{(vendor.id + eventId).substring(0, 8).toUpperCase()}</h3>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-6 border-t border-border/50">
+                            <div className="space-y-1">
+                                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Value</div>
+                                <div className="font-bold">{request.price}</div>
+                            </div>
+                            <div className="space-y-1">
+                                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Service</div>
+                                <div className="font-bold">{vendor.categories[0]}</div>
+                            </div>
+                            <div className="space-y-1">
+                                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Status</div>
+                                <div className="font-bold">{currentStatus}</div>
+                            </div>
+                        </div>
+
+                        <div className="pt-6 border-t border-border/50">
+                            <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Documents</h4>
+                            <div className="space-y-2">
+                                {[
+                                    { name: 'Quote_Summary.pdf', icon: FileText },
+                                    { name: 'Terms_of_Service.pdf', icon: FileText },
+                                ].map((doc, i) => (
+                                    <div key={i} className="flex items-center justify-between p-3 hover:bg-secondary/50 rounded-xl border border-transparent hover:border-border transition-all group">
+                                        <div className="flex items-center gap-3">
+                                            <doc.icon className="h-4 w-4 text-muted-foreground" />
+                                            <span className="text-sm font-medium">{doc.name}</span>
+                                        </div>
+                                        <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Download className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </WorkspaceCard>

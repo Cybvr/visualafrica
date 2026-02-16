@@ -98,21 +98,30 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         </TabsTrigger>
                         <TabsTrigger
                             value="vendors"
-                            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm font-medium"
+                            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm font-medium flex items-center gap-2"
                         >
                             Vendors
+                            <span className="flex items-center justify-center min-w-[1.25rem] h-5 px-1 text-[10px] font-black bg-secondary text-muted-foreground rounded-full border border-border group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground group-data-[state=active]:border-primary transition-colors">
+                                {event.bookedVendors.length}
+                            </span>
                         </TabsTrigger>
                         <TabsTrigger
                             value="guests"
-                            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm font-medium"
+                            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm font-medium flex items-center gap-2"
                         >
                             Guests
+                            <span className="flex items-center justify-center min-w-[1.25rem] h-5 px-1 text-[10px] font-black bg-secondary text-muted-foreground rounded-full border border-border group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground group-data-[state=active]:border-primary transition-colors">
+                                {event.guestCount}
+                            </span>
                         </TabsTrigger>
                         <TabsTrigger
                             value="contracts"
-                            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm font-medium"
+                            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm font-medium flex items-center gap-2"
                         >
                             Contracts
+                            <span className="flex items-center justify-center min-w-[1.25rem] h-5 px-1 text-[10px] font-black bg-secondary text-muted-foreground rounded-full border border-border group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground group-data-[state=active]:border-primary transition-colors">
+                                {event.bookedVendors.length}
+                            </span>
                         </TabsTrigger>
                         <TabsTrigger
                             value="inbox"
@@ -131,7 +140,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
                     {/* Vendors Tab */}
                     <TabsContent value="vendors">
-                        <VendorsTab />
+                        <VendorsTab event={event} />
                     </TabsContent>
 
 

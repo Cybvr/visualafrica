@@ -15,7 +15,7 @@ export interface SharedEvent {
         vendorId: string;
         service: string;
         amount: string;
-        status: 'Pending' | 'Confirmed' | 'Paid';
+        status: 'Pending' | 'Confirmed' | 'Paid' | 'Pending Payment' | 'Unresolved';
     }[];
     leads: {
         vendorId: string;
@@ -42,7 +42,7 @@ export const SHARED_EVENTS: SharedEvent[] = [
         budget: 5000000,
         description: 'A large-scale technology conference focusing on AI and Fintech in Africa.',
         bookedVendors: [
-            { vendorId: 'v-venue-1', service: 'Venues', amount: 'NGN 2,500,000', status: 'Confirmed' },
+            { vendorId: 'v-venue-1', service: 'Venues', amount: 'NGN 2,500,000', status: 'Paid' },
             { vendorId: 'v-catering-1', service: 'Catering', amount: 'NGN 1,200,000', status: 'Pending' }
         ],
         leads: [], // Added leads

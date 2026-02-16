@@ -114,16 +114,24 @@ export default function VendorJobDetailsPage() {
     const tabs = [
         {
             id: 'overview',
-            label: 'Event Brief',
+            label: 'Project Brief',
             content: (
                 <WorkspaceCard>
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                         <div>
-                            <h3 className="text-base font-black uppercase tracking-widest text-foreground mb-4">Description</h3>
+                            <h3 className="text-base font-black uppercase tracking-widest text-foreground mb-4">Event Description</h3>
                             <p className="text-sm text-muted-foreground leading-relaxed font-medium">
                                 {event.description}
                             </p>
                         </div>
+                        {event.itinerary && (
+                            <div>
+                                <h3 className="text-base font-black uppercase tracking-widest text-foreground mb-4">Itinerary</h3>
+                                <p className="text-sm text-muted-foreground leading-relaxed font-medium whitespace-pre-wrap">
+                                    {event.itinerary}
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </WorkspaceCard>
             )
@@ -146,9 +154,6 @@ export default function VendorJobDetailsPage() {
                         <div className="flex justify-between items-start">
                             <div>
                                 <h3 className="text-lg font-black tracking-tight">Service Agreement #{id.substring(2)}</h3>
-                                <div className="mt-2">
-                                    <StatusIndicator status={booking.status} label={booking.status} />
-                                </div>
                             </div>
                         </div>
 
