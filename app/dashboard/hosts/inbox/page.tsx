@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Search, Send, User, MapPin, ChevronDown } from 'lucide-react';
+import { Search, Send, User, MapPin, ChevronDown, ArrowLeft } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,12 +53,14 @@ const InboxContent: React.FC = () => {
   });
 
   const [activeChat, setActiveChat] = useState(chats[0]);
+  const [showMobileChat, setShowMobileChat] = useState(false);
 
   useEffect(() => {
     if (vendorIdParam) {
       const existingChat = chats.find(c => c.id === vendorIdParam);
       if (existingChat) {
         setActiveChat(existingChat);
+        setShowMobileChat(true);
       } else {
         const vendor = vendors.find(v => v.id === vendorIdParam);
         if (vendor) {
@@ -76,6 +78,7 @@ const InboxContent: React.FC = () => {
           };
           setChats(prev => [newChat, ...prev]);
           setActiveChat(newChat);
+          setShowMobileChat(true);
         }
       }
     }
@@ -92,7 +95,7 @@ const InboxContent: React.FC = () => {
 
   return (
     <div className="h-[calc(100vh-104px)] -m-6 md:-m-10 flex flex-col md:flex-row bg-background overflow-hidden">
-      <div className="w-full md:w-80 border-r border-border flex flex-col">
+      <div className={`w-full md:w-80 border-r border-border flex-col ${showMobileChat ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-6 border-b border-border/50">
           <h2 className="text-xl font-serif font-black text-foreground mb-4">Messages</h2>
           <div className="relative">
@@ -102,7 +105,7 @@ const InboxContent: React.FC = () => {
         </div>
         <div className="flex-1 overflow-y-auto divide-y divide-slate-50">
           {chats.map((chat) => (
-            <button key={chat.id} onClick={() => setActiveChat(chat)} className={`w-full p-6 text-left hover:bg-secondary transition-colors flex items-start gap-4 ${activeChat.id === chat.id ? 'bg-primary/5' : ''}`}>
+            <button key={chat.id} onClick={() => { setActiveChat(chat); setShowMobileChat(true); }} className={`w-full p-6 text-left hover:bg-secondary transition-colors flex items-start gap-4 ${activeChat.id === chat.id ? 'bg-primary/5' : ''}`}>
               <div className="w-12 h-12 rounded-2xl bg-background text-foreground flex items-center justify-center font-bold shrink-0">{chat.avatar}</div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start mb-1">
@@ -123,9 +126,12 @@ const InboxContent: React.FC = () => {
           ))}
         </div>
       </div>
-      <div className="flex-1 flex flex-col bg-secondary/20">
+      <div className={`flex-1 flex-col bg-secondary/20 ${showMobileChat ? 'flex' : 'hidden md:flex'}`}>
         <div className="p-6 bg-card border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setShowMobileChat(false)}>
+              <ArrowLeft size={20} />
+            </Button>
             <div className="w-10 h-10 rounded-xl bg-background text-foreground flex items-center justify-center font-bold">{activeChat.avatar}</div>
             <div>
               <h3 className="font-bold text-foreground">{activeChat.name}</h3>

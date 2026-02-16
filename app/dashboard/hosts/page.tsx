@@ -269,6 +269,11 @@ export default function DashboardPage() {
   const [selectedType, setSelectedType] = useState<string>('All');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
 
+  // Counts
+  const allVendorsCount = vendors.length;
+  const experiencesCount = vendors.filter(v => v.categories.includes('Experiences')).length;
+  const savedVendorsCount = 0; // Placeholder for now
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
@@ -383,7 +388,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 pb-20">
+    <div className="max-w-7xl mx-auto space-y-6 pb-10">
       <div className="space-y-4">
         <div>
           <h2 className="text-4xl font-black tracking-tight text-foreground">Home</h2>
@@ -416,36 +421,39 @@ export default function DashboardPage() {
           </aside>
 
           {/* Vendors area: tabs + grid */}
-          <div className="flex-1 space-y-2 ">
+          <div className="flex-1 space-y-4">
             {/* Tabs */}
-            <div className="flex items-center border-b border-border">
+            <div className="flex items-center border-b border-border gap-6">
               <button
                 onClick={() => setActiveTab('all')}
-                className={`p-2 text-sm font-black transition-all border-b-2 ${activeTab === 'all'
+                className={`pb-3 text-sm font-black transition-all border-b-2 flex items-center gap-2 ${activeTab === 'all'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                   }`}
               >
                 All Vendors
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'all' ? 'bg-primary/10 text-primary' : 'bg-secondary text-muted-foreground'}`}>{allVendorsCount}</span>
               </button>
               <button
                 onClick={() => setActiveTab('experiences')}
-                className={`p-2 text-sm font-black transition-all border-b-2 flex items-center gap-1.5 ${activeTab === 'experiences'
+                className={`pb-3 text-sm font-black transition-all border-b-2 flex items-center gap-2 ${activeTab === 'experiences'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                   }`}
               >
                 Experiences
                 <Crown size={14} className="text-amber-500 fill-amber-500" />
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'experiences' ? 'bg-primary/10 text-primary' : 'bg-secondary text-muted-foreground'}`}>{experiencesCount}</span>
               </button>
               <button
                 onClick={() => setActiveTab('saved')}
-                className={`p-2 text-sm font-black transition-all border-b-2 ${activeTab === 'saved'
+                className={`pb-3 text-sm font-black transition-all border-b-2 flex items-center gap-2 ${activeTab === 'saved'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                   }`}
               >
                 Saved Vendors
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'saved' ? 'bg-primary/10 text-primary' : 'bg-secondary text-muted-foreground'}`}>{savedVendorsCount}</span>
               </button>
             </div>
 

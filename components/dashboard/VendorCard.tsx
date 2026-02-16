@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { Vendor } from '../../lib/vendors-data';
-import { Star, MapPin, Heart } from 'lucide-react';
+import { Star, MapPin, Bookmark } from 'lucide-react';
 
 const VendorCard: React.FC<Vendor> = ({ name, location, price, rating, image, categories, featured, portfolio }) => {
   const [isLiked, setIsLiked] = useState(featured);
@@ -38,7 +38,7 @@ const VendorCard: React.FC<Vendor> = ({ name, location, price, rating, image, ca
           className={`absolute top-4 right-4 p-2 rounded-full backdrop-blur-md transition-all ${isLiked ? 'bg-primary text-primary-foreground' : 'bg-white/80 text-muted-foreground hover:text-accent'
             }`}
         >
-          <Heart size={14} className={isLiked ? 'fill-white' : ''} />
+          <Bookmark size={14} className={isLiked ? 'fill-white' : ''} />
         </button>
 
         <div className="absolute bottom-4 left-4 flex items-center gap-1.5 bg-card backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border border-border/50">
