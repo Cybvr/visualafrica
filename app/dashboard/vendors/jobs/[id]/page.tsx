@@ -163,21 +163,6 @@ export default function VendorJobDetailsPage() {
                             <div>
                                 <h3 className="text-lg font-black tracking-tight">Service Agreement #{id.substring(2)}</h3>
                             </div>
-                            <div className="flex gap-2">
-                                <Button variant="outline" size="sm" className="rounded-xl font-bold h-9">
-                                    <Share2 size={16} className="mr-2" />
-                                    Share
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="rounded-xl font-bold h-9 border-accent text-accent hover:bg-accent/5 gap-2"
-                                    onClick={() => typeof window !== 'undefined' && window.print()}
-                                >
-                                    <Printer size={16} />
-                                    Print
-                                </Button>
-                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-6 border-t border-border/50">
