@@ -287,6 +287,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
     { icon: Home, label: "Home", href: "/dashboard/hosts", matchPaths: ["/dashboard/hosts/vendor/"] },
     { icon: Mail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
     { icon: Calendar, label: "Manage", href: "/dashboard/hosts/events", count: hostEventsCount },
+    { icon: CreditCard, label: "Payments", href: "/dashboard/hosts/payments" },
   ];
 
   const hostSecondaryNavItems: NavItemConfig[] = [

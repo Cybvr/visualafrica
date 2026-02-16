@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { CreditCard, DollarSign, Calendar, Download, Plus, Trash2, CheckCircle, Clock, Search } from 'lucide-react';
+import { CreditCard, DollarSign, Calendar, Download, Plus, Trash2, CheckCircle, Clock, AlertCircle, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -13,30 +13,127 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { VENDOR_DASHBOARD_DATA, PaymentHistory, getPaymentStats } from '@/lib/vendor-dashboard-data';
 
-export default function VendorPaymentsPage() {
+// Sample data - would come from a database in production
+interface HostPayment {
+    id: string;
+    eventName: string;
+    eventId: string;
+    vendor: string;
+    date: string;
+    dueDate: string;
+    amount: string;
+    status: 'paid' | 'pending' | 'overdue' | 'processing';
+    method: string;
+}
+
+interface PaymentMethod {
+    id: string;
+    type: 'card' | 'bank';
+    cardBrand?: string;
+    last4?: string;
+    bankName?: string;
+    accountNumber?: string;
+    isDefault: boolean;
+}
+
+const SAMPLE_PAYMENTS: HostPayment[] = [
+    {
+        id: 'PAY-001',
+        eventName: 'Chidi & Amaka Wedding',
+        eventId: 'ev-001',
+        vendor: 'Lagos Event Planners',
+        date: '2025-02-10',
+        dueDate: '2025-02-15',
+        amount: '$1,500',
+        status: 'paid',
+        method: 'Visa •••• 4242'
+    },
+    {
+        id: 'PAY-002',
+        eventName: 'Chidi & Amaka Wedding',
+        eventId: 'ev-001',
+        vendor: 'Premium Caterers Lagos',
+        date: '2025-02-12',
+        dueDate: '2025-02-20',
+        amount: '$3,750',
+        status: 'pending',
+        method: 'Visa •••• 4242'
+    },
+    {
+        id: 'PAY-003',
+        eventName: 'Tech Conference 2025',
+        eventId: '1',
+        vendor: 'Coastal Venue & Events',
+        date: '2025-02-01',
+        dueDate: '2025-02-05',
+        amount: '$2,500',
+        status: 'paid',
+        method: 'Mastercard •••• 5555'
+    },
+];
+
+const SAMPLE_PAYMENT_METHODS: PaymentMethod[] = [
+    {
+        id: 'pm-1',
+        type: 'card',
+        cardBrand: 'Visa',
+        last4: '4242',
+        isDefault: true
+    },
+    {
+        id: 'pm-2',
+        type: 'card',
+        cardBrand: 'Mastercard',
+        last4: '5555',
+        isDefault: false
+    },
+    {
+        id: 'pm-3',
+        type: 'bank',
+        bankName: 'First Bank Nigeria',
+        accountNumber: '••••••5678',
+        isDefault: false
+    }
+];
+
+export default function HostPaymentsPage() {
     const [activeTab, setActiveTab] = useState<'history' | 'methods'>('history');
     const [searchQuery, setSearchQuery] = useState('');
-    const { payments, paymentMethods } = VENDOR_DASHBOARD_DATA;
-    const paymentStats = getPaymentStats();
+
+    // Calculate payment stats
+    const totalSpent = SAMPLE_PAYMENTS
+        .filter(p => p.status === 'paid')
+        .reduce((sum, p) => sum + parseFloat(p.amount.replace(/[$,]/g, '')), 0);
+
+    const pendingAmount = SAMPLE_PAYMENTS
+        .filter(p => p.status === 'pending' || p.status === 'processing')
+        .reduce((sum, p) => sum + parseFloat(p.amount.replace(/[$,]/g, '')), 0);
+
+    const thisMonth = SAMPLE_PAYMENTS
+        .filter(p => {
+            const paymentDate = new Date(p.date);
+            const now = new Date();
+            return paymentDate.getMonth() === now.getMonth() && paymentDate.getFullYear() === now.getFullYear();
+        })
+        .reduce((sum, p) => sum + parseFloat(p.amount.replace(/[$,]/g, '')), 0);
 
     // Filter payments based on search query
-    const filteredPayments = payments.filter((payment) => {
+    const filteredPayments = SAMPLE_PAYMENTS.filter((payment) => {
         const query = searchQuery.toLowerCase();
         return (
             payment.eventName.toLowerCase().includes(query) ||
-            payment.client.toLowerCase().includes(query) ||
+            payment.vendor.toLowerCase().includes(query) ||
             payment.id.toLowerCase().includes(query) ||
             payment.amount.toLowerCase().includes(query)
         );
     });
 
-    const getStatusBadge = (status: PaymentHistory['status']) => {
+    const getStatusBadge = (status: HostPayment['status']) => {
         const configs = {
-            completed: {
+            paid: {
                 icon: CheckCircle,
-                text: 'Completed',
+                text: 'Paid',
                 className: 'bg-green-50 text-green-700 border-green-200'
             },
             pending: {
@@ -48,6 +145,11 @@ export default function VendorPaymentsPage() {
                 icon: Clock,
                 text: 'Processing',
                 className: 'bg-blue-50 text-blue-700 border-blue-200'
+            },
+            overdue: {
+                icon: AlertCircle,
+                text: 'Overdue',
+                className: 'bg-red-50 text-red-700 border-red-200'
             }
         };
 
@@ -68,18 +170,18 @@ export default function VendorPaymentsPage() {
             <div className="space-y-4">
                 <div>
                     <h2 className="text-4xl font-black tracking-tight text-foreground">Payments</h2>
-                    <p className="text-muted-foreground mt-1 font-medium">Track your earnings and manage payment methods.</p>
+                    <p className="text-muted-foreground mt-1 font-medium">Manage your event payments and payment methods.</p>
                 </div>
 
-                {/* Earnings Summary Cards */}
+                {/* Payment Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-card border border-border rounded-2xl p-6">
                         <div className="flex items-center justify-between mb-2">
-                            <p className="text-sm font-medium text-muted-foreground">Total Earned</p>
-                            <DollarSign size={20} className="text-green-600" />
+                            <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
+                            <DollarSign size={20} className="text-primary" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${paymentStats.totalEarned.toLocaleString()}</p>
-                        <p className="text-xs text-muted-foreground mt-1">Lifetime earnings</p>
+                        <p className="text-3xl font-black text-foreground">${totalSpent.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground mt-1">All time</p>
                     </div>
 
                     <div className="bg-card border border-border rounded-2xl p-6">
@@ -87,17 +189,17 @@ export default function VendorPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">Pending</p>
                             <Clock size={20} className="text-yellow-600" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${paymentStats.pendingAmount.toLocaleString()}</p>
-                        <p className="text-xs text-muted-foreground mt-1">Awaiting processing</p>
+                        <p className="text-3xl font-black text-foreground">${pendingAmount.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground mt-1">Awaiting payment</p>
                     </div>
 
                     <div className="bg-card border border-border rounded-2xl p-6">
                         <div className="flex items-center justify-between mb-2">
                             <p className="text-sm font-medium text-muted-foreground">This Month</p>
-                            <Calendar size={20} className="text-primary" />
+                            <Calendar size={20} className="text-green-600" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${paymentStats.thisMonth.toLocaleString()}</p>
-                        <p className="text-xs text-muted-foreground mt-1">February 2024</p>
+                        <p className="text-3xl font-black text-foreground">${thisMonth.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground mt-1">February 2026</p>
                     </div>
                 </div>
             </div>
@@ -134,7 +236,7 @@ export default function VendorPaymentsPage() {
                         <div className="relative flex-1 max-w-md">
                             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Input
-                                placeholder="Search by event, client, or ID..."
+                                placeholder="Search by event, vendor, or ID..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="pl-10"
@@ -153,8 +255,9 @@ export default function VendorPaymentsPage() {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead className="font-black">Event</TableHead>
-                                        <TableHead className="font-black">Client</TableHead>
-                                        <TableHead className="font-black">Date</TableHead>
+                                        <TableHead className="font-black">Vendor</TableHead>
+                                        <TableHead className="font-black">Payment Date</TableHead>
+                                        <TableHead className="font-black">Due Date</TableHead>
                                         <TableHead className="font-black">Method</TableHead>
                                         <TableHead className="font-black">Status</TableHead>
                                         <TableHead className="font-black text-right">Amount</TableHead>
@@ -165,19 +268,22 @@ export default function VendorPaymentsPage() {
                                         <TableRow key={payment.id}>
                                             <TableCell>
                                                 <Link
-                                                    href={`/dashboard/vendors/jobs/${payment.bookingId}`}
+                                                    href={`/dashboard/hosts/events/${payment.eventId}`}
                                                     className="font-bold text-foreground hover:text-primary transition-colors"
                                                 >
                                                     {payment.eventName}
                                                 </Link>
                                                 <p className="text-xs text-muted-foreground mt-0.5">ID: {payment.id}</p>
                                             </TableCell>
-                                            <TableCell className="font-medium">{payment.client}</TableCell>
+                                            <TableCell className="font-medium">{payment.vendor}</TableCell>
                                             <TableCell className="text-sm text-muted-foreground">
                                                 <div className="flex items-center gap-1">
                                                     <Calendar size={12} />
                                                     {payment.date}
                                                 </div>
+                                            </TableCell>
+                                            <TableCell className="text-sm text-muted-foreground">
+                                                {payment.dueDate}
                                             </TableCell>
                                             <TableCell className="text-sm">
                                                 <div className="flex items-center gap-1 text-muted-foreground">
@@ -200,16 +306,16 @@ export default function VendorPaymentsPage() {
                                 <p className="text-muted-foreground mt-2 font-medium">
                                     {searchQuery
                                         ? 'Try adjusting your search query'
-                                        : 'Completed jobs will generate payment records here.'}
+                                        : 'Vendor payments for your events will appear here.'}
                                 </p>
                             </div>
                         )}
                     </div>
 
                     {/* Results count */}
-                    {payments.length > 0 && (
+                    {SAMPLE_PAYMENTS.length > 0 && (
                         <p className="text-sm text-muted-foreground">
-                            Showing {filteredPayments.length} of {payments.length} payments
+                            Showing {filteredPayments.length} of {SAMPLE_PAYMENTS.length} payments
                         </p>
                     )}
                 </div>
@@ -225,7 +331,7 @@ export default function VendorPaymentsPage() {
 
                     {/* Payment Methods List */}
                     <div className="space-y-3">
-                        {paymentMethods.map((method) => (
+                        {SAMPLE_PAYMENT_METHODS.map((method) => (
                             <div
                                 key={method.id}
                                 className="bg-card border border-border rounded-xl p-6 flex items-center justify-between"
@@ -236,14 +342,21 @@ export default function VendorPaymentsPage() {
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2 mb-1">
-                                            <h3 className="text-lg font-bold text-foreground">{method.bankName}</h3>
+                                            <h3 className="text-lg font-bold text-foreground">
+                                                {method.type === 'card'
+                                                    ? `${method.cardBrand} •••• ${method.last4}`
+                                                    : method.bankName
+                                                }
+                                            </h3>
                                             {method.isDefault && (
                                                 <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded-full">
                                                     DEFAULT
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="text-sm text-muted-foreground">Account: {method.accountNumber}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                            {method.type === 'card' ? 'Credit/Debit Card' : `Account: ${method.accountNumber}`}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -262,9 +375,9 @@ export default function VendorPaymentsPage() {
 
                     {/* Info Box */}
                     <div className="bg-secondary border border-border rounded-xl p-6">
-                        <h4 className="text-sm font-bold text-foreground mb-2">Payment Processing</h4>
+                        <h4 className="text-sm font-bold text-foreground mb-2">Payment Security</h4>
                         <p className="text-xs text-muted-foreground leading-relaxed">
-                            Payments are processed within 3-5 business days after an event is completed. Make sure your payment method is up to date to avoid delays.
+                            All payments are processed securely through our payment partners. Your payment information is encrypted and never stored on our servers.
                         </p>
                     </div>
                 </div>
