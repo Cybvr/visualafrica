@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Search, Send, User, MapPin, ChevronDown } from 'lucide-react';
 import {
@@ -11,27 +12,55 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { vendors } from '@/lib/vendors-data';
+import { SHARED_EVENTS } from '@/lib/shared-data';
 
-const CHATS = [
-  { id: 'v-venue-1', name: 'The Monarch Event Center', lastMsg: 'The quote is ready for your review.', time: '10:30 AM', unread: true, avatar: 'M', status: 'quoted', location: 'Lekki, Lagos', price: 'NGN 5,000,000' },
-  { id: 'v-catering-1', name: 'Naija Gourmet Flavors', lastMsg: 'Tasting scheduled for next Tuesday.', time: 'Yesterday', unread: false, avatar: 'N', status: 'booked', location: 'Ikoyi, Lagos', price: 'NGN 15,000/Guest' },
-  { id: 'v-photo-1', name: 'Eko Lens Studio', lastMsg: 'Portfolio updated with new wedding samples.', time: 'Mon', unread: false, avatar: 'E', status: 'requested', location: 'Ikeja, Lagos', price: 'NGN 450,000' },
+// Mock initial chats with Real Vendor IDs
+const INITIAL_CHATS = [
+  { id: 'v-venue-1', lastMsg: 'The quote is ready for your review.', time: '10:30 AM', unread: true },
+  { id: 'v-catering-1', lastMsg: 'Tasting scheduled for next Tuesday.', time: 'Yesterday', unread: false },
+  { id: 'v-photo-1', lastMsg: 'Portfolio updated with new wedding samples.', time: 'Mon', unread: false },
 ];
+
+const getVendorStatus = (vendorId: string): string => {
+  // Check all events to see if this vendor is booked and what their status is
+  for (const event of SHARED_EVENTS) {
+    const booking = event.bookedVendors?.find(b => b.vendorId === vendorId);
+    if (booking) {
+      return booking.status.toLowerCase(); // e.g., 'confirmed', 'pending', 'paid'
+    }
+  }
+  return 'requested'; // Default if not found in any booking but chat exists
+};
 
 const InboxContent: React.FC = () => {
   const searchParams = useSearchParams();
-  const vendorId = searchParams.get('vendorId');
+  const vendorIdParam = searchParams.get('vendorId');
 
-  const [chats, setChats] = useState(CHATS);
-  const [activeChat, setActiveChat] = useState(CHATS[0]);
+  // Hydrate chats with vendor details
+  const [chats, setChats] = useState(() => {
+    return INITIAL_CHATS.map(chat => {
+      const vendor = vendors.find(v => v.id === chat.id);
+      return {
+        ...chat,
+        name: vendor?.name || 'Unknown Vendor',
+        avatar: vendor?.name?.charAt(0) || '?',
+        location: vendor?.location || 'Unknown',
+        price: vendor?.price || 'N/A',
+        status: getVendorStatus(chat.id),
+        vendorSlug: vendor?.slug
+      };
+    });
+  });
+
+  const [activeChat, setActiveChat] = useState(chats[0]);
 
   useEffect(() => {
-    if (vendorId) {
-      const existingChat = chats.find(c => c.id === vendorId);
+    if (vendorIdParam) {
+      const existingChat = chats.find(c => c.id === vendorIdParam);
       if (existingChat) {
         setActiveChat(existingChat);
       } else {
-        const vendor = vendors.find(v => v.id === vendorId);
+        const vendor = vendors.find(v => v.id === vendorIdParam);
         if (vendor) {
           const newChat = {
             id: vendor.id,
@@ -40,16 +69,17 @@ const InboxContent: React.FC = () => {
             time: 'Now',
             unread: false,
             avatar: vendor.name.charAt(0),
-            status: 'requested',
+            status: getVendorStatus(vendor.id),
             location: vendor.location,
-            price: vendor.price || 'N/A'
+            price: vendor.price || 'N/A',
+            vendorSlug: vendor.slug
           };
           setChats(prev => [newChat, ...prev]);
           setActiveChat(newChat);
         }
       }
     }
-  }, [vendorId]);
+  }, [vendorIdParam]);
 
   const updateStatus = (chatId: string, newStatus: string) => {
     setChats(prev => prev.map(chat =>
@@ -134,7 +164,9 @@ const InboxContent: React.FC = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <button className="text-primary text-sm font-black px-4 py-2 hover:bg-primary/5 rounded-2xl transition-colors">Profile</button>
+            <Link href={`/dashboard/hosts/vendor/${activeChat.vendorSlug || activeChat.id}`} className="text-primary text-sm font-black px-4 py-2 hover:bg-primary/5 rounded-2xl transition-colors">
+              Profile
+            </Link>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-8 space-y-6">

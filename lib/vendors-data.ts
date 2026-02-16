@@ -106,6 +106,8 @@ export interface Vendor {
   price: string | null
   rating: number
   featured: boolean
+  isSponsored?: boolean
+  isNew?: boolean
   image: string
   gallery: VendorImage[]
   vendor: {
@@ -143,6 +145,7 @@ export const vendors: Vendor[] = [
     price: "From $600",
     rating: 4.9,
     featured: true,
+    isSponsored: true,
     image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800",
     gallery: [{ url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800", alt: "setup" }],
     vendor: { name: "Olu & Co Events", logo: "", slug: "olu-and-co" },
@@ -171,6 +174,7 @@ export const vendors: Vendor[] = [
     price: "From $800",
     rating: 4.8,
     featured: true,
+    isNew: true,
     image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800",
     gallery: [{ url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800", alt: "catamaran" }],
     vendor: { name: "Olu & Co Events", logo: "", slug: "olu-and-co" },
