@@ -46,7 +46,7 @@ const GuestWebsite: React.FC = () => {
                 </div>
               ))}
             </div>
-            <button className="w-full mt-6 py-3 border border-border text-muted-foreground font-bold text-sm rounded-2xl hover:bg-slate-50 transition-colors">
+            <button className="w-full mt-6 py-3 border border-border text-muted-foreground font-bold text-sm rounded-2xl hover:bg-secondary transition-colors">
               Load more guests
             </button>
           </div>
@@ -63,8 +63,8 @@ const GuestWebsite: React.FC = () => {
               <p className="text-muted-foreground text-sm leading-relaxed">Your custom guest portal is live at:<br /><span className="text-foreground font-medium">Waddi.events/may-offsite</span></p>
             </div>
             <div className="flex gap-2">
-              <button className="flex-1 bg-card text-foreground py-3 rounded-xl font-bold text-sm hover:bg-slate-100">Edit Site</button>
-              <button className="p-3 bg-slate-800 rounded-xl hover:bg-slate-700"><ExternalLink size={20} /></button>
+              <button className="flex-1 bg-card text-foreground py-3 rounded-xl font-bold text-sm hover:bg-card">Edit Site</button>
+              <button className="p-3 bg-background rounded-xl hover:bg-slate-700"><ExternalLink size={20} /></button>
             </div>
           </div>
 

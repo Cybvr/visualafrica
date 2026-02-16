@@ -90,7 +90,7 @@ const FilterSidebar: React.FC<{
                 placeholder="Search vendors..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                className="w-full pl-9 pr-4 py-2 bg-secondary border border-border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
               />
             </div>
           )}

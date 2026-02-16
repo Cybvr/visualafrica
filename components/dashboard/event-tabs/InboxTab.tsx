@@ -43,7 +43,7 @@ export default function InboxTab() {
                 </div>
                 <div className="flex-1 overflow-y-auto divide-y divide-slate-50">
                     {chats.map((chat) => (
-                        <button key={chat.id} onClick={() => setActiveChat(chat)} className={`w-full p-6 text-left hover:bg-slate-50 transition-colors flex items-start gap-4 ${activeChat.id === chat.id ? 'bg-primary/5' : ''}`}>
+                        <button key={chat.id} onClick={() => setActiveChat(chat)} className={`w-full p-6 text-left hover:bg-secondary transition-colors flex items-start gap-4 ${activeChat.id === chat.id ? 'bg-primary/5' : ''}`}>
                             <div className="w-12 h-12 rounded-2xl bg-background text-foreground flex items-center justify-center font-bold shrink-0">{chat.avatar}</div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex justify-between items-start mb-1">
@@ -64,7 +64,7 @@ export default function InboxTab() {
                     ))}
                 </div>
             </div>
-            <div className="flex-1 flex flex-col bg-slate-50/20">
+            <div className="flex-1 flex flex-col bg-secondary/20">
                 <div className="p-6 bg-card border-b border-border flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl bg-background text-foreground flex items-center justify-center font-bold">{activeChat.avatar}</div>

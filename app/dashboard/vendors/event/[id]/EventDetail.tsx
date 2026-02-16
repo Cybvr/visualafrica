@@ -24,9 +24,9 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
       case 'Confirmed':
         return 'bg-green-50 text-green-700 border-green-200';
       case 'Completed':
-        return 'bg-slate-50 text-slate-700 border-slate-200';
+        return 'bg-secondary text-foreground-700 border-slate-200';
       default:
-        return 'bg-slate-50 text-slate-700 border-slate-200';
+        return 'bg-secondary text-foreground-700 border-slate-200';
     }
   };
 
@@ -51,10 +51,10 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
           Back to Events
         </button>
         <div className="flex items-center gap-2">
-          <button className="p-2 hover:bg-slate-50 text-muted-foreground transition-all">
+          <button className="p-2 hover:bg-secondary text-muted-foreground transition-all">
             <Share2 size={16} />
           </button>
-          <button className="p-2 hover:bg-slate-50 text-muted-foreground transition-all">
+          <button className="p-2 hover:bg-secondary text-muted-foreground transition-all">
             <Heart size={16} />
           </button>
         </div>
@@ -86,7 +86,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
             {(event.categories || event.themes) && (
               <div className="flex flex-wrap gap-2">
                 {event.categories?.map((cat, idx) => (
-                  <span key={idx} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md uppercase">
+                  <span key={idx} className="px-2 py-0.5 bg-card text-foreground-600 text-[10px] font-bold rounded-md uppercase">
                     {cat}
                   </span>
                 ))}
@@ -115,7 +115,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
           </div>
 
           {/* Host Info */}
-          <div className="bg-slate-50 p-4 rounded border border-border">
+          <div className="bg-secondary p-4 rounded border border-border">
             <p className="text-xs text-muted-foreground mb-1">Event Host</p>
             <p className="font-medium text-foreground">{event.hostName}</p>
           </div>
@@ -181,7 +181,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
               <button className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded font-medium transition-colors">
                 Submit Proposal
               </button>
-              <button className="w-full border border-border hover:bg-slate-50 text-foreground py-3 rounded font-medium flex items-center justify-center gap-2 transition-colors">
+              <button className="w-full border border-border hover:bg-secondary text-foreground py-3 rounded font-medium flex items-center justify-center gap-2 transition-colors">
                 <MessageSquare size={16} />
                 Contact Host
               </button>
@@ -193,7 +193,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
           </div>
 
           {/* Info Box */}
-          <div className="border border-border rounded p-4 bg-slate-50">
+          <div className="border border-border rounded p-4 bg-secondary">
             <p className="text-sm font-medium text-foreground mb-2">Response Time Matters</p>
             <p className="text-xs text-muted-foreground leading-relaxed">
               This host is actively reviewing proposals. Early submissions receive priority consideration.

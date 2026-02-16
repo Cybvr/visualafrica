@@ -131,7 +131,7 @@ export default function VendorDashboardPage() {
                     {(event.categories || event.themes) && (
                       <div className="flex flex-wrap gap-2 mt-4">
                         {event.categories?.map((cat, idx) => (
-                          <span key={idx} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md">
+                          <span key={idx} className="px-2 py-0.5 bg-card text-foreground-600 text-[10px] font-bold rounded-md">
                             {cat}
                           </span>
                         ))}

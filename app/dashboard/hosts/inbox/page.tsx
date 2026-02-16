@@ -36,12 +36,12 @@ const Inbox: React.FC = () => {
           <h2 className="text-xl font-serif font-black text-foreground mb-4">Messages</h2>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <input type="text" placeholder="Search chats..." className="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+            <input type="text" placeholder="Search chats..." className="w-full pl-10 pr-4 py-2 bg-secondary border-none rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary/20" />
           </div>
         </div>
         <div className="flex-1 overflow-y-auto divide-y divide-slate-50">
           {chats.map((chat) => (
-            <button key={chat.id} onClick={() => setActiveChat(chat)} className={`w-full p-6 text-left hover:bg-slate-50 transition-colors flex items-start gap-4 ${activeChat.id === chat.id ? 'bg-primary/5' : ''}`}>
+            <button key={chat.id} onClick={() => setActiveChat(chat)} className={`w-full p-6 text-left hover:bg-secondary transition-colors flex items-start gap-4 ${activeChat.id === chat.id ? 'bg-primary/5' : ''}`}>
               <div className="w-12 h-12 rounded-2xl bg-background text-foreground flex items-center justify-center font-bold shrink-0">{chat.avatar}</div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start mb-1">
@@ -62,7 +62,7 @@ const Inbox: React.FC = () => {
           ))}
         </div>
       </div>
-      <div className="flex-1 flex flex-col bg-slate-50/20">
+      <div className="flex-1 flex flex-col bg-secondary/20">
         <div className="p-6 bg-card border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-background text-foreground flex items-center justify-center font-bold">{activeChat.avatar}</div>
@@ -121,7 +121,7 @@ const Inbox: React.FC = () => {
         </div>
         <div className="p-6 bg-card border-t border-border/50">
           <div className="flex gap-4">
-            <input type="text" placeholder="Type your response..." className="flex-1 px-6 py-4 bg-slate-50 border-none rounded-[2rem] outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
+            <input type="text" placeholder="Type your response..." className="flex-1 px-6 py-4 bg-secondary border-none rounded-[2rem] outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
             <button className="w-14 h-14 bg-primary text-foreground rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
               <Send size={20} />
             </button>

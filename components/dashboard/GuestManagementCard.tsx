@@ -46,11 +46,11 @@ const GuestManagementCard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-2 w-full mt-6 gap-4">
-          <div className="bg-slate-50 p-4 rounded-2xl flex flex-col items-center">
+          <div className="bg-secondary p-4 rounded-2xl flex flex-col items-center">
             <span className="text-2xl font-bold text-accent">12</span>
             <span className="text-xs font-semibold text-muted-foreground uppercase">Registered</span>
           </div>
-          <div className="bg-slate-50 p-4 rounded-2xl flex flex-col items-center">
+          <div className="bg-secondary p-4 rounded-2xl flex flex-col items-center">
             <span className="text-2xl font-bold text-muted-foreground">48</span>
             <span className="text-xs font-semibold text-muted-foreground uppercase">Pending</span>
           </div>

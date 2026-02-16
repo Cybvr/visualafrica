@@ -61,10 +61,10 @@ export default function BlogDetailPage() {
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <button className="p-3 bg-slate-50 rounded-xl text-muted-foreground hover:text-accent transition-all">
+                                <button className="p-3 bg-secondary rounded-xl text-muted-foreground hover:text-accent transition-all">
                                     <Share2 size={18} />
                                 </button>
-                                <button className="p-3 bg-slate-50 rounded-xl text-muted-foreground hover:text-accent transition-all">
+                                <button className="p-3 bg-secondary rounded-xl text-muted-foreground hover:text-accent transition-all">
                                     <Bookmark size={18} />
                                 </button>
                             </div>

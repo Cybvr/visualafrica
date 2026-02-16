@@ -57,8 +57,8 @@ export default function VendorOffersPage() {
                         key={offer.id}
                         className="group bg-card border border-border rounded-3xl p-4 flex flex-col md:flex-row gap-6 hover:shadow-lg transition-all hover:border-primary/50"
                     >
-                        <div className="relative w-full md:w-48 h-48 md:h-auto rounded-2xl overflow-hidden shrink-0 bg-slate-100 flex items-center justify-center">
-                            <Users size={48} className="text-slate-300" />
+                        <div className="relative w-full md:w-48 h-48 md:h-auto rounded-2xl overflow-hidden shrink-0 bg-card flex items-center justify-center">
+                            <Users size={48} className="text-muted-foreground" />
                         </div>
 
                         <div className="flex-1 py-2 flex flex-col justify-between">
@@ -110,8 +110,8 @@ export default function VendorOffersPage() {
 
             {displayOffers.length === 0 && (
                 <div className="py-20 text-center space-y-4">
-                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
-                        <Archive className="text-slate-300" size={32} />
+                    <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto">
+                        <Archive className="text-muted-foreground" size={32} />
                     </div>
                     <p className="text-muted-foreground font-bold">No {activeTab} offers found.</p>
                 </div>

@@ -25,7 +25,7 @@ export default function ContractsTab({ bookedVendors }: ContractsTabProps) {
             'Confirmed': 'bg-green-100 text-green-700',
             'Pending': 'bg-accent text-foreground',
             'Paid': 'bg-blue-100 text-blue-700',
-            'Draft': 'bg-slate-100 text-foreground',
+            'Draft': 'bg-card text-foreground',
         };
         return styles[status as keyof typeof styles] || styles['Draft'];
     };
@@ -82,7 +82,7 @@ export default function ContractsTab({ bookedVendors }: ContractsTabProps) {
                             className="bg-card p-5 rounded-[2rem] border border-border hover:shadow-md transition-all group flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
                         >
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-slate-100 overflow-hidden flex-shrink-0">
+                                <div className="w-12 h-12 rounded-2xl bg-card overflow-hidden flex-shrink-0">
                                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                                 </div>
                                 <div>
@@ -123,7 +123,7 @@ export default function ContractsTab({ bookedVendors }: ContractsTabProps) {
             </div>
 
             {displayVendors.length === 0 && (
-                <div className="py-12 bg-slate-50 rounded-[2rem] border border-dashed border-border text-center">
+                <div className="py-12 bg-secondary rounded-[2rem] border border-dashed border-border text-center">
                     <p className="text-muted-foreground font-bold text-sm">No contracts found for this event.</p>
                 </div>
             )}

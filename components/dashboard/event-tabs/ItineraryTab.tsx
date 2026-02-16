@@ -97,7 +97,7 @@ const EditModal: React.FC<EditModalProps> = ({ event, dayDate, onClose, onSave }
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-6 py-3 rounded-full border border-border text-foreground font-semibold hover:bg-slate-50"
+                            className="flex-1 px-6 py-3 rounded-full border border-border text-foreground font-semibold hover:bg-secondary"
                         >
                             Cancel
                         </button>
@@ -155,7 +155,7 @@ const DayEditModal: React.FC<DayEditModalProps> = ({ day, onClose, onSave }) => 
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-6 py-3 rounded-full border border-border text-foreground font-semibold hover:bg-slate-50"
+                            className="flex-1 px-6 py-3 rounded-full border border-border text-foreground font-semibold hover:bg-secondary"
                         >
                             Cancel
                         </button>
@@ -259,7 +259,7 @@ const ItineraryTab: React.FC = () => {
                 <div className="flex gap-3">
                     <button
                         onClick={handleShare}
-                        className="bg-card border border-border text-foreground px-6 py-2 rounded-full text-sm font-semibold hover:bg-slate-50 transition-colors flex items-center gap-2"
+                        className="bg-card border border-border text-foreground px-6 py-2 rounded-full text-sm font-semibold hover:bg-secondary transition-colors flex items-center gap-2"
                     >
                         <Share2 size={16} />
                         Share
@@ -296,7 +296,7 @@ const ItineraryTab: React.FC = () => {
                                         <div className="bg-card p-6 rounded-3xl border border-border shadow-sm hover:shadow-md transition-shadow">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex gap-6 items-center flex-1">
-                                                    <div className="bg-slate-50 p-3 rounded-2xl text-muted-foreground font-bold text-xs uppercase flex flex-col items-center min-w-[70px]">
+                                                    <div className="bg-secondary p-3 rounded-2xl text-muted-foreground font-bold text-xs uppercase flex flex-col items-center min-w-[70px]">
                                                         <Clock size={16} className="mb-1" />
                                                         {event.time}
                                                     </div>
@@ -311,13 +311,13 @@ const ItineraryTab: React.FC = () => {
                                                 <div className="flex items-center gap-2">
                                                     <button
                                                         onClick={() => setEditingEvent({ dayId: day.id, event })}
-                                                        className="p-2 text-slate-300 hover:text-foreground transition-colors"
+                                                        className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                                                     >
                                                         <Pencil size={18} />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteEvent(day.id, event.id)}
-                                                        className="p-2 text-slate-300 hover:text-red-600 transition-colors"
+                                                        className="p-2 text-muted-foreground hover:text-red-600 transition-colors"
                                                     >
                                                         <Trash2 size={18} />
                                                     </button>

@@ -41,7 +41,7 @@ const GuestsTab: React.FC = () => {
                                         <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${i % 2 === 0 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                                             {i % 2 === 0 ? 'Confirmed' : 'Pending'}
                                         </span>
-                                        <button className="p-2 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity"><Mail size={16} /></button>
+                                        <button className="p-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"><Mail size={16} /></button>
                                     </div>
                                 </div>
                             ))}
@@ -63,8 +63,8 @@ const GuestsTab: React.FC = () => {
                             <p className="text-muted-foreground text-sm leading-relaxed">Your custom guest portal is live at:<br /><span className="text-foreground font-medium">Waddi.events/may-offsite</span></p>
                         </div>
                         <div className="flex gap-2">
-                            <button className="flex-1 bg-white text-foreground py-3 rounded-xl font-bold text-sm hover:bg-slate-100">Edit Site</button>
-                            <button className="p-3 bg-slate-800 rounded-xl hover:bg-slate-700"><ExternalLink size={20} /></button>
+                            <button className="flex-1 bg-white text-foreground py-3 rounded-xl font-bold text-sm hover:bg-card">Edit Site</button>
+                            <button className="p-3 bg-background rounded-xl hover:bg-slate-700"><ExternalLink size={20} /></button>
                         </div>
                     </div>
 

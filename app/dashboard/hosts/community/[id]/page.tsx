@@ -66,7 +66,7 @@ export default function InspirationDetailsPage() {
 
                         <button
                             onClick={handleDuplicate}
-                            className="bg-background text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-800 transition-all hover:scale-105 shadow-xl shadow-slate-900/10 active:scale-95"
+                            className="bg-background text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-background transition-all hover:scale-105 shadow-xl shadow-slate-900/10 active:scale-95"
                         >
                             <Copy size={18} />
                             Duplicate to My Events
@@ -77,7 +77,7 @@ export default function InspirationDetailsPage() {
                     {event.publicGallery && event.publicGallery.length > 0 && (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             {event.publicGallery.map((img, i) => (
-                                <div key={i} className="aspect-square rounded-2xl overflow-hidden bg-slate-100 relative group">
+                                <div key={i} className="aspect-square rounded-2xl overflow-hidden bg-card relative group">
                                     <img src={img} alt={`Gallery ${i}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                 </div>
                             ))}
@@ -110,7 +110,7 @@ export default function InspirationDetailsPage() {
                                 <h3 className="text-lg font-black text-foreground mb-4">Vendors Used</h3>
                                 <div className="flex flex-wrap gap-3">
                                     {['Photography', 'Catering', 'Decor'].map(tag => (
-                                        <span key={tag} className="px-4 py-2 bg-slate-100 text-muted-foreground rounded-lg text-sm font-bold">{tag}</span>
+                                        <span key={tag} className="px-4 py-2 bg-card text-muted-foreground rounded-lg text-sm font-bold">{tag}</span>
                                     ))}
                                 </div>
                             </div>

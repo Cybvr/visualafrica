@@ -32,14 +32,14 @@ export const DashboardFilter = ({
             <div className="flex items-center gap-1.5 shrink-0">
                 <button
                     onClick={onStatusClick}
-                    className="flex items-center gap-1.5 h-10 px-3 border border-slate-200 rounded-lg text-xs font-bold text-muted-foreground hover:bg-slate-50 hover:text-foreground transition-all"
+                    className="flex items-center gap-1.5 h-10 px-3 border border-slate-200 rounded-lg text-xs font-bold text-muted-foreground hover:bg-secondary hover:text-foreground transition-all"
                 >
                     <Filter size={12} />
                     Status
                 </button>
                 <button
                     onClick={onDateClick}
-                    className="flex items-center gap-1.5 h-10 px-3 border border-slate-200 rounded-lg text-xs font-bold text-muted-foreground hover:bg-slate-50 hover:text-foreground transition-all"
+                    className="flex items-center gap-1.5 h-10 px-3 border border-slate-200 rounded-lg text-xs font-bold text-muted-foreground hover:bg-secondary hover:text-foreground transition-all"
                 >
                     <Calendar size={12} />
                     Date

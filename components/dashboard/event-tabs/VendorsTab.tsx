@@ -60,7 +60,7 @@ const VendorsTab: React.FC = () => {
 
             <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
                 <table className="w-full text-left">
-                    <thead className="bg-slate-50 border-b border-border">
+                    <thead className="bg-secondary border-b border-border">
                         <tr>
                             <th className="px-8 py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Vendor</th>
                             <th className="px-8 py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Service</th>
@@ -74,7 +74,11 @@ const VendorsTab: React.FC = () => {
                             filteredRequests.map((req) => {
                                 const status = STATUS_MAP[req.status as keyof typeof STATUS_MAP];
                                 return (
-                                    <tr key={req.id} className="group hover:bg-slate-50 transition-colors cursor-pointer">
+                                    <tr
+                                        key={req.id}
+                                        onClick={() => window.location.href = `${window.location.pathname}/vendors/${req.id}`}
+                                        className="group hover:bg-secondary transition-colors cursor-pointer"
+                                    >
                                         <td className="px-8 py-6">
                                             <div className="font-bold text-foreground">{req.name}</div>
                                             <div className="flex items-center gap-1 mt-1 text-[10px] text-muted-foreground font-bold uppercase">
@@ -93,7 +97,7 @@ const VendorsTab: React.FC = () => {
                                         </td>
                                         <td className="px-8 py-6 text-right font-black text-foreground">{req.priceDisplay}</td>
                                         <td className="px-8 py-6 text-right">
-                                            <ChevronRight size={18} className="text-slate-300 group-hover:text-primary transition-colors inline" />
+                                            <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors inline" />
                                         </td>
                                     </tr>
                                 )

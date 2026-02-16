@@ -59,7 +59,7 @@ const HostSettingsPage = () => {
                                         JP
                                     </div>
                                     <div className="space-y-2">
-                                        <button className="px-4 py-2 bg-background text-white text-xs font-black rounded-full hover:bg-slate-800 transition-all">
+                                        <button className="px-4 py-2 bg-background text-white text-xs font-black rounded-full hover:bg-background transition-all">
                                             Change Photo
                                         </button>
                                         <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">JPG, GIF or PNG. 1MB Max.</p>
@@ -104,7 +104,7 @@ const HostSettingsPage = () => {
 
                         {activeTab !== 'Profile' && (
                             <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
-                                <div className="w-20 h-20 bg-card rounded-[2rem] flex items-center justify-center text-slate-200">
+                                <div className="w-20 h-20 bg-card rounded-[2rem] flex items-center justify-center text-foreground-200">
                                     <Settings size={40} strokeWidth={1} />
                                 </div>
                                 <div>

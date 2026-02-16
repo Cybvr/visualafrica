@@ -74,8 +74,8 @@ const ExperiencesPage: React.FC = () => {
 
                 {displayExperiences.length === 0 && (
                     <div className="col-span-full py-20 text-center space-y-4">
-                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
-                            <Search className="text-slate-300" size={32} />
+                        <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto">
+                            <Search className="text-muted-foreground" size={32} />
                         </div>
                         <p className="text-muted-foreground font-bold">No experiences found at the moment.</p>
                     </div>

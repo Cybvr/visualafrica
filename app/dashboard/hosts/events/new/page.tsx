@@ -106,13 +106,13 @@ export default function CreateEventPage() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                     <button
                         onClick={() => router.push('/dashboard/hosts/events')}
-                        className="w-full sm:w-auto px-8 py-4 bg-background text-white rounded-2xl font-black hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20"
+                        className="w-full sm:w-auto px-8 py-4 bg-background text-white rounded-2xl font-black hover:bg-background transition-all shadow-xl shadow-slate-900/20"
                     >
                         Go to My Events
                     </button>
                     <button
                         onClick={() => router.push('/dashboard/hosts/vendors')}
-                        className="w-full sm:w-auto px-8 py-4 bg-white border border-border text-foreground rounded-2xl font-black hover:bg-slate-50 transition-all"
+                        className="w-full sm:w-auto px-8 py-4 bg-white border border-border text-foreground rounded-2xl font-black hover:bg-secondary transition-all"
                     >
                         Browse Vendors
                     </button>
@@ -163,7 +163,7 @@ export default function CreateEventPage() {
                                 <textarea
                                     rows={4}
                                     placeholder="e.g. Plan a wedding for Chidi and Amaka on December 12th in Lekki with 250 guests and 15M budget..."
-                                    className="w-full px-6 py-4 bg-slate-50 border border-border rounded-2xl text-base font-medium outline-none focus:ring-4 focus:ring-primary/10 transition-all resize-none placeholder:text-slate-300"
+                                    className="w-full px-6 py-4 bg-secondary border border-border rounded-2xl text-base font-medium outline-none focus:ring-4 focus:ring-primary/10 transition-all resize-none placeholder:text-muted-foreground"
                                     value={aiPrompt}
                                     onChange={(e) => setAiPrompt(e.target.value)}
                                 />
@@ -172,7 +172,7 @@ export default function CreateEventPage() {
                                         <button
                                             key={hint}
                                             onClick={() => setAiPrompt(prev => prev + hint)}
-                                            className="px-3 py-1 bg-slate-50 border border-border rounded-full text-[10px] font-black text-muted-foreground hover:text-accent hover:border-primary transition-all"
+                                            className="px-3 py-1 bg-secondary border border-border rounded-full text-[10px] font-black text-muted-foreground hover:text-accent hover:border-primary transition-all"
                                         >
                                             + {hint}
                                         </button>
@@ -227,7 +227,7 @@ export default function CreateEventPage() {
                                     ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110'
                                     : step > s
                                         ? 'bg-green-100 text-green-600'
-                                        : 'bg-slate-50 text-muted-foreground'
+                                        : 'bg-secondary text-muted-foreground'
                                     }`}
                             >
                                 {step > s ? <Check size={14} /> : s}
@@ -252,7 +252,7 @@ export default function CreateEventPage() {
                                         type="text"
                                         required
                                         placeholder="e.g. Chidi & Amaka Wedding"
-                                        className="w-full px-6 py-4 bg-slate-50 border border-border rounded-2xl text-lg font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-slate-300"
+                                        className="w-full px-6 py-4 bg-secondary border border-border rounded-2xl text-lg font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-muted-foreground"
                                         value={formData.eventName}
                                         onChange={(e) => setFormData({ ...formData, eventName: e.target.value })}
                                     />
@@ -262,7 +262,7 @@ export default function CreateEventPage() {
                                         <label className="text-sm font-black text-foreground">Event Theme</label>
                                         <div className="relative">
                                             <select
-                                                className="w-full px-6 py-4 bg-slate-50 border border-border rounded-2xl text-base font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
+                                                className="w-full px-6 py-4 bg-secondary border border-border rounded-2xl text-base font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
                                                 value={formData.theme}
                                                 onChange={(e) => setFormData({ ...formData, theme: e.target.value })}
                                             >
@@ -280,7 +280,7 @@ export default function CreateEventPage() {
                                             <input
                                                 type="date"
                                                 required
-                                                className="w-full pl-14 pr-6 py-4 bg-slate-50 border border-border rounded-2xl text-base font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer"
+                                                className="w-full pl-14 pr-6 py-4 bg-secondary border border-border rounded-2xl text-base font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer"
                                                 value={formData.date}
                                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                                             />
@@ -304,7 +304,7 @@ export default function CreateEventPage() {
                                         type="text"
                                         required
                                         placeholder="e.g. Lekki Phase 1, Lagos"
-                                        className="w-full px-6 py-4 bg-slate-50 border border-border rounded-2xl text-lg font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all"
+                                        className="w-full px-6 py-4 bg-secondary border border-border rounded-2xl text-lg font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all"
                                         value={formData.location}
                                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                                     />
@@ -317,7 +317,7 @@ export default function CreateEventPage() {
                                             type="number"
                                             required
                                             placeholder="e.g. 250"
-                                            className="w-full pl-14 pr-6 py-4 bg-slate-50 border border-border rounded-2xl text-lg font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all"
+                                            className="w-full pl-14 pr-6 py-4 bg-secondary border border-border rounded-2xl text-lg font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all"
                                             value={formData.guestCount}
                                             onChange={(e) => setFormData({ ...formData, guestCount: e.target.value })}
                                         />
@@ -342,7 +342,7 @@ export default function CreateEventPage() {
                                             type="text"
                                             required
                                             placeholder="e.g. 15,000,000"
-                                            className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-border rounded-2xl text-lg font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all"
+                                            className="w-full pl-12 pr-6 py-4 bg-secondary border border-border rounded-2xl text-lg font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all"
                                             value={formData.budget}
                                             onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
                                         />
@@ -353,7 +353,7 @@ export default function CreateEventPage() {
                                     <textarea
                                         rows={4}
                                         placeholder="e.g. A luxurious outdoor wedding with a modern African theme and focus on great food..."
-                                        className="w-full px-6 py-4 bg-slate-50 border border-border rounded-2xl text-base font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all resize-none placeholder:text-slate-300"
+                                        className="w-full px-6 py-4 bg-secondary border border-border rounded-2xl text-base font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all resize-none placeholder:text-muted-foreground"
                                         value={formData.description}
                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     />
@@ -380,7 +380,7 @@ export default function CreateEventPage() {
                                 type="button"
                                 onClick={handleNext}
                                 disabled={step === 1 && !formData.eventName}
-                                className="px-10 py-4 bg-background text-white rounded-2xl font-black flex items-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-10 py-4 bg-background text-white rounded-2xl font-black flex items-center gap-2 hover:bg-background transition-all shadow-xl shadow-slate-900/10 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Continue
                                 <ChevronRight size={18} />

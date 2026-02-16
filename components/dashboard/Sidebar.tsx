@@ -128,7 +128,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
   }
 
   return (
-    <div className="p-4 border-t">
+    <div className="p-4 border-t border-border">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="w-full hover:bg-card rounded-xl flex flex-col items-center transition-colors group text-center py-3 px-2">
@@ -144,7 +144,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
               </div>
             )}
             <div className="mt-1">
-              <div className="text-[10px] font-semibold text-sidebar-foreground truncate max-w-full">
+              <div className="text-[8px] font-semibold text-muted-foreground truncate max-w-full">
                 {userProfile.displayName}
               </div>
             </div>

@@ -26,7 +26,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
             <Header />
             <main className="flex-1">
                 {/* Hero Section */}
-                <section className="relative overflow-hidden bg-slate-50 py-20 lg:py-32">
+                <section className="relative overflow-hidden bg-secondary py-20 lg:py-32">
                     <div className="container mx-auto px-4">
                         <div className="mx-auto max-w-3xl text-center">
                             <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-6">
@@ -55,7 +55,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
 
                         {/* Hero Image Mockup Area */}
                         {/* <div className="mt-16 md:mt-24 relative mx-auto max-w-5xl rounded-2xl border bg-white p-2 shadow-2xl lg:rounded-3xl lg:p-4">
-                <div className="aspect-[16/9] overflow-hidden rounded-xl bg-slate-100 relative">
+                <div className="aspect-[16/9] overflow-hidden rounded-xl bg-card relative">
                    <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                       Feature Preview Image
                    </div>
@@ -105,7 +105,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                 <h2 className="mb-6 font-serif text-3xl font-bold md:text-4xl">
                                     Why top planners choose Visual Africa {feature.title}
                                 </h2>
-                                <p className="mb-8 text-lg text-slate-300">
+                                <p className="mb-8 text-lg text-muted-foreground">
                                     Join thousands of event professionals who trust our platform to deliver exceptional experiences.
                                 </p>
 
@@ -115,13 +115,13 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-white">
                                                 <Check className="h-3.5 w-3.5" />
                                             </div>
-                                            <span className="text-slate-200">{benefit}</span>
+                                            <span className="text-foreground-200">{benefit}</span>
                                         </li>
                                     ))}
                                 </ul>
 
                                 <div className="mt-10">
-                                    <Button asChild size="lg" className="h-14 px-8 text-base bg-white text-foreground hover:bg-slate-100">
+                                    <Button asChild size="lg" className="h-14 px-8 text-base bg-white text-foreground hover:bg-card">
                                         <Link href="/auth/login">
                                             Get Started Now <ArrowRight className="ml-2 h-4 w-4" />
                                         </Link>
@@ -156,7 +156,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                         <p className="mx-auto mb-10 max-w-2xl text-lg opacity-90">
                             Start using Visual Africa {feature.title} today and experience the difference.
                         </p>
-                        <Button asChild size="lg" variant="secondary" className="h-14 px-10 text-lg bg-white text-primary hover:bg-slate-100">
+                        <Button asChild size="lg" variant="secondary" className="h-14 px-10 text-lg bg-white text-primary hover:bg-card">
                             <Link href="/auth/login">Create Free Account</Link>
                         </Button>
                     </div>

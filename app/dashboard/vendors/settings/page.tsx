@@ -26,7 +26,7 @@ const VendorSettingsPage = () => {
 
     const EmptyState = ({ tab }: { tab: string }) => (
         <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-20">
-            <div className="w-24 h-24 rounded-[3rem] flex items-center justify-center text-slate-200">
+            <div className="w-24 h-24 rounded-[3rem] flex items-center justify-center text-foreground-200">
                 <Settings size={48} strokeWidth={1} />
             </div>
             <div>
@@ -59,7 +59,7 @@ const VendorSettingsPage = () => {
                                 onClick={() => setActiveTab(item.label)}
                                 className={`w-full flex items-center justify-between px-5 py-4 text-sm font-black rounded-2xl transition-all ${activeTab === item.label
                                     ? 'bg-primary text-white shadow-xl shadow-primary/20 scale-[1.02]'
-                                    : 'text-muted-foreground hover:bg-slate-50 hover:text-foreground'
+                                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
