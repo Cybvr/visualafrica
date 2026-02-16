@@ -30,8 +30,8 @@ const Inbox: React.FC = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-140px)] flex flex-col md:flex-row bg-card rounded-[2.5rem] border border-border overflow-hidden shadow-sm">
-      <div className="bg-red-500 w-full md:w-80 border-r border-border flex flex-col">
+    <div className="h-[calc(100vh-104px)] -m-6 md:-m-10 flex flex-col md:flex-row bg-background overflow-hidden">
+      <div className="w-full md:w-80 border-r border-border flex flex-col">
         <div className="p-6 border-b border-border/50">
           <h2 className="text-xl font-serif font-black text-foreground mb-4">Messages</h2>
           <div className="relative">

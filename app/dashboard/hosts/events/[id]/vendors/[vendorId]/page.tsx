@@ -143,13 +143,13 @@ export default function EventVendorDetailPage() {
                         </div>
                     </div>
 
-                    {/* Chat */}
-                    <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                        <div className="p-4 border-b border-border">
-                            <h3 className="font-bold">Messages</h3>
+                    {/* Chat Section */}
+                    <div className="bg-card rounded-[2.5rem] border border-border overflow-hidden shadow-sm">
+                        <div className="p-6 border-b border-border bg-secondary/10">
+                            <h3 className="font-serif font-black text-xl">Messages</h3>
                         </div>
 
-                        <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
+                        <div className="p-8 space-y-8 min-h-[400px]">
                             <div className="flex gap-3">
                                 <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
                                     <User size={14} />
@@ -175,15 +175,15 @@ export default function EventVendorDetailPage() {
                             </div>
                         </div>
 
-                        <div className="p-4 border-t border-border">
-                            <div className="flex gap-2">
+                        <div className="p-6 border-t border-border bg-secondary/5">
+                            <div className="flex gap-4">
                                 <input
                                     type="text"
                                     placeholder="Type your message..."
-                                    className="flex-1 px-4 py-2 bg-secondary rounded-lg text-sm outline-none"
+                                    className="flex-1 px-6 py-4 bg-background border border-border rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                                 />
-                                <Button size="icon" className="rounded-lg">
-                                    <Send size={16} />
+                                <Button className="w-14 h-14 rounded-2xl shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                                    <Send size={18} />
                                 </Button>
                             </div>
                         </div>

@@ -32,7 +32,7 @@ export default function InboxTab() {
     };
 
     return (
-        <div className="h-[calc(100vh-300px)] flex flex-col md:flex-row bg-card rounded-[2.5rem] border border-border overflow-hidden shadow-sm">
+        <div className="h-[calc(100vh-280px)] flex flex-col md:flex-row bg-background border border-border rounded-[2rem] overflow-hidden shadow-sm">
             <div className="w-full md:w-80 border-r border-border flex flex-col">
                 <div className="p-6 border-b border-border/50">
                     <h2 className="text-xl font-serif font-black text-foreground mb-4">Messages</h2>
