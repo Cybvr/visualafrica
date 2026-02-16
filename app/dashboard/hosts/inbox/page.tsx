@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Search, Send, User, MapPin, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
@@ -9,18 +10,48 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { vendors } from '@/lib/vendors-data';
 
 const CHATS = [
-  { id: 1, name: 'The Monarch', lastMsg: 'The quote is ready for your review.', time: '10:30 AM', unread: true, avatar: 'M', status: 'quoted', location: 'Lekki, Lagos', price: 'NGN 5,000,000' },
-  { id: 2, name: 'Naija Gourmet Flavors', lastMsg: 'Tasting scheduled for next Tuesday.', time: 'Yesterday', unread: false, avatar: 'N', status: 'booked', location: 'Ikoyi, Lagos', price: 'NGN 15,000/Guest' },
-  { id: 3, name: 'Eko Lens Studio', lastMsg: 'Portfolio updated with new wedding samples.', time: 'Mon', unread: false, avatar: 'E', status: 'requested', location: 'Ikeja, Lagos', price: 'NGN 450,000' },
+  { id: 'v-venue-1', name: 'The Monarch Event Center', lastMsg: 'The quote is ready for your review.', time: '10:30 AM', unread: true, avatar: 'M', status: 'quoted', location: 'Lekki, Lagos', price: 'NGN 5,000,000' },
+  { id: 'v-catering-1', name: 'Naija Gourmet Flavors', lastMsg: 'Tasting scheduled for next Tuesday.', time: 'Yesterday', unread: false, avatar: 'N', status: 'booked', location: 'Ikoyi, Lagos', price: 'NGN 15,000/Guest' },
+  { id: 'v-photo-1', name: 'Eko Lens Studio', lastMsg: 'Portfolio updated with new wedding samples.', time: 'Mon', unread: false, avatar: 'E', status: 'requested', location: 'Ikeja, Lagos', price: 'NGN 450,000' },
 ];
 
-const Inbox: React.FC = () => {
-  const [activeChat, setActiveChat] = useState(CHATS[0]);
-  const [chats, setChats] = useState(CHATS);
+const InboxContent: React.FC = () => {
+  const searchParams = useSearchParams();
+  const vendorId = searchParams.get('vendorId');
 
-  const updateStatus = (chatId: number, newStatus: string) => {
+  const [chats, setChats] = useState(CHATS);
+  const [activeChat, setActiveChat] = useState(CHATS[0]);
+
+  useEffect(() => {
+    if (vendorId) {
+      const existingChat = chats.find(c => c.id === vendorId);
+      if (existingChat) {
+        setActiveChat(existingChat);
+      } else {
+        const vendor = vendors.find(v => v.id === vendorId);
+        if (vendor) {
+          const newChat = {
+            id: vendor.id,
+            name: vendor.name,
+            lastMsg: 'Start a conversation...',
+            time: 'Now',
+            unread: false,
+            avatar: vendor.name.charAt(0),
+            status: 'requested',
+            location: vendor.location,
+            price: vendor.price || 'N/A'
+          };
+          setChats(prev => [newChat, ...prev]);
+          setActiveChat(newChat);
+        }
+      }
+    }
+  }, [vendorId]);
+
+  const updateStatus = (chatId: string, newStatus: string) => {
     setChats(prev => prev.map(chat =>
       chat.id === chatId ? { ...chat, status: newStatus } : chat
     ));
@@ -132,4 +163,10 @@ const Inbox: React.FC = () => {
   );
 };
 
-export default Inbox;
+export default function Inbox() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">Loading inbox...</div>}>
+      <InboxContent />
+    </Suspense>
+  );
+};

@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import Link from 'next/link';
 import { ChevronLeft, Star, MapPin, CheckCircle2, MessageSquare, Heart, Share2, Calendar, Globe, Award, ShieldCheck, Zap, Video, Image as ImageIcon } from 'lucide-react';
 import { Vendor } from '@/lib/vendors-data';
 
@@ -189,10 +190,13 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor, onBack }) => {
               <button className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-lg font-medium shadow-sm hover:shadow-md transition-all">
                 Save to List
               </button>
-              <button className="w-full bg-card hover:bg-accent text-foreground py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all border border-border">
+              <Link
+                href={`/dashboard/hosts/inbox?vendorId=${vendor.id}`}
+                className="w-full bg-card hover:bg-accent text-foreground py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all border border-border"
+              >
                 <MessageSquare size={16} />
                 Contact
-              </button>
+              </Link>
 
             </div>
 

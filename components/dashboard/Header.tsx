@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, Search, Plus, Menu } from 'lucide-react';
+import { Bell, Search, Plus, Menu, FileText } from 'lucide-react';
 
 interface HeaderProps {
   onOpenMenu?: () => void;
@@ -40,6 +40,15 @@ const Header: React.FC<HeaderProps> = ({ onOpenMenu }) => {
             14 days left Upgrade
           </button>
         </Link>
+
+        {mode === 'host' && (
+          <Link href="/dashboard/hosts/diy-content">
+            <button className="hidden lg:flex items-center gap-2 px-4 py-2 border border-border bg-card text-muted-foreground hover:text-foreground rounded-xl text-xs font-semibold hover:bg-secondary transition-all shadow-sm">
+              <FileText size={14} />
+              Resources
+            </button>
+          </Link>
+        )}
 
         <button className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
           <Bell size={20} />
