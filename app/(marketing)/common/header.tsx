@@ -121,9 +121,9 @@ export function Header() {
       <div className="mx-auto flex w-[95%] max-w-5xl items-center justify-between rounded-full bg-background/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="flex w-[180px] flex-shrink-0 items-center">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
+            <img src="/logo.png" alt="Waddi Logo" className="h-8 w-auto object-contain" />
             <span className="font-logo text-xl font-normal text-foreground">
-              Visual Africa
+              Waddi
             </span>
           </Link>
         </div>

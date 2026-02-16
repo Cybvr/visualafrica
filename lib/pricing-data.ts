@@ -29,12 +29,12 @@ export const pricingTiers: PricingTier[] = [
       {
         title: "Customizable tasklist",
         description:
-          "Start with a Visual Africa template and make it your own with event-specific customizable tasklists.",
+          "Start with a Waddi template and make it your own with event-specific customizable tasklists.",
       },
       {
         title: "Vendor Marketplace",
         description:
-          "Access to 500+ vetted vendors in Lagos, including savings up to 40% with Visual Africa pre-negotiated rates.",
+          "Access to 500+ vetted vendors in Lagos, including savings up to 40% with Waddi pre-negotiated rates.",
       },
       {
         title: "AI search",
@@ -59,7 +59,7 @@ export const pricingTiers: PricingTier[] = [
       {
         title: "Booking Vendors",
         description:
-          "Book your vendors directly through the Visual Africa platform to keep everything in one place.",
+          "Book your vendors directly through the Waddi platform to keep everything in one place.",
       },
       {
         title: "Guest website",
@@ -86,7 +86,7 @@ export const pricingTiers: PricingTier[] = [
       {
         title: "Dedicated CSM",
         description:
-          "Get a dedicated Customer Success Manager to help you get maximum value from Visual Africa.",
+          "Get a dedicated Customer Success Manager to help you get maximum value from Waddi.",
       },
       {
         title: "Company policies",

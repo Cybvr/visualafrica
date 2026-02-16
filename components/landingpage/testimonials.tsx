@@ -10,13 +10,13 @@ export function Testimonials() {
             company: "A+ Digital"
         },
         {
-            quote: "Visual Africa did a lot of the decision making for us in terms of things to try, and gave us better options than I could have found on my own.",
+            quote: "Waddi did a lot of the decision making for us in terms of things to try, and gave us better options than I could have found on my own.",
             author: "Adebayo Adeleke",
             title: "Principal Engineer",
             company: "Atomic Tech"
         },
         {
-            quote: "Visual Africa is an absolute game changer for planning events. The event went without a hitch and will be using them again. Fantastic folks working there!",
+            quote: "Waddi is an absolute game changer for planning events. The event went without a hitch and will be using them again. Fantastic folks working there!",
             author: "Ngozi Eze",
             title: "Founder",
             company: "TrustedSec"

@@ -776,7 +776,7 @@ export const vendors: Vendor[] = [
 
 export const VENDOR_FAQ = [
   {
-    question: "How do I book vendors through Visual Africa?",
+    question: "How do I book vendors through Waddi?",
     answer: "Simply browse our vendor listings, view their profiles, and click 'Get a Quote' to submit your event details.",
   }
 ]

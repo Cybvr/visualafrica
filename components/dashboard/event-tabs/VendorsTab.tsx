@@ -33,7 +33,7 @@ const VendorsTab: React.FC<VendorsTabProps> = ({ event }) => {
             name: vendor?.name || 'Unknown Vendor',
             status: bv.status,
             priceDisplay: bv.amount,
-            location: vendor?.location || 'Lagos, Nigeria',
+            location: vendor?.location,
             categories: vendor?.categories || ['Vendor'],
             date: event.date
         };

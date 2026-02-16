@@ -40,9 +40,9 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-foreground/50" />
         <div className="absolute inset-0 flex flex-col items-start justify-end p-12">
           <Link href="/" className="absolute left-8 top-8 flex items-center gap-2">
-            <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
+            <img src="/logo.png" alt="Waddi Logo" className="h-8 w-auto object-contain" />
             <span className="font-logo text-xl font-normal text-background">
-              Visual Africa
+              Waddi
             </span>
           </Link>
           <div className="max-w-md space-y-8">
@@ -70,7 +70,7 @@ export default function LoginPage() {
             </div>
             <blockquote className="border-l-2 border-background/50 pl-4">
               <p className="font-serif text-xl font-semibold leading-snug text-background">
-                {"\"Visual Africa made planning our wedding in Lagos an absolute dream. The vendors were incredible!\""}
+                {"\"Waddi made planning our wedding in Lagos an absolute dream. The vendors were incredible!\""}
               </p>
               <footer className="mt-3 text-sm text-background/70">
                 — Adunni & Chike, Lagos
@@ -86,9 +86,9 @@ export default function LoginPage() {
           {/* Mobile Logo */}
           <div className="mb-8 flex items-center justify-between lg:hidden">
             <Link href="/" className="flex items-center gap-2">
-              <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
+              <img src="/logo.png" alt="Waddi Logo" className="h-8 w-auto object-contain" />
               <span className="font-logo text-xl font-normal text-foreground">
-                Visual Africa
+                Waddi
               </span>
             </Link>
           </div>
@@ -107,7 +107,7 @@ export default function LoginPage() {
                 Welcome back
               </CardTitle>
               <CardDescription className="text-muted-foreground">
-                Sign in to your Visual Africa account
+                Sign in to your Waddi account
               </CardDescription>
             </CardHeader>
             <CardContent>

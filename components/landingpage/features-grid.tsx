@@ -33,7 +33,7 @@ export function FeaturesGrid() {
                 <div className="relative mb-16 rounded-2xl overflow-hidden min-h-[500px] flex items-center">
                     <Image
                         src="/images/waddi2.png"
-                        alt="Visual Africa Event Planning"
+                        alt="Waddi Event Planning"
                         fill
                         className="object-cover"
                     />

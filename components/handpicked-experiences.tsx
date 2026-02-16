@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 import { vendors } from "@/lib/vendors-data"
 
@@ -29,37 +30,41 @@ export function HandpickedExperiences() {
                             For your team
                         </h3>
                     </div>
-                    <Button variant="outline" className="border-primary text-primary hover:bg-primary/5">
-                        View all pre-built events
-                    </Button>
+                    <Link href="/dashboard/hosts?activeTab=experiences">
+                        <Button variant="outline" className="border-primary text-primary hover:bg-primary/5">
+                            View all pre-built events
+                        </Button>
+                    </Link>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {experiences.map((exp) => (
-                        <div key={exp.title} className="group cursor-pointer">
-                            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] mb-4">
-                                <img
-                                    src={exp.image}
-                                    alt={exp.title}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png'; }}
-                                />
-                                <div className="absolute top-4 left-4">
-                                    <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-black text-foreground uppercase tracking-wider">
-                                        {exp.category}
-                                    </span>
+                        <Link href={`/dashboard/hosts/vendor/${exp.slug}`} key={exp.title} className="group cursor-pointer">
+                            <div>
+                                <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] mb-4">
+                                    <img
+                                        src={exp.image}
+                                        alt={exp.title}
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png'; }}
+                                    />
+                                    <div className="absolute top-4 left-4">
+                                        <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-black text-foreground uppercase tracking-wider">
+                                            {exp.category}
+                                        </span>
+                                    </div>
                                 </div>
+                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">
+                                    {exp.location}
+                                </p>
+                                <h4 className="font-serif text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                                    {exp.title}
+                                </h4 >
+                                <p className="text-sm text-foreground">
+                                    from <span className="font-bold text-lg text-primary">{exp.price}</span>
+                                </p>
                             </div>
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">
-                                {exp.location}
-                            </p>
-                            <h4 className="font-serif text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                                {exp.title}
-                            </h4>
-                            <p className="text-sm text-foreground">
-                                from <span className="font-bold text-lg text-primary">{exp.price}</span>
-                            </p>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </div>

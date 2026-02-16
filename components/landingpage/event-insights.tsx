@@ -14,13 +14,13 @@ export function EventInsights() {
             image: "https://images.pexels.com/photos/20367607/pexels-photo-20367607.jpeg?auto=compress&cs=tinysrgb&w=1200"
         },
         {
-            title: "Nigeria's wedding industry alone generates over ₦100 billion annually in economic activity.",
-            source: "THISDAY, National Bureau of Statistics 2023",
+            title: "Africa hosts over 5 million weddings annually, with the continent's wedding industry projected to reach $65.6 billion by 2032.",
+            source: "Africa.com, Allied Market Research 2024",
             image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=1200"
         },
         {
-            title: "Over 80% of event vendors in Nigeria are informal micro-businesses thriving on referrals.",
-            source: "SMEDAN Industry Report 2024",
+            title: "South Africa's informal economy employs 19.5% of the workforce, with event vendors operating predominantly through referrals and unregistered micro-businesses.",
+            source: "Statistics South Africa, SALGA 2024",
             image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=1200"
         }
     ]

@@ -24,7 +24,7 @@ export async function generateMetadata({
   const solution = getSolutionBySlug(slug)
   if (!solution) return { title: "Not Found" }
   return {
-    title: `${solution.title} | Visual Africa`,
+    title: `${solution.title} | Waddi`,
     description: solution.description,
   }
 }
@@ -158,7 +158,7 @@ export default async function SolutionDetailPage({
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <div>
             <h2 className="font-serif text-3xl font-bold text-foreground md:text-4xl">
-              Why choose Visual Africa
+              Why choose Waddi
             </h2>
             <p className="mt-2 text-muted-foreground">
               The trusted partner for{" "}
@@ -178,7 +178,7 @@ export default async function SolutionDetailPage({
           <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
             <Image
               src={solution.image}
-              alt={`${solution.title} by Visual Africa`}
+              alt={`${solution.title} by Waddi`}
               fill
               className="object-cover"
             />

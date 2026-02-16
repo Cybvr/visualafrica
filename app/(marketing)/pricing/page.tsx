@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { pricingTiers } from "@/lib/pricing-data"
 
 export const metadata = {
-  title: "Pricing | Visual Africa",
+  title: "Pricing | Waddi",
   description:
     "Choose the right plan for your event planning needs. Flexible pricing for teams of all sizes.",
 }

@@ -24,7 +24,7 @@ const dmSerifDisplay = DM_Serif_Display({
 })
 
 export const metadata: Metadata = {
-  title: 'Visual Africa | Lagos\'s Trusted Event Planner Marketplace',
+  title: 'Waddi | Lagos\'s Trusted Event Planner Marketplace',
   description:
     'Connect with the finest event vendors in Lagos. Browse inspiring video reels, select vendors and receive quotes effortlessly. Plan weddings, corporate events, kids parties, and more.',
 }

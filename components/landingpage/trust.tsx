@@ -41,7 +41,7 @@ export function TrustSection() {
                         />
                         <div className="absolute bottom-8 left-8 bg-white rounded-full px-6 py-4 shadow-lg flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                                <CheckCircle className="w-6 h-6 text-white" />
+                                <CheckCircle className="w-6 h-6 text-background" />
                             </div>
                             <span className="font-semibold text-lg">Vendor verified</span>
                         </div>
@@ -49,10 +49,10 @@ export function TrustSection() {
 
                     {/* Content Side */}
                     <div>
-                        <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">
+                        <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6 text-background">
                             PLAN WITHOUT THE STRESS
                         </h2>
-                        <p className="text-lg text-gray-600 mb-12">
+                        <p className="text-lg text-background mb-12">
                             Hundreds of events planned across Nigeria by people living abroad.
                             We coordinate with local vendors so you don't have to.
                         </p>
@@ -64,12 +64,12 @@ export function TrustSection() {
                                     <div key={feature.title} className="flex gap-4">
                                         <div className="flex-shrink-0">
                                             <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                                                <Icon className="w-6 h-6 text-primary" />
+                                                <Icon className="w-6 h-6 text-background" />
                                             </div>
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-xl mb-2">{feature.title}</h3>
-                                            <p className="text-gray-600">{feature.description}</p>
+                                            <h3 className="font-semibold text-background text-xl mb-2">{feature.title}</h3>
+                                            <p className="text-background">{feature.description}</p>
                                         </div>
                                     </div>
                                 )

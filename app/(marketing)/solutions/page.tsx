@@ -5,7 +5,7 @@ import { solutions } from "@/lib/solutions-data"
 import { Button } from "@/components/ui/button"
 
 export const metadata = {
-  title: "Our Solutions | Visual Africa",
+  title: "Our Solutions | Waddi",
   description:
     "Explore our full range of event planning solutions. From corporate offsites and conferences to full-service planning, we handle it all.",
 }

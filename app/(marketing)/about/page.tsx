@@ -21,7 +21,7 @@ export default function AboutPage() {
                     <div className="mt-20">
                         <h2 className="font-serif text-3xl font-bold md:text-4xl">Our Mission</h2>
                         <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                            At Visual Africa, we believe distance shouldn't compromise the quality of your celebration. Our mission is to provide the global Nigerian diaspora with a secure, transparent platform to orchestrate extraordinary events in Lagos. We combine cutting-edge technology with high-touch local coordination to ensure your vision is executed flawlessly, no matter where you are.
+                            At Waddi, we believe distance shouldn't compromise the quality of your celebration. Our mission is to provide the global Nigerian diaspora with a secure, transparent platform to orchestrate extraordinary events in Lagos. We combine cutting-edge technology with high-touch local coordination to ensure your vision is executed flawlessly, no matter where you are.
                         </p>
                     </div>
 
@@ -96,7 +96,7 @@ export default function AboutPage() {
                             Ready to Plan Your Event?
                         </h2>
                         <p className="mx-auto mt-4 max-w-2xl text-lg opacity-90">
-                            Join thousands of satisfied clients who've found their perfect vendors through Visual Africa.
+                            Join thousands of satisfied clients who've found their perfect vendors through Waddi.
                         </p>
                         <a
                             href="/explore/vendors"

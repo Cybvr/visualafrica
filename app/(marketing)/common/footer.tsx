@@ -88,13 +88,13 @@ export function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <img src="/logo.png" alt="Visual Africa Logo" className="h-8 w-auto object-contain" />
+              <img src="/logo.png" alt="Waddi Logo" className="h-8 w-auto object-contain" />
               <span className="font-serif text-xl font-bold">
-                Visual Africa
+                Waddi
               </span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed opacity-70">
-              We connect Nigerian vendors with diaspora clients planning events back home.
+              We connect African vendors with diaspora clients planning events back home.
             </p>
             <div className="mt-4">
               <p className="text-xs font-semibold uppercase tracking-wider opacity-50">
@@ -180,28 +180,7 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Newsletter Signup */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
-              Stay Up to Date
-            </h3>
-            <p className="mt-4 text-sm opacity-70">
-              Get the latest updates on vendors and events.
-            </p>
-            <form className="mt-4 flex flex-col gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="rounded-lg border border-background/20 bg-background/10 px-4 py-2 text-sm text-background placeholder:text-background/50 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <button
-                type="submit"
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-primary/90"
-              >
-                Subscribe
-              </button>
-            </form>
-          </div>
+
         </div>
 
         {/* Bottom Bar */}
@@ -218,7 +197,7 @@ export function Footer() {
             ))}
           </div>
           <p className="text-xs opacity-50">
-            &copy; 2026 Visual Africa. All rights reserved.
+            &copy; 2026 Waddi. All rights reserved.
           </p>
         </div>
       </div>

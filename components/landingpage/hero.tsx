@@ -11,7 +11,7 @@ export function Hero() {
                 {/* Image Background */}
                 <Image
                     src="/images/waddiup.png"
-                    alt="Visual Africa Events"
+                    alt="Waddi Events"
                     fill
                     className="object-cover rounded-3xl"
                     priority
@@ -23,7 +23,7 @@ export function Hero() {
                 {/* Content */}
                 <div className="relative z-10 mx-auto max-w-4xl">
                     <h1 className="mb-6 font-serif text-4xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl">
-                        Plan your Nigeria event from abroad.
+                        Plan your African event from abroad.
                     </h1>
                     <p className="mx-auto mb-10 max-w-2xl text-lg text-white/90 md:text-xl">
                         Find trusted vendors, coordinate everything, and book in one place.

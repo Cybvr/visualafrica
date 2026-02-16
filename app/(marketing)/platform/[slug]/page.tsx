@@ -103,7 +103,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
                             <div>
                                 <h2 className="mb-6 font-serif text-3xl font-bold md:text-4xl">
-                                    Why top planners choose Visual Africa {feature.title}
+                                    Why top planners choose Waddi {feature.title}
                                 </h2>
                                 <p className="mb-8 text-lg text-muted-foreground">
                                     Join thousands of event professionals who trust our platform to deliver exceptional experiences.
@@ -154,7 +154,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                             Ready to transform your event planning?
                         </h2>
                         <p className="mx-auto mb-10 max-w-2xl text-lg opacity-90">
-                            Start using Visual Africa {feature.title} today and experience the difference.
+                            Start using Waddi {feature.title} today and experience the difference.
                         </p>
                         <Button asChild size="lg" variant="secondary" className="h-14 px-10 text-lg bg-white text-primary hover:bg-card">
                             <Link href="/auth/login">Create Free Account</Link>
