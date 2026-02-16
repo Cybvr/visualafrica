@@ -50,66 +50,94 @@ export default function EventVendorDetailPage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-6 py-6 pb-24">
-            {/* Header */}
+            {/* Header / Back Link only */}
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => router.back()}
-                        className="p-2 hover:bg-secondary rounded-full transition-colors"
-                    >
-                        <ChevronLeft size={20} />
-                    </button>
-                    <div>
-                        <h1 className="text-xl font-bold text-foreground">{vendor.name}</h1>
-                        <p className="text-xs text-muted-foreground">{vendor.categories.join(', ')}</p>
+                <button
+                    onClick={() => router.back()}
+                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
+                >
+                    <div className="p-2 bg-card rounded-full border border-border group-hover:bg-secondary transition-colors">
+                        <ChevronLeft size={16} />
                     </div>
-                </div>
-                <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border ${getStatusStyles(currentStatus)}`}>
-                    {currentStatus}
-                </span>
+                    <span className="text-sm font-bold uppercase tracking-widest">Back to Vendors</span>
+                </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left Column - Vendor Details */}
                 <div className="lg:col-span-2 space-y-6">
-                    {/* Vendor Profile */}
-                    <div className="bg-card rounded-2xl border border-border p-6 space-y-6">
-                        <div className="flex items-start gap-4">
-                            <div className="w-20 h-20 rounded-xl bg-secondary overflow-hidden shrink-0 border border-border">
+                    {/* Vendor Profile Card */}
+                    <div className="bg-card rounded-[2.5rem] border border-border p-8 space-y-8 shadow-sm">
+                        <div className="flex flex-col md:flex-row gap-8 items-start">
+                            <div className="w-32 h-32 rounded-3xl bg-secondary overflow-hidden shrink-0 border border-border shadow-inner">
                                 <img src={vendor.image} alt={vendor.name} className="w-full h-full object-cover" />
                             </div>
-                            <div className="flex-1 space-y-2">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex items-center gap-1">
-                                        <Star size={16} className="fill-primary text-primary" />
-                                        <span className="font-bold text-foreground">{vendor.rating}</span>
+
+                            <div className="flex-1 space-y-6 w-full">
+                                {/* 1st line: Title */}
+                                <div>
+                                    <h2 className="text-3xl font-black text-foreground tracking-tight">{vendor.name}</h2>
+                                </div>
+
+                                {/* 2nd line: Category Icon, Rating, Location */}
+                                <div className="flex flex-wrap items-center gap-6 text-sm font-bold text-muted-foreground pt-1">
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-secondary rounded-full text-foreground uppercase tracking-widest text-[10px]">
+                                        <Zap size={14} className="text-primary" />
+                                        {vendor.categories[0]}
                                     </div>
-                                    <div className="flex items-center gap-1 text-muted-foreground">
-                                        <MapPin size={16} />
-                                        <span className="text-sm">{vendor.location}</span>
+                                    <div className="flex items-center gap-1.5">
+                                        <Star size={16} className="fill-primary text-primary" />
+                                        <span className="text-foreground">{vendor.rating}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <MapPin size={16} className="text-primary" />
+                                        <span className="text-foreground">{vendor.location}</span>
                                     </div>
                                 </div>
-                                <p className="text-sm text-muted-foreground leading-relaxed">{vendor.description}</p>
+
+                                {/* 3rd line: Description Icon and Description */}
+                                <div className="flex items-start gap-3">
+                                    <div className="mt-1 bg-secondary p-1.5 rounded-lg text-primary">
+                                        <FileText size={16} />
+                                    </div>
+                                    <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                                        {vendor.description}
+                                    </p>
+                                </div>
+
+                                {/* 4th line: Services Icon and Services */}
+                                <div className="flex items-start gap-3">
+                                    <div className="mt-1 bg-secondary p-1.5 rounded-lg text-primary">
+                                        <ShieldCheck size={16} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-xs font-black text-foreground uppercase tracking-widest mb-2">Services Included</p>
+                                        <p className="text-sm text-muted-foreground font-medium">
+                                            {vendor.whatsIncluded.join(' • ')}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* 5th line: Small status bar */}
+                                <div className="pt-2">
+                                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-secondary border border-border">
+                                        <div className={`w-2 h-2 rounded-full ${currentStatus === 'Approved' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : currentStatus === 'Rejected' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`} />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-foreground">Status: {currentStatus}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Portfolio */}
-                        <div className="grid grid-cols-4 gap-2">
-                            {vendor.portfolio.slice(0, 4).map(item => (
-                                <div key={item.id} className="aspect-square rounded-lg overflow-hidden bg-secondary">
-                                    <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* What's Included */}
-                        <div className="space-y-3">
-                            <h3 className="text-sm font-bold text-muted-foreground">What's Included</h3>
-                            <div className="grid grid-cols-2 gap-2">
-                                {vendor.whatsIncluded.map((item, idx) => (
-                                    <div key={idx} className="flex items-center gap-2 text-sm">
-                                        <CheckCircle2 size={14} className="text-primary shrink-0" />
-                                        <span>{item}</span>
+                        {/* Portfolio Grid - Re-integrated within card or immediately below */}
+                        <div className="pt-4 border-t border-border/50">
+                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4">Portfolio Preview</p>
+                            <div className="grid grid-cols-4 gap-4">
+                                {vendor.portfolio.slice(0, 4).map(item => (
+                                    <div key={item.id} className="aspect-square rounded-2xl overflow-hidden bg-secondary border border-border/50 hover:scale-[1.02] transition-transform cursor-pointer group relative">
+                                        <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <ImageIcon size={24} className="text-white" />
+                                        </div>
                                     </div>
                                 ))}
                             </div>
