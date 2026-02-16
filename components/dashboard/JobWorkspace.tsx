@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ReactNode } from 'react';
-import { ChevronLeft, Zap, Star, MapPin, FileText, ShieldCheck, Mail, Phone } from 'lucide-react';
+import { ChevronLeft, Zap, Star, MapPin, FileText, ShieldCheck, Mail, Phone, Share2, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -52,10 +52,17 @@ export default function JobWorkspace({
 
                 {activeTab === 'contract' && (
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" className="rounded-xl font-bold h-9">
+                        <Button variant="outline" size="sm" className="rounded-xl font-bold h-9 gap-2">
+                            <Share2 size={16} />
                             Share
                         </Button>
-                        <Button variant="outline" size="sm" className="rounded-xl font-bold h-9">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="rounded-xl font-bold h-9 gap-2 border-accent text-accent hover:bg-accent/5"
+                            onClick={() => typeof window !== 'undefined' && window.print()}
+                        >
+                            <Printer size={16} />
                             Print
                         </Button>
                     </div>

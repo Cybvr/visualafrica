@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
     MapPin, Calendar, Users, Target, Clock, Rocket,
-    ChevronLeft, Share2
+    ChevronLeft, Share2, Printer
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -45,6 +45,16 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         <Share2 size={16} />
                         Share
                     </Button>
+                    {activeTab === 'contracts' && (
+                        <Button
+                            variant="outline"
+                            className="gap-2 border-accent text-accent hover:bg-accent/5"
+                            onClick={() => typeof window !== 'undefined' && window.print()}
+                        >
+                            <Printer size={16} />
+                            Print
+                        </Button>
+                    )}
                     <Button className="gap-2">
                         <Rocket size={16} />
                         Publish

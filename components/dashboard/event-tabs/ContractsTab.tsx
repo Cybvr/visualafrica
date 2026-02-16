@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { FileText, Search, Filter, MoreHorizontal, Download, Phone, Mail } from 'lucide-react';
+import { FileText, Search, Filter, MoreHorizontal, Download, Phone, Mail, Share2, Printer } from 'lucide-react';
 import Link from 'next/link';
 import { vendors } from '@/lib/vendors-data';
 import { Input } from '@/components/ui/input';
@@ -113,10 +113,31 @@ export default function ContractsTab({ eventId, bookedVendors }: ContractsTabPro
                                 </div>
 
                                 <div className="flex items-center gap-1 ml-auto md:ml-0">
-                                    <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full text-muted-foreground hover:text-foreground">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="w-8 h-8 rounded-full text-muted-foreground hover:text-foreground"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                        }}
+                                    >
+                                        <Share2 size={16} />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="w-8 h-8 rounded-full text-muted-foreground hover:text-foreground"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            if (typeof window !== 'undefined') window.print();
+                                        }}
+                                    >
+                                        <Printer size={16} />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full text-muted-foreground hover:text-foreground" onClick={(e) => e.preventDefault()}>
                                         <Download size={16} />
                                     </Button>
-                                    <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full text-muted-foreground hover:text-foreground">
+                                    <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full text-muted-foreground hover:text-foreground" onClick={(e) => e.preventDefault()}>
                                         <MoreHorizontal size={16} />
                                     </Button>
                                 </div>

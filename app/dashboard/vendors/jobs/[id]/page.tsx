@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useParams, notFound, useRouter } from 'next/navigation';
-import { Mail, Phone, FileText, Download, MapPin, Calendar, Users, Target, Clock } from 'lucide-react';
+import { Mail, Phone, FileText, Download, MapPin, Calendar, Users, Target, Clock, Share2, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SHARED_EVENTS } from '@/lib/shared-data';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
@@ -162,6 +162,21 @@ export default function VendorJobDetailsPage() {
                         <div className="flex justify-between items-start">
                             <div>
                                 <h3 className="text-lg font-black tracking-tight">Service Agreement #{id.substring(2)}</h3>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button variant="outline" size="sm" className="rounded-xl font-bold h-9">
+                                    <Share2 size={16} className="mr-2" />
+                                    Share
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="rounded-xl font-bold h-9 border-accent text-accent hover:bg-accent/5 gap-2"
+                                    onClick={() => typeof window !== 'undefined' && window.print()}
+                                >
+                                    <Printer size={16} />
+                                    Print
+                                </Button>
                             </div>
                         </div>
 

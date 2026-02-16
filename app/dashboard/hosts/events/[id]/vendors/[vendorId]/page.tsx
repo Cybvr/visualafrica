@@ -7,7 +7,7 @@ import {
     User, ChevronLeft, Star, MapPin, CheckCircle2,
     MessageSquare, Heart, Share2, Calendar,
     Zap, Video, Image as ImageIcon, XCircle, Globe,
-    Clock, Send, FileText, Download, ShieldCheck
+    Clock, Send, FileText, Download, ShieldCheck, Printer
 } from 'lucide-react';
 import { vendors } from '@/lib/vendors-data';
 import { SHARED_EVENTS } from '@/lib/shared-data';
@@ -259,6 +259,21 @@ export default function EventVendorDetailPage() {
                         <div className="flex justify-between items-start">
                             <div>
                                 <h3 className="text-lg font-black tracking-tight">Service Agreement #{(vendor.id + eventId).substring(0, 8).toUpperCase()}</h3>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button variant="outline" size="sm" className="rounded-xl font-bold h-9">
+                                    <Share2 size={16} className="mr-2" />
+                                    Share
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="rounded-xl font-bold h-9 border-accent text-accent hover:bg-accent/5 gap-2"
+                                    onClick={() => typeof window !== 'undefined' && window.print()}
+                                >
+                                    <Printer size={16} />
+                                    Print
+                                </Button>
                             </div>
                         </div>
 
