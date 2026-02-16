@@ -3,18 +3,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { useRouter } from 'next/navigation';
 import {
     MapPin, Calendar, Users, Target, Clock, Rocket,
-    ChevronLeft, Share2, ChevronDown
+    ChevronLeft, Share2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EVENTS } from '@/lib/events-data';
 import PlanTab from '@/components/dashboard/event-tabs/PlanTab';
@@ -25,7 +18,6 @@ import InboxTab from '@/components/dashboard/event-tabs/InboxTab';
 
 export default function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
-    const router = useRouter();
     const event = EVENTS.find(e => e.id === id);
     const [activeTab, setActiveTab] = useState("overview");
 
@@ -63,30 +55,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
             <div className="space-y-6">
                 {/* Event title and basic info */}
                 <div className="space-y-2">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button className="group flex items-center gap-2 text-2xl font-bold text-foreground hover:text-primary transition-colors text-left outline-none">
-                                {event.name}
-                                <ChevronDown size={24} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-[300px] p-2 rounded-2xl">
-                            {EVENTS.map((e) => (
-                                <DropdownMenuItem
-                                    key={e.id}
-                                    onClick={() => router.push(`/dashboard/hosts/events/${e.id}`)}
-                                    className={`rounded-xl p-3 cursor-pointer ${e.id === event.id ? 'bg-primary/5 text-primary' : ''}`}
-                                >
-                                    <div className="flex flex-col gap-1">
-                                        <div className="font-bold">{e.name}</div>
-                                        <div className="text-[10px] uppercase font-black tracking-widest text-muted-foreground">
-                                            {e.date} • {e.location}
-                                        </div>
-                                    </div>
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <h1 className="text-2xl font-bold text-foreground">{event.name}</h1>
 
                     <div className="flex flex-wrap gap-4">
                         <div className="flex items-center gap-1 text-sm">

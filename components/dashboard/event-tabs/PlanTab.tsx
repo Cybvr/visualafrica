@@ -8,6 +8,35 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+
+const CATEGORIES = [
+    'Wedding',
+    'Corporate',
+    'Technology',
+    'Workshop',
+    'Outdoor',
+    'Traditional',
+    'Network'
+];
+
+const THEMES = [
+    'Nigerian Royalty',
+    'Modern Luxury',
+    'Modern Tech',
+    'Green Future',
+    'Hands-on Learning',
+    'Professional Networking',
+    'Grand Celebration',
+    'Classic Elegance'
+];
+
 interface PlanTabProps {
     event: Event;
 }
@@ -61,22 +90,34 @@ const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-muted-foreground">Event Categories</label>
-                            <Input
-                                type="text"
-                                defaultValue={event.categories?.join(', ')}
-                                placeholder="Wedding, Outdoor, Traditional..."
-                                className="bg-background border border-border focus-visible:ring-primary"
-                            />
+                            <label className="text-sm font-medium text-muted-foreground">Event Category</label>
+                            <Select defaultValue={event.categories?.[0]}>
+                                <SelectTrigger className="bg-background border border-border focus:ring-primary h-12 rounded-xl">
+                                    <SelectValue placeholder="Select a category" />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl">
+                                    {CATEGORIES.map((cat) => (
+                                        <SelectItem key={cat} value={cat} className="rounded-lg">
+                                            {cat}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-muted-foreground">Design Themes</label>
-                            <Input
-                                type="text"
-                                defaultValue={event.themes?.join(', ')}
-                                placeholder="Nigerian Royalty, Modern Luxury..."
-                                className="bg-background border border-border focus-visible:ring-primary"
-                            />
+                            <label className="text-sm font-medium text-muted-foreground">Design Theme</label>
+                            <Select defaultValue={event.themes?.[0]}>
+                                <SelectTrigger className="bg-background border border-border focus:ring-primary h-12 rounded-xl">
+                                    <SelectValue placeholder="Select a theme" />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl">
+                                    {THEMES.map((theme) => (
+                                        <SelectItem key={theme} value={theme} className="rounded-lg">
+                                            {theme}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="md:col-span-2 space-y-2">
                             <label className="text-sm font-medium text-muted-foreground">Event Description</label>
