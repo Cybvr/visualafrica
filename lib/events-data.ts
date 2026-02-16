@@ -16,10 +16,9 @@ export interface Event {
         amount: string;
         status: 'Pending' | 'Confirmed' | 'Paid';
     }[];
-    publicGallery?: string[];
-    metrics?: { label: string; value: string }[];
-    categories?: string[];
-    themes?: string[];
+    categories: string[];
+    themes: string[];
+    itinerary?: string;
 }
 
 export const EVENTS: Event[] = SHARED_EVENTS.map(event => ({
@@ -35,4 +34,5 @@ export const EVENTS: Event[] = SHARED_EVENTS.map(event => ({
     bookedVendors: event.bookedVendors,
     categories: event.categories,
     themes: event.themes,
+    itinerary: event.itinerary,
 }));

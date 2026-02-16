@@ -17,6 +17,9 @@ export interface EventData {
   thumbnail: string;
   publicGallery?: string[];
   metrics?: { label: string; value: string }[];
+  categories: string[];
+  themes: string[];
+  itinerary?: string;
 }
 
 export const MOCK_EVENTS: EventData[] = SHARED_EVENTS.map(event => ({
@@ -33,6 +36,9 @@ export const MOCK_EVENTS: EventData[] = SHARED_EVENTS.map(event => ({
   theme: 'Modern',
   showCommunityInspiration: true,
   thumbnail: event.image,
+  categories: event.categories,
+  themes: event.themes,
+  itinerary: event.itinerary,
 }));
 
 export const eventData: EventData = MOCK_EVENTS[0];

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-    ChevronLeft, Star, MapPin, CheckCircle2,
+    User, ChevronLeft, Star, MapPin, CheckCircle2,
     MessageSquare, Heart, Share2, Calendar,
     Zap, Video, Image as ImageIcon, XCircle,
     Clock, Send, FileText, Download, ShieldCheck
@@ -20,7 +20,6 @@ export default function EventVendorDetailPage() {
 
     const vendor = vendors.find(v => v.id === vendorId);
 
-    // Simulation logic for status and price (matching VendorsTab)
     const mockRequestData: Record<string, { status: string; price: string; date: string }> = {
         'v-venue-1': { status: 'Approved', price: '₦5,250,500', date: 'Oct 12, 2024' },
         'v-catering-1': { status: 'Deciding', price: '₦1,250,000', date: 'Oct 14, 2024' },
@@ -50,8 +49,8 @@ export default function EventVendorDetailPage() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 py-6 pb-24">
-            {/* Header / Breadcrumbs */}
+        <div className="max-w-6xl mx-auto space-y-6 py-6 pb-24">
+            {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <button
@@ -61,168 +60,139 @@ export default function EventVendorDetailPage() {
                         <ChevronLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="text-xl font-bold text-foreground">Vendor Request Details</h1>
-                        <p className="text-xs text-muted-foreground">Managing {vendor.name} for your event</p>
+                        <h1 className="text-xl font-bold text-foreground">{vendor.name}</h1>
+                        <p className="text-xs text-muted-foreground">{vendor.categories.join(', ')}</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border ${getStatusStyles(currentStatus)}`}>
-                        {currentStatus}
-                    </span>
-                    <Button variant="outline" size="icon" className="rounded-full">
-                        <Share2 size={18} />
-                    </Button>
-                </div>
+                <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border ${getStatusStyles(currentStatus)}`}>
+                    {currentStatus}
+                </span>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Left Column: Vendor Profile & Info (7/12) */}
-                <div className="lg:col-span-7 space-y-8">
-                    {/* Top Card: Quick Profile & Portfolio */}
-                    <div className="bg-card rounded-3xl border border-border overflow-hidden shadow-sm">
-                        <div className="p-8 space-y-6">
-                            <div className="flex items-start justify-between gap-6">
-                                <div className="space-y-4">
-                                    <div className="flex flex-wrap gap-2">
-                                        {vendor.categories.map(cat => (
-                                            <span key={cat} className="px-3 py-1 bg-secondary text-foreground rounded-full text-[10px] font-bold uppercase tracking-widest leading-none flex items-center">{cat}</span>
-                                        ))}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column - Vendor Details */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Vendor Profile */}
+                    <div className="bg-card rounded-2xl border border-border p-6 space-y-6">
+                        <div className="flex items-start gap-4">
+                            <div className="w-20 h-20 rounded-xl bg-secondary overflow-hidden shrink-0 border border-border">
+                                <img src={vendor.image} alt={vendor.name} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="flex-1 space-y-2">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-1">
+                                        <Star size={16} className="fill-primary text-primary" />
+                                        <span className="font-bold text-foreground">{vendor.rating}</span>
                                     </div>
-                                    <h2 className="text-3xl font-bold text-foreground leading-tight">{vendor.name}</h2>
-                                    <div className="flex items-center gap-6">
-                                        <div className="flex items-center gap-2">
-                                            <Star size={20} className="fill-primary text-primary" />
-                                            <span className="font-bold text-foreground">{vendor.rating}</span>
-                                            <span className="text-muted-foreground text-sm">Rating</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <MapPin size={20} className="text-muted-foreground" />
-                                            <span className="text-sm font-medium text-muted-foreground">{vendor.location}</span>
-                                        </div>
+                                    <div className="flex items-center gap-1 text-muted-foreground">
+                                        <MapPin size={16} />
+                                        <span className="text-sm">{vendor.location}</span>
                                     </div>
                                 </div>
-                                <div className="w-24 h-24 rounded-2xl bg-secondary overflow-hidden shrink-0 border border-border">
-                                    <img src={vendor.image} alt={vendor.name} className="w-full h-full object-cover" />
-                                </div>
-                            </div>
-
-                            <hr className="border-border/50" />
-
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Portfolio Highlights</h3>
-                                <div className="grid grid-cols-3 gap-3">
-                                    {vendor.portfolio.slice(0, 3).map(item => (
-                                        <div key={item.id} className="aspect-square rounded-xl overflow-hidden bg-secondary relative group cursor-pointer">
-                                            <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                {item.type === 'Video' ? <Video size={20} className="text-white" /> : <ImageIcon size={20} className="text-white" />}
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {vendor.gallery.slice(0, 3).map((img, idx) => (
-                                        <div key={idx} className="aspect-square rounded-xl overflow-hidden bg-secondary relative group cursor-pointer border border-border/50">
-                                            <img src={img.url} alt={vendor.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="space-y-4 pt-4">
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">About the Artist</h3>
-                                <p className="text-muted-foreground text-sm leading-relaxed">{vendor.description}</p>
+                                <p className="text-sm text-muted-foreground leading-relaxed">{vendor.description}</p>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Standard Package Info */}
-                    <div className="bg-card rounded-3xl border border-border p-8 space-y-6">
-                        <div className="flex items-center gap-2">
-                            <ShieldCheck size={20} className="text-primary" />
-                            <h3 className="text-lg font-bold">Standard Offering</h3>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {vendor.whatsIncluded.map((item, idx) => (
-                                <div key={idx} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                        <CheckCircle2 size={14} className="text-primary" />
-                                    </div>
-                                    {item}
+                        {/* Portfolio */}
+                        <div className="grid grid-cols-4 gap-2">
+                            {vendor.portfolio.slice(0, 4).map(item => (
+                                <div key={item.id} className="aspect-square rounded-lg overflow-hidden bg-secondary">
+                                    <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                                 </div>
                             ))}
                         </div>
+
+                        {/* What's Included */}
+                        <div className="space-y-3">
+                            <h3 className="text-sm font-bold text-muted-foreground">What's Included</h3>
+                            <div className="grid grid-cols-2 gap-2">
+                                {vendor.whatsIncluded.map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-2 text-sm">
+                                        <CheckCircle2 size={14} className="text-primary shrink-0" />
+                                        <span>{item}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Contract Section (If Approved) */}
-                    {currentStatus === 'Approved' && (
-                        <div className="bg-card rounded-3xl border border-primary/20 p-8 space-y-6 shadow-sm overflow-hidden relative">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full flex items-center justify-end p-6">
-                                <FileText size={40} className="text-primary/20" />
-                            </div>
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2 text-primary">
-                                    <FileText size={20} />
-                                    <h3 className="text-lg font-bold">Service Contract</h3>
+                    {/* Chat */}
+                    <div className="bg-card rounded-2xl border border-border overflow-hidden">
+                        <div className="p-4 border-b border-border">
+                            <h3 className="font-bold">Messages</h3>
+                        </div>
+
+                        <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
+                            <div className="flex gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                                    <User size={14} />
                                 </div>
-                                <p className="text-sm text-muted-foreground">Your contract with {vendor.name} is signed and active.</p>
+                                <div className="bg-secondary p-3 rounded-xl rounded-tl-none text-sm flex-1">
+                                    Hi! I've attached our initial quote. We've included 8 hours of coverage and a second shooter as requested.
+                                </div>
                             </div>
 
-                            <div className="flex items-center justify-between bg-secondary p-4 rounded-2xl border border-border">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-white border border-border flex items-center justify-center">
-                                        <FileText size={20} className="text-muted-foreground" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-bold text-foreground">Event_Service_Agreement.pdf</p>
-                                        <p className="text-[10px] text-muted-foreground font-medium uppercase">Last updated {request.date}</p>
-                                    </div>
+                            <div className="flex gap-3 justify-end">
+                                <div className="bg-primary text-white p-3 rounded-xl rounded-tr-none text-sm max-w-[80%]">
+                                    Thanks! Can we add an engagement session to this package?
                                 </div>
-                                <Button variant="ghost" size="sm" className="gap-2">
-                                    <Download size={14} />
-                                    View
+                            </div>
+
+                            <div className="flex gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                                    <User size={14} />
+                                </div>
+                                <div className="bg-secondary p-3 rounded-xl rounded-tl-none text-sm flex-1">
+                                    Absolutely! I've updated the price above. Let me know if you have questions!
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-4 border-t border-border">
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Type your message..."
+                                    className="flex-1 px-4 py-2 bg-secondary rounded-lg text-sm outline-none"
+                                />
+                                <Button size="icon" className="rounded-lg">
+                                    <Send size={16} />
                                 </Button>
                             </div>
                         </div>
-                    )}
+                    </div>
                 </div>
 
-                {/* Right Column: Actions & Inbox (5/12) */}
-                <div className="lg:col-span-5 space-y-8">
-                    {/* Action Bar / Pricing Card */}
-                    <div className="bg-card rounded-3xl border border-border p-8 space-y-8 shadow-sm">
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Quoted Price</p>
-                                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${getStatusStyles(currentStatus)}`}>
-                                    {currentStatus}
-                                </span>
-                            </div>
-                            <p className="text-4xl font-black text-foreground">{request.price}</p>
+                {/* Right Column - Sticky Pricing & Contract */}
+                <div className="lg:col-span-1">
+                    <div className="sticky top-6 bg-card rounded-2xl border border-border p-6 space-y-6">
+                        {/* Pricing */}
+                        <div>
+                            <p className="text-sm text-muted-foreground">Quoted Price</p>
+                            <p className="text-3xl font-black text-foreground">{request.price}</p>
+                            <p className="text-xs text-muted-foreground mt-1">Updated {request.date}</p>
                         </div>
 
-                        <div className="space-y-3">
+                        {/* Actions */}
+                        <div className="space-y-2">
                             {currentStatus === 'Deciding' ? (
                                 <>
                                     <Button
                                         onClick={() => setCurrentStatus('Approved')}
-                                        className="w-full h-14 rounded-2xl font-black text-lg gap-3 shadow-xl shadow-primary/20"
+                                        className="w-full h-12 rounded-xl font-bold gap-2"
                                     >
-                                        <CheckCircle2 size={24} />
-                                        Approve Quote
+                                        <CheckCircle2 size={20} />
+                                        Approve & Hire
                                     </Button>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <Button
-                                            variant="outline"
-                                            className="h-12 rounded-xl font-bold flex items-center gap-2"
-                                        >
-                                            <FileText size={18} />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <Button variant="outline" className="h-10 rounded-lg text-sm">
                                             Request Changes
                                         </Button>
                                         <Button
                                             variant="outline"
                                             onClick={() => setCurrentStatus('Rejected')}
-                                            className="h-12 rounded-xl font-bold border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 flex items-center gap-2"
+                                            className="h-10 rounded-lg text-sm text-red-600 border-red-200 hover:bg-red-50"
                                         >
-                                            <XCircle size={18} />
                                             Reject
                                         </Button>
                                     </div>
@@ -230,87 +200,47 @@ export default function EventVendorDetailPage() {
                             ) : currentStatus === 'Approved' ? (
                                 <Button
                                     variant="outline"
-                                    className="w-full h-14 rounded-2xl font-black text-lg gap-3 border-green-200 text-green-700 hover:bg-green-50"
+                                    className="w-full h-12 rounded-xl font-bold gap-2  text-green-700"
                                 >
-                                    <CheckCircle2 size={24} />
-                                    Hired & Active
+                                    <CheckCircle2 size={20} />
+                                    Hired
                                 </Button>
                             ) : (
                                 <Button
                                     variant="outline"
                                     onClick={() => setCurrentStatus('Deciding')}
-                                    className="w-full h-14 rounded-2xl font-black text-lg gap-3 border-red-200 text-red-600 hover:bg-red-50"
+                                    className="w-full h-12 rounded-xl font-bold gap-2 border-red-200 text-white"
                                 >
-                                    <XCircle size={24} />
-                                    Rejected Request (Reconsider)
+                                    <XCircle size={20} />
+                                    Rejected
                                 </Button>
                             )}
                         </div>
 
-                        <div className="pt-6 border-t border-border flex items-center justify-between text-xs font-bold text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                                <Clock size={14} className="text-primary" />
-                                <span>Wait Time: ~12 Hours</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <ShieldCheck size={14} className="text-green-500" />
-                                <span>Verified Partner</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Integrated Inbox */}
-                    <div className="bg-card rounded-3xl border border-border shadow-sm flex flex-col h-[600px] overflow-hidden">
-                        <div className="p-6 border-b border-border bg-secondary/30">
-                            <h3 className="font-bold text-foreground">Chat with {vendor.name.split(' ')[0]}</h3>
-                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-0.5 flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                                Typically responds within 4 hours
-                            </p>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/20">
-                            <div className="flex items-start gap-3 max-w-[85%]">
-                                <div className="w-8 h-8 rounded-lg bg-secondary text-foreground flex items-center justify-center text-[10px] font-bold shrink-0">
-                                    <User size={14} />
+                        {/* Contract (if approved) */}
+                        {currentStatus === 'Approved' && (
+                            <>
+                                <hr className="border-border" />
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2">
+                                        <FileText size={16} className="text-primary" />
+                                        <h3 className="font-bold text-sm">Contract</h3>
+                                    </div>
+                                    <div className="flex items-center justify-between bg-secondary p-3 rounded-lg">
+                                        <div className="flex items-center gap-2">
+                                            <FileText size={16} className="text-muted-foreground" />
+                                            <div>
+                                                <p className="text-xs font-medium">Agreement.pdf</p>
+                                                <p className="text-[10px] text-muted-foreground">{request.date}</p>
+                                            </div>
+                                        </div>
+                                        <Button variant="ghost" size="sm" className="h-8">
+                                            <Download size={14} />
+                                        </Button>
+                                    </div>
                                 </div>
-                                <div className="bg-card p-4 rounded-2xl rounded-tl-none border border-border shadow-sm text-sm text-foreground leading-relaxed font-medium">
-                                    Hi! I've attached our initial quote for the wedding photography. We've included 8 hours of coverage and a second shooter as requested.
-                                </div>
-                            </div>
-
-                            <div className="text-center">
-                                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest bg-white border border-border px-3 py-1 rounded-full">Yesterday</span>
-                            </div>
-
-                            <div className="flex items-start gap-3 justify-end">
-                                <div className="bg-primary p-4 rounded-2xl rounded-tr-none shadow-lg shadow-primary/10 text-sm text-foreground leading-relaxed max-w-[85%] font-bold">
-                                    Thanks! Looking good. Can we add an engagement session to this package?
-                                </div>
-                            </div>
-
-                            <div className="flex items-start gap-3 max-w-[85%]">
-                                <div className="w-8 h-8 rounded-lg bg-secondary text-foreground flex items-center justify-center text-[10px] font-bold shrink-0">
-                                    <User size={14} />
-                                </div>
-                                <div className="bg-card p-4 rounded-2xl rounded-tl-none border border-border shadow-sm text-sm text-foreground leading-relaxed font-medium">
-                                    Absolutely! I've updated the price above to reflect the additional session. Let me know if you have any other questions!
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="p-4 bg-card border-t border-border">
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    placeholder="Type your message..."
-                                    className="flex-1 px-4 py-3 bg-secondary border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                                />
-                                <Button size="icon" className="h-11 w-11 rounded-xl shadow-lg">
-                                    <Send size={18} />
-                                </Button>
-                            </div>
-                        </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

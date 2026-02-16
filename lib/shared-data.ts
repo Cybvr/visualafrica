@@ -22,11 +22,32 @@ export interface SharedEvent {
         status: 'New' | 'Contacted' | 'Qualified' | 'Closed';
         message: string;
     }[];
-    categories?: string[];
-    themes?: string[];
+    categories: string[];
+    themes: string[];
+    itinerary?: string;
 }
 
 export const SHARED_EVENTS: SharedEvent[] = [
+    {
+        id: '1',
+        hostName: 'Organizer Name', // Added hostName
+        eventName: 'Tech Conference 2025',
+        date: '2025-05-28',
+        location: 'Lagos, Nigeria',
+        guestCount: 500,
+        status: 'Confirmed',
+        image: 'https://images.unsplash.com/photo-1540575861501-7cf05a4b175a?auto=format&fit=crop&q=80',
+        budget: 5000000,
+        description: 'A large-scale technology conference focusing on AI and Fintech in Africa.',
+        bookedVendors: [
+            { vendorId: 'v-venue-1', service: 'Venues', amount: 'NGN 2,500,000', status: 'Confirmed' },
+            { vendorId: 'v-catering-1', service: 'Catering', amount: 'NGN 1,200,000', status: 'Pending' }
+        ],
+        leads: [], // Added leads
+        categories: ['Corporate', 'Technology', 'Network'],
+        themes: ['Modern Tech', 'Green Future'],
+        itinerary: '10:00 AM - Registration\n11:00 AM - Opening Keynote\n01:00 PM - Lunch Break\n02:00 PM - Panel Discussions'
+    },
     {
         id: 'ev-001',
         hostName: 'Chidi & Amaka',
