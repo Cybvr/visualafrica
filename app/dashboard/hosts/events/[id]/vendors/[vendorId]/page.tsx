@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
     User, ChevronLeft, Star, MapPin, CheckCircle2,
     MessageSquare, Heart, Share2, Calendar,
-    Zap, Video, Image as ImageIcon, XCircle,
+    Zap, Video, Image as ImageIcon, XCircle, Globe,
     Clock, Send, FileText, Download, ShieldCheck
 } from 'lucide-react';
 import { vendors } from '@/lib/vendors-data';
@@ -69,8 +69,26 @@ export default function EventVendorDetailPage() {
                     {/* Vendor Profile Card */}
                     <div className="bg-card rounded-[2.5rem] border border-border p-8 space-y-8 shadow-sm">
                         <div className="flex flex-col md:flex-row gap-8 items-start">
-                            <div className="w-32 h-32 rounded-3xl bg-secondary overflow-hidden shrink-0 border border-border shadow-inner">
-                                <img src={vendor.image} alt={vendor.name} className="w-full h-full object-cover" />
+                            <div className="space-y-4 shrink-0">
+                                <div className="w-32 h-32 rounded-3xl bg-secondary overflow-hidden border border-border shadow-inner">
+                                    <img src={vendor.image} alt={vendor.name} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="space-y-2 px-1">
+                                    <Link
+                                        href={`/vendors/${vendor.id}`}
+                                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+                                    >
+                                        <User size={12} />
+                                        Visit Page
+                                    </Link>
+                                    <a
+                                        href="#"
+                                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+                                    >
+                                        <Globe size={12} />
+                                        Visit Website
+                                    </a>
+                                </div>
                             </div>
 
                             <div className="flex-1 space-y-6 w-full">
@@ -128,20 +146,6 @@ export default function EventVendorDetailPage() {
                             </div>
                         </div>
 
-                        {/* Portfolio Grid - Re-integrated within card or immediately below */}
-                        <div className="pt-4 border-t border-border/50">
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4">Portfolio Preview</p>
-                            <div className="grid grid-cols-4 gap-4">
-                                {vendor.portfolio.slice(0, 4).map(item => (
-                                    <div key={item.id} className="aspect-square rounded-2xl overflow-hidden bg-secondary border border-border/50 hover:scale-[1.02] transition-transform cursor-pointer group relative">
-                                        <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <ImageIcon size={24} className="text-white" />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                     </div>
 
                     {/* Chat */}
