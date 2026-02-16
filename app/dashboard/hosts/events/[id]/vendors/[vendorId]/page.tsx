@@ -13,6 +13,9 @@ import { vendors } from '@/lib/vendors-data';
 import { SHARED_EVENTS } from '@/lib/shared-data';
 import { Button } from '@/components/ui/button';
 import JobWorkspace, { WorkspaceCard, StatusIndicator } from '@/components/dashboard/JobWorkspace';
+import JobChat from '@/components/dashboard/JobChat';
+import JobBrief from '@/components/dashboard/JobBrief';
+import { Event } from '@/lib/events-data';
 
 export default function EventVendorDetailPage() {
     const params = useParams();
@@ -21,10 +24,14 @@ export default function EventVendorDetailPage() {
     const vendorId = params.vendorId as string;
 
     const vendor = vendors.find(v => v.id === vendorId);
-
     const event = SHARED_EVENTS.find(e => e.id === eventId);
+
+    // Cast SharedEvent to Event for JobBrief
+    const eventBriefData = event as unknown as Event;
+
     const vendorBooking = event?.bookedVendors.find(bv => bv.vendorId === vendorId);
 
+    // ... items from mockRequestData ...
     const mockRequestData: Record<string, { status: string; price: string; date: string }> = {
         'v-venue-1': { status: 'Paid', price: '₦5,250,500', date: 'Oct 12, 2024' },
         'v-catering-1': { status: 'Deciding', price: '₦1,250,000', date: 'Oct 14, 2024' },
@@ -38,16 +45,44 @@ export default function EventVendorDetailPage() {
 
     const [currentStatus, setCurrentStatus] = useState(request.status);
 
-    if (!vendor) {
+    if (!vendor || !event) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-                <h1 className="text-2xl font-bold">Vendor not found</h1>
+                <h1 className="text-2xl font-bold">Data not found</h1>
                 <Button variant="outline" onClick={() => router.back()}>Go Back</Button>
             </div>
         );
     }
 
+    const mockMessages = [
+        {
+            id: '1',
+            senderId: 'vendor',
+            senderName: vendor.name,
+            text: "Hi! I've attached our initial quote. We've included 8 hours of coverage and a second shooter as requested.",
+            time: '10:30 AM',
+            isOwn: false
+        },
+        {
+            id: '2',
+            senderId: 'host',
+            senderName: 'You',
+            text: "Thanks! Can we add an engagement session to this package?",
+            time: '11:05 AM',
+            isOwn: true
+        },
+        {
+            id: '3',
+            senderId: 'vendor',
+            senderName: vendor.name,
+            text: "Absolutely! I've updated the price above. Let me know if you have questions!",
+            time: '11:45 AM',
+            isOwn: false
+        },
+    ];
+
     const contextCard = (
+        // ... previous contextCard implementation ...
         <WorkspaceCard className="space-y-6">
             <div className="flex flex-col md:flex-row gap-8 items-start">
                 <div className="space-y-4 shrink-0">
@@ -202,74 +237,17 @@ export default function EventVendorDetailPage() {
             id: 'inbox',
             label: 'Inbox',
             content: (
-                <WorkspaceCard className="overflow-hidden p-0">
-                    <div className="p-6 border-b border-border bg-secondary/10">
-                        <h3 className="font-serif font-black text-xl">Messages</h3>
-                    </div>
-
-                    <div className="p-8 space-y-8 min-h-[400px]">
-                        <div className="flex gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-                                <User size={14} />
-                            </div>
-                            <div className="bg-secondary p-3 rounded-xl rounded-tl-none text-sm flex-1">
-                                Hi! I've attached our initial quote. We've included 8 hours of coverage and a second shooter as requested.
-                            </div>
-                        </div>
-
-                        <div className="flex gap-3 justify-end">
-                            <div className="bg-primary text-white p-3 rounded-xl rounded-tr-none text-sm max-w-[80%]">
-                                Thanks! Can we add an engagement session to this package?
-                            </div>
-                        </div>
-
-                        <div className="flex gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-                                <User size={14} />
-                            </div>
-                            <div className="bg-secondary p-3 rounded-xl rounded-tl-none text-sm flex-1">
-                                Absolutely! I've updated the price above. Let me know if you have questions!
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="p-6 border-t border-border bg-secondary/5">
-                        <div className="flex gap-4">
-                            <input
-                                type="text"
-                                placeholder="Type your message..."
-                                className="flex-1 px-6 py-4 bg-background border border-border rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                            />
-                            <Button className="w-14 h-14 rounded-2xl shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
-                                <Send size={18} />
-                            </Button>
-                        </div>
-                    </div>
-                </WorkspaceCard>
+                <JobChat
+                    participant={{ name: vendor.name, image: vendor.image }}
+                    messages={mockMessages}
+                />
             )
         },
         {
             id: 'brief',
             label: 'Project Brief',
             content: (
-                <WorkspaceCard>
-                    <div className="space-y-8">
-                        <div>
-                            <h3 className="text-base font-black uppercase tracking-widest text-foreground mb-4">Event Description</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed font-medium">
-                                {event?.description || `Professional ${vendor.categories[0]} services for your special event. We handle all aspects of the service to ensure a seamless experience.`}
-                            </p>
-                        </div>
-                        {event?.itinerary && (
-                            <div>
-                                <h3 className="text-base font-black uppercase tracking-widest text-foreground mb-4">Itinerary</h3>
-                                <p className="text-sm text-muted-foreground leading-relaxed font-medium whitespace-pre-wrap">
-                                    {event.itinerary}
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                </WorkspaceCard>
+                <JobBrief event={eventBriefData} service={vendorBooking?.service} />
             )
         },
         {

@@ -8,6 +8,9 @@ import { SHARED_EVENTS } from '@/lib/shared-data';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 import VendorInboxTab from '@/components/dashboard/event-tabs/VendorInboxTab';
 import JobWorkspace, { WorkspaceCard, StatusIndicator } from '@/components/dashboard/JobWorkspace';
+import JobChat from '@/components/dashboard/JobChat';
+import JobBrief from '@/components/dashboard/JobBrief';
+import { Event } from '@/lib/events-data';
 
 export default function VendorJobDetailsPage() {
     const params = useParams();
@@ -17,13 +20,34 @@ export default function VendorJobDetailsPage() {
     const parts = id.split('-');
     const eventId = id.includes('-') ? parts.slice(1, -1).join('-') : id;
     const event = SHARED_EVENTS.find(e => e.id === eventId);
-    const [activeTab, setActiveTab] = useState("overview");
+
+    // Cast SharedEvent to Event for JobBrief
+    const eventBriefData = event as unknown as Event;
 
     if (!event || !booking) return notFound();
 
     const vendorBooking = event.bookedVendors.find(
         bv => bv.vendorId === VENDOR_DASHBOARD_DATA.currentVendorId
     );
+
+    const mockMessages = [
+        {
+            id: '1',
+            senderId: 'host',
+            senderName: event.hostName,
+            text: "Hello! Thank you so much for accepting our event booking. We're really looking forward to working with you.",
+            time: '10:30 AM',
+            isOwn: false
+        },
+        {
+            id: '2',
+            senderId: 'vendor',
+            senderName: 'You',
+            text: "Thank you! I've received the documents. I'm excited to be part of the event. I'll review everything and get back to you shortly.",
+            time: '11:15 AM',
+            isOwn: true
+        }
+    ];
 
     const contextCard = (
         <WorkspaceCard className="space-y-6">
@@ -116,33 +140,17 @@ export default function VendorJobDetailsPage() {
             id: 'inbox',
             label: 'Inbox',
             content: (
-                <div className="overflow-hidden bg-card rounded-[2rem] border border-border">
-                    <VendorInboxTab focusedEventId={event.id} />
-                </div>
+                <JobChat
+                    participant={{ name: event.hostName, image: event.image }}
+                    messages={mockMessages}
+                />
             )
         },
         {
             id: 'brief',
             label: 'Project Brief',
             content: (
-                <WorkspaceCard>
-                    <div className="space-y-8">
-                        <div>
-                            <h3 className="text-base font-black uppercase tracking-widest text-foreground mb-4">Event Description</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed font-medium">
-                                {event.description}
-                            </p>
-                        </div>
-                        {event.itinerary && (
-                            <div>
-                                <h3 className="text-base font-black uppercase tracking-widest text-foreground mb-4">Itinerary</h3>
-                                <p className="text-sm text-muted-foreground leading-relaxed font-medium whitespace-pre-wrap">
-                                    {event.itinerary}
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                </WorkspaceCard>
+                <JobBrief event={eventBriefData} service={vendorBooking?.service} />
             )
         },
         {
