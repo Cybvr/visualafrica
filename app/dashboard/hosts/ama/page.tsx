@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import { vendors } from "@/lib/vendors-data";
 import { BLOG_POSTS } from "@/lib/blog-data";
-import { solutions } from "@/lib/solutions-data";
 import { cn } from "@/lib/utils";
+
+// ── Constants ────────────────────────────────────────────
 
 const CITIES = [
     { name: "Lagos", flag: "🇳🇬", vibe: "Afrobeats · Aso-oke · Suya" },
@@ -34,44 +35,30 @@ const VENDOR_ACTIONS = [
     { id: "save", label: "Shortlist", icon: "🔖" },
 ];
 
+// ── Data Helpers ─────────────────────────────────────────
+
+function buildVendors(city: string) {
+    return vendors
+        .filter(v => v.location.toLowerCase().includes(city.toLowerCase()))
+        .map(v => ({
+            name: v.name,
+            type: v.categories[0],
+            tags: v.services.slice(0, 4),
+            price: v.price || "Contact for price",
+            rating: v.rating,
+            status: "Available",
+            statusColor: "hsl(var(--primary))",
+        }));
+}
+
 const ALL_VENDORS: Record<string, any[]> = {
-    Lagos: vendors.filter(v => v.location.toLowerCase().includes("lagos")).map(v => ({
-        name: v.name,
-        type: v.categories[0],
-        tags: v.services.slice(0, 4),
-        price: v.price || "Contact for price",
-        rating: v.rating,
-        status: "Available",
-        statusColor: "hsl(var(--primary))"
-    })),
-    Accra: vendors.filter(v => v.location.toLowerCase().includes("accra")).map(v => ({
-        name: v.name,
-        type: v.categories[0],
-        tags: v.services.slice(0, 4),
-        price: v.price || "Contact for price",
-        rating: v.rating,
-        status: "Available",
-        statusColor: "hsl(var(--primary))"
-    })),
-    Nairobi: vendors.filter(v => v.location.toLowerCase().includes("nairobi")).map(v => ({
-        name: v.name,
-        type: v.categories[0],
-        tags: v.services.slice(0, 4),
-        price: v.price || "Contact for price",
-        rating: v.rating,
-        status: "Available",
-        statusColor: "hsl(var(--primary))"
-    })),
-    "Cape Town": vendors.filter(v => v.location.toLowerCase().includes("cape town")).map(v => ({
-        name: v.name,
-        type: v.categories[0],
-        tags: v.services.slice(0, 4),
-        price: v.price || "Contact for price",
-        rating: v.rating,
-        status: "Available",
-        statusColor: "hsl(var(--primary))"
-    })),
+    Lagos: buildVendors("lagos"),
+    Accra: buildVendors("accra"),
+    Nairobi: buildVendors("nairobi"),
+    "Cape Town": buildVendors("cape town"),
 };
+
+// ── Market Data ──────────────────────────────────────────
 
 const MARKET_DATA: Record<string, any> = {
     Accra: {
@@ -105,7 +92,13 @@ const MARKET_DATA: Record<string, any> = {
     Lagos: {
         greeting: "Lagos — let's go. Tapped into the Lagos vendor network. Suya caterers, Afrobeats DJs, aso-oke stylists, waterfront venues. What are we planning?",
         capabilityResponses: {
-            vendor_search: { type: "vendor_cards", city: "Lagos", content: "Top vendors available in Lagos:", vendors: ALL_VENDORS.Lagos.slice(0, 3) },
+            vendor_search: {
+                type: "vendor_cards",
+                city: "Lagos",
+                content: "Top vendors available in Lagos:",
+                vendors: ALL_VENDORS.Lagos.slice(0, 3),
+                suggestions: [{ label: "Let Ama handle booking", action: "ama_run_vendor_flow" }]
+            },
             negotiate: {
                 type: "action", content: "Negotiating bundle across Lagos vendors:", actions: [
                     { label: "Contacting Mama Titi's for volume rate", status: "done" },
@@ -188,53 +181,50 @@ const MARKET_DATA: Record<string, any> = {
     }
 };
 
-const AMA_WEEKEND_START = {
-    role: "agent",
-    type: "text",
-    content: `Ama: On it.
-searching vendors in Lagos · Feb 7-9 · 12 people · ₦2M budget...
+// ── Ama Lagos Booking Flow Data ──────────────────────────
 
-Ama: Found 3 vendors. Quote requests sent.
-Vendor              Price   Status
-Zen Spa VI          ₦180k   Quote requested
-Nok by Alara        ₦350k   Quote requested
-Lagos Boat Club     ₦600k   Quote requested
-
-Allocated: ₦1.13M · Remaining: ₦870k
-Watching all three. If anyone goes quiet past 6hrs I'll pull in a replacement and let you know.`,
-};
-
-const AMA_WEEKEND_QUOTES_IN = {
-    role: "agent",
-    type: "text",
-    content: `3hrs later - Ama pings you:
-
-Ama: 2 of 3 quotes in.
-Zen Spa VI ₦180k · Feb 7, 10am-2pm · confirmed
-Lagos Boat Club ₦620k · Feb 8, 5-9pm · confirmed (sunset slot, ₦20k over original quote)
-Nok by Alara hasn't responded. I've already contacted Cécil Restaurant as backup - waiting on their quote.
-Contracts for Spa and Boat are ready to review.`,
-    suggestions: [
-        { label: "Approve Spa + Boat", action: "ama_approve_spa_boat" },
-        { label: "Reject Boat Price", action: "ama_reject_boat_price" },
-        { label: "See Cécil Details", action: "ama_see_cecil_details" },
-        { label: "Approve Spa + Boat · See Cécil Details", action: "ama_approve_and_cecil" },
+const AMA_LAGOS_FLOW = {
+    searchSummary: "searching vendors in Lagos · Feb 7–9 · 12 people · ₦2M budget...",
+    initialRows: [
+        { activity: "Spa", vendor: "Zen Spa VI", price: "₦180k", status: "Quote requested" },
+        { activity: "Dinner", vendor: "Nok by Alara", price: "₦350k", status: "Quote requested" },
+        { activity: "Boat", vendor: "Lagos Boat Club", price: "₦600k", status: "Quote requested" },
     ],
+    initialAllocated: "₦1.13M",
+    initialRemaining: "₦870k",
+    updateRows: [
+        { vendor: "Zen Spa VI", details: "₦180k · Feb 7, 10am–2pm · confirmed" },
+        { vendor: "Lagos Boat Club", details: "₦620k · Feb 8, 5–9pm · confirmed (sunset slot, ₦20k over original quote)" },
+    ],
+    backupVendor: "Cécil Restaurant — Private terrace · seats 16 · Feb 8 available · ₦280k",
+    itineraryRows: [
+        { time: "Feb 7, 10am", activity: "Spa Day", vendor: "Zen Spa VI", cost: "₦180k" },
+        { time: "Feb 8, 7pm", activity: "Dinner", vendor: "Cécil Restaurant", cost: "₦280k" },
+        { time: "Feb 8, 5pm", activity: "Boat Party", vendor: "Lagos Boat Club", cost: "₦620k" },
+    ],
+    finalTotal: "₦1.08M",
+    finalRemaining: "₦920k",
 };
+
+// ── Initial Messages ─────────────────────────────────────
 
 const INITIAL_MESSAGES = [
     {
         id: 1,
+        role: "agent",
+        type: "text",
+        content: "Hi, I'm ama, your diaspora event agent. I find vendors, negotiate deals, manage bookings, and coordinate events. What would you like to do? ✨",
         time: "9:01 AM",
-        ...AMA_WEEKEND_START,
         suggestions: [
-            { label: "Swap a Vendor", action: "ama_swap_vendor" },
-            { label: "Add Activity", action: "ama_add_activity" },
-        ],
+            { label: "Create Event", action: "start_planning" },
+            { label: "Vendor Search", action: "start_vendor_search" },
+            { label: "RSVP Blast", action: "capability", capId: "rsvp" }
+        ]
     }
 ];
 
-// ── Dots ────────────────────────────────────────────────
+// ── UI Components ────────────────────────────────────────
+
 function Dots() {
     return (
         <div style={{ display: "flex", gap: 4 }}>
@@ -245,8 +235,6 @@ function Dots() {
     );
 }
 
-// ── CityBadge ────────────────────────────────────────────
-// ── CityBadge ────────────────────────────────────────────
 function CityBadge({ city }: { city: string }) {
     const color = CITY_COLORS[city] || "hsl(var(--muted-foreground))";
     return (
@@ -258,7 +246,6 @@ function CityBadge({ city }: { city: string }) {
     );
 }
 
-// ── SuggestionBubble ─────────────────────────────────────
 function SuggestionBubble({ label, onClick }: { label: string; onClick: () => void }) {
     return (
         <button
@@ -270,7 +257,6 @@ function SuggestionBubble({ label, onClick }: { label: string; onClick: () => vo
     );
 }
 
-// ── KnowledgeCard ────────────────────────────────────────
 function KnowledgeCard({ item }: { item: any }) {
     const isBlog = !!item.author;
     return (
@@ -296,7 +282,6 @@ function KnowledgeCard({ item }: { item: any }) {
     );
 }
 
-// ── EventForm ────────────────────────────────────────────
 function EventForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     const [data, setData] = useState({ name: "", guests: "", budget: "" });
     return (
@@ -336,7 +321,6 @@ function EventForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     );
 }
 
-// ── CalendarPicker ───────────────────────────────────────
 function CalendarPicker({ onSelect }: { onSelect: (date: string) => void }) {
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
     const [selected, setSelected] = useState<number | null>(null);
@@ -352,7 +336,6 @@ function CalendarPicker({ onSelect }: { onSelect: (date: string) => void }) {
                 ))}
             </div>
             <div className="grid grid-cols-7 gap-1">
-                {/* Simplified calendar for August 2026 - starts on Saturday */}
                 {Array.from({ length: 6 }).map((_, i) => <div key={`empty-${i}`} />)}
                 {days.map(d => (
                     <button
@@ -371,8 +354,6 @@ function CalendarPicker({ onSelect }: { onSelect: (date: string) => void }) {
     );
 }
 
-// ── CityPicker ───────────────────────────────────────────
-// ── CityPicker ───────────────────────────────────────────
 function CityPicker({ onSelect, activeCity }: { onSelect: (city: string) => void; activeCity: string | null }) {
     return (
         <div className="flex flex-col gap-2 max-w-[300px]">
@@ -401,8 +382,6 @@ function CityPicker({ onSelect, activeCity }: { onSelect: (city: string) => void
     );
 }
 
-// ── Vendor Action Menu ───────────────────────────────────
-// ── Vendor Action Menu ───────────────────────────────────
 function VendorActionMenu({ vendor, onClose, onSave, isSaved, onAction }: { vendor: any; onClose: () => void; onSave: (v: any) => void; isSaved: boolean; onAction: (a: any, v: any) => void }) {
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -435,8 +414,6 @@ function VendorActionMenu({ vendor, onClose, onSave, isSaved, onAction }: { vend
     );
 }
 
-// ── VCard ────────────────────────────────────────────────
-// ── VCard ────────────────────────────────────────────────
 function VCard({ v, savedVendors, onSave, onAction }: { v: any; savedVendors: Set<string>; onSave: (v: any) => void; onAction: (a: any, v: any) => void }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const isSaved = savedVendors.has(v.name);
@@ -477,14 +454,11 @@ function VCard({ v, savedVendors, onSave, onAction }: { v: any; savedVendors: Se
                     onAction={(action, vendor) => { onAction(action, vendor); if (action.id !== "save") setMenuOpen(false); }}
                 />
             )}
-            {!menuOpen && <div style={{ marginBottom: 0 }} />}
         </div>
     );
 }
 
-// ── VendorCardMsg ────────────────────────────────────────
-// ── VendorCardMsg ────────────────────────────────────────
-function VendorCardMsg({ msg, savedVendors, onSave, onAction, activeCity }: { msg: any; savedVendors: Set<string>; onSave: (v: any) => void; onAction: (a: any, v: any) => void; activeCity: string | null }) {
+function VendorCardMsg({ msg, savedVendors, onSave, onVendorAction, activeCity }: { msg: any; savedVendors: Set<string>; onSave: (v: any) => void; onVendorAction: (a: any, v: any) => void; activeCity: string | null }) {
     const allForCity = activeCity ? ALL_VENDORS[activeCity] : [];
     const [expanded, setExpanded] = useState(false);
     const shown = expanded ? allForCity : msg.vendors;
@@ -497,7 +471,7 @@ function VendorCardMsg({ msg, savedVendors, onSave, onAction, activeCity }: { ms
                 <div style={{ color: "#F0EDE6", fontSize: 14 }}>{msg.content}</div>
             </div>
             {shown.map((v: any) => (
-                <VCard key={v.name} v={v} savedVendors={savedVendors} onSave={onSave} onAction={onAction} />
+                <VCard key={v.name} v={v} savedVendors={savedVendors} onSave={onSave} onAction={onVendorAction} />
             ))}
             {hasMore && (
                 <button onClick={() => setExpanded(e => !e)} style={{
@@ -516,8 +490,6 @@ function VendorCardMsg({ msg, savedVendors, onSave, onAction, activeCity }: { ms
     );
 }
 
-// ── Step ─────────────────────────────────────────────────
-// ── Step ─────────────────────────────────────────────────
 function Step({ a }: { a: any }) {
     const m = { done: { i: "✓", c: "#20C9A0" }, active: { i: "◌", c: "#E8A020" }, queued: { i: "○", c: "#3A3A5A" } };
     const { i, c } = m[a.status as 'done' | 'active' | 'queued'] || { i: "○", c: "#3A3A5A" };
@@ -529,9 +501,56 @@ function Step({ a }: { a: any }) {
     );
 }
 
-// ── Msg ──────────────────────────────────────────────────
-// ── Msg ──────────────────────────────────────────────────
-function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onAction, onSuggestion }: { msg: any; onSelectCity: (city: string) => void; activeCity: string | null; savedVendors: Set<string>; onSave: (v: any) => void; onAction: (data: any) => void; onSuggestion: (s: any) => void }) {
+function AmaFlowCard({ msg }: { msg: any }) {
+    const tableHeaders = msg.columns || [];
+    const tableRows = msg.rows || [];
+    return (
+        <div className="bg-card/90 border border-border rounded-2xl p-3.5 shadow-sm w-full space-y-2.5">
+            {msg.kicker && <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-bold">{msg.kicker}</div>}
+            {msg.content && <div className="text-foreground text-[13px] leading-relaxed whitespace-pre-line">{msg.content}</div>}
+            {msg.meta && <div className="text-[12px] text-primary font-medium">{msg.meta}</div>}
+
+            {tableHeaders.length > 0 && tableRows.length > 0 && (
+                <div className="rounded-xl border border-border overflow-hidden">
+                    <div
+                        className="grid bg-secondary/60 px-2.5 py-2 text-[11px] font-bold text-muted-foreground"
+                        style={{ gridTemplateColumns: `repeat(${tableHeaders.length}, minmax(0, 1fr))` }}
+                    >
+                        {tableHeaders.map((h: string) => <span key={h}>{h}</span>)}
+                    </div>
+                    {tableRows.map((row: string[], idx: number) => (
+                        <div
+                            key={`${row.join("-")}-${idx}`}
+                            className="grid px-2.5 py-2 text-[12px] border-t border-border"
+                            style={{ gridTemplateColumns: `repeat(${tableHeaders.length}, minmax(0, 1fr))` }}
+                        >
+                            {row.map((cell, cIdx) => <span key={`${cell}-${cIdx}`} className="text-foreground">{cell}</span>)}
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {msg.footer && <div className="text-[12px] text-muted-foreground font-medium">{msg.footer}</div>}
+        </div>
+    );
+}
+
+// ── Msg Component ────────────────────────────────────────
+// Each message type is handled explicitly with its own typed callback.
+
+interface MsgProps {
+    msg: any;
+    onSelectCity: (city: string) => void;
+    activeCity: string | null;
+    savedVendors: Set<string>;
+    onSave: (v: any) => void;
+    onVendorAction: (a: any, v: any) => void;
+    onFormSubmit: (data: any) => void;
+    onCalendarSelect: (date: string) => void;
+    onSuggestion: (s: any) => void;
+}
+
+function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onFormSubmit, onCalendarSelect, onSuggestion }: MsgProps) {
     const ag = msg.role === "agent";
     return (
         <div className={cn("flex gap-2 mb-4", ag ? "flex-row items-end" : "flex-row-reverse items-end")}>
@@ -550,12 +569,14 @@ function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onAction, on
                         <Dots /><div className="mt-1.5 text-muted-foreground text-xs italic">{msg.content}</div>
                     </div>
                 ) : msg.type === "vendor_cards" ? (
-                    <VendorCardMsg msg={msg} savedVendors={savedVendors} onSave={onSave} onAction={onAction} activeCity={activeCity} />
+                    <VendorCardMsg msg={msg} savedVendors={savedVendors} onSave={onSave} onVendorAction={onVendorAction} activeCity={activeCity} />
                 ) : msg.type === "action" ? (
                     <div className="bg-card/80 border border-border rounded-2xl p-3.5 shadow-sm w-full">
                         <div className="text-foreground text-[13px] font-medium mb-2.5">{msg.content}</div>
                         {msg.actions.map((a: any, idx: number) => <Step key={idx} a={a} />)}
                     </div>
+                ) : msg.type === "ama_flow_card" ? (
+                    <AmaFlowCard msg={msg} />
                 ) : msg.type === "knowledge" ? (
                     <div className="space-y-2">
                         {msg.content && <div className="bg-card border border-border rounded-2xl px-3.5 py-2 text-[14px] leading-relaxed shadow-sm rounded-bl-none text-foreground">{msg.content}</div>}
@@ -564,12 +585,12 @@ function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onAction, on
                 ) : msg.type === "event_form" ? (
                     <div className="space-y-2">
                         {msg.content && <div className="bg-card border border-border rounded-2xl px-3.5 py-2 text-[14px] leading-relaxed shadow-sm rounded-bl-none text-foreground">{msg.content}</div>}
-                        <EventForm onSubmit={onAction} />
+                        <EventForm onSubmit={onFormSubmit} />
                     </div>
                 ) : msg.type === "calendar_picker" ? (
                     <div className="space-y-2">
                         {msg.content && <div className="bg-card border border-border rounded-2xl px-3.5 py-2 text-[14px] leading-relaxed shadow-sm rounded-bl-none text-foreground">{msg.content}</div>}
-                        <CalendarPicker onSelect={onAction} />
+                        <CalendarPicker onSelect={onCalendarSelect} />
                     </div>
                 ) : msg.content ? (
                     <div className={cn(
@@ -593,28 +614,35 @@ function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onAction, on
 }
 
 // ── App ──────────────────────────────────────────────────
+
 export default function App() {
-    const [messages, setMessages] = useState<any[]>(INITIAL_MESSAGES);
+    const [messages, setMessages] = useState<any[]>(INITIAL_MESSAGES as any[]);
     const [input, setInput] = useState("");
     const [typing, setTyping] = useState(false);
     const [activeCity, setActiveCity] = useState<string | null>(null);
-    const [activeCapability, setActiveCapability] = useState<string | null>(null);
     const [savedVendors, setSavedVendors] = useState<Set<string>>(new Set());
-    const ref = useRef<HTMLDivElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => { ref.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, typing]);
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setMessages(prev => {
-                const alreadySent = prev.some(m => m?.suggestions?.some((s: any) => s.action === "ama_approve_and_cecil"));
-                if (alreadySent) return prev;
-                return [...prev, { id: Date.now(), time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), ...AMA_WEEKEND_QUOTES_IN }];
-            });
-        }, 2200);
-        return () => clearTimeout(timer);
-    }, []);
+    useEffect(() => { scrollRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, typing]);
 
     const market = activeCity ? MARKET_DATA[activeCity] : null;
+
+    // ── Message helpers ──────────────────────────────────
+
+    const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    const addMsg = (msg: any) => setMessages(prev => [...prev, { id: Date.now(), time: now(), ...msg }]);
+
+    const addUserMsg = (content: string) => addMsg({ role: "user", type: "text", content });
+
+    const addAgentMsg = (msg: any) => addMsg({ role: "agent", ...msg });
+
+    const withTyping = (delayMs: number, fn: () => void) => {
+        setTyping(true);
+        setTimeout(() => { setTyping(false); fn(); }, delayMs);
+    };
+
+    // ── Vendor handlers ──────────────────────────────────
 
     const handleSaveVendor = (vendor: any) => {
         setSavedVendors(prev => {
@@ -625,8 +653,7 @@ export default function App() {
     };
 
     const handleVendorAction = (action: any, vendor: any) => {
-        if (action.id === "save") return; // handled by save toggle
-        const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        if (action.id === "save") return;
         const responses: Record<string, any> = {
             message: {
                 type: "action", content: `Sending message to ${vendor.name}:`, actions: [
@@ -652,42 +679,39 @@ export default function App() {
         };
         const r = responses[action.id];
         if (!r) return;
-        setMessages(p => [...p,
-        { id: Date.now(), role: "user", type: "text", content: `${action.label} — ${vendor.name}`, time: now },
-        { id: Date.now() + 1, role: "agent", time: now, ...r }
-        ]);
+        addUserMsg(`${action.label} — ${vendor.name}`);
+        addAgentMsg(r);
     };
+
+    // ── City selection ───────────────────────────────────
 
     const handleSelectCity = (cityName: string) => {
         if (activeCity === cityName) return;
         setActiveCity(cityName);
-        setActiveCapability(null);
-        const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         const data = MARKET_DATA[cityName];
-        const newMsg = {
-            id: Date.now(),
-            role: "agent",
+        addAgentMsg({
             type: "text",
             content: data.greeting,
-            time: now,
             suggestions: [
                 { label: "🔍 Show me vendors", action: "vendor_search" },
                 { label: "📖 See the local guide", action: "show_guide", city: cityName },
                 { label: "✨ Start Planning", action: "start_planning", city: cityName }
             ]
-        };
-        setMessages(p => [...p, newMsg]);
+        });
     };
 
+    // ── Capability handler ───────────────────────────────
+
     const handleCapability = (cap: any) => {
+        if (!cap) return;
+
         if (!market) {
-            const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-            setMessages(p => {
-                const hasOpen = p.some(m => m.type === "city_picker");
-                if (hasOpen) return p;
-                return [...p,
-                { id: Date.now(), role: "agent", type: "text", content: "Where is the event? Pick a city first.", time: now },
-                { id: Date.now() + 1, role: "agent", type: "city_picker", content: null, time: now }
+            setMessages(prev => {
+                if (prev.some(m => m.type === "city_picker")) return prev;
+                return [
+                    ...prev,
+                    { id: Date.now(), role: "agent", type: "text", content: "Where is the event? Pick a city first.", time: now() },
+                    { id: Date.now() + 1, role: "agent", type: "city_picker", content: null, time: now() }
                 ];
             });
             return;
@@ -698,8 +722,6 @@ export default function App() {
             return;
         }
 
-        setActiveCapability(cap.id);
-        const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         const labels: Record<string, string> = {
             vendor_search: `Find vendors in ${activeCity}`,
             negotiate: `Negotiate deals in ${activeCity}`,
@@ -707,230 +729,232 @@ export default function App() {
             rsvp: `Send RSVP blast for ${activeCity} event`,
             budget: `Show ${activeCity} budget breakdown`
         };
-        setMessages(p => [...p, { id: Date.now(), role: "user", type: "text", content: labels[cap.id], time: now }]);
-        setTyping(true);
-        setTimeout(() => {
-            setTyping(false);
+        addUserMsg(labels[cap.id] || `Run ${cap.id}`);
+        withTyping(1400, () => {
             const r = market.capabilityResponses[cap.id];
-            setMessages(p => [...p, { id: Date.now() + 1, role: "agent", time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), ...r }]);
-        }, 1400);
+            addAgentMsg(r);
+        });
     };
 
-    const handleSuggestion = (s: any) => {
-        if (s.action === "ama_swap_vendor") {
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "text",
-                content: "Ama: On it. I can replace Nok by Alara right now with Cécil Restaurant at ₦280k and keep your dinner slot secure.",
-                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-                suggestions: [
-                    { label: "Use Cécil Instead", action: "ama_book_cecil" },
-                    { label: "Wait for Nok", action: "ama_wait_for_nok" }
-                ]
-            }]);
-        } else if (s.action === "ama_add_activity") {
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "text",
-                content: "Ama: Nice. I can add brunch, nightlife, or a private city tour and keep total spend inside your ₦2M cap.",
-                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-                suggestions: [
-                    { label: "Add Brunch", action: "text_reply", text: "Add brunch options in Lagos." },
-                    { label: "Add Nightlife", action: "text_reply", text: "Add nightlife options in Lagos." }
-                ]
-            }]);
-        } else if (s.action === "ama_approve_spa_boat") {
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "text",
-                content: "Ama: Spa and Boat are approved. I can now lock both and send deposit reminders.",
-                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-                suggestions: [{ label: "See Cécil Details", action: "ama_approve_and_cecil" }]
-            }]);
-        } else if (s.action === "ama_reject_boat_price") {
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "text",
-                content: "Ama: Understood. I'll push Lagos Boat Club back to ₦600k and ask for a revised quote before we sign.",
-                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-                suggestions: [
-                    { label: "Hold the Sunset Slot", action: "text_reply", text: "Hold the slot and negotiate." },
-                    { label: "Find Another Boat", action: "text_reply", text: "Find another boat option." }
-                ]
-            }]);
-        } else if (s.action === "ama_see_cecil_details" || s.action === "ama_approve_and_cecil") {
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "text",
-                content: `Ama: Spa and Boat locked. Deposit reminders scheduled. Both vendors have been sent the weekend timeline.
-Cécil Restaurant - Private terrace · seats 16 · Feb 8 available · ₦280k
-₦70k cheaper than Nok. I'd book it.`,
-                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-                suggestions: [
-                    { label: "Book Cécil", action: "ama_book_cecil" },
-                    { label: "Wait for Nok", action: "ama_wait_for_nok" },
-                    { label: "See Other Options", action: "ama_other_options" }
-                ]
-            }]);
-        } else if (s.action === "ama_wait_for_nok") {
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "text",
-                content: "Ama: Waiting on Nok. I'll keep Cécil warm for 4 hours so we don't lose the terrace.",
-                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            }]);
-        } else if (s.action === "ama_other_options") {
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "text",
-                content: "Ama: I can pull two more dinner backups in Ikoyi and VI in the next 15 minutes.",
-                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-                suggestions: [
-                    { label: "Show Backups", action: "text_reply", text: "Show dinner backups in Ikoyi and VI." },
-                    { label: "Book Cécil", action: "ama_book_cecil" }
-                ]
-            }]);
-        } else if (s.action === "ama_book_cecil") {
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "text",
-                content: `Ama: All three vendors confirmed. Here's your weekend.
-Time            Activity      Vendor              Cost
-Feb 7, 10am     Spa Day       Zen Spa VI          ₦180k
-Feb 8, 7pm      Dinner        Cécil Restaurant    ₦280k
-Feb 8, 5pm      Boat Party    Lagos Boat Club     ₦620k
+    // ── Ama booking flow ─────────────────────────────────
 
-Total: ₦1.08M · Remaining: ₦920k
-Monitoring all vendors until event day. I'll flag anything that changes.`,
-                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    const startAmaVendorFlow = () => {
+        addAgentMsg({
+            type: "ama_flow_card",
+            kicker: "Ama",
+            content: `On it.\n${AMA_LAGOS_FLOW.searchSummary}\n\nFound 3 vendors. Quote requests sent.`,
+            columns: ["Activity", "Vendor", "Price", "Status"],
+            rows: AMA_LAGOS_FLOW.initialRows.map(r => [r.activity, r.vendor, r.price, r.status]),
+            meta: `Allocated: ${AMA_LAGOS_FLOW.initialAllocated} · Remaining: ${AMA_LAGOS_FLOW.initialRemaining}`,
+            footer: "Watching all three. If anyone goes quiet past 6hrs I'll pull in a replacement and let you know.",
+            suggestions: [
+                { label: "Swap a Vendor", action: "ama_swap_vendor" },
+                { label: "Add Activity", action: "ama_add_activity" },
+            ],
+        });
+
+        withTyping(1800, () => {
+            addAgentMsg({
+                type: "ama_flow_card",
+                kicker: "3hrs later — Ama pings you",
+                content: "2 of 3 quotes in.",
+                columns: ["Vendor", "Update"],
+                rows: AMA_LAGOS_FLOW.updateRows.map(r => [r.vendor, r.details]),
+                footer: "Nok by Alara hasn't responded. I've already contacted Cécil Restaurant as backup — waiting on their quote.\nContracts for Spa and Boat are ready to review.",
                 suggestions: [
-                    { label: "Share Itinerary", action: "ama_share_itinerary" },
-                    { label: "Add Activity", action: "ama_add_activity" },
-                    { label: "View Contracts", action: "ama_view_contracts" }
+                    { label: "Approve Spa + Boat", action: "ama_approve_spa_boat" },
+                    { label: "Reject Boat Price", action: "ama_reject_boat_price" },
+                    { label: "See Cécil Details", action: "ama_see_cecil" },
+                ],
+            });
+        });
+    };
+
+    // ── Free-text send ───────────────────────────────────
+
+    const send = (text: string) => {
+        if (!text.trim()) return;
+        addUserMsg(text);
+        setInput("");
+        withTyping(1200, () => {
+            const reply = market
+                ? { type: "text", content: `On it — checking ${activeCity} vendors for that now.` }
+                : { type: "text", content: "Sure — just pick a city first so I can pull the right vendor network." };
+            addAgentMsg(reply);
+        });
+    };
+
+    // ── Form & calendar handlers ─────────────────────────
+
+    const handleCalendarSelect = (date: string) => {
+        withTyping(800, () => {
+            addAgentMsg({
+                type: "event_form",
+                content: `Perfect. I've noted down ${date}. One last step to get you accurate quotes:`,
+            });
+        });
+    };
+
+    const handleFormSubmit = (data: any) => {
+        withTyping(1500, () => {
+            addAgentMsg({
+                type: "text",
+                content: `Done! ${data.name} is now on my radar for ${activeCity}. I've pencilled in a budget of ${data.budget} for ${data.guests} guests. \n\nI'm reaching out to vendors now to get initial quotes based on your date. 🚀`,
+                suggestions: [
+                    { label: "🔍 Show me matching vendors", action: "vendor_search" },
+                    { label: "💰 Review budget breakdown", action: "capability", capId: "budget" },
+                    ...(activeCity === "Lagos" ? [{ label: "Let Ama handle booking", action: "ama_run_vendor_flow" }] : []),
                 ]
-            }]);
-        } else if (s.action === "ama_share_itinerary") {
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "text",
-                content: "Ama: Itinerary share link is ready. Sending now to your 12 guests.",
-                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            }]);
-        } else if (s.action === "ama_view_contracts") {
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "text",
-                content: "Ama: Contracts for Zen Spa VI, Cécil Restaurant, and Lagos Boat Club are ready in your review queue.",
-                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            }]);
-        } else if (s.action === "vendor_search") {
-            handleCapability(CAPABILITIES[1]); // vendor_search is now index 1
-        } else if (s.action === "start_planning") {
-            setTyping(true);
-            setTimeout(() => {
-                setTyping(false);
+            });
+        });
+    };
+
+    // ── Suggestion dispatch map ──────────────────────────
+    // Each action string maps to a focused handler. No more if/else chains.
+
+    const SUGGESTION_HANDLERS: Record<string, (s: any) => void> = {
+        // Open city picker then search vendors
+        start_vendor_search: () => {
+            addAgentMsg({ type: "city_picker", content: "Sure, let's find some vendors. Which city are we looking at?" });
+        },
+
+        // Shortcut: vendor_search = run vendor_search capability
+        vendor_search: () => handleCapability(CAPABILITIES.find(c => c.id === "vendor_search")),
+
+        // Show calendar → form → confirmation
+        start_planning: (s) => {
+            withTyping(800, () => {
                 const venue = s.city === "Lagos" ? "Lekki Terrace" : s.city === "Accra" ? "Labadi Beach" : s.city === "Nairobi" ? "Safari Club" : "the estate";
-                setMessages(prev => [...prev, {
-                    id: Date.now(),
-                    role: "agent",
-                    type: "calendar_picker",
-                    content: `Pick a date and I'll check availability for ${venue}...`,
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                }]);
-            }, 800);
-        } else if (s.action === "start_vendor_search") {
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "city_picker",
-                content: "Sure, let's find some vendors. Which city are we looking at?",
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            }]);
-        } else if (s.action === "show_guide") {
-            setTyping(true);
-            setTimeout(() => {
-                setTyping(false);
+                addAgentMsg({ type: "calendar_picker", content: `Pick a date and I'll check availability for ${venue}...` });
+            });
+        },
+
+        // Show local blog guide
+        show_guide: (s) => {
+            withTyping(1000, () => {
                 const guide = BLOG_POSTS.find(b => b.title.toLowerCase().includes(s.city.toLowerCase())) || BLOG_POSTS[1];
-                const newMsg = {
-                    id: Date.now(),
-                    role: "agent",
+                addAgentMsg({
                     type: "knowledge",
                     content: `Here's the inside scoop on ${s.city}. We've vetted these spots specifically for the diaspora community.`,
                     data: guide,
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     suggestions: [
                         { label: "🔍 Now find vendors", action: "vendor_search" },
                         { label: "💰 Help with budget", action: "capability", capId: "budget" },
                         { label: "✨ Start Planning", action: "start_planning", city: s.city }
                     ]
-                };
-                setMessages(prev => [...prev, newMsg]);
-            }, 1000);
-        } else if (s.action === "capability") {
-            handleCapability(CAPABILITIES.find(c => c.id === s.capId));
-        } else if (s.action === "text_reply") {
-            send(s.text);
-        }
-    };
+                });
+            });
+        },
 
-    const handleCalendarSelect = (date: string) => {
-        setTyping(true);
-        setTimeout(() => {
-            setTyping(false);
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "event_form",
-                content: `Perfect. I've noted down ${date}. One last step to get you accurate quotes:`,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            }]);
-        }, 800);
-    };
+        // Run a named capability (rsvp, budget, etc.)
+        capability: (s) => handleCapability(CAPABILITIES.find(c => c.id === s.capId)),
 
-    const handleFormSubmit = (data: any) => {
-        setTyping(true);
-        setTimeout(() => {
-            setTyping(false);
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                role: "agent",
-                type: "text",
-                content: `Done! ${data.name} is now on my radar for ${activeCity}. I've pencilled in a budget of ${data.budget} for ${data.guests} guests. \n\nI'm reaching out to vendors now to get initial quotes based on your date. 🚀`,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        // Hand off to Ama's full booking flow
+        ama_run_vendor_flow: (s) => {
+            addUserMsg(s.label || "Let Ama handle booking");
+            startAmaVendorFlow();
+        },
+
+        // Ama flow: swap a vendor
+        ama_swap_vendor: () => {
+            addUserMsg("Swap a Vendor");
+            addAgentMsg({ type: "text", content: "Swapping now. I'll keep Zen Spa VI and Lagos Boat Club, then source one dinner replacement under ₦350k." });
+        },
+
+        // Ama flow: add an activity
+        ama_add_activity: () => {
+            addUserMsg("Add Activity");
+            addAgentMsg({ type: "text", content: "Send me the activity type and ideal time window. I'll source options and fit it into the current budget." });
+        },
+
+        // Ama flow: approve spa + boat, show Cécil backup
+        ama_approve_spa_boat: () => {
+            addUserMsg("Approve Spa + Boat · See Cécil Details");
+            addAgentMsg({
+                type: "ama_flow_card",
+                kicker: "Ama",
+                content: "Spa and Boat locked. Deposit reminders scheduled. Both vendors have been sent the weekend timeline.",
+                columns: ["Backup Option", "Details"],
+                rows: [["Cécil Restaurant", "Private terrace · seats 16 · Feb 8 available · ₦280k"]],
+                footer: "₦70k cheaper than Nok. I'd book it.",
                 suggestions: [
-                    { label: "🔍 Show me matching vendors", action: "vendor_search" },
-                    { label: "💰 Review budget breakdown", action: "capability", capId: "budget" }
+                    { label: "Book Cécil", action: "ama_book_cecil" },
+                    { label: "Wait for Nok", action: "ama_wait_for_nok" },
+                    { label: "See Other Options", action: "ama_other_options" },
                 ]
-            }]);
-        }, 1500);
+            });
+        },
+
+        // Ama flow: reject boat price, push back
+        ama_reject_boat_price: () => {
+            addUserMsg("Reject Boat Price");
+            addAgentMsg({
+                type: "text",
+                content: "I pushed back on the ₦20k increase and asked for either the original ₦600k or added value. I'll update you once they respond.",
+                suggestions: [
+                    { label: "See Cécil Details", action: "ama_see_cecil" },
+                    { label: "Approve Spa + Boat", action: "ama_approve_spa_boat" },
+                ],
+            });
+        },
+
+        // Ama flow: show Cécil backup details
+        ama_see_cecil: () => {
+            addUserMsg("See Cécil Details");
+            addAgentMsg({
+                type: "ama_flow_card",
+                kicker: "Ama",
+                content: AMA_LAGOS_FLOW.backupVendor,
+                footer: "₦70k cheaper than Nok. I'd book it.",
+                suggestions: [
+                    { label: "Book Cécil", action: "ama_book_cecil" },
+                    { label: "Wait for Nok", action: "ama_wait_for_nok" },
+                    { label: "See Other Options", action: "ama_other_options" },
+                ],
+            });
+        },
+
+        // Ama flow: book Cécil → final itinerary
+        ama_book_cecil: () => {
+            addUserMsg("Book Cécil");
+            addAgentMsg({
+                type: "ama_flow_card",
+                kicker: "Ama",
+                content: "All three vendors confirmed. Here's your weekend.",
+                columns: ["Time", "Activity", "Vendor", "Cost"],
+                rows: AMA_LAGOS_FLOW.itineraryRows.map(r => [r.time, r.activity, r.vendor, r.cost]),
+                meta: `Total: ${AMA_LAGOS_FLOW.finalTotal} · Remaining: ${AMA_LAGOS_FLOW.finalRemaining}`,
+                footer: "Monitoring all vendors until event day. I'll flag anything that changes.",
+                suggestions: [
+                    { label: "Share Itinerary", action: "text_reply", text: "Share the itinerary with my group." },
+                    { label: "Add Activity", action: "ama_add_activity" },
+                    { label: "View Contracts", action: "text_reply", text: "Show me the contracts for all confirmed vendors." },
+                ],
+            });
+        },
+
+        // Ama flow: wait for Nok's response
+        ama_wait_for_nok: () => {
+            addUserMsg("Wait for Nok");
+            addAgentMsg({ type: "text", content: "Understood. I'll hold Cécil as backup for now and keep chasing Nok for a final quote." });
+        },
+
+        // Ama flow: see other dinner options
+        ama_other_options: () => {
+            addUserMsg("See Other Options");
+            addAgentMsg({ type: "text", content: "I'll pull two more dinner options in Victoria Island with private seating for 12–16 guests under ₦320k." });
+        },
+
+        // Send a pre-filled text message
+        text_reply: (s) => send(s.text),
     };
 
-    const send = (text: string) => {
-        if (!text.trim()) return;
-        const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        const userMsg = { id: Date.now(), role: "user", type: "text", content: text, time: now };
-        setMessages(prev => [...prev, userMsg]);
-        setInput("");
-
-        setTyping(true);
-        setTimeout(() => {
-            setTyping(false);
-            const reply = market
-                ? { type: "text", content: `On it — checking ${activeCity} vendors for that now.` }
-                : { type: "text", content: "Sure — just pick a city first so I can pull the right vendor network." };
-            setMessages(p => [...p, { id: Date.now() + 1, role: "agent", time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), ...reply }]);
-        }, 1200);
+    const handleSuggestion = (s: any) => {
+        const handler = SUGGESTION_HANDLERS[s.action];
+        if (handler) handler(s);
     };
+
+    // ── Render ───────────────────────────────────────────
 
     return (
         <div className="bg-background h-[calc(100dvh-5.5rem)] sm:h-[calc(100dvh-6rem)] md:h-[calc(100dvh-9rem)] flex flex-col overflow-hidden">
@@ -976,14 +1000,18 @@ Monitoring all vendors until event day. I'll flag anything that changes.`,
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-3 sm:space-y-4">
                 {messages.map(m => (
-                    <Msg key={m.id} msg={m} onSelectCity={handleSelectCity} activeCity={activeCity}
-                        savedVendors={savedVendors} onSave={handleSaveVendor}
-                        onAction={(data: any, v?: any) => {
-                            if (m.type === "event_form") handleFormSubmit(data);
-                            else if (m.type === "calendar_picker") handleCalendarSelect(data);
-                            else handleVendorAction(data, v);
-                        }}
-                        onSuggestion={handleSuggestion} />
+                    <Msg
+                        key={m.id}
+                        msg={m}
+                        onSelectCity={handleSelectCity}
+                        activeCity={activeCity}
+                        savedVendors={savedVendors}
+                        onSave={handleSaveVendor}
+                        onVendorAction={handleVendorAction}
+                        onFormSubmit={handleFormSubmit}
+                        onCalendarSelect={handleCalendarSelect}
+                        onSuggestion={handleSuggestion}
+                    />
                 ))}
                 {typing && (
                     <div className="flex items-end gap-2 text-primary">
@@ -995,7 +1023,7 @@ Monitoring all vendors until event day. I'll flag anything that changes.`,
                         <div className="bg-secondary border border-border rounded-2xl rounded-bl-none p-3 shadow-sm"><Dots /></div>
                     </div>
                 )}
-                <div ref={ref} />
+                <div ref={scrollRef} />
             </div>
 
             {/* Input */}
