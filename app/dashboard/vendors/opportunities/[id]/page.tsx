@@ -17,14 +17,14 @@ export default function EventDetailPage() {
             <div className="flex flex-col items-center justify-center h-full space-y-4">
                 <h1 className="text-2xl font-bold">Event not found</h1>
                 <button
-                    onClick={() => router.push('/dashboard/vendors/events')}
+                    onClick={() => router.push('/dashboard/vendors')}
                     className="text-accent font-bold"
                 >
-                    Back to Events
+                    Back to Search
                 </button>
             </div>
         );
     }
 
-    return <EventDetail event={event} onBack={() => router.push('/dashboard/vendors/events')} />;
+    return <EventDetail event={event} onBack={() => router.push('/dashboard/vendors')} />;
 }

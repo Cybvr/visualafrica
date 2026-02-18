@@ -1,207 +1,83 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from 'react';
-import Link from 'next/link';
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Search, Send, User, MapPin, ChevronDown, ArrowLeft } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
+import Inbox, { ChatConversation } from '@/components/dashboard/Inbox';
 import { vendors } from '@/lib/vendors-data';
 import { SHARED_EVENTS } from '@/lib/shared-data';
 
-// Mock initial chats with Real Vendor IDs
-const INITIAL_CHATS = [
-  { id: 'v-venue-1', lastMsg: 'The quote is ready for your review.', time: '10:30 AM', unread: true },
-  { id: 'v-catering-1', lastMsg: 'Tasting scheduled for next Tuesday.', time: 'Yesterday', unread: false },
-  { id: 'v-photo-1', lastMsg: 'Portfolio updated with new wedding samples.', time: 'Mon', unread: false },
-];
-
 const getVendorStatus = (vendorId: string): string => {
-  // Check all events to see if this vendor is booked and what their status is
   for (const event of SHARED_EVENTS) {
     const booking = event.bookedVendors?.find(b => b.vendorId === vendorId);
     if (booking) {
-      return booking.status.toLowerCase(); // e.g., 'confirmed', 'pending', 'paid'
+      return booking.status.toLowerCase();
     }
   }
-  return 'requested'; // Default if not found in any booking but chat exists
+  return 'requested';
 };
+
+const INITIAL_CONVERSATIONS: ChatConversation[] = [
+  {
+    id: 'v-venue-1',
+    name: 'The Monarch',
+    lastMsg: 'The quote is ready for your review.',
+    time: '10:30 AM',
+    unread: true,
+    status: 'quoted',
+    eventName: 'Chidi & Amaka Wedding',
+    messages: [
+      { id: '1', senderId: 'v-venue-1', text: 'Hello! We have reviewed your initial event brief. The venue in Lagos is available on May 29th. Would you like to schedule a virtual tour?', timestamp: '10:00 AM', isMe: false },
+      { id: '2', senderId: 'me', text: 'That sounds great! Does next Tuesday at 2 PM work for you?', timestamp: '10:15 AM', isMe: true },
+      { id: '3', senderId: 'v-venue-1', text: 'The quote is ready for your review.', timestamp: '10:30 AM', isMe: false },
+    ]
+  },
+  {
+    id: 'v-catering-1',
+    name: 'Naija Gourmet Flavors',
+    lastMsg: 'Tasting scheduled for next Tuesday.',
+    time: 'Yesterday',
+    unread: false,
+    status: 'booked',
+    eventName: 'Tech Conference 2025',
+    messages: [
+      { id: '1', senderId: 'v-catering-1', text: 'We have variety of menus for your tech conference. When would you like to have a tasting?', timestamp: 'Mon 2:00 PM', isMe: false },
+      { id: '2', senderId: 'me', text: 'Next Tuesday works for us.', timestamp: 'Mon 3:15 PM', isMe: true },
+      { id: '3', senderId: 'v-catering-1', text: 'Perfect, tasting scheduled for next Tuesday.', timestamp: 'Yesterday', isMe: false },
+    ]
+  },
+  {
+    id: 'v-photo-1',
+    name: 'Eko Lens Studio',
+    lastMsg: 'Portfolio updated with new wedding samples.',
+    time: 'Mon',
+    unread: false,
+    status: 'requested',
+    eventName: 'Chidi & Amaka Wedding',
+    messages: [
+      { id: '1', senderId: 'v-photo-1', text: 'I have updated my portfolio with new wedding samples from last weekend.', timestamp: 'Mon 9:00 AM', isMe: false },
+    ]
+  }
+];
 
 const InboxContent: React.FC = () => {
   const searchParams = useSearchParams();
   const vendorIdParam = searchParams.get('vendorId');
 
-  // Hydrate chats with vendor details
-  const [chats, setChats] = useState(() => {
-    return INITIAL_CHATS.map(chat => {
-      const vendor = vendors.find(v => v.id === chat.id);
-      return {
-        ...chat,
-        name: vendor?.name || 'Unknown Vendor',
-        avatar: vendor?.name?.charAt(0) || '?',
-        location: vendor?.location || 'Unknown',
-        price: vendor?.price || 'N/A',
-        status: getVendorStatus(chat.id),
-        vendorSlug: vendor?.slug
-      };
-    });
-  });
-
-  const [activeChat, setActiveChat] = useState(chats[0]);
-  const [showMobileChat, setShowMobileChat] = useState(false);
-
-  useEffect(() => {
-    if (vendorIdParam) {
-      const existingChat = chats.find(c => c.id === vendorIdParam);
-      if (existingChat) {
-        setActiveChat(existingChat);
-        setShowMobileChat(true);
-      } else {
-        const vendor = vendors.find(v => v.id === vendorIdParam);
-        if (vendor) {
-          const newChat = {
-            id: vendor.id,
-            name: vendor.name,
-            lastMsg: 'Start a conversation...',
-            time: 'Now',
-            unread: false,
-            avatar: vendor.name.charAt(0),
-            status: getVendorStatus(vendor.id),
-            location: vendor.location,
-            price: vendor.price || 'N/A',
-            vendorSlug: vendor.slug
-          };
-          setChats(prev => [newChat, ...prev]);
-          setActiveChat(newChat);
-          setShowMobileChat(true);
-        }
-      }
-    }
-  }, [vendorIdParam]);
-
-  const updateStatus = (chatId: string, newStatus: string) => {
-    setChats(prev => prev.map(chat =>
-      chat.id === chatId ? { ...chat, status: newStatus } : chat
-    ));
-    if (activeChat.id === chatId) {
-      setActiveChat(prev => ({ ...prev, status: newStatus }));
-    }
-  };
+  // Logic to handle specific vendor conversation from URL if needed
+  // For now, we use the initial mock data
 
   return (
-    <div className="h-[calc(100vh-104px)] -m-6 md:-m-10 flex flex-col md:flex-row bg-background overflow-hidden">
-      <div className={`w-full md:w-80 border-r border-border flex-col ${showMobileChat ? 'hidden md:flex' : 'flex'}`}>
-        <div className="p-6 border-b border-border/50">
-          <h2 className="text-xl font-serif font-black text-foreground mb-4">Messages</h2>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <input type="text" placeholder="Search chats..." className="w-full pl-10 pr-4 py-2 bg-secondary border-none rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary/20" />
-          </div>
-        </div>
-        <div className="flex-1 overflow-y-auto divide-y divide-slate-50">
-          {chats.map((chat) => (
-            <button key={chat.id} onClick={() => { setActiveChat(chat); setShowMobileChat(true); }} className={`w-full p-6 text-left hover:bg-secondary transition-colors flex items-start gap-4 ${activeChat.id === chat.id ? 'bg-primary/5' : ''}`}>
-              <div className="w-12 h-12 rounded-2xl bg-background text-foreground flex items-center justify-center font-bold shrink-0">{chat.avatar}</div>
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-serif font-bold text-foreground truncate">{chat.name}</h4>
-                  <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{chat.time}</span>
-                </div>
-                <p className="text-sm text-muted-foreground truncate">{chat.lastMsg}</p>
-                <div className="mt-2 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-bold uppercase tracking-wider">
-                    <MapPin size={10} className="text-primary" />
-                    <span>{chat.location}</span>
-                  </div>
-                  <span className="text-[10px] font-black text-primary">{chat.price}</span>
-                </div>
-                {chat.unread && <div className="mt-2 w-2 h-2 bg-primary rounded-full" />}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className={`flex-1 flex-col bg-secondary/20 ${showMobileChat ? 'flex' : 'hidden md:flex'}`}>
-        <div className="p-6 bg-card border-b border-border flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setShowMobileChat(false)}>
-              <ArrowLeft size={20} />
-            </Button>
-            <div className="w-10 h-10 rounded-xl bg-background text-foreground flex items-center justify-center font-bold">{activeChat.avatar}</div>
-            <div>
-              <h3 className="font-bold text-foreground">{activeChat.name}</h3>
-              <p className="text-xs text-muted-foreground font-medium italic">Online</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 rounded-xl font-bold">
-                  Update Status
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[180px]">
-                <DropdownMenuItem onClick={() => updateStatus(activeChat.id, 'requested')} className="rounded-xl font-bold">
-                  Mark as Requested
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => updateStatus(activeChat.id, 'sent')} className="rounded-xl font-bold">
-                  Mark as Sent
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => updateStatus(activeChat.id, 'quoted')} className="rounded-xl font-bold">
-                  Mark as Quoted
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => updateStatus(activeChat.id, 'negotiating')} className="rounded-xl font-bold">
-                  Mark as Negotiating
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => updateStatus(activeChat.id, 'booked')} className="rounded-xl font-bold">
-                  Mark as Booked
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => updateStatus(activeChat.id, 'declined')}
-                  className="text-red-600 rounded-xl font-bold focus:bg-red-50 focus:text-red-600"
-                >
-                  Decline
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Link href={`/dashboard/hosts/vendor/${activeChat.vendorSlug || activeChat.id}`} className="text-primary text-sm font-black px-4 py-2 hover:bg-primary/5 rounded-2xl transition-colors">
-              Profile
-            </Link>
-          </div>
-        </div>
-        <div className="flex-1 overflow-y-auto p-8 space-y-6">
-          <div className="flex items-start gap-3 max-w-lg">
-            <div className="w-8 h-8 rounded-lg bg-background text-foreground flex items-center justify-center text-[10px] font-bold shrink-0">{activeChat.avatar}</div>
-            <div className="bg-card p-4 rounded-2xl rounded-tl-none border border-border shadow-sm text-sm text-foreground leading-relaxed font-medium">
-              Hello! We have reviewed your initial event brief. The venue in Lagos is available on May 29th. Would you like to schedule a virtual tour?
-            </div>
-          </div>
-          <div className="flex items-start gap-3 justify-end">
-            <div className="bg-primary p-4 rounded-[2rem] rounded-tr-none shadow-lg shadow-primary/10 text-sm text-foreground leading-relaxed max-w-lg font-bold">
-              That sounds great! Does next Tuesday at 2 PM work for you?
-            </div>
-          </div>
-        </div>
-        <div className="p-6 bg-card border-t border-border/50">
-          <div className="flex gap-4">
-            <input type="text" placeholder="Type your response..." className="flex-1 px-6 py-4 bg-secondary border-none rounded-[2rem] outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
-            <button className="w-14 h-14 bg-primary text-foreground rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
-              <Send size={20} />
-            </button>
-          </div>
-        </div>
-      </div>
+    <div className="max-w-7xl mx-auto">
+      <Inbox
+        conversations={INITIAL_CONVERSATIONS}
+        userType="host"
+        title="Messages"
+      />
     </div>
   );
 };
 
-export default function Inbox() {
+export default function HostInboxPage() {
   return (
     <Suspense fallback={<div className="p-10 text-center">Loading inbox...</div>}>
       <InboxContent />

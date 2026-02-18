@@ -21,6 +21,7 @@ import {
   LogOut,
   User,
   Briefcase,
+  Sparkles,
   LucideIcon,
 } from "lucide-react";
 import {
@@ -287,6 +288,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
     { icon: Home, label: "Home", href: "/dashboard/hosts", matchPaths: ["/dashboard/hosts/vendor/"] },
     { icon: Mail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
     { icon: Calendar, label: "Manage", href: "/dashboard/hosts/events", count: hostEventsCount },
+    { icon: Sparkles, label: "Ama", href: "/dashboard/hosts/ama" },
     { icon: CreditCard, label: "Payments", href: "/dashboard/hosts/payments" },
   ];
 
@@ -297,6 +299,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
 
   const vendorPrimaryNavItems: NavItemConfig[] = [
     { icon: Search, label: "Search", href: "/dashboard/vendors" },
+    { icon: Mail, label: "Inbox", href: "/dashboard/vendors/inbox", count: vendorInboxCount },
     { icon: ClipboardList, label: "Jobs", href: "/dashboard/vendors/jobs", count: vendorEventsCount },
     { icon: CreditCard, label: "Payments", href: "/dashboard/vendors/payments" },
   ];

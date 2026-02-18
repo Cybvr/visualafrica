@@ -96,7 +96,7 @@ export default function VendorDashboardPage() {
             {displayEvents.map(event => (
               <Link
                 key={event.id}
-                href={`/dashboard/vendors/event/${event.id}`}
+                href={`/dashboard/vendors/opportunities/${event.id}`}
                 className="group bg-card border border-border rounded-3xl p-4 flex flex-col md:flex-row gap-6 hover:shadow-lg transition-all hover:border-primary/50 cursor-pointer"
               >
                 <div className="relative w-full md:w-72 h-48 md:h-auto rounded-2xl overflow-hidden shrink-0">
