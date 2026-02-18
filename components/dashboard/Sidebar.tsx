@@ -4,26 +4,24 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home,
-  Search,
-  Settings,
-  BriefcaseBusiness,
-  Lightbulb,
-  Heart,
-  Calendar,
-  FileText,
-  CreditCard,
-  HelpCircle,
-  Mail,
-  ClipboardList,
-  ChevronDown,
-  Plus,
-  LogOut,
-  User,
-  Briefcase,
-  Sparkles,
-  LucideIcon,
-} from "lucide-react";
+  MdAutoAwesome,
+  MdCalendarMonth,
+  MdChecklist,
+  MdCreditCard,
+  MdDarkMode,
+  MdHelp,
+  MdHome,
+  MdLightbulb,
+  MdLogout,
+  MdMail,
+  MdOutlineWbSunny,
+  MdPerson,
+  MdSearch,
+  MdSettings,
+  MdComputer,
+  MdExpandMore,
+} from "react-icons/md";
+import { IconType } from "react-icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,12 +43,11 @@ import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, signOut, User as FirebaseUser } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Monitor } from "lucide-react";
 import { VENDOR_DASHBOARD_DATA } from "@/lib/vendor-dashboard-data";
 import { EVENTS } from "@/lib/events-data";
 
 type NavItemConfig = {
-  icon: LucideIcon;
+  icon: IconType;
   label: string;
   href: string;
   count?: number;
@@ -149,7 +146,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
                 {userProfile.displayName}
               </div>
             </div>
-            <ChevronDown
+            <MdExpandMore
               size={12}
               className="text-muted-foreground transition-transform mt-1 group-data-[state=open]:rotate-180"
             />
@@ -166,12 +163,12 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
           </div>
           <Link href={mode === 'host' ? '/dashboard/vendors' : '/dashboard/hosts'}>
             <DropdownMenuItem className="py-2.5 cursor-pointer flex items-center gap-2 text-foreground font-medium">
-              <ClipboardList size={16} />
+              <MdChecklist size={16} />
               View as {mode === 'host' ? 'Vendor' : 'Host'}
             </DropdownMenuItem>
           </Link>
           <DropdownMenuItem className="py-2.5 cursor-pointer flex items-center gap-2 text-foreground font-medium">
-            <User size={16} />
+            <MdPerson size={16} />
             Profile Settings
           </DropdownMenuItem>
 
@@ -183,19 +180,19 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
 
           <DropdownMenuSub>
             <DropdownMenuSubTrigger className="py-2.5 cursor-pointer flex items-center gap-2 text-foreground font-medium">
-              {theme === "light" ? <Sun size={16} /> : theme === "dark" ? <Moon size={16} /> : <Monitor size={16} />}
+              {theme === "light" ? <MdOutlineWbSunny size={16} /> : theme === "dark" ? <MdDarkMode size={16} /> : <MdComputer size={16} />}
               Theme
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent className="min-w-[120px]">
                 <DropdownMenuItem onClick={() => setTheme("light")} className="cursor-pointer gap-2">
-                  <Sun size={14} /> Light
+                  <MdOutlineWbSunny size={14} /> Light
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setTheme("dark")} className="cursor-pointer gap-2">
-                  <Moon size={14} /> Dark
+                  <MdDarkMode size={14} /> Dark
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setTheme("system")} className="cursor-pointer gap-2">
-                  <Monitor size={14} /> System
+                  <MdComputer size={14} /> System
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
@@ -203,7 +200,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
 
           <Link href="/support">
             <DropdownMenuItem className="py-2.5 cursor-pointer flex items-center gap-2 text-foreground font-medium">
-              <HelpCircle size={16} />
+              <MdHelp size={16} />
               Support
             </DropdownMenuItem>
           </Link>
@@ -220,7 +217,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor' }> = ({ mode }) => {
             }}
             className="py-2.5 cursor-pointer flex items-center gap-2 text-red-600 focus:text-red-700 focus:bg-red-50"
           >
-            <LogOut size={16} />
+            <MdLogout size={16} />
             Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -285,28 +282,28 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const vendorEventsCount = VENDOR_DASHBOARD_DATA.bookings.length;
 
   const hostPrimaryNavItems: NavItemConfig[] = [
-    { icon: Home, label: "Home", href: "/dashboard/hosts", matchPaths: ["/dashboard/hosts/vendor/"] },
-    { icon: Mail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
-    { icon: Calendar, label: "Manage", href: "/dashboard/hosts/events", count: hostEventsCount },
-    { icon: Sparkles, label: "Ama", href: "/dashboard/hosts/ama" },
-    { icon: CreditCard, label: "Payments", href: "/dashboard/hosts/payments" },
+    { icon: MdHome, label: "Home", href: "/dashboard/hosts", matchPaths: ["/dashboard/hosts/vendor/"] },
+    { icon: MdMail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
+    { icon: MdCalendarMonth, label: "Manage", href: "/dashboard/hosts/events", count: hostEventsCount },
+    { icon: MdAutoAwesome, label: "Ama", href: "/dashboard/hosts/ama" },
+    { icon: MdCreditCard, label: "Payments", href: "/dashboard/hosts/payments" },
   ];
 
   const hostSecondaryNavItems: NavItemConfig[] = [
-    { icon: Lightbulb, label: "Community", href: "/dashboard/hosts/community" },
-    { icon: Settings, label: "Settings", href: "/dashboard/hosts/settings" },
+    { icon: MdLightbulb, label: "Community", href: "/dashboard/hosts/community" },
+    { icon: MdSettings, label: "Settings", href: "/dashboard/hosts/settings" },
   ];
 
   const vendorPrimaryNavItems: NavItemConfig[] = [
-    { icon: Search, label: "Search", href: "/dashboard/vendors" },
-    { icon: Mail, label: "Inbox", href: "/dashboard/vendors/inbox", count: vendorInboxCount },
-    { icon: ClipboardList, label: "Jobs", href: "/dashboard/vendors/jobs", count: vendorEventsCount },
-    { icon: CreditCard, label: "Payments", href: "/dashboard/vendors/payments" },
+    { icon: MdSearch, label: "Search", href: "/dashboard/vendors" },
+    { icon: MdMail, label: "Inbox", href: "/dashboard/vendors/inbox", count: vendorInboxCount },
+    { icon: MdChecklist, label: "Jobs", href: "/dashboard/vendors/jobs", count: vendorEventsCount },
+    { icon: MdCreditCard, label: "Payments", href: "/dashboard/vendors/payments" },
   ];
 
   const vendorSecondaryNavItems: NavItemConfig[] = [
-    { icon: User, label: "Profile", href: "/dashboard/vendors/profile" },
-    { icon: Settings, label: "Settings", href: "/dashboard/vendors/settings" },
+    { icon: MdPerson, label: "Profile", href: "/dashboard/vendors/profile" },
+    { icon: MdSettings, label: "Settings", href: "/dashboard/vendors/settings" },
   ];
 
   const primaryNavItems = mode === "host" ? hostPrimaryNavItems : vendorPrimaryNavItems;

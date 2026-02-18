@@ -121,16 +121,14 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full pt-2">
       <div className="mx-auto flex w-[95%] max-w-5xl items-center justify-between rounded-full bg-background/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="flex w-[180px] flex-shrink-0 items-center">
+        <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="Waddi Logo" className="h-8 w-auto object-contain" />
             <span className="font-logo text-xl font-normal text-foreground">
               Waddi
             </span>
           </Link>
-        </div>
-
-        <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex" aria-label="Main navigation">
+          <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
               Platform
@@ -275,16 +273,24 @@ export function Header() {
                     </div>
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
+                  <Link href="/support" className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
+                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Users className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-sm font-bold text-foreground">
+                        Support
+                      </span>
+                      <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                        Find answers to common questions and get help
+                      </p>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <Link
-            href="/stories"
-            className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            Stories
-          </Link>
 
           <Link
             href="/pricing"
@@ -292,7 +298,8 @@ export function Header() {
           >
             Pricing
           </Link>
-        </nav>
+          </nav>
+        </div>
 
         <div className="hidden w-[180px] flex-shrink-0 items-center justify-end gap-3 lg:flex">
           <Link href="/request-demo">
@@ -397,13 +404,6 @@ export function Header() {
                 onClick={() => setMobileOpen(false)}
               >
                 Resources
-              </Link>
-              <Link
-                href="/stories"
-                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
-                onClick={() => setMobileOpen(false)}
-              >
-                Stories
               </Link>
               <Link
                 href="/pricing"

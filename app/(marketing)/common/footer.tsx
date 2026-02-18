@@ -7,7 +7,7 @@ import { platformFeatures } from "@/lib/platform-data"
 const quickLinks = [
   { label: "Vendor Signup", href: "/vendor-signup" },
   { label: "About Us", href: "/about" },
-  { label: "FAQs", href: "/faqs" },
+  { label: "FAQs", href: "/support" },
   { label: "Blog", href: "/blog" },
   { label: "Explore", href: "/explore/vendors" },
   { label: "Pricing", href: "/pricing" },
@@ -36,6 +36,7 @@ const legalLinks = [
   { label: "Terms of Service", href: "/terms" },
   { label: "Cookie Notice", href: "/cookies" },
   { label: "AI Usage Policy", href: "/ai-policy" },
+  { label: "Legal", href: "/legal" },
 ]
 
 export function Footer() {

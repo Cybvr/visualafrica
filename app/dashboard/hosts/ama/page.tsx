@@ -21,6 +21,7 @@ const CITY_COLORS: Record<string, string> = {
 };
 
 const CAPABILITIES = [
+    { id: "create_event", label: "Create Event", icon: "✨" },
     { id: "vendor_search", label: "Vendor Search", icon: "🔍" },
     { id: "rsvp", label: "RSVP Blast", icon: "📨" },
     { id: "budget", label: "Budget Track", icon: "💰" },
@@ -188,8 +189,18 @@ const MARKET_DATA: Record<string, any> = {
 };
 
 const INITIAL_MESSAGES = [
-    { id: 1, role: "agent", type: "text", content: "Akwaaba! Karibu! I'm Ama — your diaspora event agent. I find vendors, negotiate deals, manage bookings, and coordinate events. Where is the event happening?", time: "9:01 AM" },
-    { id: 2, role: "agent", type: "city_picker", content: null, time: "9:01 AM" }
+    {
+        id: 1,
+        role: "agent",
+        type: "text",
+        content: "Hi, I'm ama, your diaspora event agent. I find vendors, negotiate deals, manage bookings, and coordinate events. What would you like to do? ✨",
+        time: "9:01 AM",
+        suggestions: [
+            { label: "Create Event", action: "start_planning" },
+            { label: "Vendor Search", action: "start_vendor_search" },
+            { label: "RSVP Blast", action: "capability", capId: "rsvp" }
+        ]
+    }
 ];
 
 // ── Dots ────────────────────────────────────────────────
@@ -204,7 +215,8 @@ function Dots() {
 }
 
 // ── CityBadge ────────────────────────────────────────────
-function CityBadge({ city }) {
+// ── CityBadge ────────────────────────────────────────────
+function CityBadge({ city }: { city: string }) {
     const color = CITY_COLORS[city] || "hsl(var(--muted-foreground))";
     return (
         <span className="inline-flex items-center gap-1 text-[10px] font-bold rounded px-1.5 py-0.5 mb-2 tracking-wider uppercase font-mono"
@@ -216,7 +228,7 @@ function CityBadge({ city }) {
 }
 
 // ── SuggestionBubble ─────────────────────────────────────
-function SuggestionBubble({ label, onClick }) {
+function SuggestionBubble({ label, onClick }: { label: string; onClick: () => void }) {
     return (
         <button
             onClick={onClick}
@@ -228,7 +240,7 @@ function SuggestionBubble({ label, onClick }) {
 }
 
 // ── KnowledgeCard ────────────────────────────────────────
-function KnowledgeCard({ item }) {
+function KnowledgeCard({ item }: { item: any }) {
     const isBlog = !!item.author;
     return (
         <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm max-w-[280px]">
@@ -253,13 +265,88 @@ function KnowledgeCard({ item }) {
     );
 }
 
+// ── EventForm ────────────────────────────────────────────
+function EventForm({ onSubmit }: { onSubmit: (data: any) => void }) {
+    const [data, setData] = useState({ name: "", guests: "", budget: "" });
+    return (
+        <div className="bg-card border border-border rounded-2xl p-4 shadow-sm max-w-[300px] w-full space-y-3">
+            <div className="text-[13px] font-bold text-foreground">Almost there! Just the basics:</div>
+            <div className="space-y-2">
+                <input
+                    type="text"
+                    placeholder="Event Name (e.g. Ama's 30th)"
+                    className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                    value={data.name}
+                    onChange={e => setData({ ...data, name: e.target.value })}
+                />
+                <input
+                    type="number"
+                    placeholder="Guest Count"
+                    className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                    value={data.guests}
+                    onChange={e => setData({ ...data, guests: e.target.value })}
+                />
+                <input
+                    type="text"
+                    placeholder="Budget (e.g. $5k)"
+                    className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                    value={data.budget}
+                    onChange={e => setData({ ...data, budget: e.target.value })}
+                />
+            </div>
+            <button
+                onClick={() => onSubmit(data)}
+                disabled={!data.name || !data.guests || !data.budget}
+                className="w-full bg-primary text-primary-foreground font-bold py-2 rounded-lg text-sm transition-all active:scale-95 disabled:opacity-50"
+            >
+                Create Event
+            </button>
+        </div>
+    );
+}
+
+// ── CalendarPicker ───────────────────────────────────────
+function CalendarPicker({ onSelect }: { onSelect: (date: string) => void }) {
+    const days = Array.from({ length: 31 }, (_, i) => i + 1);
+    const [selected, setSelected] = useState<number | null>(null);
+    return (
+        <div className="bg-card border border-border rounded-2xl p-4 shadow-sm max-w-[300px] w-full">
+            <div className="text-[13px] font-bold text-foreground mb-3 flex justify-between items-center">
+                <span>Select a Date</span>
+                <span className="text-[11px] text-muted-foreground font-normal">August 2026</span>
+            </div>
+            <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => (
+                    <span key={d} className="text-[10px] text-muted-foreground font-bold">{d}</span>
+                ))}
+            </div>
+            <div className="grid grid-cols-7 gap-1">
+                {/* Simplified calendar for August 2026 - starts on Saturday */}
+                {Array.from({ length: 6 }).map((_, i) => <div key={`empty-${i}`} />)}
+                {days.map(d => (
+                    <button
+                        key={d}
+                        onClick={() => { setSelected(d); onSelect(`August ${d}, 2026`); }}
+                        className={cn(
+                            "aspect-square text-[12px] flex items-center justify-center rounded-lg transition-colors",
+                            selected === d ? "bg-primary text-primary-foreground font-bold" : "hover:bg-secondary text-foreground"
+                        )}
+                    >
+                        {d}
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 // ── CityPicker ───────────────────────────────────────────
-function CityPicker({ onSelect, activeCity }) {
+// ── CityPicker ───────────────────────────────────────────
+function CityPicker({ onSelect, activeCity }: { onSelect: (city: string) => void; activeCity: string | null }) {
     return (
         <div className="flex flex-col gap-2 max-w-[300px]">
             {CITIES.map(c => {
                 const isActive = activeCity === c.name;
-                const color = CITY_COLORS[c.name];
                 return (
                     <button key={c.name} onClick={() => onSelect(c.name)}
                         className={cn(
@@ -284,10 +371,11 @@ function CityPicker({ onSelect, activeCity }) {
 }
 
 // ── Vendor Action Menu ───────────────────────────────────
-function VendorActionMenu({ vendor, onClose, onSave, isSaved, onAction }) {
-    const ref = useRef(null);
+// ── Vendor Action Menu ───────────────────────────────────
+function VendorActionMenu({ vendor, onClose, onSave, isSaved, onAction }: { vendor: any; onClose: () => void; onSave: (v: any) => void; isSaved: boolean; onAction: (a: any, v: any) => void }) {
+    const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
-        function handle(e) { if (ref.current && !ref.current.contains(e.target)) onClose(); }
+        function handle(e: MouseEvent) { if (ref.current && !ref.current.contains(e.target as Node)) onClose(); }
         document.addEventListener("mousedown", handle);
         return () => document.removeEventListener("mousedown", handle);
     }, [onClose]);
@@ -317,7 +405,8 @@ function VendorActionMenu({ vendor, onClose, onSave, isSaved, onAction }) {
 }
 
 // ── VCard ────────────────────────────────────────────────
-function VCard({ v, savedVendors, onSave, onAction }) {
+// ── VCard ────────────────────────────────────────────────
+function VCard({ v, savedVendors, onSave, onAction }: { v: any; savedVendors: Set<string>; onSave: (v: any) => void; onAction: (a: any, v: any) => void }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const isSaved = savedVendors.has(v.name);
 
@@ -341,7 +430,7 @@ function VCard({ v, savedVendors, onSave, onAction }) {
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-1 mt-2">
-                    {v.tags.map(t => <span key={t} className="bg-secondary text-muted-foreground text-[11px] rounded px-1.5 py-0.5">{t}</span>)}
+                    {v.tags.map((t: string) => <span key={t} className="bg-secondary text-muted-foreground text-[11px] rounded px-1.5 py-0.5">{t}</span>)}
                 </div>
                 <div className="flex justify-between mt-2">
                     <span className="text-primary font-bold text-sm">{v.price}</span>
@@ -363,7 +452,8 @@ function VCard({ v, savedVendors, onSave, onAction }) {
 }
 
 // ── VendorCardMsg ────────────────────────────────────────
-function VendorCardMsg({ msg, savedVendors, onSave, onAction, activeCity }) {
+// ── VendorCardMsg ────────────────────────────────────────
+function VendorCardMsg({ msg, savedVendors, onSave, onAction, activeCity }: { msg: any; savedVendors: Set<string>; onSave: (v: any) => void; onAction: (a: any, v: any) => void; activeCity: string | null }) {
     const allForCity = activeCity ? ALL_VENDORS[activeCity] : [];
     const [expanded, setExpanded] = useState(false);
     const shown = expanded ? allForCity : msg.vendors;
@@ -375,7 +465,7 @@ function VendorCardMsg({ msg, savedVendors, onSave, onAction, activeCity }) {
                 {msg.city && <CityBadge city={msg.city} />}
                 <div style={{ color: "#F0EDE6", fontSize: 14 }}>{msg.content}</div>
             </div>
-            {shown.map(v => (
+            {shown.map((v: any) => (
                 <VCard key={v.name} v={v} savedVendors={savedVendors} onSave={onSave} onAction={onAction} />
             ))}
             {hasMore && (
@@ -396,9 +486,10 @@ function VendorCardMsg({ msg, savedVendors, onSave, onAction, activeCity }) {
 }
 
 // ── Step ─────────────────────────────────────────────────
-function Step({ a }) {
+// ── Step ─────────────────────────────────────────────────
+function Step({ a }: { a: any }) {
     const m = { done: { i: "✓", c: "#20C9A0" }, active: { i: "◌", c: "#E8A020" }, queued: { i: "○", c: "#3A3A5A" } };
-    const { i, c } = m[a.status];
+    const { i, c } = m[a.status as 'done' | 'active' | 'queued'] || { i: "○", c: "#3A3A5A" };
     return (
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
             <span style={{ width: 20, height: 20, borderRadius: "50%", background: c + "22", color: c, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{i}</span>
@@ -408,12 +499,17 @@ function Step({ a }) {
 }
 
 // ── Msg ──────────────────────────────────────────────────
-function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onAction, onSuggestion }) {
+// ── Msg ──────────────────────────────────────────────────
+function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onAction, onSuggestion }: { msg: any; onSelectCity: (city: string) => void; activeCity: string | null; savedVendors: Set<string>; onSave: (v: any) => void; onAction: (data: any) => void; onSuggestion: (s: any) => void }) {
     const ag = msg.role === "agent";
     return (
         <div className={cn("flex gap-2 mb-4", ag ? "flex-row items-end" : "flex-row-reverse items-end")}>
             {ag && (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-sm flex-shrink-0 shadow-sm">🤖</div>
+                <img
+                    src="/images/ama.png"
+                    alt="Ama"
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0 shadow-sm"
+                />
             )}
             <div className={cn("max-w-[85%] flex flex-col", ag ? "items-start" : "items-end")}>
                 {msg.type === "city_picker" ? (
@@ -427,12 +523,22 @@ function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onAction, on
                 ) : msg.type === "action" ? (
                     <div className="bg-card/80 border border-border rounded-2xl p-3.5 shadow-sm w-full">
                         <div className="text-foreground text-[13px] font-medium mb-2.5">{msg.content}</div>
-                        {msg.actions.map((a, idx) => <Step key={idx} a={a} />)}
+                        {msg.actions.map((a: any, idx: number) => <Step key={idx} a={a} />)}
                     </div>
                 ) : msg.type === "knowledge" ? (
                     <div className="space-y-2">
                         {msg.content && <div className="bg-card border border-border rounded-2xl px-3.5 py-2 text-[14px] leading-relaxed shadow-sm rounded-bl-none text-foreground">{msg.content}</div>}
                         <KnowledgeCard item={msg.data} />
+                    </div>
+                ) : msg.type === "event_form" ? (
+                    <div className="space-y-2">
+                        {msg.content && <div className="bg-card border border-border rounded-2xl px-3.5 py-2 text-[14px] leading-relaxed shadow-sm rounded-bl-none text-foreground">{msg.content}</div>}
+                        <EventForm onSubmit={onAction} />
+                    </div>
+                ) : msg.type === "calendar_picker" ? (
+                    <div className="space-y-2">
+                        {msg.content && <div className="bg-card border border-border rounded-2xl px-3.5 py-2 text-[14px] leading-relaxed shadow-sm rounded-bl-none text-foreground">{msg.content}</div>}
+                        <CalendarPicker onSelect={onAction} />
                     </div>
                 ) : msg.content ? (
                     <div className={cn(
@@ -443,7 +549,7 @@ function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onAction, on
 
                 {ag && msg.suggestions && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
-                        {msg.suggestions.map((s, i) => (
+                        {msg.suggestions.map((s: any, i: number) => (
                             <SuggestionBubble key={i} label={s.label} onClick={() => onSuggestion(s)} />
                         ))}
                     </div>
@@ -460,16 +566,16 @@ export default function App() {
     const [messages, setMessages] = useState(INITIAL_MESSAGES);
     const [input, setInput] = useState("");
     const [typing, setTyping] = useState(false);
-    const [activeCity, setActiveCity] = useState(null);
-    const [activeCapability, setActiveCapability] = useState(null);
-    const [savedVendors, setSavedVendors] = useState(new Set());
-    const ref = useRef(null);
+    const [activeCity, setActiveCity] = useState<string | null>(null);
+    const [activeCapability, setActiveCapability] = useState<string | null>(null);
+    const [savedVendors, setSavedVendors] = useState<Set<string>>(new Set());
+    const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => { ref.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, typing]);
 
     const market = activeCity ? MARKET_DATA[activeCity] : null;
 
-    const handleSaveVendor = (vendor) => {
+    const handleSaveVendor = (vendor: any) => {
         setSavedVendors(prev => {
             const next = new Set(prev);
             next.has(vendor.name) ? next.delete(vendor.name) : next.add(vendor.name);
@@ -477,7 +583,7 @@ export default function App() {
         });
     };
 
-    const handleVendorAction = (action, vendor) => {
+    const handleVendorAction = (action: any, vendor: any) => {
         if (action.id === "save") return; // handled by save toggle
         const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         const responses = {
@@ -511,7 +617,7 @@ export default function App() {
         ]);
     };
 
-    const handleSelectCity = (cityName) => {
+    const handleSelectCity = (cityName: string) => {
         if (activeCity === cityName) return;
         setActiveCity(cityName);
         setActiveCapability(null);
@@ -525,13 +631,14 @@ export default function App() {
             time: now,
             suggestions: [
                 { label: "🔍 Show me vendors", action: "vendor_search" },
-                { label: "📖 See the local guide", action: "show_guide", city: cityName }
+                { label: "📖 See the local guide", action: "show_guide", city: cityName },
+                { label: "✨ Start Planning", action: "start_planning", city: cityName }
             ]
         };
         setMessages(p => [...p, newMsg]);
     };
 
-    const handleCapability = (cap) => {
+    const handleCapability = (cap: any) => {
         if (!market) {
             const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
             setMessages(p => {
@@ -544,6 +651,12 @@ export default function App() {
             });
             return;
         }
+
+        if (cap.id === "create_event") {
+            handleSuggestion({ action: "start_planning", city: activeCity });
+            return;
+        }
+
         setActiveCapability(cap.id);
         const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         const labels = {
@@ -562,9 +675,30 @@ export default function App() {
         }, 1400);
     };
 
-    const handleSuggestion = (s) => {
+    const handleSuggestion = (s: any) => {
         if (s.action === "vendor_search") {
-            handleCapability(CAPABILITIES[0]);
+            handleCapability(CAPABILITIES[1]); // vendor_search is now index 1
+        } else if (s.action === "start_planning") {
+            setTyping(true);
+            setTimeout(() => {
+                setTyping(false);
+                const venue = s.city === "Lagos" ? "Lekki Terrace" : s.city === "Accra" ? "Labadi Beach" : s.city === "Nairobi" ? "Safari Club" : "the estate";
+                setMessages(prev => [...prev, {
+                    id: Date.now(),
+                    role: "agent",
+                    type: "calendar_picker",
+                    content: `Pick a date and I'll check availability for ${venue}...`,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                }]);
+            }, 800);
+        } else if (s.action === "start_vendor_search") {
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "city_picker",
+                content: "Sure, let's find some vendors. Which city are we looking at?",
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            }]);
         } else if (s.action === "show_guide") {
             setTyping(true);
             setTimeout(() => {
@@ -579,7 +713,8 @@ export default function App() {
                     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     suggestions: [
                         { label: "🔍 Now find vendors", action: "vendor_search" },
-                        { label: "💰 Help with budget", action: "capability", capId: "budget" }
+                        { label: "💰 Help with budget", action: "capability", capId: "budget" },
+                        { label: "✨ Start Planning", action: "start_planning", city: s.city }
                     ]
                 };
                 setMessages(prev => [...prev, newMsg]);
@@ -591,18 +726,53 @@ export default function App() {
         }
     };
 
-    const send = (text) => {
+    const handleCalendarSelect = (date: string) => {
+        setTyping(true);
+        setTimeout(() => {
+            setTyping(false);
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "event_form",
+                content: `Perfect. I've noted down ${date}. One last step to get you accurate quotes:`,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            }]);
+        }, 800);
+    };
+
+    const handleFormSubmit = (data: any) => {
+        setTyping(true);
+        setTimeout(() => {
+            setTyping(false);
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "text",
+                content: `Done! ${data.name} is now on my radar for ${activeCity}. I've pencilled in a budget of ${data.budget} for ${data.guests} guests. \n\nI'm reaching out to vendors now to get initial quotes based on your date. 🚀`,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                suggestions: [
+                    { label: "🔍 Show me matching vendors", action: "vendor_search" },
+                    { label: "💰 Review budget breakdown", action: "capability", capId: "budget" }
+                ]
+            }]);
+        }, 1500);
+    };
+
+    const send = (text: string) => {
         if (!text.trim()) return;
         const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        setMessages(p => [...p, { id: Date.now(), role: "user", type: "text", content: text, time: now }]);
-        setInput(""); setTyping(true);
+        const userMsg = { id: Date.now(), role: "user", type: "text", content: text, time: now };
+        setMessages(prev => [...prev, userMsg]);
+        setInput("");
+
+        setTyping(true);
         setTimeout(() => {
             setTyping(false);
             const reply = market
                 ? { type: "text", content: `On it — checking ${activeCity} vendors for that now.` }
                 : { type: "text", content: "Sure — just pick a city first so I can pull the right vendor network." };
             setMessages(p => [...p, { id: Date.now() + 1, role: "agent", time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), ...reply }]);
-        }, 1400);
+        }, 1200);
     };
 
     return (
@@ -618,7 +788,11 @@ export default function App() {
 
             {/* Header */}
             <div className="bg-card border-b border-border p-3 flex-shrink-0 flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-lg flex-shrink-0 shadow-lg">🤖</div>
+                <img
+                    src="/images/ama.png"
+                    alt="Ama"
+                    className="w-10 h-10 rounded-full object-cover flex-shrink-0 shadow-lg"
+                />
                 <div className="flex-1">
                     <div className="text-foreground font-bold text-sm">Ama</div>
                     <div className="flex items-center gap-1.5">
@@ -642,32 +816,25 @@ export default function App() {
                 </div>
             </div>
 
-            {/* Capability chips */}
-            <div className="flex gap-1.5 p-2 overflow-x-auto bg-card/50 border-b border-border flex-shrink-0 no-scrollbar">
-                {CAPABILITIES.map(cap => {
-                    const isActive = activeCapability === cap.id;
-                    return (
-                        <button key={cap.id} onClick={() => handleCapability(cap)} className={cn(
-                            "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-mono tracking-tight transition-all duration-200 uppercase",
-                            isActive ? "bg-primary text-primary-foreground shadow-md" : "bg-secondary text-muted-foreground border border-border hover:border-primary/50"
-                        )}>
-                            <span>{cap.icon}</span>
-                            <span>{cap.label}</span>
-                        </button>
-                    );
-                })}
-            </div>
-
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.map(m => (
                     <Msg key={m.id} msg={m} onSelectCity={handleSelectCity} activeCity={activeCity}
-                        savedVendors={savedVendors} onSave={handleSaveVendor} onAction={handleVendorAction}
+                        savedVendors={savedVendors} onSave={handleSaveVendor}
+                        onAction={(data: any, v?: any) => {
+                            if (m.type === "event_form") handleFormSubmit(data);
+                            else if (m.type === "calendar_picker") handleCalendarSelect(data);
+                            else handleVendorAction(data, v);
+                        }}
                         onSuggestion={handleSuggestion} />
                 ))}
                 {typing && (
                     <div className="flex items-end gap-2 text-primary">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-sm flex-shrink-0 outline outline-2 outline-primary/20">🤖</div>
+                        <img
+                            src="/images/ama.png"
+                            alt="Ama"
+                            className="w-8 h-8 rounded-full object-cover flex-shrink-0 outline outline-2 outline-primary/20"
+                        />
                         <div className="bg-secondary border border-border rounded-2xl rounded-bl-none p-3 shadow-sm"><Dots /></div>
                     </div>
                 )}

@@ -2,6 +2,7 @@ import { Header } from "@/app/(marketing)/common/header"
 import { Footer } from "@/app/(marketing)/common/footer"
 import { Hero } from "@/components/landingpage/hero"
 import { FeaturesGrid } from "@/components/landingpage/features-grid"
+import { AmaSection } from "@/components/landingpage/ama-section"
 import { HandpickedExperiences } from "@/components/handpicked-experiences"
 import { HottestVendors } from "@/components/landingpage/hottest-vendors"
 import { EventInsights } from "@/components/landingpage/event-insights"
@@ -19,6 +20,7 @@ export default function HomePage() {
         <HottestVendors />
         <HandpickedExperiences />
         <FeaturesGrid />
+        <AmaSection />
         <TrustSection />
         <EventInsights />
         <Testimonials />
