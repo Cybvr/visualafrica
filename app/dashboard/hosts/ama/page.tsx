@@ -188,18 +188,49 @@ const MARKET_DATA: Record<string, any> = {
     }
 };
 
+const AMA_WEEKEND_START = {
+    role: "agent",
+    type: "text",
+    content: `Ama: On it.
+searching vendors in Lagos · Feb 7-9 · 12 people · ₦2M budget...
+
+Ama: Found 3 vendors. Quote requests sent.
+Vendor              Price   Status
+Zen Spa VI          ₦180k   Quote requested
+Nok by Alara        ₦350k   Quote requested
+Lagos Boat Club     ₦600k   Quote requested
+
+Allocated: ₦1.13M · Remaining: ₦870k
+Watching all three. If anyone goes quiet past 6hrs I'll pull in a replacement and let you know.`,
+};
+
+const AMA_WEEKEND_QUOTES_IN = {
+    role: "agent",
+    type: "text",
+    content: `3hrs later - Ama pings you:
+
+Ama: 2 of 3 quotes in.
+Zen Spa VI ₦180k · Feb 7, 10am-2pm · confirmed
+Lagos Boat Club ₦620k · Feb 8, 5-9pm · confirmed (sunset slot, ₦20k over original quote)
+Nok by Alara hasn't responded. I've already contacted Cécil Restaurant as backup - waiting on their quote.
+Contracts for Spa and Boat are ready to review.`,
+    suggestions: [
+        { label: "Approve Spa + Boat", action: "ama_approve_spa_boat" },
+        { label: "Reject Boat Price", action: "ama_reject_boat_price" },
+        { label: "See Cécil Details", action: "ama_see_cecil_details" },
+        { label: "Approve Spa + Boat · See Cécil Details", action: "ama_approve_and_cecil" },
+    ],
+};
+
 const INITIAL_MESSAGES = [
     {
         id: 1,
-        role: "agent",
-        type: "text",
-        content: "Hi, I'm ama, your diaspora event agent. I find vendors, negotiate deals, manage bookings, and coordinate events. What would you like to do? ✨",
         time: "9:01 AM",
+        ...AMA_WEEKEND_START,
         suggestions: [
-            { label: "Create Event", action: "start_planning" },
-            { label: "Vendor Search", action: "start_vendor_search" },
-            { label: "RSVP Blast", action: "capability", capId: "rsvp" }
-        ]
+            { label: "Swap a Vendor", action: "ama_swap_vendor" },
+            { label: "Add Activity", action: "ama_add_activity" },
+        ],
     }
 ];
 
@@ -563,7 +594,7 @@ function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onAction, on
 
 // ── App ──────────────────────────────────────────────────
 export default function App() {
-    const [messages, setMessages] = useState(INITIAL_MESSAGES);
+    const [messages, setMessages] = useState<any[]>(INITIAL_MESSAGES);
     const [input, setInput] = useState("");
     const [typing, setTyping] = useState(false);
     const [activeCity, setActiveCity] = useState<string | null>(null);
@@ -572,6 +603,16 @@ export default function App() {
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => { ref.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, typing]);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setMessages(prev => {
+                const alreadySent = prev.some(m => m?.suggestions?.some((s: any) => s.action === "ama_approve_and_cecil"));
+                if (alreadySent) return prev;
+                return [...prev, { id: Date.now(), time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), ...AMA_WEEKEND_QUOTES_IN }];
+            });
+        }, 2200);
+        return () => clearTimeout(timer);
+    }, []);
 
     const market = activeCity ? MARKET_DATA[activeCity] : null;
 
@@ -586,7 +627,7 @@ export default function App() {
     const handleVendorAction = (action: any, vendor: any) => {
         if (action.id === "save") return; // handled by save toggle
         const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        const responses = {
+        const responses: Record<string, any> = {
             message: {
                 type: "action", content: `Sending message to ${vendor.name}:`, actions: [
                     { label: `Opening message thread with ${vendor.name}`, status: "done" },
@@ -659,7 +700,7 @@ export default function App() {
 
         setActiveCapability(cap.id);
         const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        const labels = {
+        const labels: Record<string, string> = {
             vendor_search: `Find vendors in ${activeCity}`,
             negotiate: `Negotiate deals in ${activeCity}`,
             book: `Book & confirm in ${activeCity}`,
@@ -676,7 +717,123 @@ export default function App() {
     };
 
     const handleSuggestion = (s: any) => {
-        if (s.action === "vendor_search") {
+        if (s.action === "ama_swap_vendor") {
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "text",
+                content: "Ama: On it. I can replace Nok by Alara right now with Cécil Restaurant at ₦280k and keep your dinner slot secure.",
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                suggestions: [
+                    { label: "Use Cécil Instead", action: "ama_book_cecil" },
+                    { label: "Wait for Nok", action: "ama_wait_for_nok" }
+                ]
+            }]);
+        } else if (s.action === "ama_add_activity") {
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "text",
+                content: "Ama: Nice. I can add brunch, nightlife, or a private city tour and keep total spend inside your ₦2M cap.",
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                suggestions: [
+                    { label: "Add Brunch", action: "text_reply", text: "Add brunch options in Lagos." },
+                    { label: "Add Nightlife", action: "text_reply", text: "Add nightlife options in Lagos." }
+                ]
+            }]);
+        } else if (s.action === "ama_approve_spa_boat") {
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "text",
+                content: "Ama: Spa and Boat are approved. I can now lock both and send deposit reminders.",
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                suggestions: [{ label: "See Cécil Details", action: "ama_approve_and_cecil" }]
+            }]);
+        } else if (s.action === "ama_reject_boat_price") {
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "text",
+                content: "Ama: Understood. I'll push Lagos Boat Club back to ₦600k and ask for a revised quote before we sign.",
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                suggestions: [
+                    { label: "Hold the Sunset Slot", action: "text_reply", text: "Hold the slot and negotiate." },
+                    { label: "Find Another Boat", action: "text_reply", text: "Find another boat option." }
+                ]
+            }]);
+        } else if (s.action === "ama_see_cecil_details" || s.action === "ama_approve_and_cecil") {
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "text",
+                content: `Ama: Spa and Boat locked. Deposit reminders scheduled. Both vendors have been sent the weekend timeline.
+Cécil Restaurant - Private terrace · seats 16 · Feb 8 available · ₦280k
+₦70k cheaper than Nok. I'd book it.`,
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                suggestions: [
+                    { label: "Book Cécil", action: "ama_book_cecil" },
+                    { label: "Wait for Nok", action: "ama_wait_for_nok" },
+                    { label: "See Other Options", action: "ama_other_options" }
+                ]
+            }]);
+        } else if (s.action === "ama_wait_for_nok") {
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "text",
+                content: "Ama: Waiting on Nok. I'll keep Cécil warm for 4 hours so we don't lose the terrace.",
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            }]);
+        } else if (s.action === "ama_other_options") {
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "text",
+                content: "Ama: I can pull two more dinner backups in Ikoyi and VI in the next 15 minutes.",
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                suggestions: [
+                    { label: "Show Backups", action: "text_reply", text: "Show dinner backups in Ikoyi and VI." },
+                    { label: "Book Cécil", action: "ama_book_cecil" }
+                ]
+            }]);
+        } else if (s.action === "ama_book_cecil") {
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "text",
+                content: `Ama: All three vendors confirmed. Here's your weekend.
+Time            Activity      Vendor              Cost
+Feb 7, 10am     Spa Day       Zen Spa VI          ₦180k
+Feb 8, 7pm      Dinner        Cécil Restaurant    ₦280k
+Feb 8, 5pm      Boat Party    Lagos Boat Club     ₦620k
+
+Total: ₦1.08M · Remaining: ₦920k
+Monitoring all vendors until event day. I'll flag anything that changes.`,
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                suggestions: [
+                    { label: "Share Itinerary", action: "ama_share_itinerary" },
+                    { label: "Add Activity", action: "ama_add_activity" },
+                    { label: "View Contracts", action: "ama_view_contracts" }
+                ]
+            }]);
+        } else if (s.action === "ama_share_itinerary") {
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "text",
+                content: "Ama: Itinerary share link is ready. Sending now to your 12 guests.",
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            }]);
+        } else if (s.action === "ama_view_contracts") {
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                role: "agent",
+                type: "text",
+                content: "Ama: Contracts for Zen Spa VI, Cécil Restaurant, and Lagos Boat Club are ready in your review queue.",
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            }]);
+        } else if (s.action === "vendor_search") {
             handleCapability(CAPABILITIES[1]); // vendor_search is now index 1
         } else if (s.action === "start_planning") {
             setTyping(true);
