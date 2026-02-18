@@ -388,7 +388,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 pb-10">
+    <div className="max-w-7xl mx-auto min-w-0 space-y-6 pb-10">
       <div className="space-y-4">
         <div>
           <h2 className="text-4xl font-black tracking-tight text-foreground">Home</h2>
@@ -421,12 +421,12 @@ export default function DashboardPage() {
           </aside>
 
           {/* Vendors area: tabs + grid */}
-          <div className="flex-1 space-y-4">
+          <div className="flex-1 min-w-0 space-y-4">
             {/* Tabs */}
-            <div className="flex items-center border-b border-border gap-6">
+            <div className="w-full min-w-0 flex items-center gap-3 sm:gap-6 border-b border-border overflow-x-auto scrollbar-hide">
               <button
                 onClick={() => setActiveTab('all')}
-                className={`pb-3 text-sm font-black transition-all border-b-2 flex items-center gap-2 ${activeTab === 'all'
+                className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'all'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                   }`}
@@ -436,7 +436,7 @@ export default function DashboardPage() {
               </button>
               <button
                 onClick={() => setActiveTab('experiences')}
-                className={`pb-3 text-sm font-black transition-all border-b-2 flex items-center gap-2 ${activeTab === 'experiences'
+                className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'experiences'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                   }`}
@@ -447,7 +447,7 @@ export default function DashboardPage() {
               </button>
               <button
                 onClick={() => setActiveTab('saved')}
-                className={`pb-3 text-sm font-black transition-all border-b-2 flex items-center gap-2 ${activeTab === 'saved'
+                className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'saved'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                   }`}
@@ -457,9 +457,9 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
               {displayVendors.map(vendor => (
-                <div key={vendor.id} onClick={() => router.push(`/dashboard/hosts/vendor/${vendor.slug}`)} className="cursor-pointer">
+                <div key={vendor.id} onClick={() => router.push(`/dashboard/hosts/vendor/${vendor.slug}`)} className="cursor-pointer min-w-0">
                   <VendorCard {...vendor} />
                 </div>
               ))}

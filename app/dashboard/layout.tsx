@@ -31,7 +31,7 @@ export default function DashboardLayout({
                     <Header onOpenMenu={() => setOpen(true)} />
                 </header>
 
-                <main className="flex-1 bg-secondary/30 p-6 md:p-10">
+                <main className="flex-1 bg-secondary/30 p-3 sm:p-4 md:p-10">
                     {children}
                 </main>
             </div>

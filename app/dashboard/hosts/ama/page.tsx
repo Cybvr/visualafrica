@@ -776,7 +776,7 @@ export default function App() {
     };
 
     return (
-        <div className="bg-background min-h-screen flex flex-col font-serif overflow-hidden">
+        <div className="bg-background h-[calc(100dvh-5.5rem)] sm:h-[calc(100dvh-6rem)] md:h-[calc(100dvh-9rem)] flex flex-col font-serif overflow-hidden">
             <style>{`
         @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
@@ -787,7 +787,7 @@ export default function App() {
       `}</style>
 
             {/* Header */}
-            <div className="bg-card border-b border-border p-3 flex-shrink-0 flex items-center gap-2.5">
+            <div className="bg-card border-b border-border px-2.5 py-2 sm:p-3 flex-shrink-0 flex items-center gap-2.5">
                 <img
                     src="/images/ama.png"
                     alt="Ama"
@@ -817,7 +817,7 @@ export default function App() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-3 sm:space-y-4">
                 {messages.map(m => (
                     <Msg key={m.id} msg={m} onSelectCity={handleSelectCity} activeCity={activeCity}
                         savedVendors={savedVendors} onSave={handleSaveVendor}
@@ -842,7 +842,7 @@ export default function App() {
             </div>
 
             {/* Input */}
-            <div className="bg-background border-t border-border p-3 pb-4 flex-shrink-0">
+            <div className="bg-background border-t border-border p-2.5 pb-3 sm:p-3 sm:pb-4 flex-shrink-0">
                 <div className="flex gap-2 bg-secondary/50 border border-border rounded-2xl p-2 items-end focus-within:border-primary/50 transition-colors shadow-inner">
                     <textarea
                         value={input}
