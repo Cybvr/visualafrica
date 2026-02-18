@@ -282,10 +282,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const vendorEventsCount = VENDOR_DASHBOARD_DATA.bookings.length;
 
   const hostPrimaryNavItems: NavItemConfig[] = [
-    { icon: MdHome, label: "Home", href: "/dashboard/hosts", matchPaths: ["/dashboard/hosts/vendor/"] },
-    { icon: MdMail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
-    { icon: MdCalendarMonth, label: "Manage", href: "/dashboard/hosts/events", count: hostEventsCount },
     { icon: MdAutoAwesome, label: "Ama", href: "/dashboard/hosts/ama" },
+    { icon: MdHome, label: "Home", href: "/dashboard/hosts", matchPaths: ["/dashboard/hosts/vendor/"] },
+    { icon: MdCalendarMonth, label: "Manage", href: "/dashboard/hosts/events", count: hostEventsCount },
+    { icon: MdMail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
     { icon: MdCreditCard, label: "Payments", href: "/dashboard/hosts/payments" },
   ];
 

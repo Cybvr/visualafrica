@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Search, Send, MapPin, ChevronDown, Calendar, MoreHorizontal, User, Phone, Video } from 'lucide-react';
+import { Search, Send, ChevronDown, MoreHorizontal, Phone, Video, ArrowLeft } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { cn } from "@/lib/utils"
 
 export interface ChatMessage {
     id: string;
@@ -46,6 +47,7 @@ export default function Inbox({ conversations: initialConversations, userType, t
     const [searchQuery, setSearchQuery] = useState('');
     const [activeChatId, setActiveChatId] = useState(initialConversations[0]?.id);
     const [messageInput, setMessageInput] = useState('');
+    const [mobileView, setMobileView] = useState<'list' | 'chat'>('list');
 
     const activeChat = conversations.find(c => c.id === activeChatId);
 
@@ -87,11 +89,14 @@ export default function Inbox({ conversations: initialConversations, userType, t
     };
 
     return (
-        <div className="flex h-[calc(100vh-140px)] bg-card border border-border rounded-[2.5rem] overflow-hidden shadow-sm">
+        <div className="flex h-[calc(100dvh-7.5rem)] md:h-[calc(100dvh-9rem)] bg-card border border-border rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-sm">
             {/* Sidebar */}
-            <div className="w-full md:w-96 border-r border-border flex flex-col bg-background">
-                <div className="p-6 border-b border-border/50">
-                    <div className="flex items-center justify-between mb-6">
+            <div className={cn(
+                "w-full md:w-96 border-r border-border flex flex-col bg-background",
+                mobileView === 'chat' ? "hidden md:flex" : "flex"
+            )}>
+                <div className="p-4 md:p-6 border-b border-border/50">
+                    <div className="flex items-center justify-between mb-4 md:mb-6">
                         <h2 className="text-2xl font-serif font-black text-foreground">{title}</h2>
                         <Button variant="ghost" size="icon" className="rounded-full">
                             <MoreHorizontal size={20} />
@@ -114,8 +119,8 @@ export default function Inbox({ conversations: initialConversations, userType, t
                         filteredConversations.map((chat) => (
                             <button
                                 key={chat.id}
-                                onClick={() => setActiveChatId(chat.id)}
-                                className={`w-full p-6 text-left transition-all flex items-start gap-4 hover:bg-secondary/50 ${activeChatId === chat.id ? 'bg-secondary' : ''}`}
+                                onClick={() => { setActiveChatId(chat.id); setMobileView('chat'); }}
+                                className={`w-full p-4 md:p-6 text-left transition-all flex items-start gap-3 md:gap-4 hover:bg-secondary/50 ${activeChatId === chat.id ? 'bg-secondary' : ''}`}
                             >
                                 <Avatar className="w-14 h-14 rounded-2xl shrink-0">
                                     <AvatarImage src={chat.avatar} className="object-cover" />
@@ -159,42 +164,54 @@ export default function Inbox({ conversations: initialConversations, userType, t
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 flex flex-col bg-secondary/5">
+            <div className={cn(
+                "flex-1 flex-col bg-secondary/5",
+                mobileView === 'list' ? "hidden md:flex" : "flex"
+            )}>
                 {activeChat ? (
                     <>
                         {/* Chat Header */}
-                        <div className="p-6 bg-background border-b border-border flex items-center justify-between px-8">
-                            <div className="flex items-center gap-4">
+                        <div className="p-3 sm:p-4 md:p-6 bg-background border-b border-border flex items-center justify-between md:px-8">
+                            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="md:hidden rounded-full"
+                                    onClick={() => setMobileView('list')}
+                                    aria-label="Back to conversations"
+                                >
+                                    <ArrowLeft size={18} />
+                                </Button>
                                 <Avatar className="w-12 h-12 rounded-xl shrink-0 ring-2 ring-background">
                                     <AvatarImage src={activeChat.avatar} className="object-cover" />
                                     <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">
                                         {activeChat.name.charAt(0)}
                                     </AvatarFallback>
                                 </Avatar>
-                                <div>
-                                    <h3 className="font-bold text-foreground text-lg">{activeChat.name}</h3>
+                                <div className="min-w-0">
+                                    <h3 className="font-bold text-foreground text-base md:text-lg truncate">{activeChat.name}</h3>
                                     <div className="flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-green-500" />
                                         <p className="text-xs text-muted-foreground font-medium italic">Online</p>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-primary">
+                            <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+                                <Button variant="ghost" size="icon" className="hidden sm:inline-flex rounded-full text-muted-foreground hover:text-primary">
                                     <Phone size={18} />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-primary">
+                                <Button variant="ghost" size="icon" className="hidden sm:inline-flex rounded-full text-muted-foreground hover:text-primary">
                                     <Video size={18} />
                                 </Button>
-                                <div className="h-6 w-px bg-border mx-1" />
+                                <div className="hidden sm:block h-6 w-px bg-border mx-1" />
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="sm" className="gap-2 rounded-xl font-bold bg-background">
+                                        <Button variant="outline" size="sm" className="gap-1 md:gap-2 rounded-xl font-bold bg-background text-[10px] sm:text-xs">
                                             {activeChat.status.toUpperCase()}
                                             <ChevronDown className="h-3 w-3" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[200px] shadow-xl border-border/50">
+                                    <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[160px] md:min-w-[200px] shadow-xl border-border/50">
                                         {(userType === 'host'
                                             ? ['Requested', 'Sent', 'Quoted', 'Negotiating', 'Booked']
                                             : ['Pending', 'Confirmed', 'In Progress', 'Completed', 'Paid']
@@ -220,7 +237,7 @@ export default function Inbox({ conversations: initialConversations, userType, t
                         </div>
 
                         {/* Messages Area */}
-                        <div className="flex-1 overflow-y-auto p-12 space-y-8 scrollbar-hide">
+                        <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-12 space-y-4 md:space-y-8 scrollbar-hide">
                             {activeChat.messages.map((msg) => (
                                 <div key={msg.id} className={`flex ${msg.isMe ? 'justify-end' : 'justify-start'} items-end gap-3`}>
                                     {!msg.isMe && (
@@ -231,8 +248,8 @@ export default function Inbox({ conversations: initialConversations, userType, t
                                             </AvatarFallback>
                                         </Avatar>
                                     )}
-                                    <div className="flex flex-col gap-1.5 max-w-[60%]">
-                                        <div className={`p-5 rounded-[1.5rem] shadow-sm text-sm leading-relaxed ${msg.isMe
+                                    <div className="flex flex-col gap-1.5 max-w-[88%] sm:max-w-[75%] md:max-w-[60%]">
+                                        <div className={`p-3 sm:p-4 md:p-5 rounded-[1.25rem] md:rounded-[1.5rem] shadow-sm text-sm leading-relaxed ${msg.isMe
                                                 ? 'bg-primary text-primary-foreground font-bold rounded-br-none'
                                                 : 'bg-background text-foreground font-medium border border-border rounded-bl-none'
                                             }`}>
@@ -247,8 +264,8 @@ export default function Inbox({ conversations: initialConversations, userType, t
                         </div>
 
                         {/* Message Input */}
-                        <div className="p-8 bg-background border-t border-border">
-                            <div className="flex gap-4 items-center bg-secondary rounded-[2rem] px-6 py-2">
+                        <div className="p-3 sm:p-4 md:p-8 bg-background border-t border-border">
+                            <div className="flex gap-3 md:gap-4 items-center bg-secondary rounded-[1.25rem] md:rounded-[2rem] px-3 md:px-6 py-1.5 md:py-2">
                                 <Textarea
                                     placeholder="Type your response..."
                                     value={messageInput}
@@ -259,14 +276,14 @@ export default function Inbox({ conversations: initialConversations, userType, t
                                             handleSendMessage();
                                         }
                                     }}
-                                    className="flex-1 bg-transparent border-none focus-visible:ring-0 px-0 py-4 resize-none min-h-[56px] font-medium"
+                                    className="flex-1 bg-transparent border-none focus-visible:ring-0 px-0 py-3 md:py-4 resize-none min-h-[48px] md:min-h-[56px] font-medium"
                                 />
                                 <div className="flex items-center gap-2">
                                     <Button
                                         onClick={handleSendMessage}
-                                        className="w-12 h-12 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-all p-0"
+                                        className="w-10 h-10 md:w-12 md:h-12 bg-primary text-primary-foreground rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-all p-0"
                                     >
-                                        <Send size={20} />
+                                        <Send size={18} />
                                     </Button>
                                 </div>
                             </div>

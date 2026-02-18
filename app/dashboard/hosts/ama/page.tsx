@@ -776,7 +776,7 @@ export default function App() {
     };
 
     return (
-        <div className="bg-background h-[calc(100dvh-5.5rem)] sm:h-[calc(100dvh-6rem)] md:h-[calc(100dvh-9rem)] flex flex-col font-serif overflow-hidden">
+        <div className="bg-background h-[calc(100dvh-5.5rem)] sm:h-[calc(100dvh-6rem)] md:h-[calc(100dvh-9rem)] flex flex-col overflow-hidden">
             <style>{`
         @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
@@ -850,7 +850,7 @@ export default function App() {
                         onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
                         placeholder={market ? `Message Ama about your ${activeCity} event...` : "Message Ama — or select a city..."}
                         rows={1}
-                        className="flex-1 bg-transparent border-none text-foreground text-sm resize-none font-serif leading-relaxed px-2 py-1 placeholder:text-muted-foreground/50"
+                        className="flex-1 bg-transparent border-none text-foreground text-sm resize-none leading-relaxed px-2 py-1 placeholder:text-muted-foreground/50"
                     />
                     <button onClick={() => send(input)} className={cn(
                         "w-9 h-9 rounded-full flex items-center justify-center text-lg transition-all transform active:scale-90 shadow-md",
