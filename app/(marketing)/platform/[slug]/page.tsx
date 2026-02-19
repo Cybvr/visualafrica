@@ -40,7 +40,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                 {feature.heroSubtitle}
                             </p>
                             <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-                                <Button asChild size="lg" className="h-12 px-8 text-base">
+                                <Button asChild size="lg" className="h-12 px-8 text-primary-foreground text-base">
                                     <Link href="/auth/login">
                                         {feature.ctaText}
                                     </Link>
@@ -150,10 +150,10 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                 {/* CTA Section */}
                 <section className="py-24 bg-primary text-foreground text-center">
                     <div className="container mx-auto px-4">
-                        <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">
+                        <h2 className="font-serif text-4xl text-primary-foreground md:text-5xl font-bold mb-6">
                             Ready to transform your event planning?
                         </h2>
-                        <p className="mx-auto mb-10 max-w-2xl text-lg opacity-90">
+                        <p className="mx-auto mb-10 max-w-2xl text-primary-foreground text-lg opacity-90">
                             Start using Waddi {feature.title} today and experience the difference.
                         </p>
                         <Button asChild size="lg" variant="secondary" className="h-14 px-10 text-lg bg-white text-primary hover:bg-card">

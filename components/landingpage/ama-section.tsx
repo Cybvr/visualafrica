@@ -41,7 +41,7 @@ export function AmaSection() {
             ))}
           </div>
           <div className="mt-8">
-            <Button asChild size="lg" className="bg-primary text-foreground hover:bg-primary/90">
+            <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
               <Link href="/dashboard/hosts/ama">Chat with Ama</Link>
             </Button>
           </div>
