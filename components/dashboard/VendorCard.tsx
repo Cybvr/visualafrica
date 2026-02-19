@@ -35,7 +35,7 @@ const VendorCard: React.FC<Vendor> = ({ name, location, price, rating, image, ca
 
         <button
           onClick={toggleLike}
-          className={`absolute top-2 right-2 sm:top-4 sm:right-4 p-1.5 sm:p-2 rounded-full backdrop-blur-md transition-all ${isLiked ? 'bg-primary text-primary-foreground' : 'bg-white/80 text-muted-foreground hover:text-accent'
+          className={`absolute top-2 right-2 sm:top-4 sm:right-4 p-1.5 sm:p-2 rounded-full backdrop-blur-md transition-all ${isLiked ? 'bg-background text-foreground' : 'bg-white/80 text-muted-foreground hover:text-accent'
             }`}
         >
           <Bookmark size={14} className={isLiked ? 'fill-white' : ''} />
@@ -46,7 +46,7 @@ const VendorCard: React.FC<Vendor> = ({ name, location, price, rating, image, ca
         </div>
 
         <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 flex items-center gap-1 bg-card backdrop-blur-sm px-2 py-1 rounded-full shadow-sm">
-          <Star size={10} className="text-primary fill-primary" />
+          <Star size={10} className="text-foreground fill-foreground" />
           <span className="text-[10px] font-bold text-foreground">{rating}</span>
         </div>
       </div>

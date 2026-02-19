@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Mulish, Neuton, DM_Serif_Display } from 'next/font/google'
+import { Mulish, Neuton, DM_Serif_Display, DM_Sans } from 'next/font/google'
 
 import './globals.css'
 
@@ -23,6 +23,13 @@ const dmSerifDisplay = DM_Serif_Display({
   weight: ['400'],
 })
 
+const dmSansHeading = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  display: 'swap',
+  weight: ['300'],
+})
+
 export const metadata: Metadata = {
   title: 'Waddi | Lagos\'s Trusted Event Planner Marketplace',
   description:
@@ -43,7 +50,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${mulish.variable} ${neuton.variable} ${dmSerifDisplay.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${mulish.variable} ${neuton.variable} ${dmSerifDisplay.variable} ${dmSansHeading.variable}`}>
       <body className="font-sans antialiased">
         <ThemeProvider
           attribute="class"

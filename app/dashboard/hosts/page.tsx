@@ -75,7 +75,7 @@ const FilterSidebar: React.FC<{
       <div className="space-y-6 ">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold">Filters</h3>
-          <button onClick={onClearAll} className="text-sm text-primary font-bold hover:underline">
+          <button onClick={onClearAll} className="text-sm text-foreground font-bold hover:underline">
             Clear All
           </button>
         </div>
@@ -427,33 +427,33 @@ export default function DashboardPage() {
               <button
                 onClick={() => setActiveTab('all')}
                 className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'all'
-                  ? 'border-primary text-primary'
+                  ? 'border-border text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                   }`}
               >
                 All Vendors
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'all' ? 'bg-primary/10 text-primary' : 'bg-secondary text-muted-foreground'}`}>{allVendorsCount}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'all' ? 'bg-foreground text-foreground' : 'bg-secondary text-muted-foreground'}`}>{allVendorsCount}</span>
               </button>
               <button
                 onClick={() => setActiveTab('experiences')}
                 className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'experiences'
-                  ? 'border-primary text-primary'
+                  ? 'border-border text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                   }`}
               >
                 Experiences
                 <Crown size={14} className="text-amber-500 fill-amber-500" />
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'experiences' ? 'bg-primary/10 text-primary' : 'bg-secondary text-muted-foreground'}`}>{experiencesCount}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'experiences' ? 'bg-foreground text-foreground' : 'bg-secondary text-muted-foreground'}`}>{experiencesCount}</span>
               </button>
               <button
                 onClick={() => setActiveTab('saved')}
                 className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'saved'
-                  ? 'border-primary text-primary'
+                  ? 'border-border text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                   }`}
               >
                 Saved Vendors
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'saved' ? 'bg-primary/10 text-primary' : 'bg-secondary text-muted-foreground'}`}>{savedVendorsCount}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'saved' ? 'bg-foreground text-foreground' : 'bg-secondary text-muted-foreground'}`}>{savedVendorsCount}</span>
               </button>
             </div>
 

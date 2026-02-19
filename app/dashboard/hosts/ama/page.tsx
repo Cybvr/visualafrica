@@ -978,20 +978,20 @@ export default function App() {
                     <div className="text-foreground font-bold text-sm">Ama</div>
                     <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                        <span className="text-primary text-[10px] uppercase tracking-wider font-bold">Active · Diaspora Agent</span>
+                        <span className="text-foreground text-[10px] uppercase tracking-wider font-bold">Active · Diaspora Agent</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
                     {savedVendors.size > 0 && (
                         <div className="flex items-center gap-1.5 bg-secondary border border-border rounded-full px-2.5 py-1 shadow-sm">
                             <span className="text-xs">🔖</span>
-                            <span className="text-primary text-[10px] font-bold uppercase">{savedVendors.size} saved</span>
+                            <span className="text-foreground text-[10px] font-bold uppercase">{savedVendors.size} saved</span>
                         </div>
                     )}
                     {activeCity && (
                         <div className="flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 shadow-sm">
                             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                            <span className="text-primary text-[11px] font-bold uppercase tracking-tight">{activeCity}</span>
+                            <span className="text-foreground text-[11px] font-bold uppercase tracking-tight">{activeCity}</span>
                         </div>
                     )}
                 </div>
@@ -1014,7 +1014,7 @@ export default function App() {
                     />
                 ))}
                 {typing && (
-                    <div className="flex items-end gap-2 text-primary">
+                    <div className="flex items-end gap-2 text-foreground">
                         <img
                             src="/images/ama.png"
                             alt="Ama"
