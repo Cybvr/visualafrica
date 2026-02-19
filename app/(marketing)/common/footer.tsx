@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { Facebook, Instagram, MessageCircle } from "lucide-react"
-import { VENDOR_CATEGORIES, CATEGORY_SLUG_MAP } from "@/lib/vendors-data"
 import { solutions } from "@/lib/solutions-data"
 import { platformFeatures } from "@/lib/platform-data"
 
@@ -9,21 +8,9 @@ const quickLinks = [
   { label: "About Us", href: "/about" },
   { label: "FAQs", href: "/support" },
   { label: "Blog", href: "/blog" },
-  { label: "Explore", href: "/explore/vendors" },
   { label: "Pricing", href: "/pricing" },
   { label: "Contact", href: "/contact" },
 ]
-
-// Build explore links from vendor data
-const categoryToSlug = Object.fromEntries(
-  Object.entries(CATEGORY_SLUG_MAP).map(([slug, cat]) => [cat, slug])
-)
-const exploreLinks = VENDOR_CATEGORIES.filter(
-  (c) => c !== "All Categories"
-).map((cat) => ({
-  label: cat,
-  href: `/explore/vendors/${categoryToSlug[cat] ?? cat.toLowerCase().replace(/\s+/g, "-")}`,
-}))
 
 // Build solutions links from data
 const solutionLinks = solutions.map((s) => ({
@@ -85,7 +72,7 @@ export function Footer() {
 
       {/* Footer Content */}
       <div className="mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2">
@@ -137,25 +124,6 @@ export function Footer() {
                     className="text-sm opacity-70 transition-opacity hover:opacity-100"
                   >
                     {feature.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Explore */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
-              Explore
-            </h3>
-            <ul className="mt-4 flex flex-col gap-2">
-              {exploreLinks.slice(0, 6).map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm opacity-70 transition-opacity hover:opacity-100"
-                  >
-                    {link.label}
                   </Link>
                 </li>
               ))}

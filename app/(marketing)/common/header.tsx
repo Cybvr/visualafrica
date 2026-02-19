@@ -11,14 +11,7 @@ import {
   CalendarCheck,
   Activity,
   CreditCard,
-  Heart,
-  Cake,
   Users,
-  Building2,
-  Gem,
-  Calendar,
-  User,
-  Sparkles,
   Map,
   Presentation,
   Video,
@@ -40,17 +33,10 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { VENDOR_CATEGORIES, CATEGORY_SLUG_MAP } from "@/lib/vendors-data"
 import { solutions } from "@/lib/solutions-data"
 import { auth } from "@/lib/firebase"
 import { onAuthStateChanged, signOut, User as FirebaseUser } from "firebase/auth"
-import { EVENT_THEMES } from "@/lib/vendors-data"
 import { platformFeatures } from "@/lib/platform-data"
-
-const themeLinks = EVENT_THEMES.filter(t => t !== "All Themes").map(theme => ({
-  label: theme,
-  href: `/explore/vendors?theme=${encodeURIComponent(theme)}`,
-}))
 
 const eventTypeSlugs = ["offsites-retreats", "client-events", "skos", "conferences", "incentive-trips"]
 const serviceOfferingSlugs = ["full-service-planning", "expedited-planning"]
@@ -60,18 +46,6 @@ const platformIconMap: Record<string, ComponentType<{ className?: string }>> = {
   Book: CalendarCheck,
   Track: Activity,
   Pay: CreditCard,
-}
-
-const themeIconMap: Record<string, ComponentType<{ className?: string }>> = {
-  Wedding: Heart,
-  "Kids Birthday": Cake,
-  "Social Gathering": Users,
-  "Corporate Event": Building2,
-  Proposals: Gem,
-  Anniversary: Calendar,
-  Bachelor: User,
-  Bachelorette: User,
-  Bridal: Sparkles,
 }
 
 const offeringIconMap: Record<string, ComponentType<{ className?: string }>> = {
@@ -156,36 +130,6 @@ export function Header() {
                             {feature.description}
                           </p>
                         </div>
-                      </Link>
-                    </DropdownMenuItem>
-                  )
-                })}
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
-              Discover
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[500px] border-none bg-background p-4 shadow-2xl rounded-3xl">
-              <div className="grid grid-cols-2 gap-x-8 gap-y-2">
-                <div className="col-span-2 pb-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Choose a Theme</span>
-                </div>
-                {themeLinks.map((theme) => {
-                  const Icon = themeIconMap[theme.label]
-                  return (
-                    <DropdownMenuItem key={theme.label} asChild className="p-0 focus:bg-transparent">
-                      <Link href={theme.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
-                        {Icon && (
-                          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                            <Icon className="h-4 w-4" />
-                          </span>
-                        )}
-                        <span className="text-sm font-bold text-foreground">
-                          {theme.label}
-                        </span>
                       </Link>
                     </DropdownMenuItem>
                   )
@@ -359,25 +303,6 @@ export function Header() {
                     </Link>
                   ))}
                 </div>
-              </div>
-              <Link
-                href="/explore/vendors"
-                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
-                onClick={() => setMobileOpen(false)}
-              >
-                Discover
-              </Link>
-              <div className="ml-4 flex flex-col gap-2 border-l border-border pl-4">
-                {themeLinks.slice(0, 6).map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
               </div>
               <Link
                 href="/solutions"
