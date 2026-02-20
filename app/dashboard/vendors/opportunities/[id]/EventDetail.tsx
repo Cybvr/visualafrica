@@ -4,13 +4,13 @@ import { ChevronLeft, Calendar, MapPin, Users, DollarSign, MessageSquare, Heart,
 import { SharedEvent } from '@/lib/shared-data';
 import { SubmitProposalModal, ProposalData } from '@/components/dashboard/SubmitProposalModal';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface EventDetailProps {
   event: SharedEvent;
-  onBack: () => void;
 }
 
-const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
+const EventDetail: React.FC<EventDetailProps> = ({ event }) => {
   const router = useRouter();
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [imgSrc, setImgSrc] = React.useState(
@@ -54,13 +54,13 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
     <div className="max-w-7xl mx-auto space-y-6 pb-16">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border pb-4">
-        <button
-          onClick={onBack}
+        <Link
+          href="/dashboard/vendors"
           className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
         >
           <ChevronLeft size={16} />
           Back to Events
-        </button>
+        </Link>
         <div className="flex items-center gap-2">
           <button className="p-2 hover:bg-secondary text-muted-foreground transition-all">
             <Share2 size={16} />

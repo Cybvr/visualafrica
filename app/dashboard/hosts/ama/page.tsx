@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { vendors } from "@/lib/vendors-data";
-import { BLOG_POSTS } from "@/lib/blog-data";
+import { getVendors, getBlogPosts } from "@/lib/firestore-service";
+import { Vendor } from "@/lib/vendors-data";
+import { BlogPost } from "@/lib/blog-data";
 import { cn } from "@/lib/utils";
 
 // ── Constants ────────────────────────────────────────────
@@ -37,7 +38,7 @@ const VENDOR_ACTIONS = [
 
 // ── Data Helpers ─────────────────────────────────────────
 
-function buildVendors(city: string) {
+function buildVendorsList(vendors: Vendor[], city: string) {
     return vendors
         .filter(v => v.location.toLowerCase().includes(city.toLowerCase()))
         .map(v => ({
@@ -51,12 +52,7 @@ function buildVendors(city: string) {
         }));
 }
 
-const ALL_VENDORS: Record<string, any[]> = {
-    Lagos: buildVendors("lagos"),
-    Accra: buildVendors("accra"),
-    Nairobi: buildVendors("nairobi"),
-    "Cape Town": buildVendors("cape town"),
-};
+// ALL_VENDORS will be initialized in the component
 
 // ── Market Data ──────────────────────────────────────────
 
@@ -64,7 +60,7 @@ const MARKET_DATA: Record<string, any> = {
     Accra: {
         greeting: "Accra — perfect. I'm pulling from the Ghanaian vendor network now. Caterers, Highlife DJs, kente decor, venues. What's the event?",
         capabilityResponses: {
-            vendor_search: { type: "vendor_cards", city: "Accra", content: "Top vendors available in Accra:", vendors: ALL_VENDORS.Accra.slice(0, 3) },
+            vendor_search: { type: "vendor_cards", city: "Accra", content: "Top vendors available in Accra:", vendors: [] },
             negotiate: {
                 type: "action", content: "Negotiating bundle across Accra vendors:", actions: [
                     { label: "Contacting Maame's Kitchen for bulk rate", status: "done" },
@@ -96,7 +92,7 @@ const MARKET_DATA: Record<string, any> = {
                 type: "vendor_cards",
                 city: "Lagos",
                 content: "Top vendors available in Lagos:",
-                vendors: ALL_VENDORS.Lagos.slice(0, 3),
+                vendors: [],
                 suggestions: [{ label: "Let Ama handle booking", action: "ama_run_vendor_flow" }]
             },
             negotiate: {
@@ -126,7 +122,7 @@ const MARKET_DATA: Record<string, any> = {
     Nairobi: {
         greeting: "Nairobi — great choice. Into the Kenyan vendor network now. Nyama choma caterers, Gengetone & Amapiano DJs, Maasai-inspired decor. What are we building?",
         capabilityResponses: {
-            vendor_search: { type: "vendor_cards", city: "Nairobi", content: "Top vendors available in Nairobi:", vendors: ALL_VENDORS.Nairobi.slice(0, 3) },
+            vendor_search: { type: "vendor_cards", city: "Nairobi", content: "Top vendors available in Nairobi:", vendors: [] },
             negotiate: {
                 type: "action", content: "Negotiating bundle across Nairobi vendors:", actions: [
                     { label: "Contacting Nyama Choma Kings for group rate", status: "done" },
@@ -154,7 +150,7 @@ const MARKET_DATA: Record<string, any> = {
     "Cape Town": {
         greeting: "Cape Town — on it. Into the South African vendor network. Braai caterers, Amapiano DJs, Cape Malay & Pan-African decor, estate venues. What's the event?",
         capabilityResponses: {
-            vendor_search: { type: "vendor_cards", city: "Cape Town", content: "Top vendors available in Cape Town:", vendors: ALL_VENDORS["Cape Town"].slice(0, 3) },
+            vendor_search: { type: "vendor_cards", city: "Cape Town", content: "Top vendors available in Cape Town:", vendors: [] },
             negotiate: {
                 type: "action", content: "Negotiating bundle across Cape Town vendors:", actions: [
                     { label: "Contacting Braai Masters for group rate", status: "done" },
@@ -229,7 +225,7 @@ function Dots() {
     return (
         <div style={{ display: "flex", gap: 4 }}>
             {[0, 1, 2].map(i => (
-                <span key={i} style={{ width: 7, height: 7, borderRadius: "50%", background: "#E8A020", display: "inline-block", animation: `bounce 1.2s infinite ${i * 0.2}s` }} />
+                <span key={i} style={{ width: 7, height: 7, borderRadius: "50%", background: "#E8A020", display: "inline-block", animation: "bounce 1.2s infinite", animationDelay: `${i * 0.2}s` }} />
             ))}
         </div>
     );
@@ -458,8 +454,8 @@ function VCard({ v, savedVendors, onSave, onAction }: { v: any; savedVendors: Se
     );
 }
 
-function VendorCardMsg({ msg, savedVendors, onSave, onVendorAction, activeCity }: { msg: any; savedVendors: Set<string>; onSave: (v: any) => void; onVendorAction: (a: any, v: any) => void; activeCity: string | null }) {
-    const allForCity = activeCity ? ALL_VENDORS[activeCity] : [];
+function VendorCardMsg({ msg, savedVendors, onSave, onVendorAction, activeCity, allVendorsByCity }: { msg: any; savedVendors: Set<string>; onSave: (v: any) => void; onVendorAction: (a: any, v: any) => void; activeCity: string | null, allVendorsByCity: Record<string, any[]> }) {
+    const allForCity = activeCity ? allVendorsByCity[activeCity] || [] : [];
     const [expanded, setExpanded] = useState(false);
     const shown = expanded ? allForCity : msg.vendors;
     const hasMore = allForCity.length > msg.vendors.length;
@@ -548,9 +544,10 @@ interface MsgProps {
     onFormSubmit: (data: any) => void;
     onCalendarSelect: (date: string) => void;
     onSuggestion: (s: any) => void;
+    allVendorsByCity: Record<string, any[]>;
 }
 
-function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onFormSubmit, onCalendarSelect, onSuggestion }: MsgProps) {
+function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onFormSubmit, onCalendarSelect, onSuggestion, allVendorsByCity }: MsgProps) {
     const ag = msg.role === "agent";
     return (
         <div className={cn("flex gap-2 mb-4", ag ? "flex-row items-end" : "flex-row-reverse items-end")}>
@@ -569,7 +566,7 @@ function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorActi
                         <Dots /><div className="mt-1.5 text-muted-foreground text-xs italic">{msg.content}</div>
                     </div>
                 ) : msg.type === "vendor_cards" ? (
-                    <VendorCardMsg msg={msg} savedVendors={savedVendors} onSave={onSave} onVendorAction={onVendorAction} activeCity={activeCity} />
+                    <VendorCardMsg msg={msg} savedVendors={savedVendors} onSave={onSave} onVendorAction={onVendorAction} activeCity={activeCity} allVendorsByCity={allVendorsByCity} />
                 ) : msg.type === "action" ? (
                     <div className="bg-card/80 border border-border rounded-2xl p-3.5 shadow-sm w-full">
                         <div className="text-foreground text-[13px] font-medium mb-2.5">{msg.content}</div>
@@ -616,20 +613,62 @@ function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorActi
 // ── App ──────────────────────────────────────────────────
 
 export default function App() {
+    const [allVendors, setAllVendors] = useState<Vendor[]>([]);
+    const [allBlogPosts, setAllBlogPosts] = useState<BlogPost[]>([]);
+    const [marketData, setMarketData] = useState<Record<string, any>>(MARKET_DATA);
+    const [allVendorsByCity, setAllVendorsByCity] = useState<Record<string, any[]>>({});
     const [messages, setMessages] = useState<any[]>(INITIAL_MESSAGES as any[]);
     const [input, setInput] = useState("");
     const [typing, setTyping] = useState(false);
     const [activeCity, setActiveCity] = useState<string | null>(null);
     const [savedVendors, setSavedVendors] = useState<Set<string>>(new Set());
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+        async function loadData() {
+            try {
+                const [v, b] = await Promise.all([getVendors(), getBlogPosts()]);
+                setAllVendors(v);
+                setAllBlogPosts(b);
+
+                const cities = ["Lagos", "Accra", "Nairobi", "Cape Town"];
+                const vendorsByCity: Record<string, any[]> = {};
+                cities.forEach(city => {
+                    vendorsByCity[city] = buildVendorsList(v, city);
+                });
+                setAllVendorsByCity(vendorsByCity);
+
+                // Update marketData with real vendors
+                const updatedMarketData = { ...MARKET_DATA };
+                cities.forEach(city => {
+                    if (updatedMarketData[city]) {
+                        updatedMarketData[city].capabilityResponses.vendor_search.vendors = vendorsByCity[city].slice(0, 3);
+                    }
+                });
+                setMarketData(updatedMarketData);
+
+            } catch (error) {
+                console.error("Error loading Ama data:", error);
+            }
+        }
+        loadData();
+    }, []);
+
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => { scrollRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, typing]);
 
-    const market = activeCity ? MARKET_DATA[activeCity] : null;
+    const market = activeCity ? marketData[activeCity] : null;
+
+    if (!mounted) return null;
+
+    const onVendorAction = (a: any, v: any) => handleVendorAction(a, v);
+    const onSave = (v: any) => handleSaveVendor(v);
 
     // ── Message helpers ──────────────────────────────────
 
-    const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const now = () => new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
 
     const addMsg = (msg: any) => setMessages(prev => [...prev, { id: Date.now(), time: now(), ...msg }]);
 
@@ -832,7 +871,7 @@ export default function App() {
         // Show local blog guide
         show_guide: (s) => {
             withTyping(1000, () => {
-                const guide = BLOG_POSTS.find(b => b.title.toLowerCase().includes(s.city.toLowerCase())) || BLOG_POSTS[1];
+                const guide = allBlogPosts.find(b => b.title.toLowerCase().includes(s.city.toLowerCase())) || allBlogPosts[1];
                 addAgentMsg({
                     type: "knowledge",
                     content: `Here's the inside scoop on ${s.city}. We've vetted these spots specifically for the diaspora community.`,
@@ -1011,6 +1050,7 @@ export default function App() {
                         onFormSubmit={handleFormSubmit}
                         onCalendarSelect={handleCalendarSelect}
                         onSuggestion={handleSuggestion}
+                        allVendorsByCity={allVendorsByCity}
                     />
                 ))}
                 {typing && (

@@ -87,7 +87,7 @@ export default function VendorPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">Pending</p>
                             <Clock size={20} className="text-yellow-600" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${paymentStats.pendingAmount.toLocaleString()}</p>
+                        <p className="text-3xl font-black text-foreground">₦{paymentStats.pendingAmount.toLocaleString('en-NG')}</p>
                         <p className="text-xs text-muted-foreground mt-1">Awaiting processing</p>
                     </div>
 

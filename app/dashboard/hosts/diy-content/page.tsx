@@ -1,12 +1,29 @@
-"use client";
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Search, Filter, ArrowRight, Clock, User } from 'lucide-react';
-import { BLOG_POSTS } from '@/lib/blog-data';
+import { BlogPost } from '@/lib/blog-data';
 import BlogPostCard from '@/components/dashboard/BlogPostCard';
+import { getBlogPosts } from '@/lib/firestore-service';
 
 const DIYContent: React.FC = () => {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const data = await getBlogPosts();
+        setPosts(data);
+      } catch (error) {
+        console.error("Error fetching DIY content:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchPosts();
+  }, []);
+
+  if (isLoading) return <div className="p-10 text-center">Loading DIY resources...</div>;
   return (
     <div className="max-w-7xl mx-auto space-y-10 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -31,7 +48,7 @@ const DIYContent: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {BLOG_POSTS.map((post) => (
+        {posts.map((post) => (
           <BlogPostCard key={post.id} post={post} variant="full" />
         ))}
       </div>

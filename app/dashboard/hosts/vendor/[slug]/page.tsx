@@ -1,30 +1,29 @@
-"use client";
-
 import React from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { vendors } from '@/lib/vendors-data';
+import { getVendorBySlug } from '@/lib/firestore-service';
 import VendorDetail from './VendorDetail';
+import Link from 'next/link';
 
-export default function VendorDetailPage() {
-    const params = useParams();
-    const router = useRouter();
-    const slug = params.slug as string;
+interface PageProps {
+    params: Promise<{ slug: string }>;
+}
 
-    const vendor = vendors.find(v => v.slug === slug);
+export default async function VendorDetailPage({ params }: PageProps) {
+    const { slug } = await params;
+    const vendor = await getVendorBySlug(slug);
 
     if (!vendor) {
         return (
             <div className="flex flex-col items-center justify-center h-full space-y-4">
-                <h1 className="text-2xl font-bold">Vendor not found</h1>
-                <button
-                    onClick={() => router.push('/dashboard/hosts/vendors')}
-                    className="text-accent font-bold"
+                <h1 className="text-2xl font-bold text-foreground">Vendor not found</h1>
+                <Link
+                    href="/dashboard/hosts/vendors"
+                    className="text-primary font-bold hover:underline"
                 >
                     Back to Explore
-                </button>
+                </Link>
             </div>
         );
     }
 
-    return <VendorDetail vendor={vendor} onBack={() => router.push('/dashboard/hosts/vendors')} />;
+    return <VendorDetail vendor={vendor} />;
 }

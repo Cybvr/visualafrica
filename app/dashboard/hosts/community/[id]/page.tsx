@@ -136,7 +136,7 @@ export default function InspirationDetailsPage() {
                                     <MapPin size={18} className="text-muted-foreground" />
                                     <span className="font-bold text-foreground">Attendance</span>
                                 </div>
-                                <p className="text-sm text-muted-foreground pl-8">{event.guestCount ? event.guestCount.toLocaleString() : 'N/A'}</p>
+                                <p className="text-sm text-muted-foreground pl-8">{event.guestCount ? event.guestCount.toLocaleString('en-US') : 'N/A'}</p>
                             </div>
                         </div>
                     </div>

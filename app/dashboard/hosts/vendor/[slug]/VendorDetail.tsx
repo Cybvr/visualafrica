@@ -1,15 +1,17 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ChevronLeft, Star, MapPin, CheckCircle2, MessageSquare, Heart, Share2, Calendar, Globe, Award, ShieldCheck, Zap, Video, Image as ImageIcon } from 'lucide-react';
 import { Vendor } from '@/lib/vendors-data';
 
 interface VendorDetailProps {
   vendor: Vendor;
-  onBack: () => void;
 }
 
-const VendorDetail: React.FC<VendorDetailProps> = ({ vendor, onBack }) => {
+const VendorDetail: React.FC<VendorDetailProps> = ({ vendor }) => {
+  const router = useRouter();
+  const onBack = () => router.push('/dashboard/hosts/vendors');
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-16">
       {/* Header / Breadcrumb */}

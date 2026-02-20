@@ -1,12 +1,13 @@
 "use client";
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import Inbox, { ChatConversation } from '@/components/dashboard/Inbox';
-import { SHARED_EVENTS } from '@/lib/shared-data';
+import { SharedEvent } from '@/lib/shared-data';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
+import { getEvents } from '@/lib/firestore-service';
 
-const generateConversations = (): ChatConversation[] => {
-  const contracts = SHARED_EVENTS.filter(event =>
+const generateConversations = (events: SharedEvent[]): ChatConversation[] => {
+  const contracts = events.filter(event =>
     event.bookedVendors.some(bv => bv.vendorId === VENDOR_DASHBOARD_DATA.currentVendorId)
   );
 
@@ -46,7 +47,24 @@ const generateConversations = (): ChatConversation[] => {
 };
 
 const InboxContent: React.FC = () => {
-  const conversations = generateConversations();
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const events = await getEvents();
+        setConversations(generateConversations(events));
+      } catch (error) {
+        console.error("Error fetching inbox data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (isLoading) return <div className="p-10 text-center">Loading inbox...</div>;
 
   return (
     <div className="max-w-7xl mx-auto">

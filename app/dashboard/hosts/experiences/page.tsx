@@ -1,20 +1,39 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { vendors, VENDOR_CATEGORIES, Vendor } from '@/lib/vendors-data';
+import { Vendor } from '@/lib/vendors-data';
 import VendorCard from '@/components/dashboard/VendorCard';
+import { getVendors } from '@/lib/firestore-service';
 
 const ExperiencesPage: React.FC = () => {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<'all' | 'saved'>('all');
+    const [vendors, setVendors] = useState<Vendor[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchVendors() {
+            try {
+                const data = await getVendors();
+                setVendors(data);
+            } catch (error) {
+                console.error("Error fetching experiences data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        fetchVendors();
+    }, []);
 
     // Filter for experiences only
     const experiencesVendors = vendors.filter(v => v.categories.includes('Experiences'));
 
     // For demo purposes, we'll just show the same list for saved if tab is 'saved'
     const displayExperiences = activeTab === 'all' ? experiencesVendors : experiencesVendors.slice(0, 1);
+
+    if (isLoading) return <div className="p-10 text-center">Loading experiences...</div>;
 
     return (
         <div className="max-w-7xl mx-auto space-y-10 pb-20">

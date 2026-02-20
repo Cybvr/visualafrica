@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
+import { SharedEvent } from '@/lib/shared-data';
+import { getEvents } from '@/lib/firestore-service';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
-import { SHARED_EVENTS } from '@/lib/shared-data';
 import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
 import Image from 'next/image';
 import { MapPin, Calendar, Users, Briefcase, Star, Clock } from 'lucide-react';
@@ -17,8 +18,22 @@ type EventStatus = 'All Events' | 'Planning' | 'Confirmed' | 'Completed';
 export default function VendorDashboardPage() {
   const router = useRouter();
   const [displayName, setDisplayName] = useState<string>('');
+  const [allEvents, setAllEvents] = useState<SharedEvent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    async function fetchData() {
+      try {
+        const events = await getEvents();
+        setAllEvents(events);
+      } catch (error) {
+        console.error("Error fetching vendor dashboard data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
         setDisplayName('');
@@ -43,8 +58,8 @@ export default function VendorDashboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredEvents = searchQuery.trim() === ''
-    ? SHARED_EVENTS
-    : SHARED_EVENTS.filter(event =>
+    ? allEvents
+    : allEvents.filter(event =>
       event.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.hostName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.location.toLowerCase().includes(searchQuery.toLowerCase())

@@ -8,11 +8,10 @@ import { useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { vendors, VENDOR_CATEGORIES, EVENT_THEMES } from '@/lib/vendors-data';
-import { BLOG_POSTS } from '@/lib/blog-data';
-import { EVENTS } from '@/lib/events-data';
-import { SHARED_EVENTS } from '@/lib/shared-data';
-import { MOCK_EVENTS } from '@/lib/event-data';
+import { VENDOR_CATEGORIES, EVENT_THEMES, Vendor } from '@/lib/vendors-data';
+import { BlogPost } from '@/lib/blog-data';
+import { SharedEvent } from '@/lib/shared-data';
+import { getVendors, getEvents, getBlogPosts } from '@/lib/firestore-service';
 import BlogPostCard from '@/components/dashboard/BlogPostCard';
 import VendorCard from '@/components/dashboard/VendorCard';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -20,16 +19,10 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 
-// Extract unique locations from vendor data
-const LOCATIONS = Array.from(new Set(vendors.flatMap(v => {
-  // Extract city from location string (e.g., "Lekki, Lagos" -> "Lagos")
-  const parts = v.location.split(',').map(p => p.trim());
-  return parts[parts.length - 1]; // Get the last part (city/state)
-}))).sort();
-
 const VENDOR_TYPES = ['All', 'Regular Vendors', 'Suspended', 'New'];
 
 const FilterSidebar: React.FC<{
+  vendors: Vendor[];
   searchQuery: string;
   selectedCategories: string[];
   selectedThemes: string[];
@@ -44,6 +37,7 @@ const FilterSidebar: React.FC<{
   onPriceChange: (range: [number, number]) => void;
   onClearAll: () => void;
 }> = ({
+  vendors,
   searchQuery,
   selectedCategories,
   selectedThemes,
@@ -58,6 +52,12 @@ const FilterSidebar: React.FC<{
   onPriceChange,
   onClearAll,
 }) => {
+    // Extract unique locations from vendor data
+    const LOCATIONS = Array.from(new Set(vendors.flatMap(v => {
+      const parts = v.location.split(',').map(p => p.trim());
+      return parts[parts.length - 1];
+    }))).sort();
+
     const [expandedSections, setExpandedSections] = useState({
       search: true,
       type: true,
@@ -245,8 +245,8 @@ const FilterSidebar: React.FC<{
                 className="w-full"
               />
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>₦{priceRange[0].toLocaleString()}</span>
-                <span>₦{priceRange[1].toLocaleString()}</span>
+                <span>₦{priceRange[0].toLocaleString('en-NG')}</span>
+                <span>₦{priceRange[1].toLocaleString('en-NG')}</span>
               </div>
             </div>
           )}
@@ -259,6 +259,12 @@ export default function DashboardPage() {
   const router = useRouter();
   const [displayName, setDisplayName] = useState<string>('');
 
+  // Data States
+  const [allVendors, setAllVendors] = useState<Vendor[]>([]);
+  const [allEvents, setAllEvents] = useState<SharedEvent[]>([]);
+  const [allBlogPosts, setAllBlogPosts] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   // Filter States
   const [activeTab, setActiveTab] = useState<'all' | 'experiences' | 'saved'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -270,11 +276,29 @@ export default function DashboardPage() {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
 
   // Counts
-  const allVendorsCount = vendors.length;
-  const experiencesCount = vendors.filter(v => v.categories.includes('Experiences')).length;
+  const allVendorsCount = allVendors.length;
+  const experiencesCount = allVendors.filter(v => v.categories.includes('Experiences')).length;
   const savedVendorsCount = 0; // Placeholder for now
 
   useEffect(() => {
+    async function fetchData() {
+      try {
+        const [v, e, b] = await Promise.all([
+          getVendors(),
+          getEvents(),
+          getBlogPosts()
+        ]);
+        setAllVendors(v);
+        setAllEvents(e);
+        setAllBlogPosts(b);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
         setDisplayName('');
@@ -328,42 +352,42 @@ export default function DashboardPage() {
     : "Welcome back. Here's what's happening today.";
 
   // Apply filters logic
-  let filteredVendors = vendors;
+  let filteredVendors = allVendors;
 
   if (activeTab === 'experiences') {
-    filteredVendors = filteredVendors.filter(v => v.categories.includes('Experiences'));
+    filteredVendors = filteredVendors.filter((v: Vendor) => v.categories.includes('Experiences'));
   }
 
   if (selectedType === 'Regular Vendors') {
-    filteredVendors = filteredVendors.filter(v => !v.categories.includes('Experiences'));
+    filteredVendors = filteredVendors.filter((v: Vendor) => !v.categories.includes('Experiences'));
   } else if (selectedType === 'New') {
-    filteredVendors = filteredVendors.filter(v => v.isNew);
+    filteredVendors = filteredVendors.filter((v: Vendor) => v.isNew);
   } else if (selectedType === 'Sponsored') {
-    filteredVendors = filteredVendors.filter(v => v.isSponsored);
+    filteredVendors = filteredVendors.filter((v: Vendor) => v.isSponsored);
   }
 
   if (selectedCategories.length > 0) {
-    filteredVendors = filteredVendors.filter(v =>
-      v.categories.some(cat => selectedCategories.includes(cat))
+    filteredVendors = filteredVendors.filter((v: Vendor) =>
+      v.categories.some((cat: string) => selectedCategories.includes(cat))
     );
   }
 
   if (selectedThemes.length > 0) {
-    filteredVendors = filteredVendors.filter(v =>
-      v.eventThemes.some(theme => selectedThemes.includes(theme))
+    filteredVendors = filteredVendors.filter((v: Vendor) =>
+      v.eventThemes.some((theme: string) => selectedThemes.includes(theme))
     );
   }
 
   if (selectedLocations.length > 0) {
-    filteredVendors = filteredVendors.filter(v =>
-      selectedLocations.some(loc => v.location.includes(loc))
+    filteredVendors = filteredVendors.filter((v: Vendor) =>
+      selectedLocations.some((loc: string) => v.location.includes(loc))
     );
   }
 
   if (searchQuery) {
-    filteredVendors = filteredVendors.filter(v =>
+    filteredVendors = filteredVendors.filter((v: Vendor) =>
       v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.categories.some(cat => cat.toLowerCase().includes(searchQuery.toLowerCase()))
+      v.categories.some((cat: string) => cat.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   }
 
@@ -371,6 +395,7 @@ export default function DashboardPage() {
 
   const filterSidebar = (
     <FilterSidebar
+      vendors={allVendors}
       searchQuery={searchQuery}
       selectedCategories={selectedCategories}
       selectedThemes={selectedThemes}

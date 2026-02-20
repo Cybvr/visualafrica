@@ -4,10 +4,12 @@ import React, { ReactNode } from 'react';
 import { ChevronLeft, Zap, Star, MapPin, FileText, ShieldCheck, Mail, Phone, Share2, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Link from 'next/link';
 
 interface JobWorkspaceProps {
     role: 'host' | 'vendor';
-    onBack: () => void;
+    onBack?: () => void;
+    backUrl?: string;
     title: string;
     status: string;
     statusBadge: ReactNode;
@@ -22,6 +24,7 @@ interface JobWorkspaceProps {
 
 export default function JobWorkspace({
     onBack,
+    backUrl,
     title,
     statusBadge,
     contextCard,
@@ -30,20 +33,34 @@ export default function JobWorkspace({
 }: JobWorkspaceProps) {
     const [activeTab, setActiveTab] = React.useState(tabs[0]?.id);
 
+    const backButton = backUrl ? (
+        <Link
+            href={backUrl}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
+        >
+            <div className="p-2 bg-card rounded-full border border-border group-hover:bg-secondary transition-colors">
+                <ChevronLeft size={16} />
+            </div>
+            <span className="text-sm font-bold uppercase tracking-widest">Back</span>
+        </Link>
+    ) : (
+        <button
+            onClick={onBack}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
+        >
+            <div className="p-2 bg-card rounded-full border border-border group-hover:bg-secondary transition-colors">
+                <ChevronLeft size={16} />
+            </div>
+            <span className="text-sm font-bold uppercase tracking-widest">Back</span>
+        </button>
+    );
+
     return (
         <div className="max-w-6xl mx-auto space-y-6 py-6 pb-24 px-4">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-6">
-                    <button
-                        onClick={onBack}
-                        className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
-                    >
-                        <div className="p-2 bg-card rounded-full border border-border group-hover:bg-secondary transition-colors">
-                            <ChevronLeft size={16} />
-                        </div>
-                        <span className="text-sm font-bold uppercase tracking-widest">Back</span>
-                    </button>
+                    {backButton}
                     <div className="h-4 w-px bg-border hidden md:block" />
                     <h1 className="text-lg font-black uppercase tracking-widest text-foreground hidden md:block">
                         {activeTab === 'contract' ? 'Contract' : title}

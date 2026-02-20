@@ -1,7 +1,4 @@
-"use client"
-
 import { useState, useMemo } from "react"
-import { useParams, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Search, ChevronRight } from "lucide-react"
 import { Input } from "@/components/ui/input"
@@ -15,37 +12,48 @@ import {
 import { VendorCard } from "@/components/dashboard/vendor-card"
 import { VendorDetail } from "@/components/dashboard/vendor-detail"
 import {
-  vendors,
-  getVendorBySlug,
   EVENT_THEMES,
   CATEGORY_SLUG_MAP,
   VENDOR_FAQ,
   type EventTheme,
   type VendorCategory,
+  type Vendor,
 } from "@/lib/vendors-data"
+import { getVendors, getVendorBySlug } from "@/lib/firestore-service"
 
 const ITEMS_PER_PAGE = 8
 
-export default function ExploreVendorsPage() {
-  const params = useParams()
-  const segments = (params?.category as string[] | undefined) ?? []
+interface PageProps {
+  params: Promise<{ category?: string[] }>
+}
+
+export default async function ExploreVendorsPage({ params }: PageProps) {
+  const { category: segments = [] } = await params
   const firstSegment = segments[0] ?? null
 
   const isVendorDetail =
     firstSegment !== null && !(firstSegment in CATEGORY_SLUG_MAP)
-  const vendorData = isVendorDetail ? getVendorBySlug(firstSegment) : undefined
+
+  const allVendors = await getVendors()
+  const vendorData = isVendorDetail ? await getVendorBySlug(firstSegment) : undefined
 
   if (isVendorDetail && vendorData) {
     return <VendorDetail vendor={vendorData} />
   }
 
-  return <VendorListingContent categorySlug={firstSegment} />
+  return <VendorListingContent categorySlug={firstSegment} vendors={allVendors} />
 }
+
+"use client"
+
+import { useSearchParams } from "next/navigation"
 
 function VendorListingContent({
   categorySlug,
+  vendors,
 }: {
   categorySlug: string | null
+  vendors: Vendor[]
 }) {
   const initialCategory: VendorCategory = categorySlug
     ? CATEGORY_SLUG_MAP[categorySlug] ?? "All Categories"
@@ -65,7 +73,7 @@ function VendorListingContent({
   const locations = useMemo(() => {
     const locs = vendors.map((v) => v.location.split(",")[0].trim())
     return ["All Locations", ...Array.from(new Set(locs))]
-  }, [])
+  }, [vendors])
 
   const filteredVendors = useMemo(() => {
     let result = [...vendors]
@@ -93,7 +101,7 @@ function VendorListingContent({
     }
 
     return result
-  }, [selectedCategory, selectedTheme, selectedLocation, search])
+  }, [selectedCategory, selectedTheme, selectedLocation, search, vendors])
 
   const visibleVendors = filteredVendors.slice(0, visibleCount)
   const hasMore = visibleCount < filteredVendors.length

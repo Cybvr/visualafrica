@@ -100,7 +100,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                             <span>{event.guestCount} guests</span>
                         </div>
                         <div className="flex items-center gap-1 text-sm">
-                            <span className="font-medium text-success">₦{(event.budget || 0).toLocaleString()}</span>
+                            <span className="font-medium text-success">₦{(event.budget || 0).toLocaleString('en-NG')}</span>
                         </div>
                     </div>
                 </div>

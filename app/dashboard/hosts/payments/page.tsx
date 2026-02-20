@@ -180,7 +180,7 @@ export default function HostPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
                             <DollarSign size={20} className="text-primary" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${totalSpent.toLocaleString()}</p>
+                        <p className="text-3xl font-black text-foreground">${totalSpent.toLocaleString('en-US')}</p>
                         <p className="text-xs text-muted-foreground mt-1">All time</p>
                     </div>
 
@@ -189,7 +189,7 @@ export default function HostPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">Pending</p>
                             <Clock size={20} className="text-yellow-600" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${pendingAmount.toLocaleString()}</p>
+                        <p className="text-3xl font-black text-foreground">₦{pendingAmount.toLocaleString('en-NG')}</p>
                         <p className="text-xs text-muted-foreground mt-1">Awaiting payment</p>
                     </div>
 
@@ -198,7 +198,7 @@ export default function HostPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">This Month</p>
                             <Calendar size={20} className="text-green-600" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${thisMonth.toLocaleString()}</p>
+                        <p className="text-3xl font-black text-foreground">${thisMonth.toLocaleString('en-US')}</p>
                         <p className="text-xs text-muted-foreground mt-1">February 2026</p>
                     </div>
                 </div>

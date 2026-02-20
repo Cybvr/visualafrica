@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Calendar, Users, Briefcase, Search, Filter, SlidersHorizontal } from 'lucide-react';
 import { VENDOR_DASHBOARD_DATA, Booking } from '@/lib/vendor-dashboard-data';
-import { SHARED_EVENTS } from '@/lib/shared-data';
+import { SharedEvent } from '@/lib/shared-data';
+import { getEvents } from '@/lib/firestore-service';
 import { Button } from '@/components/ui/button';
 import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
 
@@ -35,15 +36,31 @@ function getJobCategory(booking: Booking): JobStatus[] {
 
 export default function VendorJobsPage() {
     const { bookings } = VENDOR_DASHBOARD_DATA;
+    const [allEvents, setAllEvents] = useState<SharedEvent[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState<JobStatus>('all');
+
+    useEffect(() => {
+        async function fetchEvents() {
+            try {
+                const events = await getEvents();
+                setAllEvents(events);
+            } catch (error) {
+                console.error("Error fetching vendor jobs data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        fetchEvents();
+    }, []);
 
     // Calculate real counts based on booking statuses
     const jobCounts = {
         all: bookings.length,
         pending: bookings.filter(b => getJobCategory(b).includes('pending')).length,
-        offers: 0, // Would come from proposals system when implemented
+        offers: 0,
         active: bookings.filter(b => getJobCategory(b).includes('active')).length,
-        declined: 0, // Would track declined jobs
+        declined: 0,
         completed: bookings.filter(b => getJobCategory(b).includes('completed')).length
     };
 
@@ -101,7 +118,7 @@ export default function VendorJobsPage() {
             <div className="grid grid-cols-1 gap-6">
                 {filteredBookings.length > 0 ? (
                     filteredBookings.map((booking) => {
-                        const eventFromShared = SHARED_EVENTS.find(e => e.id === booking.id.split('-')[1]);
+                        const eventFromShared = allEvents.find(e => e.id === booking.id.split('-')[1]);
                         const displayImage = eventFromShared?.image || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800';
 
                         return (

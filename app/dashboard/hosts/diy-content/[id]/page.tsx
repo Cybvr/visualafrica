@@ -1,16 +1,16 @@
-"use client";
-
 import React from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Clock, User, Share2, Bookmark, ChevronRight } from 'lucide-react';
+import { notFound } from 'next/navigation';
+import { ArrowLeft, Clock, Share2, Bookmark, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { BLOG_POSTS } from '@/lib/blog-data';
+import { getBlogPostById } from '@/lib/firestore-service';
 
-export default function BlogDetailPage() {
-    const params = useParams();
-    const router = useRouter();
-    const id = params.id as string;
-    const post = BLOG_POSTS.find(p => p.id === id);
+interface PageProps {
+    params: Promise<{ id: string }>;
+}
+
+export default async function BlogDetailPage({ params }: PageProps) {
+    const { id } = await params;
+    const post = await getBlogPostById(id);
 
     if (!post) {
         return (

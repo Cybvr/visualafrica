@@ -1,25 +1,27 @@
-"use client";
-
-import React, { useState } from 'react';
-import { useParams, notFound, useRouter } from 'next/navigation';
+import React from 'react';
+import { notFound } from 'next/navigation';
 import { Mail, Phone, FileText, Download, MapPin, Calendar, Users, Target, Clock, Share2, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { SHARED_EVENTS } from '@/lib/shared-data';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
-import VendorInboxTab from '@/components/dashboard/event-tabs/VendorInboxTab';
+import { SharedEvent } from '@/lib/shared-data';
 import JobWorkspace, { WorkspaceCard, StatusIndicator } from '@/components/dashboard/JobWorkspace';
 import JobChat from '@/components/dashboard/JobChat';
 import JobBrief from '@/components/dashboard/JobBrief';
 import { Event } from '@/lib/events-data';
+import { getEvents } from '@/lib/firestore-service';
 
-export default function VendorJobDetailsPage() {
-    const params = useParams();
-    const router = useRouter();
-    const id = params.id as string;
+interface PageProps {
+    params: Promise<{ id: string }>;
+}
+
+export default async function VendorJobDetailsPage({ params }: PageProps) {
+    const { id } = await params;
     const booking = VENDOR_DASHBOARD_DATA.bookings.find(b => b.id === id);
     const parts = id.split('-');
     const eventId = id.includes('-') ? parts.slice(1, -1).join('-') : id;
-    const event = SHARED_EVENTS.find(e => e.id === eventId);
+
+    const events = await getEvents();
+    const event = events.find((e: SharedEvent) => e.id === eventId);
 
     // Cast SharedEvent to Event for JobBrief
     const eventBriefData = event as unknown as Event;
@@ -208,7 +210,7 @@ export default function VendorJobDetailsPage() {
     return (
         <JobWorkspace
             role="vendor"
-            onBack={() => router.push('/dashboard/vendors/jobs')}
+            backUrl="/dashboard/vendors/jobs"
             title={event.eventName}
             status={booking.status}
             statusBadge={<StatusIndicator status={booking.status} label={booking.status} />}

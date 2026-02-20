@@ -1,30 +1,30 @@
-"use client";
-
 import React from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { SHARED_EVENTS } from '@/lib/shared-data';
+import { getEvents } from '@/lib/firestore-service';
 import EventDetail from './EventDetail';
+import Link from 'next/link';
 
-export default function EventDetailPage() {
-    const params = useParams();
-    const router = useRouter();
-    const id = params.id as string;
+interface PageProps {
+    params: Promise<{ id: string }>;
+}
 
-    const event = SHARED_EVENTS.find(e => e.id === id);
+export default async function EventDetailPage({ params }: PageProps) {
+    const { id } = await params;
+    const events = await getEvents();
+    const event = events.find(e => e.id === id);
 
     if (!event) {
         return (
             <div className="flex flex-col items-center justify-center h-full space-y-4">
-                <h1 className="text-2xl font-bold">Event not found</h1>
-                <button
-                    onClick={() => router.push('/dashboard/vendors')}
-                    className="text-accent font-bold"
+                <h1 className="text-2xl font-bold text-foreground">Event not found</h1>
+                <Link
+                    href="/dashboard/vendors"
+                    className="text-primary font-bold hover:underline"
                 >
                     Back to Search
-                </button>
+                </Link>
             </div>
         );
     }
 
-    return <EventDetail event={event} onBack={() => router.push('/dashboard/vendors')} />;
+    return <EventDetail event={event} />;
 }
