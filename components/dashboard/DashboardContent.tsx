@@ -1,4 +1,6 @@
 
+"use client";
+
 import React, { useEffect, useState } from 'react';
 import { X, ChevronLeft, ChevronRight, Rocket } from 'lucide-react';
 import { VendorCard } from './vendor-card';
