@@ -456,7 +456,7 @@ export default function DashboardPage() {
                   }`}
               >
                 All Vendors
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'all' ? 'bg-foreground text-foreground' : 'bg-secondary text-muted-foreground'}`}>{allVendorsCount}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'all' ? 'bg-card text-foreground' : 'bg-card text-foreground'}`}>{allVendorsCount}</span>
               </button>
               <button
                 onClick={() => setActiveTab('experiences')}
@@ -481,11 +481,11 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 items-stretch">
               {displayVendors.map(vendor => (
-                <div key={vendor.id} onClick={() => router.push(`/dashboard/hosts/vendor/${vendor.slug}`)} className="cursor-pointer min-w-0">
+                <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full min-w-0">
                   <VendorCard vendor={vendor} />
-                </div>
+                </Link>
               ))}
             </div>
 

@@ -3,6 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { X, ChevronLeft, ChevronRight, Rocket } from 'lucide-react';
+import Link from 'next/link';
 import { VendorCard } from './vendor-card';
 import ItineraryCard from './ItineraryCard';
 import GuestManagementCard from './GuestManagementCard';
@@ -65,9 +66,11 @@ const DashboardContent: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
           {vendors.slice(0, 4).map(vendor => (
-            <VendorCard key={vendor.id} vendor={vendor} />
+            <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full">
+              <VendorCard vendor={vendor} />
+            </Link>
           ))}
         </div>
       </section>

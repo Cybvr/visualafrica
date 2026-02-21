@@ -196,9 +196,11 @@ export function VendorListingContent({
           </p>
 
           {filteredVendors.length > 0 ? (
-            <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4 items-stretch">
               {visibleVendors.map((vendor) => (
-                <VendorCard key={vendor.id} vendor={vendor} />
+                <Link key={vendor.id} href={`/explore/vendors/${vendor.slug}`} className="block h-full">
+                  <VendorCard vendor={vendor} />
+                </Link>
               ))}
             </div>
           ) : (

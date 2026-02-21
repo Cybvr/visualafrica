@@ -2,13 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Sparkles } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { type Vendor } from '@/lib/types';
 import { VendorCard } from '@/components/dashboard/vendor-card';
 import { getVendors } from '@/lib/firestore-service';
 
 const ExperiencesPage: React.FC = () => {
-    const router = useRouter();
     const [activeTab, setActiveTab] = useState<'all' | 'saved'>('all');
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -84,11 +83,11 @@ const ExperiencesPage: React.FC = () => {
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12 items-stretch">
                 {displayExperiences.map(vendor => (
-                    <div key={vendor.id} onClick={() => router.push(`/dashboard/hosts/vendor/${vendor.slug}`)} className="cursor-pointer">
+                    <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full">
                         <VendorCard vendor={vendor} />
-                    </div>
+                    </Link>
                 ))}
 
                 {displayExperiences.length === 0 && (
