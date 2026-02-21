@@ -92,7 +92,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                 </section>
 
                 {/* Benefits Section */}
-                <section className="bg-background py-24 text-white">
+                <section className="bg-background py-24 text-foreground">
                     <div className="container mx-auto px-4">
                         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
                             <div>
@@ -106,7 +106,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                 <ul className="space-y-4">
                                     {feature.benefits.map((benefit, index) => (
                                         <li key={index} className="flex items-center gap-3">
-                                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-white">
+                                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-foreground">
                                                 <Check className="h-3.5 w-3.5" />
                                             </div>
                                             <span className="text-foreground-200">{benefit}</span>

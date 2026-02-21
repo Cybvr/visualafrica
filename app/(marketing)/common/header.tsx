@@ -42,9 +42,11 @@ const eventTypeSlugs = ["offsites-retreats", "client-events", "skos", "conferenc
 const serviceOfferingSlugs = ["full-service-planning", "expedited-planning"]
 
 const platformIconMap: Record<string, ComponentType<{ className?: string }>> = {
+  Plan: FileText,
+  Budget: CreditCard,
   Discover: Search,
-  Book: CalendarCheck,
   Track: Activity,
+  Book: CalendarCheck,
   Pay: CreditCard,
 }
 
@@ -133,145 +135,145 @@ export function Header() {
             </span>
           </Link>
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
-              Platform
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[500px] border-none bg-background p-4 shadow-2xl rounded-3xl">
-              <div className="grid grid-cols-2 gap-x-8 gap-y-2">
-                <div className="col-span-2 pb-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Platform Features</span>
-                </div>
-                {platformFeatures.map((feature) => {
-                  const Icon = platformIconMap[feature.title]
-                  return (
-                    <DropdownMenuItem key={feature.title} asChild className="p-0 focus:bg-transparent">
-                      <Link href={feature.href} className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
-                        {Icon && (
-                          <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-card text-primary">
-                            <Icon className="h-4 w-4" />
-                          </span>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <span className="text-sm font-bold text-foreground">
-                            {feature.title}
-                          </span>
-                          <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
-                            {feature.description}
-                          </p>
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                  )
-                })}
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
-              Solutions
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[600px] border-none bg-background p-6 shadow-2xl rounded-3xl">
-              <div className="grid grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Event Types</span>
-                  <div className="space-y-1">
-                    {eventTypes.map((item) => {
-                      const Icon = "slug" in item ? offeringIconMap[item.slug] : null
-                      return (
-                        <DropdownMenuItem key={item.label} asChild className="p-0 focus:bg-transparent">
-                          <Link href={item.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
-                            {Icon && (
-                              <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                <Icon className="h-4 w-4" />
-                              </span>
-                            )}
-                            <span className="text-sm font-bold leading-tight text-foreground">
-                              {item.label}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
+                Platform
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[500px] border-none bg-background p-4 shadow-2xl rounded-3xl">
+                <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+                  <div className="col-span-2 pb-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Platform Features</span>
+                  </div>
+                  {platformFeatures.map((feature) => {
+                    const Icon = platformIconMap[feature.title]
+                    return (
+                      <DropdownMenuItem key={feature.title} asChild className="p-0 focus:bg-transparent">
+                        <Link href={feature.href} className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
+                          {Icon && (
+                            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-card text-primary">
+                              <Icon className="h-4 w-4" />
                             </span>
-                          </Link>
-                        </DropdownMenuItem>
-                      )
-                    })}
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <span className="text-sm font-bold text-foreground">
+                              {feature.title}
+                            </span>
+                            <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                              {feature.description}
+                            </p>
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                    )
+                  })}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
+                Solutions
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[600px] border-none bg-background p-6 shadow-2xl rounded-3xl">
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Event Types</span>
+                    <div className="space-y-1">
+                      {eventTypes.map((item) => {
+                        const Icon = "slug" in item ? offeringIconMap[item.slug] : null
+                        return (
+                          <DropdownMenuItem key={item.label} asChild className="p-0 focus:bg-transparent">
+                            <Link href={item.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
+                              {Icon && (
+                                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                  <Icon className="h-4 w-4" />
+                                </span>
+                              )}
+                              <span className="text-sm font-bold leading-tight text-foreground">
+                                {item.label}
+                              </span>
+                            </Link>
+                          </DropdownMenuItem>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Service Solutions</span>
+                    <div className="space-y-1">
+                      {serviceSolutions.map((item) => {
+                        const Icon = "slug" in item ? offeringIconMap[item.slug] : null
+                        return (
+                          <DropdownMenuItem key={item.label} asChild className="p-0 focus:bg-transparent">
+                            <Link href={item.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
+                              {Icon && (
+                                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                  <Icon className="h-4 w-4" />
+                                </span>
+                              )}
+                              <span className="text-sm font-bold leading-tight text-foreground">
+                                {item.label}
+                              </span>
+                            </Link>
+                          </DropdownMenuItem>
+                        )
+                      })}
+                    </div>
                   </div>
                 </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-                <div className="space-y-3">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Service Solutions</span>
-                  <div className="space-y-1">
-                    {serviceSolutions.map((item) => {
-                      const Icon = "slug" in item ? offeringIconMap[item.slug] : null
-                      return (
-                        <DropdownMenuItem key={item.label} asChild className="p-0 focus:bg-transparent">
-                          <Link href={item.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
-                            {Icon && (
-                              <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                <Icon className="h-4 w-4" />
-                              </span>
-                            )}
-                            <span className="text-sm font-bold leading-tight text-foreground">
-                              {item.label}
-                            </span>
-                          </Link>
-                        </DropdownMenuItem>
-                      )
-                    })}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
+                Resources
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[280px] border-none bg-background p-4 shadow-2xl rounded-3xl">
+                <div className="space-y-2">
+                  <div className="pb-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Learn More</span>
                   </div>
-                </div>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
-              Resources
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[280px] border-none bg-background p-4 shadow-2xl rounded-3xl">
-              <div className="space-y-2">
-                <div className="pb-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Learn More</span>
-                </div>
-                <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
-                  <Link href="/blog" className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
-                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <BookOpen className="h-4 w-4" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <span className="text-sm font-bold text-foreground">
-                        Blog
+                  <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
+                    <Link href="/blog" className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
+                      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <BookOpen className="h-4 w-4" />
                       </span>
-                      <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
-                        Tips, guides, and inspiration for planning amazing events
-                      </p>
-                    </div>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
-                  <Link href="/support" className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
-                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Users className="h-4 w-4" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <span className="text-sm font-bold text-foreground">
-                        Support
+                      <div className="min-w-0 flex-1">
+                        <span className="text-sm font-bold text-foreground">
+                          Blog
+                        </span>
+                        <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                          Tips, guides, and inspiration for planning amazing events
+                        </p>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
+                    <Link href="/support" className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
+                      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <Users className="h-4 w-4" />
                       </span>
-                      <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
-                        Find answers to common questions and get help
-                      </p>
-                    </div>
-                  </Link>
-                </DropdownMenuItem>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-sm font-bold text-foreground">
+                          Support
+                        </span>
+                        <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                          Find answers to common questions and get help
+                        </p>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <Link
-            href="/pricing"
-            className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            Pricing
-          </Link>
+            <Link
+              href="/pricing"
+              className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              Pricing
+            </Link>
           </nav>
         </div>
 
@@ -299,7 +301,7 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <Link href="/auth/login">
-              <Button size="sm" className="flex items-center gap-2 bg-primary text-foreground hover:bg-primary/90">
+              <Button size="sm" className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
                 Sign In
               </Button>
             </Link>

@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
-const capabilities = ["Create Event", "Vendor Search", "RSVP Blast", "Budget Track"]
+const capabilities = ["Plan", "Budget", "Discover", "Track"]
 
 const sampleMessages = [
   {

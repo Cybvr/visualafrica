@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 export function WaddiPrompt() {
     const [query, setQuery] = useState("");
 
-    const suggestions = ["Plan", "Research", "Suggest", "Organize"];
+    const suggestions = ["Plan", "Budget", "Discover", "Track"];
 
     return (
         <section className="w-full bg-[#f4f7f6] pt-16 pb-8 flex flex-col items-center justify-center px-4">
@@ -16,7 +16,7 @@ export function WaddiPrompt() {
                 <div className="flex items-center gap-3">
 
                     <h1 className="text-3xl md:text-5xl font-medium text-gray-800 tracking-tight">
-                        Meet your personal event AI assistant
+                        Your event, fully coordinated. Ask anything
                     </h1>
                 </div>
 
