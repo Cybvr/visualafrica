@@ -1066,24 +1066,41 @@ export default function App() {
             </div>
 
             {/* Input */}
-            <div className="bg-background border-t border-border p-2.5 pb-3 sm:p-3 sm:pb-4 flex-shrink-0">
-                <div className="flex gap-2 bg-secondary/50 border border-border rounded-2xl p-2 items-end focus-within:border-primary/50 transition-colors shadow-inner">
-                    <textarea
-                        value={input}
-                        onChange={e => setInput(e.target.value)}
-                        onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
-                        placeholder={market ? `Message Ama about your ${activeCity} event...` : "Message Ama — or select a city..."}
-                        rows={1}
-                        className="flex-1 bg-transparent border-none text-foreground text-sm resize-none leading-relaxed px-2 py-1 placeholder:text-muted-foreground/50"
-                    />
-                    <button onClick={() => send(input)} className={cn(
-                        "w-9 h-9 rounded-full flex items-center justify-center text-lg transition-all transform active:scale-90 shadow-md",
-                        input.trim() ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground opacity-50"
-                    )}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 19V5M12 5L5 12M12 5L19 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                    </button>
+            <div className="bg-background border-t border-border p-3 sm:p-4 flex-shrink-0">
+                <div className="w-full bg-card rounded-[2rem] shadow-sm border border-border p-3 sm:p-4 transition-shadow focus-within:shadow-md">
+                    <div className="flex flex-col gap-3">
+                        <textarea
+                            value={input}
+                            onChange={e => setInput(e.target.value)}
+                            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
+                            placeholder={market ? `Message Ama about your ${activeCity} event...` : "Message Ama — or select a city..."}
+                            rows={1}
+                            className="w-full bg-transparent resize-none border-none outline-none text-foreground text-sm sm:text-base placeholder:text-muted-foreground min-h-[40px] px-2"
+                        />
+                        <div className="flex items-center justify-between px-1">
+                            {/* Empty flex-1 to push the buttons to the right */}
+                            <div className="flex flex-1"></div>
+
+                            <div className="flex items-center gap-2">
+                                <button className="p-2 hover:bg-secondary rounded-full transition-colors text-muted-foreground" title="Voice input">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="22" /></svg>
+                                </button>
+                                <button
+                                    onClick={() => send(input)}
+                                    disabled={!input.trim()}
+                                    className={cn(
+                                        "p-2 rounded-full transition-colors flex items-center justify-center",
+                                        input.trim()
+                                            ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                                            : "bg-secondary text-muted-foreground/50"
+                                    )}
+                                    title="Send message"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 7-7 7 7" /><path d="M12 19V5" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
