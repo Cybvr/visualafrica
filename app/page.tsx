@@ -1,5 +1,6 @@
 import { Header } from "@/app/(marketing)/common/header"
 import { Footer } from "@/app/(marketing)/common/footer"
+import { WaddiPrompt } from "@/components/landingpage/waddi-prompt"
 import { Hero } from "@/components/landingpage/hero"
 import { FeaturesGrid } from "@/components/landingpage/features-grid"
 import { AmaSection } from "@/components/landingpage/ama-section"
@@ -16,6 +17,7 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col">
       <Header />
       <main className="flex-1">
+        <WaddiPrompt />
         <Hero />
         <HottestVendors />
         <HandpickedExperiences />
