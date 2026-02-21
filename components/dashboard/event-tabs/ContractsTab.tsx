@@ -1,8 +1,9 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { vendors as allVendors } from '@/lib/vendors-data';
+import { getVendors } from '@/lib/firestore-service';
+import { Vendor } from '@/lib/types';
 
 interface ContractsTabProps {
     eventId: string;
@@ -15,6 +16,19 @@ interface ContractsTabProps {
 }
 
 export default function ContractsTab({ eventId, bookedVendors }: ContractsTabProps) {
+    const [allVendors, setAllVendors] = useState<Vendor[]>([]);
+
+    useEffect(() => {
+        async function loadVendors() {
+            try {
+                setAllVendors(await getVendors());
+            } catch (error) {
+                console.error("Failed to load vendors for contracts:", error);
+            }
+        }
+        loadVendors();
+    }, []);
+
     const displayVendors = bookedVendors ? bookedVendors.map(bv => {
         const vendor = allVendors.find(v => v.id === bv.vendorId);
         return {

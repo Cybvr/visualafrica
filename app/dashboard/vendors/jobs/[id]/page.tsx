@@ -3,11 +3,10 @@ import { notFound } from 'next/navigation';
 import { Mail, Phone, FileText, Download, MapPin, Calendar, Users, Target, Clock, Share2, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
-import { SharedEvent } from '@/lib/shared-data';
+import { SharedEvent } from '@/lib/types';
 import JobWorkspace, { WorkspaceCard, StatusIndicator } from '@/components/dashboard/JobWorkspace';
 import JobChat from '@/components/dashboard/JobChat';
 import JobBrief from '@/components/dashboard/JobBrief';
-import { Event } from '@/lib/events-data';
 import { getEvents } from '@/lib/firestore-service';
 
 interface PageProps {
@@ -22,9 +21,6 @@ export default async function VendorJobDetailsPage({ params }: PageProps) {
 
     const events = await getEvents();
     const event = events.find((e: SharedEvent) => e.id === eventId);
-
-    // Cast SharedEvent to Event for JobBrief
-    const eventBriefData = event as unknown as Event;
 
     if (!event || !booking) return notFound();
 
@@ -152,7 +148,7 @@ export default async function VendorJobDetailsPage({ params }: PageProps) {
             id: 'brief',
             label: 'Project Brief',
             content: (
-                <JobBrief event={eventBriefData} service={vendorBooking?.service} />
+                <JobBrief event={event} service={vendorBooking?.service} />
             )
         },
         {

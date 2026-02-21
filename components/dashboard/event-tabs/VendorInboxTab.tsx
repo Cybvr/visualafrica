@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Search, Send, MapPin, ChevronDown, Calendar } from 'lucide-react';
 import {
     DropdownMenu,
@@ -10,12 +10,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { SHARED_EVENTS } from '@/lib/shared-data';
+import { getEvents } from '@/lib/firestore-service';
+import { SharedEvent } from '@/lib/types';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 
 // Generate chats from events where vendor is involved
-const generateChats = () => {
-    const contracts = SHARED_EVENTS.filter(event =>
+const generateChats = (events: SharedEvent[]) => {
+    const contracts = events.filter(event =>
         event.bookedVendors.some(bv => bv.vendorId === VENDOR_DASHBOARD_DATA.currentVendorId)
     );
 
@@ -48,8 +49,24 @@ interface VendorInboxTabProps {
 }
 
 export default function VendorInboxTab({ focusedEventId }: VendorInboxTabProps) {
-    const initialChats = generateChats();
+    const [events, setEvents] = useState<SharedEvent[]>([]);
+    const initialChats = useMemo(() => generateChats(events), [events]);
     const [chats, setChats] = useState(initialChats);
+
+    useEffect(() => {
+        async function loadEvents() {
+            try {
+                setEvents(await getEvents());
+            } catch (error) {
+                console.error("Failed to load inbox events:", error);
+            }
+        }
+        loadEvents();
+    }, []);
+
+    useEffect(() => {
+        setChats(initialChats);
+    }, [initialChats]);
 
     // Default to focused event if provided, else first chat
     const initialActive = focusedEventId

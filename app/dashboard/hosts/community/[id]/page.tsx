@@ -1,18 +1,32 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Heart, Calendar, MapPin, Copy, Share2, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { MOCK_EVENTS } from '@/lib/event-data';
+import { getEventById } from '@/lib/firestore-service';
+import { SharedEvent } from '@/lib/types';
 
 export default function InspirationDetailsPage() {
     const params = useParams();
     const router = useRouter();
-    // ID in event-data is string
     const id = params.id as string;
-    const event = MOCK_EVENTS.find(e => e.id === id);
+    const [event, setEvent] = useState<SharedEvent | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        async function loadEvent() {
+            try {
+                setEvent(await getEventById(id));
+            } catch (error) {
+                console.error("Failed to load community event:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        loadEvent();
+    }, [id]);
 
     const handleDuplicate = () => {
         toast.success("Event duplicated to your drafts!", {
@@ -23,6 +37,10 @@ export default function InspirationDetailsPage() {
         // In a real app, this would create a new event record and redirect to its edit page
         // router.push('/dashboard/hosts/events/new-id');
     };
+
+    if (isLoading) {
+        return <div className="p-10 text-center text-muted-foreground">Loading event...</div>;
+    }
 
     if (!event) {
         return <div className="p-10 text-center text-muted-foreground">Event not found</div>;
@@ -40,7 +58,7 @@ export default function InspirationDetailsPage() {
 
             <div className="bg-card rounded-[2.5rem] border border-border overflow-hidden shadow-sm">
                 <div className="h-[400px] w-full relative">
-                    <img src={event.thumbnail} alt={event.name} className="w-full h-full object-cover" />
+                    <img src={event.image} alt={event.eventName} className="w-full h-full object-cover" />
                     <div className="absolute top-6 right-6 flex gap-3">
                         <button className="h-10 px-4 bg-card backdrop-blur-sm rounded-xl flex items-center gap-2 text-sm font-bold text-foreground hover:bg-card transition-colors shadow-sm">
                             <Share2 size={16} />
@@ -56,10 +74,10 @@ export default function InspirationDetailsPage() {
                 <div className="p-8 md:p-12 space-y-8">
                     <div className="flex flex-col md:flex-row gap-6 justify-between items-start">
                         <div>
-                            <span className="text-accent text-[10px] font-black uppercase tracking-widest mb-2 block">{event.theme}</span>
-                            <h1 className="text-3xl md:text-4xl font-black text-foreground mb-2">{event.name}</h1>
+                            <span className="text-accent text-[10px] font-black uppercase tracking-widest mb-2 block">{event.themes?.[0] || "Event"}</span>
+                            <h1 className="text-3xl md:text-4xl font-black text-foreground mb-2">{event.eventName}</h1>
                             <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground">
-                                <div className="w-6 h-6 rounded-full bg-background text-white flex items-center justify-center text-[8px] font-black">{event.name[0]}</div>
+                                <div className="w-6 h-6 rounded-full bg-background text-white flex items-center justify-center text-[8px] font-black">{event.eventName[0]}</div>
                                 Created by Visual User
                             </div>
                         </div>

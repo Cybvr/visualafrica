@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { SharedEvent } from '@/lib/shared-data';
+import { SharedEvent } from '@/lib/types';
 import { getEvents } from '@/lib/firestore-service';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 import { DashboardFilter } from '@/components/dashboard/DashboardFilter';

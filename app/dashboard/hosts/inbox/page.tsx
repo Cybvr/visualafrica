@@ -4,8 +4,7 @@ import React, { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Inbox, { ChatConversation } from '@/components/dashboard/Inbox';
 import { getEvents, getVendors } from '@/lib/firestore-service';
-import { Vendor } from '@/lib/vendors-data';
-import { SharedEvent } from '@/lib/shared-data';
+import { Vendor, SharedEvent } from '@/lib/types';
 
 const generateConversations = (events: SharedEvent[], allVendors: Vendor[]): ChatConversation[] => {
   // Logic to build conversations from event bookedVendors

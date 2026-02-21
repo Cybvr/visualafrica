@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
-import { solutions, getSolutionBySlug } from "@/lib/solutions-data"
+import { getSolutionBySlug, getSolutions } from "@/lib/firestore-service"
 import { Button } from "@/components/ui/button"
 import {
   Accordion,
@@ -11,7 +11,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const solutions = await getSolutions()
   return solutions.map((s) => ({ slug: s.slug }))
 }
 
@@ -21,7 +22,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const solution = getSolutionBySlug(slug)
+  const solution = await getSolutionBySlug(slug)
   if (!solution) return { title: "Not Found" }
   return {
     title: `${solution.title} | Waddi`,
@@ -35,7 +36,7 @@ export default async function SolutionDetailPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const solution = getSolutionBySlug(slug)
+  const solution = await getSolutionBySlug(slug)
   if (!solution) notFound()
 
   return (

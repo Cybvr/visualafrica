@@ -1,13 +1,26 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, ChevronLeft, ChevronRight, Rocket } from 'lucide-react';
-import VendorCard from './VendorCard';
+import { VendorCard } from './vendor-card';
 import ItineraryCard from './ItineraryCard';
 import GuestManagementCard from './GuestManagementCard';
-// Import the central vendors data to fix type mismatches
-import { vendors } from '../../lib/vendors-data';
+import { getVendors } from '@/lib/firestore-service';
+import { Vendor } from '@/lib/types';
 
 const DashboardContent: React.FC = () => {
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+
+  useEffect(() => {
+    async function loadVendors() {
+      try {
+        setVendors(await getVendors());
+      } catch (error) {
+        console.error("Failed to load vendors for dashboard:", error);
+      }
+    }
+    loadVendors();
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Overview Heading */}
@@ -51,9 +64,8 @@ const DashboardContent: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Fix: Use data from lib/vendors-data.ts to satisfy Vendor type requirements */}
           {vendors.slice(0, 4).map(vendor => (
-            <VendorCard key={vendor.id} {...vendor} />
+            <VendorCard key={vendor.id} vendor={vendor} />
           ))}
         </div>
       </section>

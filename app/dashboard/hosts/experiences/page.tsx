@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Vendor } from '@/lib/vendors-data';
-import VendorCard from '@/components/dashboard/VendorCard';
+import { type Vendor } from '@/lib/types';
+import { VendorCard } from '@/components/dashboard/vendor-card';
 import { getVendors } from '@/lib/firestore-service';
 
 const ExperiencesPage: React.FC = () => {
@@ -87,7 +87,7 @@ const ExperiencesPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
                 {displayExperiences.map(vendor => (
                     <div key={vendor.id} onClick={() => router.push(`/dashboard/hosts/vendor/${vendor.slug}`)} className="cursor-pointer">
-                        <VendorCard {...vendor} />
+                        <VendorCard vendor={vendor} />
                     </div>
                 ))}
 

@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { Facebook, Instagram, MessageCircle } from "lucide-react"
-import { solutions } from "@/lib/solutions-data"
-import { platformFeatures } from "@/lib/platform-data"
+import { getPlatformFeatures, getSolutions } from "@/lib/firestore-service"
 
 const quickLinks = [
   { label: "Vendor Signup", href: "/vendor-signup" },
@@ -12,12 +11,6 @@ const quickLinks = [
   { label: "Contact", href: "/contact" },
 ]
 
-// Build solutions links from data
-const solutionLinks = solutions.map((s) => ({
-  label: s.title,
-  href: `/solutions/${s.slug}`,
-}))
-
 const legalLinks = [
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms of Service", href: "/terms" },
@@ -26,7 +19,16 @@ const legalLinks = [
   { label: "Legal", href: "/legal" },
 ]
 
-export function Footer() {
+export async function Footer() {
+  const [solutions, platformFeatures] = await Promise.all([
+    getSolutions(),
+    getPlatformFeatures(),
+  ])
+  const solutionLinks = solutions.map((s) => ({
+    label: s.title,
+    href: `/solutions/${s.slug}`,
+  }))
+
   return (
     <footer className="border-t border-border bg-foreground text-background">
       {/* CTA Banner */}

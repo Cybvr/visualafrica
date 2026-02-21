@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { SharedEvent } from '@/lib/shared-data';
+import { SharedEvent } from '@/lib/types';
 import { Calendar, MapPin, User, Users } from 'lucide-react';
 
 interface EventCardProps {

@@ -3,10 +3,10 @@
 import React from 'react';
 import { Globe, Users, Mail, Plus, ExternalLink } from 'lucide-react';
 
-import { Event } from '@/lib/events-data';
+import { SharedEvent } from '@/lib/types';
 
 interface GuestsTabProps {
-    event: Event;
+    event: SharedEvent;
 }
 
 const GuestsTab: React.FC<GuestsTabProps> = ({ event }) => {
@@ -75,7 +75,7 @@ const GuestsTab: React.FC<GuestsTabProps> = ({ event }) => {
                         </div>
                         <div>
                             <h3 className="text-xl font-bold mb-2">RSVP Website</h3>
-                            <p className="text-muted-foreground text-sm leading-relaxed">Your custom guest portal is live at:<br /><span className="text-foreground font-medium">Waddi.events/{event.name.toLowerCase().replace(/\s+/g, '-')}</span></p>
+                            <p className="text-muted-foreground text-sm leading-relaxed">Your custom guest portal is live at:<br /><span className="text-foreground font-medium">Waddi.events/{event.eventName.toLowerCase().replace(/\s+/g, '-')}</span></p>
                         </div>
                         <div className="flex gap-2">
                             <button className="flex-1 bg-white text-foreground py-3 rounded-xl font-bold text-sm hover:bg-card">Edit Site</button>

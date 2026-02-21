@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation"
-import { platformFeatures } from "@/lib/platform-data"
+import { getPlatformFeatures } from "@/lib/firestore-service"
 import { Header } from "@/app/(marketing)/common/header"
 import { Footer } from "@/app/(marketing)/common/footer"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Check, ArrowRight, Zap } from "lucide-react"
+import { IconRenderer } from "@/components/marketing/IconRenderer"
 
 // Generate static params for all platform pages
-export function generateStaticParams() {
+export async function generateStaticParams() {
+    const platformFeatures = await getPlatformFeatures()
     return platformFeatures.map((feature) => ({
         slug: feature.slug,
     }))
@@ -15,6 +17,7 @@ export function generateStaticParams() {
 
 export default async function PlatformPage({ params }: { params: Promise<{ slug: string }> }) {
     const resolvedParams = await params
+    const platformFeatures = await getPlatformFeatures()
     const feature = platformFeatures.find((f) => f.slug === resolvedParams.slug)
 
     if (!feature) {
@@ -52,15 +55,6 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                 </Button>
                             </div>
                         </div>
-
-                        {/* Hero Image Mockup Area */}
-                        {/* <div className="mt-16 md:mt-24 relative mx-auto max-w-5xl rounded-2xl border bg-white p-2 shadow-2xl lg:rounded-3xl lg:p-4">
-                <div className="aspect-[16/9] overflow-hidden rounded-xl bg-card relative">
-                   <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-                      Feature Preview Image
-                   </div>
-                </div>
-            </div> */}
                     </div>
                 </section>
 
@@ -83,7 +77,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                     className="group rounded-2xl border border-border bg-white p-8 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
                                 >
                                     <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                                        <item.icon className="h-6 w-6" />
+                                        <IconRenderer name={item.icon} className="h-6 w-6" />
                                     </div>
                                     <h3 className="mb-3 text-xl font-bold text-foreground">
                                         {item.title}
@@ -135,7 +129,6 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                 <div className="absolute inset-0 flex items-center justify-center">
                                     <div className="text-center p-8">
                                         <div className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/20 text-primary mb-6 backdrop-blur-sm">
-                                            {/* We can dynamically render a key icon here if needed, but keeping it simple for now */}
                                             <Zap className="h-10 w-10 text-primary" />
                                         </div>
                                         <h3 className="text-2xl font-bold mb-2">Powering Your Success</h3>

@@ -1,5 +1,5 @@
-import { VENDOR_CATEGORIES } from "@/lib/vendors-data"
-import type { VendorCategory } from "@/lib/vendors-data"
+import { VENDOR_CATEGORIES } from "@/lib/constants"
+import type { VendorCategory } from "@/lib/types"
 
 interface VendorFiltersProps {
   selectedCategory: VendorCategory

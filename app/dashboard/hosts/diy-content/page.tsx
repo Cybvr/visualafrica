@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Search, Filter, ArrowRight, Clock, User } from 'lucide-react';
-import { BlogPost } from '@/lib/blog-data';
+import { BlogPost } from '@/lib/types';
 import BlogPostCard from '@/components/dashboard/BlogPostCard';
 import { getBlogPosts } from '@/lib/firestore-service';
 

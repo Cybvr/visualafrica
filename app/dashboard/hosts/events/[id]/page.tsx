@@ -2,14 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { notFound, useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
     MapPin, Calendar, Users, Target, Clock, Rocket,
     ChevronLeft, Share2, Printer
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { EVENTS } from '@/lib/events-data';
+import { getEventById } from '@/lib/firestore-service';
+import { SharedEvent } from '@/lib/types';
 import PlanTab from '@/components/dashboard/event-tabs/PlanTab';
 import GuestsTab from '@/components/dashboard/event-tabs/GuestsTab';
 import VendorsTab from '@/components/dashboard/event-tabs/VendorsTab';
@@ -25,6 +26,8 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     // Get active tab from URL or default to 'overview'
     const currentTab = searchParams.get('tab') || 'overview';
     const [activeTab, setActiveTab] = useState(currentTab);
+    const [event, setEvent] = useState<SharedEvent | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     // Sync state with URL
     useEffect(() => {
@@ -38,10 +41,26 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         router.push(`${pathname}?${params.toString()}`);
     };
 
-    const event = EVENTS.find(e => e.id === id);
+    useEffect(() => {
+        async function loadEvent() {
+            try {
+                const eventData = await getEventById(id);
+                setEvent(eventData);
+            } catch (error) {
+                console.error("Failed to load event:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        loadEvent();
+    }, [id]);
+
+    if (isLoading) {
+        return <div className="max-w-4xl mx-auto py-12 text-center text-muted-foreground">Loading event...</div>;
+    }
 
     if (!event) {
-        return notFound();
+        return <div className="max-w-4xl mx-auto py-12 text-center text-muted-foreground">Event not found.</div>;
     }
 
     return (
@@ -84,7 +103,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
             <div className="space-y-6">
                 {/* Event title and basic info */}
                 <div className="space-y-2">
-                    <h1 className="text-2xl font-bold text-foreground">{event.name}</h1>
+                    <h1 className="text-2xl font-bold text-foreground">{event.eventName}</h1>
 
                     <div className="flex flex-wrap gap-4">
                         <div className="flex items-center gap-1 text-sm">

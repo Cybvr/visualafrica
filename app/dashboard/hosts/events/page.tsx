@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Calendar, Users, Plus } from 'lucide-react';
-import { EVENTS } from '@/lib/events-data';
+import { getEvents } from '@/lib/firestore-service';
 import { Button } from '@/components/ui/button';
 
-export default function EventsPage() {
+export default async function EventsPage() {
+    const events = await getEvents();
+
     return (
         <div className="max-w-7xl mx-auto space-y-8">
             <div className="flex items-center justify-between">
@@ -21,7 +23,7 @@ export default function EventsPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-6">
-                {EVENTS.map((event) => (
+                {events.map((event) => (
                     <Link
                         key={event.id}
                         href={`/dashboard/hosts/events/${event.id}`}
@@ -31,7 +33,7 @@ export default function EventsPage() {
                         <div className="relative w-full md:w-72 h-48 md:h-auto rounded-2xl overflow-hidden shrink-0">
                             <Image
                                 src={event.image}
-                                alt={event.name}
+                                alt={event.eventName}
                                 fill
                                 className="object-cover transition-transform duration-500 "
                             />
@@ -53,7 +55,7 @@ export default function EventsPage() {
                                     <span className="text-xs font-medium text-muted-foreground">ID: #{event.id}</span>
                                 </div>
                                 <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-                                    {event.name}
+                                    {event.eventName}
                                 </h3>
                                 <p className="text-muted-foreground text-sm line-clamp-2 max-w-2xl">
                                     {event.description}

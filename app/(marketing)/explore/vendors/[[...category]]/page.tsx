@@ -14,12 +14,9 @@ import { VendorDetail } from "@/components/dashboard/vendor-detail"
 import {
   EVENT_THEMES,
   CATEGORY_SLUG_MAP,
-  VENDOR_FAQ,
-  type EventTheme,
-  type VendorCategory,
-  type Vendor,
-} from "@/lib/vendors-data"
-import { getVendors, getVendorBySlug } from "@/lib/firestore-service"
+} from "@/lib/constants"
+import { type EventTheme, type VendorCategory, type Vendor } from "@/lib/types"
+import { getVendors, getVendorBySlug, getFaqs } from "@/lib/firestore-service"
 
 const ITEMS_PER_PAGE = 8
 
@@ -36,12 +33,14 @@ export default async function ExploreVendorsPage({ params }: PageProps) {
 
   const allVendors = await getVendors()
   const vendorData = isVendorDetail ? await getVendorBySlug(firstSegment) : undefined
+  const faqs = await getFaqs()
+  const vendorFaqs = faqs.filter(f => f.category === 'vendors' || f.category === 'general')
 
   if (isVendorDetail && vendorData) {
     return <VendorDetail vendor={vendorData} />
   }
 
-  return <VendorListingContent categorySlug={firstSegment} vendors={allVendors} />
+  return <VendorListingContent categorySlug={firstSegment} vendors={allVendors} faqs={vendorFaqs} />
 }
 
 "use client"
@@ -51,9 +50,11 @@ import { useSearchParams } from "next/navigation"
 function VendorListingContent({
   categorySlug,
   vendors,
+  faqs,
 }: {
   categorySlug: string | null
   vendors: Vendor[]
+  faqs: any[]
 }) {
   const initialCategory: VendorCategory = categorySlug
     ? CATEGORY_SLUG_MAP[categorySlug] ?? "All Categories"
@@ -286,10 +287,10 @@ function VendorListingContent({
             </p>
           </div>
           <Accordion type="single" collapsible className="mt-12">
-            {VENDOR_FAQ.map((faq, i) => (
+            {faqs.map((faq, i) => (
               <AccordionItem
-                key={i}
-                value={`faq-${i}`}
+                key={faq.id || i}
+                value={`faq-${faq.id || i}`}
                 className="border-border"
               >
                 <AccordionTrigger className="text-left font-medium text-foreground hover:text-primary hover:no-underline">

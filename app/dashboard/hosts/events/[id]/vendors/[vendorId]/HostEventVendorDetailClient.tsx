@@ -7,15 +7,13 @@ import {
     User, ChevronLeft, Star, MapPin, CheckCircle2,
     MessageSquare, Heart, Share2, Calendar,
     Zap, Video, Image as ImageIcon, XCircle, Globe,
-    Clock, Send, FileText, Download, ShieldCheck, Printer
+    Clock, Download, ShieldCheck, Printer, FileText
 } from 'lucide-react';
-import { Vendor } from '@/lib/vendors-data';
-import { SharedEvent } from '@/lib/shared-data';
+import { Vendor, SharedEvent } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import JobWorkspace, { WorkspaceCard, StatusIndicator } from '@/components/dashboard/JobWorkspace';
 import JobChat from '@/components/dashboard/JobChat';
 import JobBrief from '@/components/dashboard/JobBrief';
-import { Event } from '@/lib/events-data';
 
 interface HostEventVendorDetailClientProps {
     vendor: Vendor;
@@ -26,9 +24,6 @@ export default function HostEventVendorDetailClient({ vendor, event }: HostEvent
     const router = useRouter();
     const vendorId = vendor.id;
     const eventId = event.id;
-
-    // Cast SharedEvent to Event for JobBrief
-    const eventBriefData = event as unknown as Event;
 
     const vendorBooking = event.bookedVendors.find(bv => bv.vendorId === vendorId);
 
@@ -237,7 +232,7 @@ export default function HostEventVendorDetailClient({ vendor, event }: HostEvent
             id: 'brief',
             label: 'Project Brief',
             content: (
-                <JobBrief event={eventBriefData} service={vendorBooking?.service} />
+                <JobBrief event={event} service={vendorBooking?.service} />
             )
         },
         {

@@ -3,10 +3,10 @@
 import React from 'react';
 import { FileText, Calendar, MapPin, Target } from 'lucide-react';
 import { WorkspaceCard } from './JobWorkspace';
-import { Event } from '@/lib/events-data';
+import { SharedEvent } from '@/lib/types';
 
 interface JobBriefProps {
-    event: Event;
+    event: SharedEvent;
     service?: string;
 }
 

@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Star, Heart, MapPin } from "lucide-react"
-import type { Vendor } from "@/lib/vendors-data"
+import type { Vendor } from "@/lib/types"
 
 export function VendorCard({ vendor }: { vendor: Vendor }) {
   return (

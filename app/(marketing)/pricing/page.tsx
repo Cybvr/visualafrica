@@ -3,7 +3,7 @@ import { Check } from "lucide-react"
 import { Header } from "@/app/(marketing)/common/header"
 import { Footer } from "@/app/(marketing)/common/footer"
 import { Button } from "@/components/ui/button"
-import { pricingTiers } from "@/lib/pricing-data"
+import { getPricingTiers } from "@/lib/firestore-service"
 
 export const metadata = {
   title: "Pricing | Waddi",
@@ -11,7 +11,8 @@ export const metadata = {
     "Choose the right plan for your event planning needs. Flexible pricing for teams of all sizes.",
 }
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const pricingTiers = await getPricingTiers()
   return (
     <div className="flex min-h-screen flex-col">
       <Header />

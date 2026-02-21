@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { getVendors, getBlogPosts } from "@/lib/firestore-service";
-import { Vendor } from "@/lib/vendors-data";
-import { BlogPost } from "@/lib/blog-data";
+import { Vendor, BlogPost } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 // ── Constants ────────────────────────────────────────────

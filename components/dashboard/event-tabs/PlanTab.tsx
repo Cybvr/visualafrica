@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 import { useState } from 'react';
-import { Layout, Eye, Calendar, MapPin, Plus } from 'lucide-react';
-import { Event } from '@/lib/events-data';
+import { Layout, Plus } from 'lucide-react';
+import { SharedEvent } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -38,7 +38,7 @@ const THEMES = [
 ];
 
 interface PlanTabProps {
-    event: Event;
+    event: SharedEvent;
 }
 
 const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
@@ -61,7 +61,7 @@ const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
                             <label className="text-sm font-medium text-muted-foreground">Display Name</label>
                             <Input
                                 type="text"
-                                defaultValue={event.name}
+                                defaultValue={event.eventName}
                                 className="bg-background border border-border focus-visible:ring-primary"
                             />
                         </div>

@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button"
 import { Calendar, Users } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { BLOG_POSTS } from "@/lib/blog-data"
+import { getBlogPosts } from "@/lib/firestore-service"
 
-export function FeaturesGrid() {
+export async function FeaturesGrid() {
+    const blogPosts = await getBlogPosts()
     const features = [
         {
             title: "Secure Escrow Payments",
@@ -77,7 +78,7 @@ export function FeaturesGrid() {
                 </div>
 
                 <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {BLOG_POSTS.slice(0, 3).map((post) => (
+                    {blogPosts.slice(0, 3).map((post) => (
                         <Link
                             key={post.id}
                             href={`/blog/${post.id}`}

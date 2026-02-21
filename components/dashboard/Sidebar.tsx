@@ -44,7 +44,7 @@ import { onAuthStateChanged, signOut, User as FirebaseUser } from "firebase/auth
 import { doc, getDoc } from "firebase/firestore";
 import { useTheme } from "next-themes";
 import { VENDOR_DASHBOARD_DATA } from "@/lib/vendor-dashboard-data";
-import { EVENTS } from "@/lib/events-data";
+import { getEvents } from "@/lib/firestore-service";
 
 type NavItemConfig = {
   icon: IconType;
@@ -274,9 +274,21 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const pathname = usePathname();
   const mode = pathname?.startsWith("/dashboard/vendors") ? "vendor" : "host";
+  const [hostEventsCount, setHostEventsCount] = useState(0);
+
+  useEffect(() => {
+    async function loadCounts() {
+      try {
+        const events = await getEvents();
+        setHostEventsCount(events.length);
+      } catch (error) {
+        console.error("Failed to load sidebar event count:", error);
+      }
+    }
+    loadCounts();
+  }, []);
 
   const hostInboxCount = 3;
-  const hostEventsCount = EVENTS.length;
   const vendorOffersCount = VENDOR_DASHBOARD_DATA.leads.length;
   const vendorInboxCount = VENDOR_DASHBOARD_DATA.chats.filter(c => c.unread).length;
   const vendorEventsCount = VENDOR_DASHBOARD_DATA.bookings.length;

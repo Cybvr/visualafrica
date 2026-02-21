@@ -1,8 +1,8 @@
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight } from "lucide-react"
-import { solutions } from "@/lib/solutions-data"
 import { Button } from "@/components/ui/button"
+import { getSolutions } from "@/lib/firestore-service"
 
 export const metadata = {
   title: "Our Solutions | Waddi",
@@ -10,7 +10,8 @@ export const metadata = {
     "Explore our full range of event planning solutions. From corporate offsites and conferences to full-service planning, we handle it all.",
 }
 
-export default function SolutionsPage() {
+export default async function SolutionsPage() {
+  const solutions = await getSolutions()
   return (
     <>
       {/* Hero */}

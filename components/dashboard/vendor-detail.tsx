@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { Vendor } from "@/lib/vendors-data"
+import type { Vendor } from "@/lib/types"
 
 export function VendorDetail({ vendor }: { vendor: Vendor }) {
   const [currentImage, setCurrentImage] = useState(0)
@@ -146,11 +146,10 @@ export function VendorDetail({ vendor }: { vendor: Vendor }) {
                     <button
                       key={i}
                       onClick={() => setCurrentImage(i)}
-                      className={`relative h-16 w-20 shrink-0 overflow-hidden rounded-md ${
-                        i === currentImage
+                      className={`relative h-16 w-20 shrink-0 overflow-hidden rounded-md ${i === currentImage
                           ? "ring-2 ring-primary"
                           : "opacity-60 hover:opacity-80"
-                      }`}
+                        }`}
                     >
                       <Image
                         src={img.url}

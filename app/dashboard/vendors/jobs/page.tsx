@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Calendar, Users, Briefcase, Search, Filter, SlidersHorizontal } from 'lucide-react';
 import { VENDOR_DASHBOARD_DATA, Booking } from '@/lib/vendor-dashboard-data';
-import { SharedEvent } from '@/lib/shared-data';
+import { SharedEvent } from '@/lib/types';
 import { getEvents } from '@/lib/firestore-service';
 import { Button } from '@/components/ui/button';
 import { DashboardFilter } from '@/components/dashboard/DashboardFilter';

@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Clock, CheckCircle, FileText, ChevronRight, MapPin, XCircle, CreditCard, AlertCircle } from 'lucide-react';
-import { vendors } from '@/lib/vendors-data';
-import { Event } from '@/lib/events-data';
+import { getVendors } from '@/lib/firestore-service';
+import { SharedEvent, Vendor } from '@/lib/types';
 import { DashboardFilter } from '../DashboardFilter';
 
 const STATUS_MAP: Record<string, { color: string; icon: React.ReactNode }> = {
@@ -18,12 +18,24 @@ const STATUS_MAP: Record<string, { color: string; icon: React.ReactNode }> = {
 };
 
 interface VendorsTabProps {
-    event: Event;
+    event: SharedEvent;
 }
 
 const VendorsTab: React.FC<VendorsTabProps> = ({ event }) => {
     const [activeStatus, setActiveStatus] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
+    const [vendors, setVendors] = useState<Vendor[]>([]);
+
+    useEffect(() => {
+        async function loadVendors() {
+            try {
+                setVendors(await getVendors());
+            } catch (error) {
+                console.error("Failed to load vendors:", error);
+            }
+        }
+        loadVendors();
+    }, []);
 
     const vendorRequests = event.bookedVendors.map(bv => {
         const vendor = vendors.find(v => v.id === bv.vendorId);

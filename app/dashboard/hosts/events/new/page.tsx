@@ -14,7 +14,7 @@ import {
     CheckCircle2,
     PartyPopper
 } from 'lucide-react';
-import { EVENT_THEMES } from '@/lib/vendors-data';
+import { EVENT_THEMES } from '@/lib/constants';
 
 type FormStep = 1 | 2 | 3;
 

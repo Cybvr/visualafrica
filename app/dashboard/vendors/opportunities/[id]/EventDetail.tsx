@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { ChevronLeft, Calendar, MapPin, Users, DollarSign, MessageSquare, Heart, Share2 } from 'lucide-react';
-import { SharedEvent } from '@/lib/shared-data';
+import { SharedEvent } from '@/lib/types';
 import { SubmitProposalModal, ProposalData } from '@/components/dashboard/SubmitProposalModal';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';

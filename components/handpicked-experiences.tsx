@@ -1,10 +1,10 @@
-"use client";
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
-import { vendors } from "@/lib/vendors-data"
+import { getVendors } from "@/lib/firestore-service"
 
-export function HandpickedExperiences() {
+export async function HandpickedExperiences() {
+    const vendors = await getVendors()
     const experiences = vendors
         .filter(v => v.categories.includes("Experiences"))
         .slice(0, 4)
@@ -46,7 +46,6 @@ export function HandpickedExperiences() {
                                         src={exp.image}
                                         alt={exp.title}
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                        onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png'; }}
                                     />
                                     <div className="absolute top-4 left-4">
                                         <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-black text-foreground uppercase tracking-wider">

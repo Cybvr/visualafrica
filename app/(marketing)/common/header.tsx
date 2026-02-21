@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import type { ComponentType } from "react"
 import Link from "next/link"
 import {
@@ -33,10 +33,10 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { solutions } from "@/lib/solutions-data"
 import { auth } from "@/lib/firebase"
 import { onAuthStateChanged, signOut, User as FirebaseUser } from "firebase/auth"
-import { platformFeatures } from "@/lib/platform-data"
+import { getPlatformFeatures, getSolutions } from "@/lib/firestore-service"
+import { Offering, PlatformFeature } from "@/lib/types"
 
 const eventTypeSlugs = ["offsites-retreats", "client-events", "skos", "conferences", "incentive-trips"]
 const serviceOfferingSlugs = ["full-service-planning", "expedited-planning"]
@@ -58,23 +58,13 @@ const offeringIconMap: Record<string, ComponentType<{ className?: string }>> = {
   "expedited-planning": Zap,
 }
 
-const eventTypes = solutions.filter(o => eventTypeSlugs.includes(o.slug)).map(o => ({
-  label: o.title,
-  href: `/solutions/${o.slug}`,
-  slug: o.slug,
-}))
-
-const serviceSolutions = solutions.filter(o => serviceOfferingSlugs.includes(o.slug)).map(o => ({
-  label: o.title,
-  href: `/solutions/${o.slug}`,
-  slug: o.slug,
-}))
-
 type AuthUser = FirebaseUser | null
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [user, setUser] = useState<AuthUser>(null)
+  const [solutions, setSolutions] = useState<Offering[]>([])
+  const [platformFeatures, setPlatformFeatures] = useState<PlatformFeature[]>([])
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -82,6 +72,46 @@ export function Header() {
     })
     return () => unsubscribe()
   }, [])
+
+  useEffect(() => {
+    async function loadMenuData() {
+      try {
+        const [solutionData, platformData] = await Promise.all([
+          getSolutions(),
+          getPlatformFeatures(),
+        ])
+        setSolutions(solutionData)
+        setPlatformFeatures(platformData)
+      } catch (error) {
+        console.error("Failed to load navigation data:", error)
+      }
+    }
+    loadMenuData()
+  }, [])
+
+  const eventTypes = useMemo(
+    () =>
+      solutions
+        .filter((o) => eventTypeSlugs.includes(o.slug))
+        .map((o) => ({
+          label: o.title,
+          href: `/solutions/${o.slug}`,
+          slug: o.slug,
+        })),
+    [solutions]
+  )
+
+  const serviceSolutions = useMemo(
+    () =>
+      solutions
+        .filter((o) => serviceOfferingSlugs.includes(o.slug))
+        .map((o) => ({
+          label: o.title,
+          href: `/solutions/${o.slug}`,
+          slug: o.slug,
+        })),
+    [solutions]
+  )
 
 
   const handleLogout = async () => {

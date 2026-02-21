@@ -8,12 +8,11 @@ import { useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { VENDOR_CATEGORIES, EVENT_THEMES, Vendor } from '@/lib/vendors-data';
-import { BlogPost } from '@/lib/blog-data';
-import { SharedEvent } from '@/lib/shared-data';
+import { VENDOR_CATEGORIES, EVENT_THEMES } from '@/lib/constants';
+import { Vendor, BlogPost, SharedEvent } from '@/lib/types';
 import { getVendors, getEvents, getBlogPosts } from '@/lib/firestore-service';
 import BlogPostCard from '@/components/dashboard/BlogPostCard';
-import VendorCard from '@/components/dashboard/VendorCard';
+import { VendorCard } from '@/components/dashboard/vendor-card';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -485,7 +484,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
               {displayVendors.map(vendor => (
                 <div key={vendor.id} onClick={() => router.push(`/dashboard/hosts/vendor/${vendor.slug}`)} className="cursor-pointer min-w-0">
-                  <VendorCard {...vendor} />
+                  <VendorCard vendor={vendor} />
                 </div>
               ))}
             </div>

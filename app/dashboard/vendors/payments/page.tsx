@@ -19,7 +19,7 @@ export default function VendorPaymentsPage() {
     const [activeTab, setActiveTab] = useState<'history' | 'methods'>('history');
     const [searchQuery, setSearchQuery] = useState('');
     const { payments, paymentMethods } = VENDOR_DASHBOARD_DATA;
-    const paymentStats = getPaymentStats();
+    const paymentStats = getPaymentStats(payments);
 
     // Filter payments based on search query
     const filteredPayments = payments.filter((payment) => {

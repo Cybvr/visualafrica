@@ -2,7 +2,7 @@
 
 import React, { Suspense, useState, useEffect } from 'react';
 import Inbox, { ChatConversation } from '@/components/dashboard/Inbox';
-import { SharedEvent } from '@/lib/shared-data';
+import { SharedEvent } from '@/lib/types';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 import { getEvents } from '@/lib/firestore-service';
 
