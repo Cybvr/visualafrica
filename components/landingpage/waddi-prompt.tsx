@@ -14,9 +14,9 @@ export function WaddiPrompt() {
             <div className="max-w-4xl w-full flex flex-col items-center gap-8">
                 {/* Title */}
                 <div className="flex items-center gap-3">
-                    <Sparkles className="w-8 h-8 text-blue-500" />
+
                     <h1 className="text-3xl md:text-5xl font-medium text-gray-800 tracking-tight">
-                        Meet Waddi, your personal event AI assistant
+                        Meet your personal event AI assistant
                     </h1>
                 </div>
 
