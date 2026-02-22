@@ -11,202 +11,28 @@ import { doc, getDoc } from 'firebase/firestore';
 import ChatHeader from "@/components/dashboard/ChatHeader";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import Sidebar from "@/components/dashboard/Sidebar";
+import { DEMO_CHAT_HISTORY, MARKET_DATA, INITIAL_MESSAGES, getChatMessages, CITY_COLORS, CITIES, buildVendorsList } from "@/lib/chat-data";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Plus, ChevronDown, Mic, ArrowRight, MapPin } from "lucide-react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
+import { Plus, ChevronDown, Mic, ArrowRight, MapPin, Star, Users } from "lucide-react";
 import Link from 'next/link';
-
-// ── Constants ────────────────────────────────────────────
-
-const CITIES = [
-    { name: "Lagos", flag: "🇳🇬", vibe: "Afrobeats · Aso-oke · Suya" },
-    { name: "Accra", flag: "🇬🇭", vibe: "Highlife · Kente · Jollof" },
-    { name: "Nairobi", flag: "🇰🇪", vibe: "Amapiano · Maasai · Nyama choma" },
-    { name: "Cape Town", flag: "🇿🇦", vibe: "Amapiano · Ubuntu · Braai" },
-];
-
-const CITY_COLORS: Record<string, string> = {
-    Lagos: "hsl(var(--primary))",
-    Accra: "#E8A020",
-    Nairobi: "#A78BFA",
-    "Cape Town": "#F472B6",
-};
-
-const CAPABILITIES = [
-    { id: "budget", label: "Budget", icon: "💰" },
-    { id: "create_event", label: "Create", icon: "✨" },
-    { id: "vendor_search", label: "Discover", icon: "🔍" },
-    { id: "rsvp", label: "Track", icon: "📨" },
-];
-
-const VENDOR_ACTIONS = [
-    { id: "message", label: "Say Hello", icon: "💬" },
-    { id: "contract", label: "Send Paperwork", icon: "📄" },
-    { id: "profile", label: "See their story", icon: "👤" },
-    { id: "save", label: "Shortlist", icon: "🔖" },
-];
-
-// ── Data Helpers ─────────────────────────────────────────
-
-function buildVendorsList(vendors: Vendor[], city: string) {
-    return vendors
-        .filter(v => v.location.toLowerCase().includes(city.toLowerCase()))
-        .map(v => ({
-            name: v.name,
-            slug: v.slug || v.id,
-            type: v.categories[0],
-            tags: v.services.slice(0, 4),
-            price: v.price || "Contact for price",
-            rating: v.rating,
-            status: "Available",
-            statusColor: "hsl(var(--primary))",
-        }));
-}
-
-// ── Market Data ──────────────────────────────────────────
-
-const MARKET_DATA: Record<string, any> = {
-    Accra: {
-        greeting: "Accra — perfect. I'm pulling from the Ghanaian vendor network now. Caterers, Highlife DJs, kente decor, venues. What's the event?",
-        capabilityResponses: {
-            vendor_search: { type: "vendor_cards", city: "Accra", content: "Top vendors available in Accra:", vendors: [] },
-            negotiate: {
-                type: "action", content: "Negotiating bundle across Accra vendors:", actions: [
-                    { label: "Contacting Maame's Kitchen for bulk rate", status: "done" },
-                    { label: "Contacting DJ Ohene for package discount", status: "done" },
-                    { label: "Requesting 12% bundle across catering + DJ + decor", status: "active" },
-                ]
-            },
-            book: {
-                type: "action", content: "Confirming Accra bookings:", actions: [
-                    { label: "Sending deposit request to Maame's Kitchen", status: "done" },
-                    { label: "Confirming DJ Ohene date hold", status: "active" },
-                    { label: "Generating vendor contracts", status: "queued" },
-                ]
-            },
-            rsvp: {
-                type: "action", content: "Launching Accra RSVP campaign:", actions: [
-                    { label: "Drafting bilingual invite (English + Twi)", status: "done" },
-                    { label: "Sending to diaspora community list (340 contacts)", status: "active" },
-                    { label: "Setting up RSVP tracking dashboard", status: "queued" },
-                ]
-            },
-            budget: { type: "text", content: "Accra budget summary:\n\nCatering (200 guests): ₵17,000 · DJ: ₵2,200 · Decor: ₵1,200 · Venue (est.): ₵4,500\n\nRunning total: ₵24,900 (~$1,620 USD)\nBundle savings pending — est. ₵2,988 off (12%)." },
-        }
-    },
-    Lagos: {
-        greeting: "Lagos — let's go. Tapped into the Lagos vendor network. Suya caterers, Afrobeats DJs, aso-oke stylists, waterfront venues. What are we planning?",
-        capabilityResponses: {
-            vendor_search: {
-                type: "vendor_cards",
-                city: "Lagos",
-                content: "Top vendors available in Lagos:",
-                vendors: [],
-                suggestions: [{ label: "Let Ama handle booking", action: "ama_run_vendor_flow" }]
-            },
-            negotiate: {
-                type: "action", content: "Negotiating bundle across Lagos vendors:", actions: [
-                    { label: "Contacting Mama Titi's for volume rate", status: "done" },
-                    { label: "Contacting DJ Neptune for package deal", status: "done" },
-                    { label: "Requesting 10% bundle across catering + DJ + decor", status: "active" },
-                ]
-            },
-            book: {
-                type: "action", content: "Confirming Lagos bookings:", actions: [
-                    { label: "Sending deposit request to Mama Titi's Kitchen", status: "done" },
-                    { label: "Confirming DJ Neptune date hold", status: "active" },
-                    { label: "Securing venue deposit — Landmark Centre", status: "queued" },
-                ]
-            },
-            rsvp: {
-                type: "action", content: "Launching Lagos RSVP campaign:", actions: [
-                    { label: "Drafting bilingual invite (English + Yoruba)", status: "done" },
-                    { label: "Sending to diaspora community list (410 contacts)", status: "active" },
-                    { label: "Setting up RSVP tracking link", status: "queued" },
-                ]
-            },
-            budget: { type: "text", content: "Lagos budget summary:\n\nCatering (300 guests): ₦1,350,000 · DJ: ₦180,000 · Decor: ₦85,000 · Venue (est.): ₦850,000\n\nRunning total: ₦2,465,000 (~$1,540 USD)\nBundle savings pending — est. ₦246,500 off (10%)." },
-        }
-    },
-    Nairobi: {
-        greeting: "Nairobi — great choice. Into the Kenyan vendor network now. Nyama choma caterers, Gengetone & Amapiano DJs, Maasai-inspired decor. What are we building?",
-        capabilityResponses: {
-            vendor_search: { type: "vendor_cards", city: "Nairobi", content: "Top vendors available in Nairobi:", vendors: [] },
-            negotiate: {
-                type: "action", content: "Negotiating bundle across Nairobi vendors:", actions: [
-                    { label: "Contacting Nyama Choma Kings for group rate", status: "done" },
-                    { label: "Requesting DJ + decor package discount", status: "active" },
-                    { label: "Targeting 12% bundle saving", status: "queued" },
-                ]
-            },
-            book: {
-                type: "action", content: "Confirming Nairobi bookings:", actions: [
-                    { label: "Assigning local on-ground coordinator", status: "done" },
-                    { label: "Sending deposit to Nyama Choma Kings", status: "active" },
-                    { label: "Confirming venue — Nairobi Safari Club Gardens", status: "queued" },
-                ]
-            },
-            rsvp: {
-                type: "action", content: "Launching Nairobi RSVP campaign:", actions: [
-                    { label: "Drafting trilingual invite (English + Swahili + Kikuyu)", status: "done" },
-                    { label: "Sending to diaspora community list (290 contacts)", status: "active" },
-                    { label: "Setting up RSVP tracking dashboard", status: "queued" },
-                ]
-            },
-            budget: { type: "text", content: "Nairobi budget summary:\n\nCatering (150 guests): KSh 420,000 · DJ: KSh 55,000 · Decor: KSh 22,000 · Venue (est.): KSh 120,000\n\nRunning total: KSh 617,000 (~$4,750 USD)\nBundle savings pending — est. KSh 74,000 off." },
-        }
-    },
-    "Cape Town": {
-        greeting: "Cape Town — on it. Into the South African vendor network. Braai caterers, Amapiano DJs, Cape Malay & Pan-African decor, estate venues. What's the event?",
-        capabilityResponses: {
-            vendor_search: { type: "vendor_cards", city: "Cape Town", content: "Top vendors available in Cape Town:", vendors: [] },
-            negotiate: {
-                type: "action", content: "Negotiating bundle across Cape Town vendors:", actions: [
-                    { label: "Contacting Braai Masters for group rate", status: "done" },
-                    { label: "Requesting DJ + decor bundle", status: "active" },
-                    { label: "Targeting 10% saving across all three", status: "queued" },
-                ]
-            },
-            book: {
-                type: "action", content: "Confirming Cape Town bookings:", actions: [
-                    { label: "Sending deposit to Braai Masters CT", status: "done" },
-                    { label: "Confirming DJ Bongani date hold", status: "active" },
-                    { label: "Securing Groot Constantia Lawns deposit", status: "queued" },
-                ]
-            },
-            rsvp: {
-                type: "action", content: "Launching Cape Town RSVP campaign:", actions: [
-                    { label: "Drafting invite (English + Zulu + Afrikaans)", status: "done" },
-                    { label: "Sending to diaspora community list (260 contacts)", status: "active" },
-                    { label: "Setting up RSVP tracking dashboard", status: "queued" },
-                ]
-            },
-            budget: { type: "text", content: "Cape Town budget summary:\n\nCatering (150 guests): R48,000 · DJ: R4,500 · Decor: R12,000 · Venue (est.): R22,000\n\nRunning total: R86,500 (~$4,700 USD)\nBundle savings pending — est. R8,650 off (10%)." },
-        }
-    }
-};
-
-// ── Initial Messages ─────────────────────────────────────
-
-const INITIAL_MESSAGES: any[] = [
-    {
-        id: 1,
-        role: "agent",
-        type: "text",
-        content: "Hi! I'm Ama, your AI event coordinator. How can I help you today?",
-        suggestions: [
-            { label: "Budget", action: "capability", capId: "budget" },
-            { label: "Create", action: "start_planning" },
-            { label: "Discover", action: "start_vendor_search" },
-            { label: "Track", action: "capability", capId: "rsvp" }
-        ],
-        time: new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" })
-    }
-];
+import {
+    EventOverviewCard,
+    VendorGrid,
+    TaskChecklist,
+    DayOfTimeline,
+} from "@/components/dashboard/chat";
 
 // ── UI Components ────────────────────────────────────────
 
@@ -322,17 +148,17 @@ function VendorCardMsg({ msg, savedVendors, onSave, onVendorAction, activeCity, 
 
     return (
         <div className="w-full">
-            <div className="bg-secondary/40 border border-border rounded-xl p-3.5 mb-2 shadow-sm">
+            <div className="mb-3">
                 {msg.city && <CityBadge city={msg.city} />}
                 <div className="text-foreground text-[14px] leading-relaxed">{msg.content}</div>
             </div>
-            <div className="space-y-2">
+            <div className="w-full max-w-[480px] space-y-3">
                 {shown.map((v: any) => (
                     <VCard key={v.name} v={v} savedVendors={savedVendors} onSave={onSave} onVendorAction={onVendorAction} />
                 ))}
             </div>
             {allForCity.length > 0 && hasMore && (
-                <button onClick={() => setExpanded(e => !e)} className="w-full py-2.5 mt-1 border border-dashed border-border rounded-xl text-muted-foreground text-xs hover:text-primary hover:border-primary transition-all font-mono">
+                <button onClick={() => setExpanded(e => !e)} className="w-full max-w-[480px] py-2.5 mt-2 border border-dashed border-border rounded-xl text-muted-foreground text-xs hover:text-primary hover:border-primary transition-all font-mono">
                     {expanded ? "▲ Show less" : `▼ View more vendors (${allForCity.length - initialVendors.length} more)`}
                 </button>
             )}
@@ -343,7 +169,7 @@ function VendorCardMsg({ msg, savedVendors, onSave, onVendorAction, activeCity, 
 function KnowledgeCard({ item }: { item: any }) {
     const isBlog = !!item.author;
     return (
-        <div className="bg-card border border-border rounded-2xl overflow-hidden max-w-[280px] shadow-sm">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden w-full shadow-sm">
             {item.image && (
                 <div className="h-24 w-full relative overflow-hidden">
                     <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
@@ -369,7 +195,7 @@ function CommunityCard({ item }: { item: any }) {
     return (
         <Link
             href={`/dashboard/hosts/community/${item.id}`}
-            className="group block bg-card border border-border rounded-2xl overflow-hidden max-w-[280px] shadow-sm hover:shadow-md hover:border-primary/30 transition-all active:scale-[0.98]"
+            className="group block bg-card border border-border rounded-2xl overflow-hidden w-full shadow-sm hover:shadow-md hover:border-primary/30 transition-all active:scale-[0.98]"
         >
             <div className="h-40 w-full relative overflow-hidden">
                 <img src={item.image} alt={item.eventName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -392,10 +218,10 @@ function CommunityCard({ item }: { item: any }) {
     );
 }
 
-function EventForm({ onSubmit }: { onSubmit: (data: any) => void }) {
-    const [data, setData] = useState({ name: "", guests: "", budget: "" });
+function EventForm({ onSubmit, defaultCity }: { onSubmit: (data: any) => void; defaultCity?: string | null }) {
+    const [data, setData] = useState({ name: "", guests: "", budget: "", city: defaultCity || "" });
     return (
-        <div className="bg-card border border-border rounded-2xl p-4 max-w-[300px] w-full space-y-3 shadow-sm">
+        <div className="bg-card border border-border rounded-2xl p-4 w-full space-y-3 shadow-sm">
             <div className="text-[13px] font-bold text-foreground">Almost there! Just the basics:</div>
             <div className="space-y-2">
                 <input
@@ -419,10 +245,20 @@ function EventForm({ onSubmit }: { onSubmit: (data: any) => void }) {
                     value={data.budget}
                     onChange={e => setData({ ...data, budget: e.target.value })}
                 />
+                <Select value={data.city} onValueChange={(value) => setData({ ...data, city: value })}>
+                    <SelectTrigger className="w-full bg-secondary/50 border-border text-sm">
+                        <SelectValue placeholder="Select City" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {CITIES.map(c => (
+                            <SelectItem key={c.name} value={c.name}>{c.flag} {c.name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
             <button
                 onClick={() => onSubmit(data)}
-                disabled={!data.name || !data.guests || !data.budget}
+                disabled={!data.name || !data.guests || !data.budget || !data.city}
                 className="w-full bg-primary text-primary-foreground font-bold py-2 rounded-lg text-sm transition-all active:scale-95 disabled:opacity-50"
             >
                 Create Event
@@ -435,7 +271,7 @@ function CalendarPicker({ onSelect }: { onSelect: (date: string) => void }) {
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
     const [selected, setSelected] = useState<number | null>(null);
     return (
-        <div className="bg-card border border-border rounded-2xl p-4 max-w-[300px] w-full shadow-sm">
+        <div className="bg-card border border-border rounded-2xl p-4 w-full shadow-sm">
             <div className="text-[13px] font-bold text-foreground mb-3 flex justify-between items-center">
                 <span>Select a Date</span>
                 <span className="text-[11px] text-muted-foreground font-normal">August 2026</span>
@@ -509,59 +345,192 @@ function Step({ a }: { a: any }) {
     );
 }
 
-function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onSuggestion, allVendorsByCity, onFormSubmit, onCalendarSelect }: any) {
-    const ag = msg.role === "agent";
+function StoreCard({ item, onAction }: { item: any; onAction?: (action: string, item: any) => void }) {
+    const [showActions, setShowActions] = useState(false);
+
     return (
-        <div className={cn("flex gap-2 mb-6", ag ? "flex-row items-start" : "flex-row-reverse items-end")}>
-            {ag && <img src="/images/ama.png" alt="Ama" className="w-8 h-8 rounded-full object-cover shrink-0 mt-1" />}
-            <div className={cn("max-w-[85%] flex flex-col", ag ? "items-start" : "items-end")}>
-                {msg.type === "city_picker" ? (
-                    <div className="flex flex-col gap-2 w-full max-w-[300px]">
-                        {CITIES.map(c => (
-                            <button key={c.name} onClick={() => onSelectCity(c.name)} className="flex items-center gap-3 p-3 bg-card border border-border rounded-xl hover:border-primary/50 transition-all text-left">
-                                <span className="text-2xl">{c.flag}</span>
-                                <div>
-                                    <div className="text-[13px] font-bold">{c.name}</div>
-                                    <div className="text-[10px] text-muted-foreground uppercase tracking-tight">{c.vibe}</div>
-                                </div>
-                            </button>
-                        ))}
+        <div className="block relative group">
+            <div
+                onClick={() => setShowActions(!showActions)}
+                className={cn(
+                    "bg-card border transition-all duration-150 rounded-xl p-3 mb-2 cursor-pointer select-none group-hover:border-primary/50 group-hover:shadow-md",
+                    "border-border"
+                )}
+            >
+                <div className="flex justify-between items-start">
+                    <div>
+                        <div className="text-foreground font-bold text-sm group-hover:text-primary transition-colors">{item.title}</div>
+                        <div className="text-muted-foreground text-[11px] uppercase tracking-wider font-mono">{item.city}</div>
                     </div>
-                ) : msg.type === "vendor_cards" ? (
-                    <VendorCardMsg msg={msg} savedVendors={savedVendors} onSave={onSave} onVendorAction={onVendorAction} activeCity={activeCity} allVendorsByCity={allVendorsByCity} />
-                ) : msg.type === "action" ? (
-                    <div className="bg-secondary/20 rounded-2xl p-4 border border-border/50 w-full">
-                        <div className="text-foreground text-sm font-bold mb-3">{msg.content}</div>
-                        {msg.actions.map((a: any, idx: number) => <Step key={idx} a={a} />)}
+                    <div className="flex items-center gap-1.5">
+                        <span className="bg-primary/10 text-primary text-[11px] font-semibold rounded-full px-2 py-0.5">{item.price}</span>
                     </div>
-                ) : msg.type === "ama_flow_card" ? (
-                    <AmaFlowCard msg={msg} />
-                ) : msg.type === "knowledge" ? (
-                    <div className="space-y-2">
-                        {msg.content && <div className="text-[14px] leading-relaxed text-foreground">{msg.content}</div>}
-                        <KnowledgeCard item={msg.data} />
+                </div>
+
+                <div className="flex justify-between items-center mt-2">
+                    <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-bold uppercase tracking-tighter">
+                        <span className="flex items-center gap-0.5"><Star size={10} className="text-yellow-500 fill-yellow-500" /> {item.rating || "4.8"}</span>
+                        <span className="flex items-center gap-0.5"><Users size={10} /> {item.runs || "12"} runs</span>
                     </div>
-                ) : msg.type === "community" ? (
-                    <div className="space-y-2">
-                        {msg.content && <div className="text-[14px] leading-relaxed text-foreground">{msg.content}</div>}
-                        <CommunityCard item={msg.data} />
-                    </div>
-                ) : msg.type === "event_form" ? (
-                    <div className="space-y-2">
-                        {msg.content && <div className="text-[14px] leading-relaxed text-foreground">{msg.content}</div>}
-                        <EventForm onSubmit={onFormSubmit} />
-                    </div>
-                ) : msg.type === "calendar_picker" ? (
-                    <div className="space-y-2">
-                        {msg.content && <div className="text-[14px] leading-relaxed text-foreground">{msg.content}</div>}
-                        <CalendarPicker onSelect={onCalendarSelect} />
-                    </div>
-                ) : (
-                    <div className={cn("rounded-2xl px-4 py-2.5 text-sm sm:text-base leading-relaxed whitespace-pre-line",
-                        ag ? "bg-transparent text-foreground px-0 rounded-none shadow-none" : "bg-card border border-border text-foreground rounded-br-none shadow-sm")}>
-                        {msg.content}
+                    {!showActions && (
+                        <span className="text-muted-foreground hover:text-foreground transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                            Actions <ChevronDown size={12} />
+                        </span>
+                    )}
+                </div>
+
+                {showActions && (
+                    <div className="mt-3 bg-secondary/40 rounded-full p-1 border border-border flex items-center justify-between gap-1 w-full animate-in fade-in slide-in-from-top-2 duration-200" onClick={(e) => e.stopPropagation()}>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onAction && onAction('apply', item); }}
+                            className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none">
+                            <span className="text-[14px]">⚡</span> <span className="hidden sm:inline">Apply</span>
+                        </button>
+                        <div className="w-[1px] h-3 bg-border"></div>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onAction && onAction('buy', item); }}
+                            className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none">
+                            <span className="text-[14px]">💰</span> <span className="hidden sm:inline">Buy Kit</span>
+                        </button>
+                        <div className="w-[1px] h-3 bg-border"></div>
+                        <Link
+                            href={`/dashboard/hosts/chat/${item.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex-1 text-[11px] font-semibold py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full transition-all flex justify-center items-center gap-1.5 leading-none">
+                            <span className="text-[14px]">👁️</span> <span className="hidden sm:inline">Preview</span>
+                        </Link>
                     </div>
                 )}
+            </div>
+        </div>
+    );
+}
+
+function StoreListMsg({ msg, onStoreAction }: { msg: any; onStoreAction?: (action: string, item: any) => void }) {
+    const items = msg.items || [];
+    return (
+        <div className="w-full">
+            <div className="mb-3">
+                {msg.city && <CityBadge city={msg.city} />}
+                <div className="text-foreground text-[14px] leading-relaxed">{msg.content}</div>
+            </div>
+            <div className="w-full max-w-[480px] space-y-3">
+                {items.map((item: any) => (
+                    <StoreCard key={item.id} item={item} onAction={onStoreAction} />
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onStoreAction, onSuggestion, allVendorsByCity, onFormSubmit, onCalendarSelect }: any) {
+    const ag = msg.role === "agent";
+    return (
+        <div className={cn("flex gap-3.5 mb-6", ag ? "flex-row items-start" : "flex-row-reverse items-start")}>
+            {ag ? (
+                <img src="/images/ama.png" alt="Waddi" className="w-[32px] h-[32px] rounded-full object-cover shrink-0 mt-0.5 border border-border shadow-sm" />
+            ) : (
+                <div className="w-[32px] h-[32px] rounded-full bg-primary text-primary-foreground flex-shrink-0 mt-0.5 flex items-center justify-center text-[10px] font-bold shadow-sm">
+                    YOU
+                </div>
+            )}
+
+            <div className={cn("flex-1 min-w-0 flex flex-col", ag ? "items-start" : "items-end")}>
+                {/* Petal-style Header */}
+                <div className={cn("text-[11px] text-muted-foreground mb-1 flex items-center gap-2", !ag && "justify-end")}>
+                    <span className="font-semibold text-foreground/80">{ag ? "Waddi" : "You"}</span>
+                    <span className="opacity-50 font-medium">{msg.time}</span>
+                </div>
+
+                <div className={cn("w-full max-w-[95%] sm:max-w-[480px]", ag ? "text-left" : "text-right")}>
+                    {msg.type === "city_picker" ? (
+                        <div className="flex flex-col gap-2 w-full mt-1">
+                            {CITIES.map(c => (
+                                <button key={c.name} onClick={() => onSelectCity(c.name)} className="flex items-center gap-3 p-3 bg-card border border-border rounded-xl hover:border-primary/50 transition-all text-left shadow-sm">
+                                    <span className="text-2xl">{c.flag}</span>
+                                    <div>
+                                        <div className="text-[13px] font-bold">{c.name}</div>
+                                        <div className="text-[10px] text-muted-foreground uppercase tracking-tight">{c.vibe}</div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    ) : msg.type === "vendor_cards" ? (
+                        <div className="mt-1">
+                            <VendorCardMsg msg={msg} savedVendors={savedVendors} onSave={onSave} onVendorAction={onVendorAction} activeCity={activeCity} allVendorsByCity={allVendorsByCity} />
+                        </div>
+                    ) : msg.type === "action" ? (
+                        <div className="w-full mt-1">
+                            <div className="bg-secondary/20 rounded-2xl p-4 border border-border/50 w-full shadow-sm">
+                                <div className="text-foreground text-sm font-bold mb-3">{msg.content}</div>
+                                {msg.actions.map((a: any, idx: number) => <Step key={idx} a={a} />)}
+                            </div>
+                        </div>
+                    ) : msg.type === "ama_flow_card" ? (
+                        <div className="w-full mt-1">
+                            <AmaFlowCard msg={msg} />
+                        </div>
+                    ) : msg.type === "knowledge" ? (
+                        <div className="w-full space-y-2 mt-1">
+                            {msg.content && <div className="text-[14px] leading-relaxed text-foreground">{msg.content}</div>}
+                            <div className="w-full">
+                                <KnowledgeCard item={msg.data} />
+                            </div>
+                        </div>
+                    ) : msg.type === "community" ? (
+                        <div className="w-full space-y-2 mt-1">
+                            {msg.content && <div className="text-[14px] leading-relaxed text-foreground">{msg.content}</div>}
+                            <div className="w-full">
+                                <CommunityCard item={msg.data} />
+                            </div>
+                        </div>
+                    ) : msg.type === "event_form" ? (
+                        <div className="w-full space-y-2 mt-1">
+                            {msg.content && <div className="text-[14px] leading-relaxed text-foreground">{msg.content}</div>}
+                            <div className="w-full">
+                                <EventForm onSubmit={onFormSubmit} defaultCity={activeCity} />
+                            </div>
+                        </div>
+                    ) : msg.type === "calendar_picker" ? (
+                        <div className="w-full space-y-2 mt-1">
+                            {msg.content && <div className="text-[14px] leading-relaxed text-foreground">{msg.content}</div>}
+                            <div className="w-full">
+                                <CalendarPicker onSelect={onCalendarSelect} />
+                            </div>
+                        </div>
+                    ) : msg.type === "store_cards" ? (
+                        <div className="mt-1">
+                            <StoreListMsg msg={msg} onStoreAction={onStoreAction} />
+                        </div>
+                    ) : msg.type === "overview" ? (
+                        <div className="w-full mt-1">
+                            <EventOverviewCard />
+                        </div>
+                    ) : msg.type === "todo" ? (
+                        <div className="w-full mt-1">
+                            <TaskChecklist />
+                        </div>
+                    ) : msg.type === "timeline" ? (
+                        <div className="w-full mt-1">
+                            <DayOfTimeline />
+                        </div>
+                    ) : msg.type === "vendors" ? (
+                        <div className="w-full mt-1">
+                            <VendorGrid />
+                        </div>
+                    ) : (
+                        msg.content ? (
+                            <div className={cn(
+                                "rounded-2xl px-4 py-3 text-[14px] leading-relaxed whitespace-pre-line shadow-sm border mt-1 inline-block",
+                                ag
+                                    ? "bg-card border-border text-foreground rounded-tl-[4px] text-left"
+                                    : "bg-secondary/30 border-border text-foreground rounded-tr-[4px] text-left"
+                            )}>
+                                {msg.content}
+                            </div>
+                        ) : null
+                    )}
+                </div>
 
                 {ag && msg.suggestions && (
                     <div className="flex flex-wrap gap-1.5 mt-3">
@@ -585,12 +554,39 @@ export default function ChatPage() {
     const [savedVendors, setSavedVendors] = useState<Set<string>>(new Set());
     const [allVendorsByCity, setAllVendorsByCity] = useState<Record<string, any[]>>({});
     const [liveEvents, setLiveEvents] = useState<SharedEvent[]>([]);
+    const [storeKits] = useState<any[]>(() => DEMO_CHAT_HISTORY.filter((kit: any) => kit.published));
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [chatTitle, setChatTitle] = useState("New Chat");
     const [dataLoaded, setDataLoaded] = useState(false);
     const [historyLoaded, setHistoryLoaded] = useState(false);
     const [waddiModel, setWaddiModel] = useState<'lite' | 'pro'>('lite');
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+    const [pendingAction, setPendingAction] = useState<any>(null);
+
+    const handlePillClick = (pill: any) => {
+        const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
+
+        // If pill has an explicit action, route through the logic engine
+        if (pill.action) {
+            const userContent = pill.id === 'store' ? "Browse Store" : (pill.action === 'vendor_search' ? "Show me vendors" : `Show me ${pill.label.toLowerCase()}`);
+            send(userContent, pill);
+            return;
+        }
+
+        // Fallback for static UI views (Overview, Todo, etc)
+        setMessages(prev => [...prev, { id: Date.now(), role: "user", content: `Show me ${pill.label.toLowerCase()}`, time: nowStr }]);
+        setTyping(true);
+        setTimeout(() => {
+            setTyping(false);
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                role: "agent",
+                time: nowStr,
+                type: pill.id,
+                content: `Here is the ${pill.label.toLowerCase()} for your event:`
+            }]);
+        }, 800);
+    };
 
     useEffect(() => {
         async function init() {
@@ -611,7 +607,7 @@ export default function ChatPage() {
         const chatIdStr = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
 
         try {
-            const savedChatRaw = localStorage.getItem(`chat_${chatIdStr}`);
+            const savedChatRaw = chatIdStr !== 'new' ? localStorage.getItem(`chat_${chatIdStr}`) : null;
             if (savedChatRaw) {
                 const parsed = JSON.parse(savedChatRaw);
                 if (parsed && parsed.messages && parsed.messages.length > 0) {
@@ -630,251 +626,22 @@ export default function ChatPage() {
         const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
 
         // Populate initial messages based on chat ID using LIVE data
-        if (params.id === 'lagos-bday') {
-            const lagosVendors = allVendorsByCity["Lagos"] || [];
-            const v1 = lagosVendors[0]?.name || "Local Vendor";
-            const v2 = lagosVendors[1]?.name || "Premium Catering";
-            const v3 = lagosVendors[2]?.name || "Event Venue";
+        const initialDemochatMessages = getChatMessages(chatIdStr, allVendorsByCity, liveEvents);
 
-            setMessages([
-                {
-                    id: 'msg-1',
-                    role: "user",
-                    content: "I'm looking for some help with my birthday weekend in Lagos.",
-                    time: "Yesterday"
-                },
-                {
-                    id: 'msg-2',
-                    role: "agent",
-                    type: "text",
-                    content: MARKET_DATA.Lagos.greeting,
-                    suggestions: [
-                        { label: "Start Planning", action: "start_planning" },
-                        { label: "Search Vendors", action: "vendor_search" }
-                    ],
-                    time: "Yesterday"
-                },
-                {
-                    id: 'msg-3',
-                    role: "agent",
-                    type: "ama_flow_card",
-                    kicker: "BUDGET OVERVIEW",
-                    content: "Here's the current allocation for your Lagos weekend using our verified vendors:",
-                    columns: ["Activity", "Vendor", "Price", "Status"],
-                    rows: [
-                        ["Spa", v1, "₦180k", "Quote requested"],
-                        ["Dinner", v2, "₦350k", "Quote requested"],
-                        ["Experience", v3, "₦600k", "Quote requested"]
-                    ],
-                    footer: `Total Allocated: ₦1.13M · Remaining: ₦870k`,
-                    suggestions: [
-                        { label: "Update Budget", action: "budget" },
-                        { label: "Negotiate Bundle", action: "negotiate" }
-                    ],
-                    time: "Yesterday"
-                },
-                {
-                    id: 'msg-4',
-                    role: "user",
-                    content: "Thanks! Can you also look for some high-end clubs for the Saturday night?",
-                    time: "02:14 PM"
-                }
-            ]);
-            setChatTitle("Lagos birthday weekend");
-            setActiveCity("Lagos");
-        } else if (params.id === 'accra-wedding') {
-            const accraVendors = allVendorsByCity["Accra"] || [];
-            const v1 = accraVendors[0]?.name || "Accra Catering";
-            const v2 = accraVendors[1]?.name || "Ghana DJ";
-            const v3 = accraVendors[2]?.name || "Luxury Decor";
-
-            // Find a real Accra event
-            const accraEvent = liveEvents.find(e => (e.location || "").toLowerCase().includes("accra")) || liveEvents[0];
-
-            setMessages([
-                {
-                    id: 'msg-h-1',
-                    role: "user",
-                    content: "Searching for wedding vendors in Accra for December.",
-                    time: "Tuesday"
-                },
-                {
-                    id: 'msg-a-2',
-                    role: "agent",
-                    type: "ama_flow_card",
-                    kicker: "BUDGET OVERVIEW",
-                    content: "Preliminary shortlist for your Accra wedding:",
-                    columns: ["Activity", "Vendor", "Price", "Status"],
-                    rows: [
-                        ["Catering", v1, "₵17,000", "Confirmed"],
-                        ["Music", v2, "₵2,200", "Confirmed"],
-                        ["Decor", v3, "₵3,500", "Quote received"]
-                    ],
-                    footer: `Total Allocated: ₵22,700 · Remaining: ₵7,300`,
-                    suggestions: [
-                        { label: "Show more catering", action: "vendor_search" },
-                        { label: "Adjust Budget", action: "budget" }
-                    ],
-                    time: "Tuesday"
-                },
-                {
-                    id: 'msg-h-2',
-                    role: "user",
-                    content: "What about photographers?",
-                    time: "Wednesday"
-                },
-                {
-                    id: 'msg-a-3',
-                    role: "agent",
-                    type: "vendor_cards",
-                    city: "Accra",
-                    content: "Here are some top photographers from our Accra database:",
-                    vendors: accraVendors.slice(0, 3),
-                    suggestions: [
-                        { label: "Contract All", action: "book" },
-                        { label: "See more options", action: "vendor_search" }
-                    ],
-                    time: "Wednesday"
-                },
-                {
-                    id: 'msg-a-4',
-                    role: "agent",
-                    type: "community",
-                    content: accraEvent ? `This real event shared by ${accraEvent.hostName} had a similar vibe. You might find their vendor list helpful:` : "Check out this community inspiration:",
-                    data: accraEvent || {
-                        id: "accra-wedding-ref",
-                        eventName: "Modern Accra Wedding",
-                        location: "Labadi, Accra",
-                        description: "A stunning seaside ceremony using local vendors.",
-                        image: "/images/events/wedding-1.jpg"
-                    },
-                    suggestions: [
-                        { label: "Duplicate this plan", action: "duplicate_event" },
-                        { label: "Ask about their caterer", action: "text" }
-                    ],
-                    time: "Wednesday"
-                }
-            ]);
-            setChatTitle("Accra wedding shortlist");
-            setActiveCity("Accra");
-        } else if (params.id === 'nairobi-boat') {
-            const nairobiVendors = allVendorsByCity["Nairobi"] || [];
-            setMessages([
-                {
-                    id: 'n-1',
-                    role: "user",
-                    content: "Planning a boat + dinner outing in Nairobi for September. Any ideas?",
-                    time: "Last week"
-                },
-                {
-                    id: 'n-2',
-                    role: "agent",
-                    type: "text",
-                    content: MARKET_DATA.Nairobi.greeting,
-                    suggestions: [
-                        { label: "Show boat venues", action: "vendor_search" },
-                        { label: "Plan itinerary", action: "capability", capId: "itinerary" }
-                    ],
-                    time: "Last week"
-                },
-                {
-                    id: 'n-3',
-                    role: "agent",
-                    type: "ama_flow_card",
-                    kicker: "NAIROBI PLAN",
-                    content: "I've drafted a plan using live Nairobi vendors:",
-                    columns: ["Activity", "Vendor", "Price", "Status"],
-                    rows: [
-                        ["Experience", nairobiVendors[0]?.name || "Nairobi Club", "KSh 45,000", "Available"],
-                        ["Dinner", nairobiVendors[1]?.name || "Local Grill", "KSh 85,000", "Table held"]
-                    ],
-                    footer: `Total Allocated: KSh 130,000 · Remaining: KSh 20,000`,
-                    suggestions: [
-                        { label: "Check cheaper options", action: "vendor_search" },
-                        { label: "Confirm dinner table", action: "book" }
-                    ],
-                    time: "Last week"
-                },
-                {
-                    id: 'n-4',
-                    role: "user",
-                    content: "The price for the boat seems high. Can we look for smaller options?",
-                    time: "09:12 AM"
-                }
-            ]);
-            setChatTitle("Nairobi boat + dinner plan");
-            setActiveCity("Nairobi");
-        } else if (params.id === 'cape-town-brunch') {
-            const ctVendors = allVendorsByCity["Cape Town"] || [];
-            setMessages([
-                {
-                    id: 'ct-1',
-                    role: "user",
-                    content: "Need brunch vendors for a baby shower in Cape Town. Around 40 guests.",
-                    time: "Monday"
-                },
-                {
-                    id: 'ct-2',
-                    role: "agent",
-                    type: "text",
-                    content: MARKET_DATA["Cape Town"].greeting,
-                    suggestions: [
-                        { label: "Search Brunches", action: "vendor_search" },
-                        { label: "Venue shortlist", action: "capability", capId: "shortlist" }
-                    ],
-                    time: "Monday"
-                },
-                {
-                    id: 'ct-3',
-                    role: "agent",
-                    type: "vendor_cards",
-                    city: "Cape Town",
-                    content: "These live venues have great brunch availability for October:",
-                    vendors: ctVendors.slice(0, 2),
-                    suggestions: [
-                        { label: "Request more", action: "vendor_search" },
-                        { label: "Book " + (ctVendors[0]?.name || "Venue"), action: "book" }
-                    ],
-                    time: "Monday"
-                },
-                {
-                    id: 'ct-4',
-                    role: "agent",
-                    type: "ama_flow_card",
-                    kicker: "BUDGET OVERVIEW",
-                    content: "Current budget snapshot for your Cape Town event:",
-                    columns: ["Activity", "Vendor", "Price", "Status"],
-                    rows: [
-                        ["Venue", ctVendors[0]?.name || "Estate", "R12,000", "Confirmed"],
-                        ["Catering", ctVendors[1]?.name || "Kitchen", "R18,500", "Received"]
-                    ],
-                    footer: `Total Allocated: R30,500 · Remaining: R9,500`,
-                    suggestions: [
-                        { label: "Full budget breakdown", action: "budget" },
-                        { label: "Contract catering", action: "book" }
-                    ],
-                    time: "Tuesday"
-                },
-                {
-                    id: 'ct-5',
-                    role: "user",
-                    content: `Let's go with ${ctVendors[0]?.name || "the estate"}. Can you check if they allow outside cake?`,
-                    time: "11:45 AM"
-                }
-            ]);
-            setChatTitle("Cape Town brunch vendors");
-            setActiveCity("Cape Town");
+        if (initialDemochatMessages.length > 0) {
+            setMessages(initialDemochatMessages);
+            const demoChatInfo = DEMO_CHAT_HISTORY.find(c => c.id === chatIdStr);
+            setChatTitle(demoChatInfo?.title || "Conversation");
+            setActiveCity(demoChatInfo?.city || null);
         } else if (params.id && params.id !== 'new') {
-            const mockTitles: Record<string, string> = {
-                "accra-wedding": "Accra wedding shortlist",
-                "nairobi-boat": "Nairobi boat + dinner plan",
-                "cape-town-brunch": "Cape Town brunch vendors"
-            };
-            setChatTitle(mockTitles[params.id as string] || "Conversation");
+            const demoChatInfo = DEMO_CHAT_HISTORY.find(c => c.id === chatIdStr);
+            setChatTitle(demoChatInfo?.title || "Conversation");
             setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
+            setActiveCity(demoChatInfo?.city || null);
         } else {
             setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
             setChatTitle("New Chat");
+            setActiveCity(null);
         }
         setHistoryLoaded(true);
     }, [params.id, dataLoaded]);
@@ -895,11 +662,44 @@ export default function ChatPage() {
     const scrollRef = useRef<HTMLDivElement>(null);
     useEffect(() => { scrollRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, typing]);
 
-    const send = (text: string, actionData?: any) => {
-        if (!text.trim()) return;
+    // ── Logic Dispatcher ─────────────────────────────────────
+
+    const extractIntent = (text: string, actionData?: any) => {
+        const lower = text.toLowerCase().trim();
+
+        // Priority 1: Direct action passed from metadata
+        const directAction = actionData?.capId || actionData?.action;
+        if (directAction) return directAction;
+
+        // Priority 2: Keyword matching (NLP-lite)
+        if (lower.includes("budget") || lower.includes("price") || lower.includes("cost")) return "budget";
+        if (lower.includes("vendor") || lower.includes("search") || lower.includes("find") || lower.includes("caterer") || lower.includes("dj")) return "vendor_search";
+        if (lower.includes("book") || lower.includes("confirm") || lower.includes("hold")) return "book";
+        if (lower.includes("negotiate") || lower.includes("deal") || lower.includes("discount")) return "negotiate";
+        if (lower.includes("rsvp") || lower.includes("invite") || lower.includes("guests")) return "rsvp";
+        if (lower.includes("upsell") || lower.includes("kit") || lower.includes("store")) return "upsell";
+        if (lower.includes("experience")) return "experience";
+
+        return "fallback";
+    };
+
+    const resolveCity = (text: string, currentCity: string | null) => {
+        const lower = text.toLowerCase();
+        const found = CITIES.find(c => lower.includes(c.name.toLowerCase()));
+        return found ? found.name : currentCity;
+    };
+
+    /**
+     * The core logic engine (n8n node style)
+     * Handles intent -> capability mapping & prerequisite checking
+     */
+    const dispatchLogic = (text: string, actionData?: any, isResumption = false) => {
         const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
-        setMessages(prev => [...prev, { id: Date.now(), role: "user", content: text, time: nowStr }]);
-        setInput("");
+        const intent = extractIntent(text, actionData);
+        const city = resolveCity(text, activeCity);
+
+        // State sensing: capture city automatically
+        if (city && city !== activeCity) setActiveCity(city);
 
         setTyping(true);
         setTimeout(() => {
@@ -911,56 +711,156 @@ export default function ChatPage() {
                 time: nowStr,
                 type: "text"
             };
+            const normalizedIntent = intent === "start_experiences" ? "experience" : intent;
+            const allVendors = Object.values(allVendorsByCity).flat();
 
-            const capId = actionData?.capId || actionData?.action;
+            if (intent === "start_planning") {
+                response.type = "event_form";
+                response.content = "Share your event details and I'll build your plan.";
+                setMessages(prev => [...prev, response]);
+                return;
+            }
 
-            if (activeCity && capId && MARKET_DATA[activeCity]?.capabilityResponses?.[capId]) {
-                const mock = MARKET_DATA[activeCity].capabilityResponses[capId];
-                response = { ...response, ...mock };
-                // If it's a vendor search, ensure we inject the actual vendors
-                if (capId === 'vendor_search') {
-                    response.vendors = allVendorsByCity[activeCity] || [];
+            if (intent === "start_store" || intent === "view_store_kit" || intent === "view_kit" || intent === "upsell") {
+                if (storeKits.length === 0) {
+                    response.type = "text";
+                    response.content = "No store chats yet.";
+                } else {
+                    response.type = "store_cards";
+                    response.content = "Store items you can apply to your plan:";
+                    response.items = storeKits.map((kit: any) => ({
+                        id: kit.id,
+                        title: kit.title || kit.name || "Untitled chat",
+                        city: kit.city || "Unspecified",
+                        price: kit.price || "—",
+                        rating: kit.rating,
+                        runs: kit.runs
+                    }));
                 }
-            } else if (activeCity && text.toLowerCase().includes("budget")) {
-                const mock = MARKET_DATA[activeCity].capabilityResponses.budget;
-                response = { ...response, ...mock };
-            } else if (!activeCity) {
-                response.content = "I'm looking into that for you. Which city are we talking about?";
+                setMessages(prev => [...prev, response]);
+                return;
+            }
+
+            if (!city && (normalizedIntent === "vendor_search" || normalizedIntent === "start_vendor_search")) {
+                response.type = "vendor_cards";
+                response.content = "Top vendors across all cities:";
+                response.vendors = allVendors;
+                response.suggestions = [{ label: "Experiences", action: "start_experiences" }];
+                setMessages(prev => [...prev, response]);
+                return;
+            }
+
+            if (!city && normalizedIntent === "experience") {
+                const experienceVendors = allVendors.filter((v: any) =>
+                    Array.isArray(v.categories) ? v.categories.includes("Experiences") : v.type === "Experiences"
+                );
+                if (experienceVendors.length === 0) {
+                    response.type = "text";
+                    response.content = "I couldn't find experience packages yet. Want all vendors instead?";
+                    response.suggestions = [{ label: "Discover Vendors", action: "vendor_search" }];
+                } else {
+                    response.type = "vendor_cards";
+                    response.content = "Top experience packages across all cities:";
+                    response.vendors = experienceVendors;
+                    response.suggestions = [{ label: "Discover Vendors", action: "vendor_search" }];
+                }
+                setMessages(prev => [...prev, response]);
+                return;
+            }
+
+            // Prerequisite node: City context
+            if (!city) {
+                response.content = "I'd love to help with that! To give you accurate data and local options, which city are we planning for?";
                 response.type = "city_picker";
+                // Store the full context of this action for later
+                setPendingAction(actionData || { action: intent, text: text });
+                setMessages(prev => [...prev, response]);
+                return;
+            }
+
+            // Execution node: Capability Registry
+            const market = MARKET_DATA[city];
+            const capabilityResponse = market?.capabilityResponses?.[normalizedIntent] || market?.capabilityResponses?.fallback;
+
+            if (capabilityResponse) {
+                response = { ...response, ...capabilityResponse };
+                // Dynamic injector for vendors
+                if (normalizedIntent === 'vendor_search' || normalizedIntent === 'start_vendor_search') {
+                    response.vendors = allVendorsByCity[city] || [];
+                }
+                if (normalizedIntent === "experience") {
+                    const experienceVendors = (allVendorsByCity[city] || []).filter((v: any) =>
+                        Array.isArray(v.categories) ? v.categories.includes("Experiences") : v.type === "Experiences"
+                    );
+                    if (experienceVendors.length === 0) {
+                        response.type = "text";
+                        response.content = `I couldn't find experience packages in ${city} yet. Want to see all vendors instead?`;
+                        response.suggestions = [{ label: "Discover Vendors", action: "vendor_search" }];
+                    } else {
+                        response.type = "vendor_cards";
+                        response.content = `Top experience packages in ${city}:`;
+                        response.vendors = experienceVendors;
+                        response.suggestions = [{ label: "Discover Vendors", action: "vendor_search" }];
+                    }
+                }
             } else {
-                response.content = `I'm on it. Processing your request for ${activeCity}...`;
+                response.content = `I'm coordinating your ${city} event. How else can I help?`;
                 response.suggestions = [
-                    { label: "Search Vendors", action: "vendor_search" },
-                    { label: "Check Budget", action: "budget" }
+                    { label: "Plan", action: "start_planning" },
+                    { label: "Discover Vendors", action: "vendor_search" },
+                    { label: "Experiences", action: "start_experiences" },
+                    { label: "Store", action: "start_store" }
                 ];
             }
 
             setMessages(prev => [...prev, response]);
-        }, 1500);
+        }, 1200);
+    };
+
+    const send = (text: string, actionData?: any) => {
+        if (!text.trim()) return;
+        const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
+        // UI node: append user message
+        setMessages(prev => [...prev, { id: Date.now(), role: "user", content: text, time: nowStr }]);
+        setInput("");
+
+        // Pass to logic engine
+        dispatchLogic(text, actionData);
     };
 
     const handleSelectCity = (city: string) => {
         setActiveCity(city);
-        const now = () => new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
-        setMessages(prev => [...prev, {
-            id: Date.now(),
-            role: "agent",
+
+        // Logic Flow Node: Show greeting
+        addAgentMsg({
             content: MARKET_DATA[city].greeting,
             suggestions: [
-                { label: "Discover", action: "vendor_search" },
-                { label: "Budget", action: "capability", capId: "budget" }
-            ],
-            time: now()
-        }]);
+                { label: "Discover Vendors", action: "vendor_search" },
+                { label: "Review Budget", action: "capability", capId: "budget" }
+            ]
+        });
+
+        // Workflow Resumption Node
+        if (pendingAction) {
+            const actionToRun = pendingAction;
+            setPendingAction(null);
+
+            setTimeout(() => {
+                const text = actionToRun.label || actionToRun.text || "Continue";
+                // IMPORTANT: Dispatch logic directly to avoid duplicating user message in chat history
+                dispatchLogic(text, actionToRun, true);
+            }, 1000);
+        }
     };
 
     const handleFormSubmit = (data: any) => {
-        addUserMsg(`My event: ${data.name}, ${data.guests} guests, budget ${data.budget}`);
+        if (data.city) setActiveCity(data.city);
+        addUserMsg(`My event: ${data.name}, ${data.guests} guests, budget ${data.budget}, city ${data.city}`);
         withTyping(1200, () => {
             addAgentMsg({
                 type: "text",
                 content: "Got it! I'm creating your event draft and finding the best vendors now.",
-                suggestions: [{ label: "Show budget breakdown", action: "capability", capId: "budget" }]
+                suggestions: [{ label: "Review Budget", action: "capability", capId: "budget" }]
             });
         });
     };
@@ -971,7 +871,7 @@ export default function ChatPage() {
             addAgentMsg({
                 type: "text",
                 content: `Great choice! I've marked ${date} on the calendar. What's the plan for that day?`,
-                suggestions: [{ label: "Search vendors", action: "vendor_search" }]
+                suggestions: [{ label: "Discover Vendors", action: "vendor_search" }]
             });
         });
     };
@@ -991,6 +891,49 @@ export default function ChatPage() {
         setTimeout(() => { setTyping(false); fn(); }, delayMs);
     };
 
+    const handleStoreAction = (action: string, item: any) => {
+        if (action === 'apply') {
+            addUserMsg(`Apply ${item.title} kit to my plan`);
+            dispatchLogic(`Apply ${item.title} kit`);
+        } else if (action === 'buy') {
+            addAgentMsg({
+                content: `Processing purchase for ${item.title} (${item.price}). Secure checkout will open in a new tab...`,
+                type: "text"
+            });
+            // Simulate checkout
+            setTimeout(() => {
+                addAgentMsg({
+                    content: `Purchase successful! The ${item.title} has been applied to your event workspace.`,
+                    type: "text"
+                });
+            }, 2000);
+        }
+    };
+
+    const handleVendorAction = (action: any, vendor: any) => {
+        if (action.id === 'message') {
+            addUserMsg(`Message ${vendor.name}`);
+            dispatchLogic(`I'd like to message ${vendor.name}`);
+        } else if (action.id === 'contract') {
+            addUserMsg(`Generate brief for ${vendor.name}`);
+            dispatchLogic(`Create a brief for ${vendor.name}`);
+        }
+    };
+
+    const handleSaveVendor = (vendor: any) => {
+        setSavedVendors(prev => {
+            const next = new Set(prev);
+            if (next.has(vendor.name)) {
+                next.delete(vendor.name);
+                addAgentMsg({ content: `Removed ${vendor.name} from your saved vendors.`, type: 'text' });
+            } else {
+                next.add(vendor.name);
+                addAgentMsg({ content: `Saved ${vendor.name}! You can view your saved vendors in the Vendors tab.`, type: 'text' });
+            }
+            return next;
+        });
+    };
+
     const [mode, setMode] = useState<'chat' | 'planning'>('chat');
 
     const resetToNewChat = () => {
@@ -1004,6 +947,40 @@ export default function ChatPage() {
         router.push("/dashboard/hosts/chat/new");
     };
 
+    const downloadChatTranscript = () => {
+        const chatId = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
+        const safeTitle = (chatTitle || "chat").replace(/[^a-z0-9-_]+/gi, "-").replace(/^-+|-+$/g, "");
+        const filename = `${safeTitle || "chat"}-${chatId}-transcript.txt`;
+        const generatedAt = new Date().toLocaleString("en-US");
+
+        const lines = messages.map((m: any) => {
+            const speaker = m.role === "user" ? "You" : "Ama";
+            const timestamp = m.time ? ` [${m.time}]` : "";
+            const content =
+                typeof m.content === "string" && m.content.trim().length > 0
+                    ? m.content.trim()
+                    : `[${m.type || "message"}]`;
+            return `${speaker}${timestamp}: ${content}`;
+        });
+
+        const body = [
+            `Chat: ${chatTitle || "New Chat"}`,
+            `Generated: ${generatedAt}`,
+            "",
+            ...lines
+        ].join("\n");
+
+        const blob = new Blob([body], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="bg-background h-screen flex flex-col overflow-hidden relative">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -1012,9 +989,34 @@ export default function ChatPage() {
                     title={chatTitle}
                     onRename={setChatTitle}
                     onDelete={resetToNewChat}
+                    onDownload={downloadChatTranscript}
                     waddiModel={waddiModel}
                     onChangeWaddiModel={setWaddiModel}
                 />
+
+                {/* Corridor Pills */}
+                <div className="flex gap-2.5 px-4 sm:px-6 py-3 border-b border-border overflow-x-auto bg-background/50 backdrop-blur-sm hide-scrollbar shrink-0">
+                    {[
+                        { id: 'start_planning', label: 'Plan', icon: '📝', action: 'start_planning' },
+                        { id: 'vendors_search', label: 'Discover Vendors', icon: '🔍', action: 'vendor_search' },
+                        { id: 'experience', label: 'Experiences', icon: '✨', action: 'experience' },
+                        { id: 'store', label: 'Store', icon: '🏪', action: 'start_store' },
+                        { id: 'overview', label: 'Overview', icon: '📊' },
+                        { id: 'todo', label: 'To-do List', icon: '✅' },
+                        { id: 'timeline', label: 'Timeline', icon: '📅' },
+                        { id: 'budget', label: 'Budget', icon: '💰', action: 'budget' },
+                    ].map(pill => (
+                        <button
+                            key={pill.id}
+                            onClick={() => handlePillClick(pill)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border text-[12px] font-medium text-foreground hover:border-primary/50 hover:bg-secondary/50 transition-all whitespace-nowrap shadow-sm"
+                        >
+                            <span className="text-xs">{pill.icon}</span>
+                            {pill.label}
+                        </button>
+                    ))}
+                </div>
+
                 <SheetContent side="left" className="p-0 w-64 border-none">
                     <Sidebar onNavigate={() => setIsMobileMenuOpen(false)} />
                 </SheetContent>
@@ -1022,31 +1024,45 @@ export default function ChatPage() {
 
             <style>{`
         @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .msg-animate { 
+            animation: fadeUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
+            opacity: 0; 
+        }
         ::-webkit-scrollbar{width:4px}
         ::-webkit-scrollbar-thumb{background:hsl(var(--border));border-radius:4px}
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
             <div className="flex-1 overflow-y-auto">
                 <div className="p-4 sm:p-6 space-y-6 max-w-4xl mx-auto w-full">
-                    {messages.map(m => (
-                        <Msg
-                            key={m.id}
-                            msg={m}
-                            onSelectCity={handleSelectCity}
-                            activeCity={activeCity}
-                            savedVendors={savedVendors}
-                            allVendorsByCity={allVendorsByCity}
-                            onSuggestion={(s: any) => {
-                                send(s.label, s);
-                            }}
-                            onFormSubmit={handleFormSubmit}
-                            onCalendarSelect={handleCalendarSelect}
-                        />
+                    {messages.map((m, idx) => (
+                        <div key={m.id} className="msg-animate" style={{ animationDelay: `${Math.min(idx, 8) * 0.05}s` }}>
+                            <Msg
+                                msg={m}
+                                onSelectCity={handleSelectCity}
+                                activeCity={activeCity}
+                                savedVendors={savedVendors}
+                                allVendorsByCity={allVendorsByCity}
+                                onSuggestion={(s: any) => {
+                                    send(s.label, s);
+                                }}
+                                onStoreAction={handleStoreAction}
+                                onVendorAction={handleVendorAction}
+                                onSave={handleSaveVendor}
+                                onFormSubmit={handleFormSubmit}
+                                onCalendarSelect={handleCalendarSelect}
+                            />
+                        </div>
                     ))}
                     {typing && (
-                        <div className="flex items-end gap-2 mb-6">
-                            <img src="/images/ama.png" alt="Ama" className="w-8 h-8 rounded-full object-cover" />
-                            <div className="bg-secondary/40 rounded-2xl px-4 py-3"><Dots /></div>
+                        <div className="flex items-end gap-2 mb-6 msg-animate">
+                            <img src="/images/ama.png" alt="Ama" className="w-[32px] h-[32px] rounded-full object-cover border border-border" />
+                            <div className="bg-secondary/40 rounded-2xl px-4 py-3 shadow-sm border border-border/50"><Dots /></div>
                         </div>
                     )}
                     <div ref={scrollRef} className="h-4" />
@@ -1060,7 +1076,7 @@ export default function ChatPage() {
                             value={input}
                             onChange={e => setInput(e.target.value)}
                             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
-                            placeholder={mode === 'chat' ? "Message Ama..." : "Tell Ama what to plan..."}
+                            placeholder={mode === 'chat' ? "Ask Waddi anything about this chat..." : "Tell Ama what to plan..."}
                             rows={1}
                             className="w-full bg-transparent px-5 pt-5 pb-16 text-sm focus:outline-none resize-none min-h-[100px]"
                         />
@@ -1081,6 +1097,25 @@ export default function ChatPage() {
                                     <DropdownMenuContent align="start" className="w-40">
                                         <DropdownMenuItem onClick={() => setMode('chat')}>Chat Mode</DropdownMenuItem>
                                         <DropdownMenuItem onClick={() => setMode('planning')}>Plan Mode</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button className="flex items-center gap-1 px-3 py-1.5 text-[14px] font-medium text-foreground hover:bg-secondary rounded-lg transition-colors max-w-[170px]">
+                                            <MapPin size={14} className="text-muted-foreground shrink-0" />
+                                            <span className="truncate">{activeCity || "All Cities"}</span>
+                                            <ChevronDown size={14} className="text-muted-foreground shrink-0" />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="start" className="w-44">
+                                        <DropdownMenuItem onClick={() => setActiveCity(null)}>All Cities</DropdownMenuItem>
+                                        {CITIES.map(city => (
+                                            <DropdownMenuItem key={city.name} onClick={() => setActiveCity(city.name)}>
+                                                <span className="mr-2">{city.flag}</span>
+                                                {city.name}
+                                            </DropdownMenuItem>
+                                        ))}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
@@ -1120,7 +1155,9 @@ export default function ChatPage() {
                             </div>
                         </div>
                     </div>
-
+                    <p className="text-[11px] text-muted-foreground mt-3 text-center opacity-60">
+                        Waddi can access vendors, contracts, and guest data for this event
+                    </p>
                 </div>
             </div>
         </div>

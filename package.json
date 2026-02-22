@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "push:platform-features": "node scripts/push-platform-features.js"
+    "push:platform-features": "node scripts/push-platform-features.js",
+    "push:vendors": "node scripts/push-vendors.js"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",

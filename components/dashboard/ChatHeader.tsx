@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Share, Menu, MoreVertical, ChevronDown } from 'lucide-react';
+import { Share, Menu, MoreVertical, ChevronDown, Store, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -28,12 +28,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface ChatHeaderProps {
   onOpenMenu?: () => void;
   title?: string;
   onRename?: (nextTitle: string) => void;
   onDelete?: () => void;
+  onDownload?: () => void;
   waddiModel?: 'lite' | 'pro';
   onChangeWaddiModel?: (model: 'lite' | 'pro') => void;
 }
@@ -43,6 +50,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   title = "Ama",
   onRename,
   onDelete,
+  onDownload,
   waddiModel = 'lite',
   onChangeWaddiModel,
 }) => {
@@ -51,6 +59,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isPublishOpen, setIsPublishOpen] = useState(false);
+  const [publishData, setPublishData] = useState({ title: title, city: '', price: '', description: '' });
 
   useEffect(() => {
     if (!isEditingTitle) {
@@ -85,6 +95,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   const currentModel = waddiModel === "lite"
     ? { label: "Waddi Lite", description: "Fast everyday planning" }
     : { label: "Waddi Pro", description: "Deeper planning and insights" };
+  const iconActionClass = "h-7 w-7 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors";
 
   return (
     <>
@@ -92,7 +103,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={onOpenMenu}
-            className="md:hidden p-2 -ml-2 text-muted-foreground hover:bg-secondary rounded-xl transition-colors"
+            className={`md:hidden -ml-2 ${iconActionClass}`}
           >
             <Menu size={20} />
           </button>
@@ -152,46 +163,74 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           )}
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsShareOpen(true)}
-            className="hidden sm:flex items-center gap-2 rounded-xl border-border py-2.5 px-4 h-auto font-bold text-sm hover:bg-card"
-          >
-            <Share size={14} />
-            Share
-          </Button>
-          <button
-            onClick={() => setIsShareOpen(true)}
-            className="sm:hidden p-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors"
-          >
-            <Share size={18} />
-          </button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="p-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors">
-                <MoreVertical size={18} />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32">
-              <DropdownMenuItem
-                onClick={() => {
-                  setEditingTitle(title);
-                  setIsEditingTitle(true);
-                }}
-              >
-                Rename
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setIsDeleteOpen(true)}
-                className="text-red-600 focus:text-red-700"
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <TooltipProvider delayDuration={120}>
+          <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setIsPublishOpen(true)}
+                  className={iconActionClass}
+                >
+                  <Store size={18} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Publish to Store</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setIsShareOpen(true)}
+                  className={iconActionClass}
+                >
+                  <Share size={18} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Share Chat</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onDownload}
+                  className={iconActionClass}
+                >
+                  <Download size={18} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Download Chat</TooltipContent>
+            </Tooltip>
+
+            <DropdownMenu>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <button className={iconActionClass}>
+                      <MoreVertical size={18} />
+                    </button>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent>More</TooltipContent>
+              </Tooltip>
+              <DropdownMenuContent align="end" className="w-32">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setEditingTitle(title);
+                    setIsEditingTitle(true);
+                  }}
+                >
+                  Rename
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setIsDeleteOpen(true)}
+                  className="text-red-600 focus:text-red-700"
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </TooltipProvider>
       </div>
 
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
@@ -218,7 +257,9 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
         open={isShareOpen}
         onOpenChange={(open) => {
           setIsShareOpen(open);
-          if (!open) setCopied(false);
+          if (!open) {
+            setCopied(false);
+          }
         }}
       >
         <DialogContent className="sm:max-w-md">
@@ -228,14 +269,65 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               Send this link so someone can open this chat.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-2">
+
+          <div className="space-y-4">
             <Input value={shareUrl} readOnly />
           </div>
-          <DialogFooter>
+          <DialogFooter className="sm:justify-between flex-row-reverse" style={{ justifyContent: 'flex-start' }}>
             <Button type="button" onClick={copyShareLink}>
               {copied ? "Copied" : "Copy link"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isPublishOpen}
+        onOpenChange={setIsPublishOpen}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Publish to Store</DialogTitle>
+            <DialogDescription>
+              Add details to publish this chat as a reusable kit in the Store.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Kit Title</label>
+              <Input value={publishData.title} onChange={e => setPublishData({ ...publishData, title: e.target.value })} placeholder="e.g. Lagos Birthday Kit" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">City</label>
+                <Input value={publishData.city} onChange={e => setPublishData({ ...publishData, city: e.target.value })} placeholder="e.g. Lagos" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Price</label>
+                <Input value={publishData.price} onChange={e => setPublishData({ ...publishData, price: e.target.value })} placeholder="e.g. $49" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Description</label>
+              <textarea
+                className="w-full min-h-[80px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                value={publishData.description}
+                onChange={e => setPublishData({ ...publishData, description: e.target.value })}
+                placeholder="Describe what's included..."
+              />
+            </div>
+            <DialogFooter className="mt-4">
+              <Button variant="outline" onClick={() => setIsPublishOpen(false)}>Cancel</Button>
+              <Button onClick={() => {
+                // Mock API call
+                setIsPublishOpen(false);
+                alert("Published to Store!");
+              }}>
+                <Store className="w-4 h-4 mr-2" /> Publish
+              </Button>
+            </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </>

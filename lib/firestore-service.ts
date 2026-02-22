@@ -2,6 +2,14 @@ import { db } from './firebase';
 import { collection, getDocs, query, where, doc, getDoc, orderBy } from 'firebase/firestore';
 import { Vendor, SharedEvent, BlogPost, FAQ, PricingTier, Offering, PlatformFeature } from './types';
 
+export async function getStoreKits(): Promise<any[]> {
+    const querySnapshot = await getDocs(collection(db, 'chats'));
+
+    return querySnapshot.docs
+        .map(doc => ({ ...doc.data(), id: doc.id } as any))
+        .filter((chat: any) => chat.published === true);
+}
+
 export async function getVendors(): Promise<Vendor[]> {
     const querySnapshot = await getDocs(collection(db, 'vendors'));
     return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Vendor));

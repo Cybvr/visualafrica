@@ -21,6 +21,7 @@ import {
   MdExpandMore,
   MdChevronLeft,
   MdChevronRight,
+  MdStore,
 } from "react-icons/md";
 import { IconType } from "react-icons";
 import {
@@ -46,6 +47,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { useTheme } from "next-themes";
 import { VENDOR_DASHBOARD_DATA } from "@/lib/vendor-dashboard-data";
 import { getEvents } from "@/lib/firestore-service";
+import { DEMO_CHAT_HISTORY } from "@/lib/chat-data";
 import ChatHistorySection from "./ChatHistorySection";
 
 type NavItemConfig = {
@@ -307,12 +309,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
   const mode = pathname?.startsWith("/dashboard/vendors") ? "vendor" : "host";
   const logoHref = mode === "vendor" ? "/dashboard/vendors" : "/dashboard/hosts";
   const [hostEventsCount, setHostEventsCount] = useState(0);
-  const [hostChatHistoryItems, setHostChatHistoryItems] = useState([
-    { id: "lagos-bday", title: "Lagos birthday weekend" },
-    { id: "accra-wedding", title: "Accra wedding shortlist" },
-    { id: "nairobi-boat", title: "Nairobi boat + dinner plan" },
-    { id: "cape-town-brunch", title: "Cape Town brunch vendors" },
-  ]);
+  const [hostChatHistoryItems, setHostChatHistoryItems] = useState(DEMO_CHAT_HISTORY);
 
   useEffect(() => {
     async function loadCounts() {
@@ -331,10 +328,18 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
   const vendorInboxCount = VENDOR_DASHBOARD_DATA.chats.filter(c => c.unread).length;
   const vendorEventsCount = VENDOR_DASHBOARD_DATA.bookings.length;
 
+  // Force a fresh ID for the New Task link to ensure it's always a fresh session
+  const [freshTaskId, setFreshTaskId] = useState(`task-${Date.now()}`);
+
+  useEffect(() => {
+    // Regenerate the ID whenever the user navigates, so the link is always "ready" for the next fresh task
+    setFreshTaskId(`task-${Date.now()}`);
+  }, [pathname]);
+
   const hostPrimaryNavItems: NavItemConfig[] = [
-    { icon: MdAdd, label: "New Task", href: "/dashboard/hosts/chat/new" },
+    { icon: MdAdd, label: "New Task", href: `/dashboard/hosts/chat/${freshTaskId}` },
     { icon: MdSearch, label: "Search", href: "/dashboard/hosts/search", matchPaths: ["/dashboard/hosts/vendor/"] },
-    { icon: MdLightbulb, label: "Community", href: "/dashboard/hosts/community" },
+    { icon: MdStore, label: "Store", href: "/dashboard/hosts/store" },
     { icon: MdCalendarMonth, label: "Manage", href: "/dashboard/hosts/events", count: hostEventsCount },
     { icon: MdMail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
     { icon: MdCreditCard, label: "Payments", href: "/dashboard/hosts/payments" },
