@@ -157,7 +157,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
             variant="outline"
             size="sm"
             onClick={() => setIsShareOpen(true)}
-            className="hidden sm:flex items-center gap-2 rounded-xl border-border py-2.5 px-4 h-auto font-bold text-sm"
+            className="hidden sm:flex items-center gap-2 rounded-xl border-border py-2.5 px-4 h-auto font-bold text-sm hover:bg-card"
           >
             <Share size={14} />
             Share
