@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Bell, Search, Plus, Menu, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface HeaderProps {
   onOpenMenu?: () => void;
@@ -22,33 +23,17 @@ const Header: React.FC<HeaderProps> = ({ onOpenMenu }) => {
         >
           <Menu size={20} />
         </button>
-
-        <div className="hidden sm:flex items-center bg-secondary/50 border border-border rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary/10 transition-all">
-          <Search size={16} className="text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search platform..."
-            className="bg-transparent border-none outline-none text-xs px-2 w-48 font-medium text-foreground placeholder:text-muted-foreground"
-          />
-        </div>
       </div>
 
       <div className="flex items-center gap-4">
-        <Link href="/pricing">
-          <button className="hidden lg:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/20 text-foreground rounded-xl text-xs font-semibold hover:from-primary/30 hover:to-accent/30 transition-all shadow-sm">
-            <Plus size={14} className="text-primary" />
-            14 days left Upgrade
-          </button>
-        </Link>
-
-        {mode === 'host' && (
-          <Link href="/dashboard/hosts/diy-content">
-            <button className="hidden lg:flex items-center gap-2 px-4 py-2 border border-border bg-card text-muted-foreground hover:text-foreground rounded-xl text-xs font-semibold hover:bg-secondary transition-all shadow-sm">
-              <FileText size={14} />
-              Resources
-            </button>
+        <div className="flex items-center gap-2">
+          <Link href="/support">
+            <Button variant="outline" size="sm" className="hidden lg:flex items-center gap-2 border-primary/20 hover:bg-primary/5 hover:border-primary/40 text-primary h-9 rounded-xl px-4">
+              <FileText size={16} />
+              <span className="font-semibold text-xs">Resources</span>
+            </Button>
           </Link>
-        )}
+        </div>
 
         <button className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
           <Bell size={20} />

@@ -89,74 +89,82 @@ export default function Inbox({ conversations: initialConversations, userType, t
     };
 
     return (
-        <div className="flex h-[calc(100dvh-7.5rem)] md:h-[calc(100dvh-9rem)] bg-card border border-border rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-sm">
+        <div className="flex h-[calc(100dvh-7.5rem)] md:h-[calc(100dvh-9rem)] bg-background border border-border rounded-lg overflow-hidden shadow-sm">
             {/* Sidebar */}
             <div className={cn(
-                "w-full md:w-96 border-r border-border flex flex-col bg-background",
+                "w-full md:w-80 lg:w-96 border-r border-border flex flex-col bg-muted/20",
                 mobileView === 'chat' ? "hidden md:flex" : "flex"
             )}>
-                <div className="p-4 md:p-6 border-b border-border/50">
-                    <div className="flex items-center justify-between mb-4 md:mb-6">
-                        <h2 className="text-2xl font-serif font-black text-foreground">{title}</h2>
-                        <Button variant="ghost" size="icon" className="rounded-full">
+                <div className="p-4 border-b border-border">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-semibold text-foreground">{title}</h2>
+                        <Button variant="ghost" size="icon">
                             <MoreHorizontal size={20} />
                         </Button>
                     </div>
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                         <Input
                             type="text"
-                            placeholder="Search conversations..."
+                            placeholder="Search..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-4 py-6 bg-secondary border-none rounded-2xl text-sm focus:ring-2 focus:ring-primary/20"
+                            className="w-full pl-9 bg-background text-sm"
                         />
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto divide-y divide-border/50 scrollbar-hide">
+                <div className="flex-1 overflow-y-auto divide-y divide-border">
                     {filteredConversations.length > 0 ? (
                         filteredConversations.map((chat) => (
                             <button
                                 key={chat.id}
                                 onClick={() => { setActiveChatId(chat.id); setMobileView('chat'); }}
-                                className={`w-full p-4 md:p-6 text-left transition-all flex items-start gap-3 md:gap-4 hover:bg-secondary/50 ${activeChatId === chat.id ? 'bg-secondary' : ''}`}
+                                className={cn(
+                                    "w-full p-4 text-left transition-colors flex items-start gap-3 hover:bg-muted/50",
+                                    activeChatId === chat.id ? 'bg-muted/80' : ''
+                                )}
                             >
-                                <Avatar className="w-14 h-14 rounded-2xl shrink-0">
+                                <Avatar className="w-12 h-12 rounded-full shrink-0">
                                     <AvatarImage src={chat.avatar} className="object-cover" />
-                                    <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">
+                                    <AvatarFallback className="bg-primary/10 text-primary font-medium text-lg">
                                         {chat.name.charAt(0)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start mb-1">
-                                        <h4 className="font-bold text-foreground truncate">{chat.name}</h4>
-                                        <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{chat.time}</span>
+                                        <h4 className="font-medium text-foreground truncate text-sm">{chat.name}</h4>
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">{chat.time}</span>
                                     </div>
-                                    <p className={`text-sm ${chat.unread ? 'text-foreground font-bold' : 'text-muted-foreground'} truncate font-medium mb-2`}>
+                                    <p className={cn(
+                                        "text-sm truncate mb-1",
+                                        chat.unread ? "text-foreground font-medium" : "text-muted-foreground"
+                                    )}>
                                         {chat.lastMsg}
                                     </p>
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-between mt-1">
                                         <div className="flex items-center gap-2">
                                             {chat.eventName && (
-                                                <span className="text-[10px] text-muted-foreground font-black uppercase tracking-wider truncate max-w-[120px]">
+                                                <span className="text-xs text-muted-foreground truncate max-w-[120px]">
                                                     {chat.eventName}
                                                 </span>
                                             )}
                                         </div>
-                                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter border ${chat.status === 'booked' || chat.status === 'paid' || chat.status === 'confirmed'
+                                        <span className={cn(
+                                            "px-2 py-0.5 rounded-full text-xs font-medium border",
+                                            chat.status === 'booked' || chat.status === 'paid' || chat.status === 'confirmed'
                                                 ? 'bg-green-50 text-green-700 border-green-200'
                                                 : 'bg-primary/5 text-primary border-primary/10'
-                                            }`}>
+                                        )}>
                                             {chat.status}
                                         </span>
                                     </div>
-                                    {chat.unread && <div className="mt-2 w-2 h-2 bg-primary rounded-full animate-pulse" />}
                                 </div>
+                                {chat.unread && <div className="w-2 h-2 bg-primary rounded-full shrink-0 self-center" />}
                             </button>
                         ))
                     ) : (
-                        <div className="p-12 text-center text-muted-foreground font-medium">
+                        <div className="p-8 text-center text-sm text-muted-foreground">
                             No conversations found
                         </div>
                     )}
@@ -165,53 +173,52 @@ export default function Inbox({ conversations: initialConversations, userType, t
 
             {/* Chat Area */}
             <div className={cn(
-                "flex-1 flex-col bg-secondary/5",
+                "flex-1 flex-col bg-background",
                 mobileView === 'list' ? "hidden md:flex" : "flex"
             )}>
                 {activeChat ? (
                     <>
                         {/* Chat Header */}
-                        <div className="p-3 sm:p-4 md:p-6 bg-background border-b border-border flex items-center justify-between md:px-8">
-                            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0">
+                        <div className="p-4 border-b border-border flex items-center justify-between bg-muted/10">
+                            <div className="flex items-center gap-3 min-w-0">
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="md:hidden rounded-full"
+                                    className="md:hidden"
                                     onClick={() => setMobileView('list')}
-                                    aria-label="Back to conversations"
                                 >
                                     <ArrowLeft size={18} />
                                 </Button>
-                                <Avatar className="w-12 h-12 rounded-xl shrink-0 ring-2 ring-background">
+                                <Avatar className="w-10 h-10 rounded-full shrink-0">
                                     <AvatarImage src={activeChat.avatar} className="object-cover" />
-                                    <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">
+                                    <AvatarFallback className="bg-primary/10 text-primary font-medium">
                                         {activeChat.name.charAt(0)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="min-w-0">
-                                    <h3 className="font-bold text-foreground text-base md:text-lg truncate">{activeChat.name}</h3>
-                                    <div className="flex items-center gap-2">
+                                    <h3 className="font-medium text-foreground text-sm md:text-base truncate">{activeChat.name}</h3>
+                                    <div className="flex items-center gap-1.5 mt-0.5">
                                         <span className="w-2 h-2 rounded-full bg-green-500" />
-                                        <p className="text-xs text-muted-foreground font-medium italic">Online</p>
+                                        <p className="text-xs text-muted-foreground">Online</p>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
-                                <Button variant="ghost" size="icon" className="hidden sm:inline-flex rounded-full text-muted-foreground hover:text-primary">
+                            <div className="flex items-center gap-2">
+                                <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-muted-foreground">
                                     <Phone size={18} />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="hidden sm:inline-flex rounded-full text-muted-foreground hover:text-primary">
+                                <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-muted-foreground">
                                     <Video size={18} />
                                 </Button>
-                                <div className="hidden sm:block h-6 w-px bg-border mx-1" />
+                                <div className="hidden sm:block h-6 w-px bg-border mx-2" />
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="sm" className="gap-1 md:gap-2 rounded-xl font-bold bg-background text-[10px] sm:text-xs">
-                                            {activeChat.status.toUpperCase()}
-                                            <ChevronDown className="h-3 w-3" />
+                                        <Button variant="outline" size="sm" className="gap-2 text-xs">
+                                            {activeChat.status.charAt(0).toUpperCase() + activeChat.status.slice(1)}
+                                            <ChevronDown className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[160px] md:min-w-[200px] shadow-xl border-border/50">
+                                    <DropdownMenuContent align="end">
                                         {(userType === 'host'
                                             ? ['Requested', 'Sent', 'Quoted', 'Negotiating', 'Booked']
                                             : ['Pending', 'Confirmed', 'In Progress', 'Completed', 'Paid']
@@ -219,7 +226,6 @@ export default function Inbox({ conversations: initialConversations, userType, t
                                             <DropdownMenuItem
                                                 key={status}
                                                 onClick={() => updateStatus(activeChat.id, status.toLowerCase())}
-                                                className="rounded-xl font-bold py-2.5"
                                             >
                                                 Mark as {status}
                                             </DropdownMenuItem>
@@ -227,7 +233,7 @@ export default function Inbox({ conversations: initialConversations, userType, t
                                         <div className="h-px bg-border my-1" />
                                         <DropdownMenuItem
                                             onClick={() => updateStatus(activeChat.id, 'declined')}
-                                            className="text-red-600 rounded-xl font-bold py-2.5 focus:bg-red-50 focus:text-red-600"
+                                            className="text-red-600 focus:text-red-600"
                                         >
                                             Decline / Cancel
                                         </DropdownMenuItem>
@@ -237,25 +243,33 @@ export default function Inbox({ conversations: initialConversations, userType, t
                         </div>
 
                         {/* Messages Area */}
-                        <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-12 space-y-4 md:space-y-8 scrollbar-hide">
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
                             {activeChat.messages.map((msg) => (
-                                <div key={msg.id} className={`flex ${msg.isMe ? 'justify-end' : 'justify-start'} items-end gap-3`}>
+                                <div key={msg.id} className={cn(
+                                    "flex gap-3 max-w-[85%] sm:max-w-[75%]",
+                                    msg.isMe ? "ml-auto flex-row-reverse" : "mr-auto"
+                                )}>
                                     {!msg.isMe && (
-                                        <Avatar className="w-8 h-8 rounded-lg shrink-0">
+                                        <Avatar className="w-8 h-8 rounded-full shrink-0">
                                             <AvatarImage src={activeChat.avatar} className="object-cover" />
-                                            <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+                                            <AvatarFallback className="bg-primary/10 text-primary text-xs">
                                                 {activeChat.name.charAt(0)}
                                             </AvatarFallback>
                                         </Avatar>
                                     )}
-                                    <div className="flex flex-col gap-1.5 max-w-[88%] sm:max-w-[75%] md:max-w-[60%]">
-                                        <div className={`p-3 sm:p-4 md:p-5 rounded-[1.25rem] md:rounded-[1.5rem] shadow-sm text-sm leading-relaxed ${msg.isMe
-                                                ? 'bg-primary text-primary-foreground font-bold rounded-br-none'
-                                                : 'bg-background text-foreground font-medium border border-border rounded-bl-none'
-                                            }`}>
+                                    <div className="flex flex-col gap-1">
+                                        <div className={cn(
+                                            "p-3 rounded-lg text-sm",
+                                            msg.isMe
+                                                ? "bg-primary text-primary-foreground rounded-tr-none"
+                                                : "bg-muted text-foreground rounded-tl-none"
+                                        )}>
                                             {msg.text}
                                         </div>
-                                        <span className={`text-[9px] font-black uppercase tracking-widest text-muted-foreground ${msg.isMe ? 'text-right' : 'text-left'}`}>
+                                        <span className={cn(
+                                            "text-xs text-muted-foreground",
+                                            msg.isMe ? "text-right" : "text-left"
+                                        )}>
                                             {msg.timestamp}
                                         </span>
                                     </div>
@@ -264,10 +278,10 @@ export default function Inbox({ conversations: initialConversations, userType, t
                         </div>
 
                         {/* Message Input */}
-                        <div className="p-3 sm:p-4 md:p-8 bg-background border-t border-border">
-                            <div className="flex gap-3 md:gap-4 items-center bg-secondary rounded-[1.25rem] md:rounded-[2rem] px-3 md:px-6 py-1.5 md:py-2">
+                        <div className="p-4 bg-background border-t border-border">
+                            <div className="flex items-end gap-2">
                                 <Textarea
-                                    placeholder="Type your response..."
+                                    placeholder="Type a message..."
                                     value={messageInput}
                                     onChange={(e) => setMessageInput(e.target.value)}
                                     onKeyDown={(e) => {
@@ -276,27 +290,27 @@ export default function Inbox({ conversations: initialConversations, userType, t
                                             handleSendMessage();
                                         }
                                     }}
-                                    className="flex-1 bg-transparent border-none focus-visible:ring-0 px-0 py-3 md:py-4 resize-none min-h-[48px] md:min-h-[56px] font-medium"
+                                    className="min-h-[40px] max-h-[160px] resize-none pb-2 text-sm"
                                 />
-                                <div className="flex items-center gap-2">
-                                    <Button
-                                        onClick={handleSendMessage}
-                                        className="w-10 h-10 md:w-12 md:h-12 bg-primary text-primary-foreground rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-all p-0"
-                                    >
-                                        <Send size={18} />
-                                    </Button>
-                                </div>
+                                <Button
+                                    onClick={handleSendMessage}
+                                    disabled={!messageInput.trim()}
+                                    size="icon"
+                                    className="h-10 w-10 shrink-0"
+                                >
+                                    <Send size={18} />
+                                </Button>
                             </div>
                         </div>
                     </>
                 ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center p-8 opacity-40">
-                        <div className="w-24 h-24 bg-background border border-border rounded-[2.5rem] flex items-center justify-center mb-6">
-                            <Send size={40} className="text-muted-foreground" />
+                    <div className="flex-1 flex flex-col items-center justify-center text-center p-8 text-muted-foreground">
+                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                            <Send size={24} />
                         </div>
-                        <h3 className="text-2xl font-black text-foreground">Select a conversation</h3>
-                        <p className="text-muted-foreground mt-2 max-w-xs font-medium">
-                            Choose a conversation from the sidebar to start messaging.
+                        <h3 className="text-lg font-medium text-foreground">Your Messages</h3>
+                        <p className="mt-1 text-sm">
+                            Select a conversation from the sidebar to start messaging.
                         </p>
                     </div>
                 )}
@@ -304,3 +318,4 @@ export default function Inbox({ conversations: initialConversations, userType, t
         </div>
     );
 }
+

@@ -31,6 +31,18 @@ export type VendorCategory =
     | "Yachts"
     | "Experiences";
 
+export type UserRole = 'admin' | 'host' | 'vendor';
+
+export interface UserProfile {
+    uid: string;
+    email: string;
+    displayName: string;
+    photoURL?: string;
+    role: UserRole;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export interface VendorImage {
     url: string;
     alt: string;
@@ -47,6 +59,7 @@ export interface PortfolioItem {
 export interface Vendor {
     id: string;
     slug: string;
+    ownerId: string; // UID of the managing vendor user
     name: string;
     location: string;
     price: string | null;
@@ -89,6 +102,7 @@ export interface Vendor {
 
 export interface SharedEvent {
     id: string;
+    hostId: string; // UID of the host (creator)
     hostName: string;
     eventName: string;
     date: string;

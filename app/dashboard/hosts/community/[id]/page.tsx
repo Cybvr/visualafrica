@@ -51,9 +51,9 @@ export default function InspirationDetailsPage() {
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 pb-20">
-            <Link href="/dashboard/hosts/inspiration" className="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/dashboard/hosts/community" className="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors">
                 <ArrowLeft size={16} />
-                Back to Inspiration
+                Back to Community
             </Link>
 
             <div className="bg-card rounded-[2.5rem] border border-border overflow-hidden shadow-sm">

@@ -5,6 +5,13 @@ import { Eye, Heart, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { getEvents } from '@/lib/firestore-service';
 import { SharedEvent } from '@/lib/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+
+function seededCount(seed: string, min: number, range: number) {
+  const sum = seed.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  return min + (sum % range);
+}
 
 const Inspiration: React.FC = () => {
   const [publicEvents, setPublicEvents] = useState<SharedEvent[]>([]);
@@ -28,24 +35,62 @@ const Inspiration: React.FC = () => {
         <p className="text-muted-foreground mt-1">Discover public events organized by other users.</p>
       </div>
 
-      <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
         {publicEvents.map(item => (
-          <Link href={`/dashboard/hosts/community/${item.id}`} key={item.id} className="block relative rounded-[2rem] overflow-hidden group break-inside-avoid shadow-sm hover:shadow-2xl transition-all border border-border bg-card">
-            <div className="p-4 flex items-center gap-3 border-b border-border">
-              <div className="w-8 h-8 rounded-full bg-background text-foreground flex items-center justify-center text-[10px] font-black">{item.eventName[0]}</div>
-              <span className="text-xs font-bold text-foreground">Visual User</span>
-            </div>
-            <img src={item.image} alt={item.eventName} className="w-full h-auto object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700" />
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-accent text-[10px] font-black uppercase tracking-widest text-ellipsis overflow-hidden whitespace-nowrap max-w-[100px]">{item.themes?.[0] || "Event"}</span>
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Heart size={14} />
-                  <span className="text-[10px] font-bold">{Math.floor(Math.random() * 500) + 50}</span>
+          <Link href={`/dashboard/hosts/community/${item.id}`} key={item.id} className="block h-full min-w-0">
+            <Card className="group flex h-full flex-col overflow-hidden border-border bg-card transition-shadow hover:shadow-lg">
+              <div className="relative aspect-[4/3] overflow-hidden">
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={item.eventName}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-muted" />
+                )}
+                <Badge className="absolute left-3 top-3 bg-accent text-foreground">
+                  {item.themes?.[0] || "Event"}
+                </Badge>
+                <div className="absolute right-3 top-3 flex items-center gap-1 rounded-md bg-foreground/70 px-2 py-1 text-xs font-semibold text-background backdrop-blur-sm">
+                  <Eye className="h-3 w-3 text-foreground" />
+                  {seededCount(item.id, 140, 520)}
                 </div>
+                <button
+                  className="absolute right-3 bottom-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+                  aria-label="Like event"
+                >
+                  <Heart className="h-4 w-4" />
+                </button>
               </div>
-              <h3 className="text-foreground font-black text-lg group-hover:text-accent transition-colors">{item.eventName}</h3>
-            </div>
+
+              <CardContent className="flex flex-1 flex-col p-4">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="truncate text-xs font-semibold uppercase tracking-wide text-foreground">
+                    Community Event
+                  </span>
+                </div>
+
+                <h3 className="font-serif text-base font-semibold leading-snug text-card-foreground line-clamp-2">
+                  {item.eventName}
+                </h3>
+
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-2">
+                  {item.description || "Shared by a Visual Africa host to inspire your next event."}
+                </p>
+
+                <div className="mt-3 flex items-center gap-3 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Heart className="h-4 w-4 shrink-0 text-foreground" />
+                    <span>{seededCount(item.id + "likes", 60, 420)}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MessageSquare className="h-4 w-4 shrink-0 text-foreground" />
+                    <span>{seededCount(item.id + "comments", 8, 120)}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </Link>
         ))}
       </div>

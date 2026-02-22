@@ -4,19 +4,30 @@ import { Vendor, SharedEvent, BlogPost, FAQ, PricingTier, Offering, PlatformFeat
 
 export async function getVendors(): Promise<Vendor[]> {
     const querySnapshot = await getDocs(collection(db, 'vendors'));
-    return querySnapshot.docs.map(doc => doc.data() as Vendor);
+    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Vendor));
 }
 
 export async function getVendorBySlug(slug: string): Promise<Vendor | null> {
+    // 1. Try finding by slug field
     const q = query(collection(db, 'vendors'), where('slug', '==', slug));
     const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) return null;
-    return querySnapshot.docs[0].data() as Vendor;
+    if (!querySnapshot.empty) {
+        return { ...querySnapshot.docs[0].data(), id: querySnapshot.docs[0].id } as Vendor;
+    }
+
+    // 2. Fallback to document ID
+    const docRef = doc(db, 'vendors', slug);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return { ...docSnap.data(), id: docSnap.id } as Vendor;
+    }
+
+    return null;
 }
 
 export async function getEvents(): Promise<SharedEvent[]> {
     const querySnapshot = await getDocs(collection(db, 'events'));
-    return querySnapshot.docs.map(doc => doc.data() as SharedEvent);
+    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as SharedEvent));
 }
 
 export async function getBlogPosts(): Promise<BlogPost[]> {

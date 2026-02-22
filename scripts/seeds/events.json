@@ -1,0 +1,135 @@
+[
+    {
+        "id": "event-lagos-wedding-2026",
+        "hostId": "system",
+        "hostName": "Olumide & Adesuwa",
+        "eventName": "The Royal Afro-Fusion Wedding",
+        "date": "2026-08-15",
+        "location": "Lagos, Nigeria",
+        "guestCount": 450,
+        "budget": 25000000,
+        "status": "Confirmed",
+        "image": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop",
+        "description": "A grand celebration of love merging traditional Edo roots with modern Lagos luxury. Featuring a star-studded Afrobeats lineup and a custom-built glass marquee.",
+        "bookedVendors": [
+            {
+                "vendorId": "zen-spa-vi",
+                "service": "Pre-wedding Spa",
+                "amount": "₦180k",
+                "status": "Confirmed"
+            },
+            {
+                "vendorId": "nok-by-alara",
+                "service": "Catering",
+                "amount": "₦4.5M",
+                "status": "Paid"
+            }
+        ],
+        "leads": [],
+        "categories": [
+            "Wedding",
+            "Social Gathering"
+        ],
+        "themes": [
+            "Wedding",
+            "Proposals"
+        ],
+        "publicGallery": [
+            "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2074&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop"
+        ],
+        "metrics": [
+            {
+                "label": "RSVPs",
+                "value": "412/450"
+            },
+            {
+                "label": "Vendors",
+                "value": "12/15 Booked"
+            }
+        ],
+        "guests": [
+            {
+                "id": "g1",
+                "name": "David Adeleke",
+                "email": "david@example.com",
+                "status": "Confirmed",
+                "type": "VIP"
+            }
+        ]
+    },
+    {
+        "id": "event-nairobi-tech-2026",
+        "hostId": "system",
+        "hostName": "Silicon Savannah Hub",
+        "eventName": "Tech Innovation Gala 2026",
+        "date": "2026-10-22",
+        "location": "Nairobi, Kenya",
+        "guestCount": 300,
+        "budget": 5000000,
+        "status": "Planning",
+        "image": "https://images.unsplash.com/photo-1540575861501-7ad060e39fe5?q=80&w=2070&auto=format&fit=crop",
+        "description": "An evening dedicated to the brightest minds in African tech. Networking, keynotes, and a showcase of the most promising startups from the continent.",
+        "bookedVendors": [],
+        "leads": [
+            {
+                "vendorId": "nairobi-safari-club",
+                "status": "Contacted",
+                "message": "Interested in the garden venue for our cocktail hour."
+            }
+        ],
+        "categories": [
+            "Corporate Event",
+            "Entertainment"
+        ],
+        "themes": [
+            "Corporate Event"
+        ],
+        "publicGallery": [],
+        "metrics": [
+            {
+                "label": "Early Bird",
+                "value": "150 Sold"
+            },
+            {
+                "label": "Sponsors",
+                "value": "8/10 Secured"
+            }
+        ],
+        "guests": []
+    },
+    {
+        "id": "event-accra-anniversary-2026",
+        "hostId": "system",
+        "hostName": "The Mensah Family",
+        "eventName": "Golden Anniversary: 50 Years of Grace",
+        "date": "2026-12-05",
+        "location": "Accra, Ghana",
+        "guestCount": 200,
+        "budget": 350000,
+        "status": "Planning",
+        "image": "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop",
+        "description": "Celebrating five decades of marriage with a beautiful garden party. Traditional kente dress code and highlife music throughout the night.",
+        "bookedVendors": [],
+        "leads": [],
+        "categories": [
+            "Anniversary",
+            "Social Gathering"
+        ],
+        "themes": [
+            "Anniversary"
+        ],
+        "publicGallery": [],
+        "metrics": [
+            {
+                "label": "Invitations",
+                "value": "Sent"
+            },
+            {
+                "label": "Menu",
+                "value": "Finalized"
+            }
+        ],
+        "guests": []
+    }
+]

@@ -11,7 +11,7 @@ interface VendorDetailProps {
 
 const VendorDetail: React.FC<VendorDetailProps> = ({ vendor }) => {
   const router = useRouter();
-  const onBack = () => router.push('/dashboard/hosts/vendors');
+  const onBack = () => router.back();
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-16">
       {/* Header / Breadcrumb */}
@@ -21,7 +21,7 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor }) => {
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-bold"
         >
           <ChevronLeft size={16} />
-          Back to Browse
+          Back
         </button>
         <div className="flex items-center gap-2">
           <button className="p-2 rounded-full bg-card border border-border hover:bg-accent text-muted-foreground transition-all">

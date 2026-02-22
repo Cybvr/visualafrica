@@ -43,6 +43,7 @@ export const viewport: Viewport = {
 }
 
 import { ThemeProvider } from '@/components/providers/theme-provider'
+import { AuthProvider } from '@/components/providers/auth-provider'
 
 export default function RootLayout({
   children,
@@ -52,14 +53,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${mulish.variable} ${neuton.variable} ${dmSerifDisplay.variable} ${dmSansHeading.variable}`}>
       <body className="font-sans antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   )

@@ -108,7 +108,7 @@ export default function SupportContent({ faqs, categories }: SupportContentProps
                                 Email Support
                             </Button>
                             <Button asChild variant="outline" className="h-12 rounded-xl border-primary/20 bg-background px-8 font-bold text-primary hover:bg-primary/10">
-                                <Link href="/dashboard/hosts/ama">
+                                <Link href="/dashboard/hosts">
                                     <MessageCircle className="mr-2 h-4 w-4" />
                                     Chat with Ama
                                 </Link>

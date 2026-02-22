@@ -42,7 +42,7 @@ export function AmaSection() {
           </div>
           <div className="mt-8">
             <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link href="/dashboard/hosts/ama">Chat with Ama</Link>
+              <Link href="/dashboard/hosts">Chat with Ama</Link>
             </Button>
           </div>
         </div>

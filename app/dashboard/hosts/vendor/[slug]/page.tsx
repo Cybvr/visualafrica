@@ -16,7 +16,7 @@ export default async function VendorDetailPage({ params }: PageProps) {
             <div className="flex flex-col items-center justify-center h-full space-y-4">
                 <h1 className="text-2xl font-bold text-foreground">Vendor not found</h1>
                 <Link
-                    href="/dashboard/hosts/vendors"
+                    href="/dashboard/hosts/search"
                     className="text-primary font-bold hover:underline"
                 >
                     Back to Explore

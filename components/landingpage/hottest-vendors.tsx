@@ -21,7 +21,7 @@ export async function HottestVendors() {
                         <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground">
                             Hottest Vendors
                         </h2></div>
-                    <Link href="/dashboard/hosts">
+                    <Link href="/dashboard/hosts/search">
                         <button className="text-muted-foreground font-black uppercase tracking-widest text-xs hover:tracking-[0.2em] transition-all">
                             Discover all vendors →
                         </button>
