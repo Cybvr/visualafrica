@@ -62,7 +62,7 @@ export interface Vendor {
     ownerId: string; // UID of the managing vendor user
     name: string;
     location: string;
-    price: string | null;
+    price: number | null;
     rating: number;
     image: string;
     categories: VendorCategory[];

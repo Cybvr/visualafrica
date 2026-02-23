@@ -13,7 +13,7 @@ export async function HandpickedExperiences() {
             slug: v.slug,
             location: v.location.split(",")[0], // Just the city
             title: v.name,
-            price: v.price?.match(/NGN [\d,]+/)?.[0] || v.price,
+            price: v.price ? `$${v.price.toLocaleString()}` : "Contact",
             image: v.image,
             category: v.categories[0]
         }))

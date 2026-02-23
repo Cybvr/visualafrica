@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Vendor, VendorCategory, EventTheme } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Upload } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { uploadImage } from "@/lib/upload-service";
 
 interface VendorFormProps {
     initialData?: Partial<Vendor>;
@@ -28,6 +29,7 @@ const THEMES: EventTheme[] = [
 export default function VendorForm({ initialData, onSubmit, title }: VendorFormProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const [formData, setFormData] = useState({
         name: initialData?.name || "",
         slug: initialData?.slug || "",
@@ -122,25 +124,88 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
                         />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-sm font-bold">Price String</label>
+                        <label className="text-sm font-bold">Price ($) *</label>
                         <input
-                            type="text"
+                            required
+                            type="number"
                             className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary"
                             value={formData.price}
-                            onChange={e => setFormData({ ...formData, price: e.target.value })}
-                            placeholder="e.g. 500,000+"
+                            onChange={e => setFormData({ ...formData, price: e.target.value ? Number(e.target.value) : "" as any })}
+                            placeholder="e.g. 500000"
                         />
                     </div>
                     <div className="md:col-span-2 space-y-2">
-                        <label className="text-sm font-bold">Image URL *</label>
-                        <input
-                            required
-                            type="url"
-                            className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary"
-                            value={formData.image}
-                            onChange={e => setFormData({ ...formData, image: e.target.value })}
-                            placeholder="https://images.unsplash.com/..."
-                        />
+                        <label className="text-sm font-bold">Vendor Image *</label>
+                        <div
+                            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                            onDrop={async (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const file = e.dataTransfer.files?.[0];
+                                if (file) {
+                                    setUploading(true);
+                                    try {
+                                        const url = await uploadImage(file, `vendors/${Date.now()}-${file.name}`);
+                                        setFormData({ ...formData, image: url });
+                                    } catch (err) {
+                                        alert("Upload failed");
+                                    } finally {
+                                        setUploading(false);
+                                    }
+                                }
+                            }}
+                            className={cn(
+                                "relative border-2 border-dashed border-border rounded-2xl p-8 transition-all flex flex-col items-center justify-center gap-4 bg-secondary/20 hover:bg-secondary/30 group cursor-pointer",
+                                uploading && "opacity-50 cursor-wait"
+                            )}
+                            onClick={() => document.getElementById('fileInput')?.click()}
+                        >
+                            <input
+                                id="fileInput"
+                                type="file"
+                                className="hidden"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setUploading(true);
+                                        try {
+                                            const url = await uploadImage(file, `vendors/${Date.now()}-${file.name}`);
+                                            setFormData({ ...formData, image: url });
+                                        } catch (err) {
+                                            alert("Upload failed");
+                                        } finally {
+                                            setUploading(false);
+                                        }
+                                    }
+                                }}
+                            />
+
+                            {formData.image ? (
+                                <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border">
+                                    <img src={formData.image} className="w-full h-full object-cover" alt="Preview" />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <p className="text-white text-sm font-bold flex items-center gap-2">
+                                            <Upload size={16} /> Click or drag to change
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-center">
+                                    <div className="bg-primary/10 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                        <Upload className="text-primary" size={32} />
+                                    </div>
+                                    <p className="font-bold text-sm">Drag & drop your vendor image</p>
+                                    <p className="text-xs text-muted-foreground mt-1">PNG, JPG or WebP. Max 5MB</p>
+                                </div>
+                            )}
+
+                            {uploading && (
+                                <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center rounded-2xl">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
