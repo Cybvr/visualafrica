@@ -3,11 +3,12 @@ import { collection, getDocs, query, where, doc, getDoc, orderBy } from 'firebas
 import { Vendor, SharedEvent, BlogPost, FAQ, PricingTier, Offering, PlatformFeature } from './types';
 
 export async function getStoreKits(): Promise<any[]> {
-    const querySnapshot = await getDocs(collection(db, 'chats'));
-
-    return querySnapshot.docs
-        .map(doc => ({ ...doc.data(), id: doc.id } as any))
-        .filter((chat: any) => chat.published === true);
+    const q = query(
+        collection(db, 'chats'),
+        where('published', '==', true)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as any));
 }
 
 export async function getVendors(): Promise<Vendor[]> {

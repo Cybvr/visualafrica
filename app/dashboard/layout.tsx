@@ -4,8 +4,10 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../../components/dashboard/Sidebar";
 import Header from "../../components/dashboard/Header";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function DashboardLayout({
     children,
@@ -13,10 +15,24 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
+    const router = useRouter();
     const [open, setOpen] = useState(false);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [authChecked, setAuthChecked] = useState(false);
 
     const isChatPage = pathname?.startsWith("/dashboard/hosts/chat/");
+
+    // Auth guard — redirect to /login if not authenticated
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                router.replace("/login");
+            } else {
+                setAuthChecked(true);
+            }
+        });
+        return () => unsubscribe();
+    }, [router]);
 
     useEffect(() => {
         const saved = window.localStorage.getItem("dashboard-sidebar-collapsed");
@@ -29,12 +45,16 @@ export default function DashboardLayout({
         window.localStorage.setItem("dashboard-sidebar-collapsed", String(isSidebarCollapsed));
     }, [isSidebarCollapsed]);
 
+    // Render nothing until auth is confirmed (prevents flash of dashboard for logged-out users)
+    if (!authChecked) {
+        return null;
+    }
+
     return (
         <div className="flex min-h-screen bg-background text-foreground">
             {/* Desktop Sidebar */}
             <aside
-                className={`hidden md:block border-r border-border shrink-0 h-screen sticky top-0 transition-[width] duration-200 ${isSidebarCollapsed ? "w-16" : "w-64"
-                    }`}
+                className={`hidden md:block border-r border-border shrink-0 h-screen sticky top-0 transition-[width] duration-200 ${isSidebarCollapsed ? "w-16" : "w-64"}`}
             >
                 <Sidebar
                     collapsed={isSidebarCollapsed}
