@@ -12,8 +12,10 @@ import {
     serverTimestamp,
     onSnapshot,
     deleteDoc,
-    setDoc
+    setDoc,
+    writeBatch
 } from 'firebase/firestore';
+
 import { Vendor, SharedEvent, BlogPost, FAQ, PricingTier, Offering, PlatformFeature } from './types';
 
 export async function getStoreKits(): Promise<any[]> {
@@ -319,4 +321,16 @@ export async function updateVendor(vendorId: string, data: Partial<Vendor>) {
 export async function deleteVendor(vendorId: string) {
     const docRef = doc(db, 'vendors', vendorId);
     await deleteDoc(docRef);
+}
+
+export async function bulkUpdateVendors(updates: { id: string, data: Partial<Vendor> }[]) {
+    const batch = writeBatch(db);
+    updates.forEach((update) => {
+        const docRef = doc(db, 'vendors', update.id);
+        batch.update(docRef, {
+            ...update.data,
+            updatedAt: serverTimestamp()
+        });
+    });
+    await batch.commit();
 }
