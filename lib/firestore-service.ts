@@ -11,7 +11,8 @@ import {
     updateDoc,
     serverTimestamp,
     onSnapshot,
-    deleteDoc
+    deleteDoc,
+    setDoc
 } from 'firebase/firestore';
 import { Vendor, SharedEvent, BlogPost, FAQ, PricingTier, Offering, PlatformFeature } from './types';
 
@@ -286,4 +287,36 @@ export async function remixChat(originalChatId: string, newUserId: string): Prom
     }
 
     return newChatRef.id;
+}
+
+export async function addVendor(vendorData: Omit<Vendor, 'id'>) {
+    const docId = vendorData.slug || undefined;
+    if (docId) {
+        await setDoc(doc(db, 'vendors', docId), {
+            ...vendorData,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+        });
+        return docId;
+    } else {
+        const docRef = await addDoc(collection(db, 'vendors'), {
+            ...vendorData,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+        });
+        return docRef.id;
+    }
+}
+
+export async function updateVendor(vendorId: string, data: Partial<Vendor>) {
+    const docRef = doc(db, 'vendors', vendorId);
+    await updateDoc(docRef, {
+        ...data,
+        updatedAt: serverTimestamp()
+    });
+}
+
+export async function deleteVendor(vendorId: string) {
+    const docRef = doc(db, 'vendors', vendorId);
+    await deleteDoc(docRef);
 }
