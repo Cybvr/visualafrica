@@ -108,7 +108,9 @@ export default function AdminVendorsPage() {
                                             {v.categories.length > 2 && <span className="text-[10px] text-muted-foreground">+{v.categories.length - 2}</span>}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-sm font-medium text-foreground">{v.price || "N/A"}</td>
+                                    <td className="px-6 py-4 text-sm font-medium text-foreground">
+                                        {v.price && /[0-9]/.test(String(v.price)) ? `$${String(v.price).replace(/[^\d.,+k\s]/g, '')}` : (v.price || "N/A")}
+                                    </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2">
                                             <Button variant="ghost" size="icon" asChild title="View Public Page">
