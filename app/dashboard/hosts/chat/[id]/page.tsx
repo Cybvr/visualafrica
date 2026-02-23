@@ -10,7 +10,8 @@ import {
     saveChatMessage,
     listenToMessages,
     updateChatMetadata,
-    createChat
+    createChat,
+    getStoreKits
 } from "@/lib/firestore-service";
 import { Vendor, BlogPost, SharedEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -30,6 +31,12 @@ import {
     SelectValue
 } from "@/components/ui/select";
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
     Plus,
     ChevronDown,
     Mic,
@@ -42,7 +49,8 @@ import {
     ShoppingBag,
     CalendarDays,
     ListTodo,
-    Clock3
+    Clock3,
+    MoreHorizontal
 } from "lucide-react";
 import Link from 'next/link';
 import {
@@ -472,7 +480,7 @@ function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorActi
                 <div className={cn("text-[11px] text-muted-foreground mb-1 flex items-center gap-2", !ag && "justify-end")}>
                     {ag ? (
                         <>
-                            <span className="font-semibold text-foreground/80">Waddi bot</span>
+                            <span className="font-semibold text-foreground/80">Waddi</span>
                             <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Lite</span>
                         </>
                     ) : (
@@ -601,9 +609,10 @@ export default function ChatPage() {
     const [savedVendors, setSavedVendors] = useState<Set<string>>(new Set());
     const [allVendorsByCity, setAllVendorsByCity] = useState<Record<string, any[]>>({});
     const [liveEvents, setLiveEvents] = useState<SharedEvent[]>([]);
-    const [storeKits] = useState<any[]>(() => DEMO_CHAT_HISTORY.filter((kit: any) => kit.published));
+    const [storeKits, setStoreKits] = useState<any[]>(() => DEMO_CHAT_HISTORY.filter((kit: any) => kit.published));
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [chatTitle, setChatTitle] = useState("New Chat");
+    const [chatMetadata, setChatMetadata] = useState<any>(null);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [historyLoaded, setHistoryLoaded] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(null);
@@ -648,12 +657,17 @@ export default function ChatPage() {
 
     useEffect(() => {
         async function init() {
-            const [v, evs] = await Promise.all([getVendors(), getEvents()]);
+            const [v, evs, fetchedStoreKits] = await Promise.all([getVendors(), getEvents(), getStoreKits()]);
             const cities = ["Lagos", "Accra", "Nairobi", "Cape Town"];
             const vendorsByCity: Record<string, any[]> = {};
             cities.forEach(city => vendorsByCity[city] = buildVendorsList(v, city));
             setAllVendorsByCity(vendorsByCity);
             setLiveEvents(evs);
+
+            const demoKits = DEMO_CHAT_HISTORY.filter((kit: any) => kit.published);
+            const dbKitsDeduped = fetchedStoreKits.filter(dbKit => !demoKits.some((demoKit: any) => demoKit.id === dbKit.id));
+            setStoreKits([...dbKitsDeduped, ...demoKits]);
+
             setDataLoaded(true);
         }
         init();
@@ -669,6 +683,7 @@ export default function ChatPage() {
             setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
             setChatTitle("New Chat");
             setActiveCity(null);
+            setChatMetadata(null);
             setHistoryLoaded(true);
             return;
         }
@@ -678,6 +693,7 @@ export default function ChatPage() {
             if (chat) {
                 setChatTitle(chat.title);
                 setActiveCity(chat.activeCity);
+                setChatMetadata(chat);
                 if (chat.savedVendors) setSavedVendors(new Set(chat.savedVendors));
             } else if (chatIdStr !== 'new') {
                 // Not in Firestore yet (could be a fresh task-ID from sidebar)
@@ -685,6 +701,7 @@ export default function ChatPage() {
                 setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
                 setChatTitle("New Chat");
                 setActiveCity(null);
+                setChatMetadata(null);
             }
         });
 
@@ -711,7 +728,7 @@ export default function ChatPage() {
         const lower = text.toLowerCase().trim();
 
         // Priority 1: Direct action passed from metadata
-        const directAction = actionData?.capId || actionData?.action;
+        const directAction = actionData?.capId || actionData?.action || actionData?.id;
         if (directAction) return directAction;
 
         // Priority 2: Keyword matching (NLP-lite)
@@ -761,6 +778,15 @@ export default function ChatPage() {
                 response.type = "event_form";
                 response.content = "Share your event details and I'll build your plan.";
                 setMessages(prev => [...prev, response]);
+                if (currentChatId) saveChatMessage(currentChatId, response);
+                return;
+            }
+
+            if (intent === "overview" || intent === "todo" || intent === "timeline") {
+                response.type = intent;
+                response.content = `Here is your ${intent === 'overview' ? 'events overview' : (intent === 'timeline' ? 'itinerary' : intent)} for your planning session:`;
+                setMessages(prev => [...prev, response]);
+                if (currentChatId) saveChatMessage(currentChatId, response);
                 return;
             }
 
@@ -783,6 +809,7 @@ export default function ChatPage() {
                     response.viewAllLabel = "View all kits";
                 }
                 setMessages(prev => [...prev, response]);
+                if (currentChatId) saveChatMessage(currentChatId, response);
                 return;
             }
 
@@ -794,6 +821,7 @@ export default function ChatPage() {
                 response.viewAllLabel = "View all vendors";
                 response.suggestions = [{ label: "Experiences", action: "start_experiences" }];
                 setMessages(prev => [...prev, response]);
+                if (currentChatId) saveChatMessage(currentChatId, response);
                 return;
             }
 
@@ -814,6 +842,7 @@ export default function ChatPage() {
                     response.suggestions = [{ label: "Discover Vendors", action: "vendor_search" }];
                 }
                 setMessages(prev => [...prev, response]);
+                if (currentChatId) saveChatMessage(currentChatId, response);
                 return;
             }
 
@@ -824,6 +853,7 @@ export default function ChatPage() {
                 // Store the full context of this action for later
                 setPendingAction(actionData || { action: intent, text: text });
                 setMessages(prev => [...prev, response]);
+                if (currentChatId) saveChatMessage(currentChatId, response);
                 return;
             }
 
@@ -1099,6 +1129,31 @@ export default function ChatPage() {
                             setWaddiModel(model);
                         }
                     }}
+                    onPublish={async (data) => {
+                        const chatIdStr = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
+                        if (chatIdStr !== 'new') {
+                            const newMetaData = {
+                                published: true,
+                                title: data.title,
+                                city: data.city,
+                                category: data.category,
+                                price: data.price,
+                                description: data.description,
+                                image: data.image || "/images/logo.png",
+                                rating: "5.0",
+                                runs: 1
+                            };
+                            await updateChatMetadata(chatIdStr, newMetaData);
+                            setChatMetadata((prev: any) => ({ ...prev, ...newMetaData }));
+                        }
+                    }}
+                    initialPublishData={chatMetadata ? {
+                        city: chatMetadata.city,
+                        price: chatMetadata.price,
+                        description: chatMetadata.description,
+                        category: chatMetadata.category,
+                        image: chatMetadata.image
+                    } : undefined}
                 />
 
                 <PricingDialog
@@ -1113,26 +1168,55 @@ export default function ChatPage() {
                     }}
                 />
 
-                {/* Corridor Pills */}
-                <div className="flex gap-2.5 px-4 sm:px-6 py-3 border-b border-border overflow-x-auto bg-background/50 backdrop-blur-sm hide-scrollbar shrink-0">
-                    {[
-                        { id: 'start_planning', label: 'Plan', icon: Plus, action: 'start_planning' },
-                        { id: 'vendors_search', label: 'Discover Vendors', icon: Search, action: 'vendor_search' },
-                        { id: 'experience', label: 'Experiences', icon: Sparkles, action: 'experience' },
-                        { id: 'store', label: 'Shop', icon: ShoppingBag, action: 'start_store' },
-                        { id: 'overview', label: 'My Events', icon: CalendarDays },
-                        { id: 'todo', label: 'To-do List', icon: ListTodo },
-                        { id: 'timeline', label: 'Timeline', icon: Clock3 },
-                    ].map(pill => (
-                        <button
-                            key={pill.id}
-                            onClick={() => handlePillClick(pill)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border text-[12px] font-medium text-foreground hover:border-primary/50 hover:bg-secondary/50 transition-all whitespace-nowrap shadow-sm"
-                        >
-                            <pill.icon size={14} className="shrink-0" />
-                            {pill.label}
-                        </button>
-                    ))}
+                {/* Corridor Pills - Option B Layout */}
+                <div className="flex items-center justify-between gap-2.5 px-4 sm:px-6 py-4 border-b border-border bg-background/50 backdrop-blur-md shrink-0">
+                    <div className="flex items-center gap-2.5 overflow-x-auto hide-scrollbar">
+                        {[
+                            { id: 'start_planning', label: 'Plan', icon: Plus, action: 'start_planning', primary: true },
+                            { id: 'overview', label: 'My Events', icon: CalendarDays },
+                            { id: 'todo', label: 'To-do', icon: ListTodo },
+                        ].map(pill => (
+                            <button
+                                key={pill.id}
+                                onClick={() => handlePillClick(pill)}
+                                className={cn(
+                                    "flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all whitespace-nowrap shadow-sm active:scale-95",
+                                    pill.primary
+                                        ? "bg-foreground text-background hover:bg-foreground/90"
+                                        : "bg-card border border-border text-foreground hover:bg-secondary/80"
+                                )}
+                            >
+                                <pill.icon size={16} className={cn("shrink-0", pill.primary ? "text-background" : "text-muted-foreground")} />
+                                {pill.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border text-[13px] font-semibold text-foreground hover:bg-secondary/80 transition-all shadow-sm shrink-0 active:scale-95 ml-2">
+                                <MoreHorizontal size={16} className="text-muted-foreground" />
+                                <span>More</span>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48 p-1">
+                            {[
+                                { id: 'vendors_search', label: 'Discover Vendors', icon: Search, action: 'vendor_search' },
+                                { id: 'experience', label: 'Experiences', icon: Sparkles, action: 'experience' },
+                                { id: 'store', label: 'Shop', icon: ShoppingBag, action: 'start_store' },
+                                { id: 'timeline', label: 'Itinerary', icon: Clock3 },
+                            ].map(pill => (
+                                <DropdownMenuItem
+                                    key={pill.id}
+                                    onClick={() => handlePillClick(pill)}
+                                    className="flex items-center gap-2 cursor-pointer py-2"
+                                >
+                                    <pill.icon size={14} className="text-muted-foreground" />
+                                    <span className="text-sm font-medium">{pill.label}</span>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
 
                 <SheetContent side="left" className="p-0 w-64 border-none">

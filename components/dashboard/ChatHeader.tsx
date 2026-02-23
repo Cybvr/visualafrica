@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Share, Menu, MoreVertical, ChevronDown, Store, Download } from 'lucide-react';
+import { Share, Menu, MoreVertical, ChevronDown, Store, Download, ImagePlus, Loader2 } from 'lucide-react';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -43,6 +45,8 @@ interface ChatHeaderProps {
   onDownload?: () => void;
   waddiModel?: 'lite' | 'pro';
   onChangeWaddiModel?: (model: 'lite' | 'pro') => void;
+  onPublish?: (data: { title: string; city: string; price: string; description: string; category: string; image: string }) => Promise<void>;
+  initialPublishData?: { city?: string; price?: string; description?: string; category?: string; image?: string };
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -53,14 +57,48 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   onDownload,
   waddiModel = 'lite',
   onChangeWaddiModel,
+  onPublish,
+  initialPublishData,
 }) => {
+  const [isPublishing, setIsPublishing] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editingTitle, setEditingTitle] = useState(title);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isPublishOpen, setIsPublishOpen] = useState(false);
-  const [publishData, setPublishData] = useState({ title: title, city: '', price: '', description: '' });
+  const [publishData, setPublishData] = useState({ title: title, city: '', price: '', description: '', category: '', image: '' });
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    const storageRef = ref(storage, `store_covers/${Date.now()}_${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(Math.round(progress));
+      },
+      (error) => {
+        console.error("Upload error:", error);
+        setIsUploading(false);
+        alert("Failed to upload image. Please try again.");
+      },
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        setPublishData(prev => ({ ...prev, image: downloadURL }));
+        setIsUploading(false);
+      }
+    );
+  };
 
   useEffect(() => {
     if (!isEditingTitle) {
@@ -168,7 +206,17 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => setIsPublishOpen(true)}
+                  onClick={() => {
+                    setPublishData({
+                      title,
+                      city: initialPublishData?.city || '',
+                      price: initialPublishData?.price || '',
+                      description: initialPublishData?.description || '',
+                      category: initialPublishData?.category || '',
+                      image: initialPublishData?.image || ''
+                    });
+                    setIsPublishOpen(true);
+                  }}
                   className={iconActionClass}
                 >
                   <Store size={18} />
@@ -294,19 +342,55 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           </DialogHeader>
 
           <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Kit Title</label>
-              <Input value={publishData.title} onChange={e => setPublishData({ ...publishData, title: e.target.value })} placeholder="e.g. Lagos Birthday Kit" />
-            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">City</label>
                 <Input value={publishData.city} onChange={e => setPublishData({ ...publishData, city: e.target.value })} placeholder="e.g. Lagos" />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Price</label>
-                <Input value={publishData.price} onChange={e => setPublishData({ ...publishData, price: e.target.value })} placeholder="e.g. $49" />
+                <label className="text-sm font-medium">Category</label>
+                <Input value={publishData.category} onChange={e => setPublishData({ ...publishData, category: e.target.value })} placeholder="e.g. Birthday" />
               </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Price</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">$</span>
+                <Input value={publishData.price} onChange={e => setPublishData({ ...publishData, price: e.target.value })} placeholder="49" className="pl-7" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Cover Image</label>
+              {publishData.image ? (
+                <div className="relative w-full aspect-video rounded-md overflow-hidden border border-border group">
+                  <img src={publishData.image} alt="Cover Preview" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-background/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Button variant="secondary" size="sm" onClick={() => setPublishData({ ...publishData, image: '' })}>
+                      Remove Image
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center w-full">
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-border border-dashed rounded-lg cursor-pointer bg-secondary/20 hover:bg-secondary/50 overflow-hidden relative">
+                    {isUploading ? (
+                      <div className="flex flex-col items-center justify-center space-y-2">
+                        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                        <span className="text-xs font-semibold text-muted-foreground">Uploading... {uploadProgress}%</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                          <ImagePlus className="w-8 h-8 mb-3 text-muted-foreground" />
+                          <p className="mb-1 text-sm text-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                          <p className="text-xs text-muted-foreground">PNG, JPG or WEBP (Max 5MB)</p>
+                        </div>
+                        <Input type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleImageUpload} />
+                      </>
+                    )}
+                  </label>
+                </div>
+              )}
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Description</label>
@@ -318,13 +402,27 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               />
             </div>
             <DialogFooter className="mt-4">
-              <Button variant="outline" onClick={() => setIsPublishOpen(false)}>Cancel</Button>
-              <Button onClick={() => {
-                // Mock API call
-                setIsPublishOpen(false);
-                alert("Published to Store!");
-              }}>
-                <Store className="w-4 h-4 mr-2" /> Publish
+              <Button variant="outline" onClick={() => setIsPublishOpen(false)} disabled={isPublishing}>Cancel</Button>
+              <Button
+                onClick={async () => {
+                  if (onPublish) {
+                    setIsPublishing(true);
+                    try {
+                      await onPublish(publishData);
+                      setIsPublishOpen(false);
+                    } catch (error) {
+                      console.error("Publish failed:", error);
+                    } finally {
+                      setIsPublishing(false);
+                    }
+                  } else {
+                    setIsPublishOpen(false);
+                    alert("Published to Store!");
+                  }
+                }}
+                disabled={isPublishing || !publishData.title || !publishData.city || !publishData.price || !publishData.category}
+              >
+                {isPublishing ? "Publishing..." : <><Store className="w-4 h-4 mr-2" /> Publish</>}
               </Button>
             </DialogFooter>
           </div>

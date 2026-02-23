@@ -190,3 +190,39 @@ export async function deleteChat(chatId: string) {
     const chatRef = doc(db, 'chats', chatId);
     await deleteDoc(chatRef);
 }
+
+export async function remixChat(originalChatId: string, newUserId: string): Promise<string> {
+    const originalChatRef = doc(db, 'chats', originalChatId);
+    const originalChatSnap = await getDoc(originalChatRef);
+    if (!originalChatSnap.exists()) {
+        throw new Error("Chat not found");
+    }
+    const originalData = originalChatSnap.data();
+
+    // Create new chat
+    const newChatRef = await addDoc(collection(db, 'chats'), {
+        ...originalData,
+        userId: newUserId,
+        published: false,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        remixedFrom: originalChatId
+    });
+
+    // Copy messages
+    const q = query(
+        collection(db, 'chats', originalChatId, 'messages'),
+        orderBy('timestamp', 'asc')
+    );
+    const messagesSnap = await getDocs(q);
+
+    for (const msgDoc of messagesSnap.docs) {
+        const msgData = msgDoc.data();
+        await addDoc(collection(db, 'chats', newChatRef.id, 'messages'), {
+            ...msgData,
+            timestamp: serverTimestamp()
+        });
+    }
+
+    return newChatRef.id;
+}

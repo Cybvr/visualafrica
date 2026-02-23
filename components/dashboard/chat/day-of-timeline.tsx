@@ -77,7 +77,7 @@ export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange }: D
                     </div>
                     <div className="text-[13px] font-medium text-foreground">No Event Selected</div>
                     <div className="text-[11px] text-muted-foreground max-w-[200px]">
-                        Select an event from the dropdown above to view its day-of timeline.
+                        Select an event from the dropdown above to view its day-of itinerary.
                     </div>
                 </div>
             ) : (
@@ -94,7 +94,7 @@ export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange }: D
                             value={newLabel}
                             onChange={(e) => setNewLabel(e.target.value)}
                             onKeyDown={(e) => { if (e.key === "Enter") handleAddEntry(); }}
-                            placeholder="Add timeline item..."
+                            placeholder="Add itinerary item..."
                             className="h-8 w-full rounded-lg border border-border bg-secondary/20 px-3 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
                         />
                         <button

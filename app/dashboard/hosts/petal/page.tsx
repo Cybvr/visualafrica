@@ -78,7 +78,7 @@ const buildInitialMessages = (): Message[] => [
     },
     {
         id: 6, role: "user", timestamp: "10:28 AM",
-        content: "What does the day-of timeline look like right now? I want to review it with James tonight.",
+        content: "What does the day-of itinerary look like right now? I want to review it with James tonight.",
     },
     {
         id: 7, role: "agent", timestamp: "10:28 AM",
@@ -87,8 +87,8 @@ const buildInitialMessages = (): Message[] => [
                 <p>Here's the current day-of draft. A few slots are still TBD — I've flagged them:</p>
                 <DayOfTimeline />
                 <div className="flex gap-2 mt-3.5 flex-wrap">
-                    <ActionBtn primary>Export timeline PDF</ActionBtn>
-                    <ActionBtn>Edit timeline</ActionBtn>
+                    <ActionBtn primary>Export itinerary PDF</ActionBtn>
+                    <ActionBtn>Edit itinerary</ActionBtn>
                     <ActionBtn>Share with James</ActionBtn>
                 </div>
             </>
