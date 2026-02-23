@@ -173,7 +173,10 @@ export default function StorePreviewPage() {
                                     <Sparkles size={12} /> Pre-built Event Kit
                                 </span>
                             </div>
-                            <h1 className="text-2xl sm:text-3xl font-black text-foreground mb-2 truncate whitespace-normal leading-tight">{kit.title || "Untitled Kit"}</h1>
+                            <h1 className="text-2xl sm:text-3xl font-black text-foreground mb-1 truncate whitespace-normal leading-tight">{kit.title || "Untitled Kit"}</h1>
+                            {kit.publisherName && (
+                                <p className="text-xs text-muted-foreground mb-2 font-medium">by {kit.publisherName}</p>
+                            )}
                             <p className="text-muted-foreground text-sm max-w-lg leading-relaxed line-clamp-3">{kit.description || "A cohesive event plan, curated vendors, and detailed itinerary. Get this kit and make it yours instantly."}</p>
                         </div>
                     </div>

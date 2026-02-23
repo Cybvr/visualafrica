@@ -26,7 +26,7 @@ export default function DashboardLayout({
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (!user) {
-                router.replace("/login");
+                router.replace("/auth/login");
             } else {
                 setAuthChecked(true);
             }

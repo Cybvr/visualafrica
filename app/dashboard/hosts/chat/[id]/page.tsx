@@ -1140,6 +1140,7 @@ export default function ChatPage() {
                                 price: data.price,
                                 description: data.description,
                                 image: data.image || "/images/logo.png",
+                                publisherName: currentUser?.displayName || currentUser?.email || "Anonymous",
                                 rating: "5.0",
                                 runs: 1
                             };

@@ -76,9 +76,12 @@ export default function StorePage() {
                                 </div>
 
                                 <CardContent className="flex flex-col p-4">
-                                    <h3 className="font-serif text-[16px] font-bold leading-tight text-foreground group-hover:text-primary transition-colors mb-4">
+                                    <h3 className="font-serif text-[16px] font-bold leading-tight text-foreground group-hover:text-primary transition-colors mb-1">
                                         {kit.title || 'Untitled chat'}
                                     </h3>
+                                    {kit.publisherName && (
+                                        <p className="text-xs text-muted-foreground mb-3">by {kit.publisherName}</p>
+                                    )}
                                     <div className="mt-auto flex items-center justify-between">
                                         <div className="flex items-center gap-3 text-xs text-muted-foreground font-medium">
                                             <div className="flex items-center gap-1">
