@@ -2,22 +2,26 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getVendors, getBlogPosts, getEvents } from "@/lib/firestore-service";
+import {
+    getVendors,
+    getBlogPosts,
+    getEvents,
+    getChatById,
+    saveChatMessage,
+    listenToMessages,
+    updateChatMetadata,
+    createChat
+} from "@/lib/firestore-service";
 import { Vendor, BlogPost, SharedEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import ChatHeader from "@/components/dashboard/ChatHeader";
+import { PricingDialog } from "@/components/dashboard/PricingDialog";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { DEMO_CHAT_HISTORY, MARKET_DATA, INITIAL_MESSAGES, getChatMessages, CITY_COLORS, CITIES, buildVendorsList } from "@/lib/chat-data";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
 import {
     Select,
     SelectContent,
@@ -25,7 +29,21 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import { Plus, ChevronDown, Mic, ArrowRight, MapPin, Star, Users } from "lucide-react";
+import {
+    Plus,
+    ChevronDown,
+    Mic,
+    ArrowRight,
+    MapPin,
+    Star,
+    Users,
+    Search,
+    Sparkles,
+    ShoppingBag,
+    CalendarDays,
+    ListTodo,
+    Clock3
+} from "lucide-react";
 import Link from 'next/link';
 import {
     EventOverviewCard,
@@ -139,12 +157,11 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
 function VendorCardMsg({ msg, savedVendors, onSave, onVendorAction, activeCity, allVendorsByCity }: { msg: any; savedVendors: Set<string>; onSave: (v: any) => void; onVendorAction: (a: any, v: any) => void; activeCity: string | null, allVendorsByCity: Record<string, any[]> }) {
     const targetCity = msg.city || activeCity;
     const allForCity = targetCity ? allVendorsByCity[targetCity] || [] : [];
-    const [expanded, setExpanded] = useState(false);
-
-    // Ensure we have some vendors to show by defaulting to the city's list if the message list is empty
-    const initialVendors = (msg.vendors && msg.vendors.length > 0) ? msg.vendors : allForCity.slice(0, 3);
-    const shown = expanded ? allForCity : initialVendors;
-    const hasMore = allForCity.length > initialVendors.length;
+    const sourceVendors = (msg.vendors && msg.vendors.length > 0) ? msg.vendors : allForCity;
+    const shown = sourceVendors.slice(0, 5);
+    const hasMore = sourceVendors.length > shown.length;
+    const viewAllHref = msg.viewAllHref || "/dashboard/hosts/search";
+    const viewAllLabel = msg.viewAllLabel || "View all vendors";
 
     return (
         <div className="w-full">
@@ -157,10 +174,13 @@ function VendorCardMsg({ msg, savedVendors, onSave, onVendorAction, activeCity, 
                     <VCard key={v.name} v={v} savedVendors={savedVendors} onSave={onSave} onVendorAction={onVendorAction} />
                 ))}
             </div>
-            {allForCity.length > 0 && hasMore && (
-                <button onClick={() => setExpanded(e => !e)} className="w-full max-w-[480px] py-2.5 mt-2 border border-dashed border-border rounded-xl text-muted-foreground text-xs hover:text-primary hover:border-primary transition-all font-mono">
-                    {expanded ? "▲ Show less" : `▼ View more vendors (${allForCity.length - initialVendors.length} more)`}
-                </button>
+            {hasMore && (
+                <Link
+                    href={viewAllHref}
+                    className="block w-full max-w-[480px] py-2.5 mt-2 border border-dashed border-border rounded-xl text-muted-foreground text-xs hover:text-primary hover:border-primary transition-all font-mono text-center"
+                >
+                    {viewAllLabel} ({sourceVendors.length})
+                </Link>
             )}
         </div>
     );
@@ -408,6 +428,10 @@ function StoreCard({ item, onAction }: { item: any; onAction?: (action: string, 
 
 function StoreListMsg({ msg, onStoreAction }: { msg: any; onStoreAction?: (action: string, item: any) => void }) {
     const items = msg.items || [];
+    const shown = items.slice(0, 5);
+    const hasMore = items.length > shown.length;
+    const viewAllHref = msg.viewAllHref || "/dashboard/hosts/store";
+    const viewAllLabel = msg.viewAllLabel || "View all kits";
     return (
         <div className="w-full">
             <div className="mb-3">
@@ -415,20 +439,28 @@ function StoreListMsg({ msg, onStoreAction }: { msg: any; onStoreAction?: (actio
                 <div className="text-foreground text-[14px] leading-relaxed">{msg.content}</div>
             </div>
             <div className="w-full max-w-[480px] space-y-3">
-                {items.map((item: any) => (
+                {shown.map((item: any) => (
                     <StoreCard key={item.id} item={item} onAction={onStoreAction} />
                 ))}
             </div>
+            {hasMore && (
+                <Link
+                    href={viewAllHref}
+                    className="block w-full max-w-[480px] py-2.5 mt-2 border border-dashed border-border rounded-xl text-muted-foreground text-xs hover:text-primary hover:border-primary transition-all font-mono text-center"
+                >
+                    {viewAllLabel} ({items.length})
+                </Link>
+            )}
         </div>
     );
 }
 
-function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onStoreAction, onSuggestion, allVendorsByCity, onFormSubmit, onCalendarSelect }: any) {
+function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onStoreAction, onSuggestion, allVendorsByCity, onFormSubmit, onCalendarSelect, liveEvents, selectedEventId, onEventSelect }: any) {
     const ag = msg.role === "agent";
     return (
         <div className={cn("flex gap-3.5 mb-6", ag ? "flex-row items-start" : "flex-row-reverse items-start")}>
             {ag ? (
-                <img src="/images/ama.png" alt="Waddi" className="w-[32px] h-[32px] rounded-full object-cover shrink-0 mt-0.5 border border-border shadow-sm" />
+                <img src="/images/logo.png" alt="Waddi" className="w-[32px] h-[32px] rounded-full object-cover shrink-0 mt-0.5" />
             ) : (
                 <div className="w-[32px] h-[32px] rounded-full bg-primary text-primary-foreground flex-shrink-0 mt-0.5 flex items-center justify-center text-[10px] font-bold shadow-sm">
                     YOU
@@ -438,7 +470,14 @@ function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorActi
             <div className={cn("flex-1 min-w-0 flex flex-col", ag ? "items-start" : "items-end")}>
                 {/* Petal-style Header */}
                 <div className={cn("text-[11px] text-muted-foreground mb-1 flex items-center gap-2", !ag && "justify-end")}>
-                    <span className="font-semibold text-foreground/80">{ag ? "Waddi" : "You"}</span>
+                    {ag ? (
+                        <>
+                            <span className="font-semibold text-foreground/80">Waddi bot</span>
+                            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Lite</span>
+                        </>
+                    ) : (
+                        <span className="font-semibold text-foreground/80">You</span>
+                    )}
                     <span className="opacity-50 font-medium">{msg.time}</span>
                 </div>
 
@@ -503,16 +542,24 @@ function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorActi
                             <StoreListMsg msg={msg} onStoreAction={onStoreAction} />
                         </div>
                     ) : msg.type === "overview" ? (
-                        <div className="w-full mt-1">
-                            <EventOverviewCard />
+                        <div className="w-full mt-1 space-y-4">
+                            {liveEvents && liveEvents.length > 0 ? (
+                                liveEvents.map((event: SharedEvent) => (
+                                    <EventOverviewCard key={event.id} event={event} />
+                                ))
+                            ) : (
+                                <div className="p-4 border border-dashed border-border rounded-xl text-center text-muted-foreground text-sm">
+                                    No events found in your account.
+                                </div>
+                            )}
                         </div>
                     ) : msg.type === "todo" ? (
                         <div className="w-full mt-1">
-                            <TaskChecklist />
+                            <TaskChecklist events={liveEvents} selectedEventId={selectedEventId} onEventChange={onEventSelect} />
                         </div>
                     ) : msg.type === "timeline" ? (
                         <div className="w-full mt-1">
-                            <DayOfTimeline />
+                            <DayOfTimeline events={liveEvents} selectedEventId={selectedEventId} onEventChange={onEventSelect} />
                         </div>
                     ) : msg.type === "vendors" ? (
                         <div className="w-full mt-1">
@@ -559,11 +606,20 @@ export default function ChatPage() {
     const [chatTitle, setChatTitle] = useState("New Chat");
     const [dataLoaded, setDataLoaded] = useState(false);
     const [historyLoaded, setHistoryLoaded] = useState(false);
+    const [currentUser, setCurrentUser] = useState<any>(null);
     const [waddiModel, setWaddiModel] = useState<'lite' | 'pro'>('lite');
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
     const [pendingAction, setPendingAction] = useState<any>(null);
+    const [isPricingOpen, setIsPricingOpen] = useState(false);
 
-    const handlePillClick = (pill: any) => {
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setCurrentUser(user);
+        });
+        return () => unsubscribe();
+    }, []);
+
+    const handlePillClick = async (pill: any) => {
         const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
 
         // If pill has an explicit action, route through the logic engine
@@ -573,19 +629,21 @@ export default function ChatPage() {
             return;
         }
 
+        // Special handling for My Events to pull from DB
+        if (pill.id === 'overview') {
+            setTyping(true);
+            try {
+                const refreshedEvents = await getEvents();
+                setLiveEvents(refreshedEvents);
+            } catch (err) {
+                console.error("Failed to refresh events", err);
+            }
+        }
+
         // Fallback for static UI views (Overview, Todo, etc)
-        setMessages(prev => [...prev, { id: Date.now(), role: "user", content: `Show me ${pill.label.toLowerCase()}`, time: nowStr }]);
-        setTyping(true);
-        setTimeout(() => {
-            setTyping(false);
-            setMessages(prev => [...prev, {
-                id: Date.now() + 1,
-                role: "agent",
-                time: nowStr,
-                type: pill.id,
-                content: `Here is the ${pill.label.toLowerCase()} for your event:`
-            }]);
-        }, 800);
+        // If it's a new chat, use send to ensure it's created and persisted
+        const userContent = `Show me ${pill.label.toLowerCase()}`;
+        send(userContent, pill);
     };
 
     useEffect(() => {
@@ -602,62 +660,47 @@ export default function ChatPage() {
     }, []);
 
     useEffect(() => {
-        if (!dataLoaded) return;
+        if (!dataLoaded || !currentUser) return;
 
         const chatIdStr = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
 
-        try {
-            const savedChatRaw = chatIdStr !== 'new' ? localStorage.getItem(`chat_${chatIdStr}`) : null;
-            if (savedChatRaw) {
-                const parsed = JSON.parse(savedChatRaw);
-                if (parsed && parsed.messages && parsed.messages.length > 0) {
-                    setMessages(parsed.messages);
-                    if (parsed.chatTitle) setChatTitle(parsed.chatTitle);
-                    if (parsed.activeCity) setActiveCity(parsed.activeCity);
-                    if (parsed.savedVendors) setSavedVendors(new Set(parsed.savedVendors));
-                    setHistoryLoaded(true);
-                    return;
-                }
-            }
-        } catch (e) {
-            console.error("Failed to parse chat history", e);
-        }
-
-        const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
-
-        // Populate initial messages based on chat ID using LIVE data
-        const initialDemochatMessages = getChatMessages(chatIdStr, allVendorsByCity, liveEvents);
-
-        if (initialDemochatMessages.length > 0) {
-            setMessages(initialDemochatMessages);
-            const demoChatInfo = DEMO_CHAT_HISTORY.find(c => c.id === chatIdStr);
-            setChatTitle(demoChatInfo?.title || "Conversation");
-            setActiveCity(demoChatInfo?.city || null);
-        } else if (params.id && params.id !== 'new') {
-            const demoChatInfo = DEMO_CHAT_HISTORY.find(c => c.id === chatIdStr);
-            setChatTitle(demoChatInfo?.title || "Conversation");
-            setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
-            setActiveCity(demoChatInfo?.city || null);
-        } else {
+        if (chatIdStr === 'new') {
+            const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
             setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
             setChatTitle("New Chat");
             setActiveCity(null);
+            setHistoryLoaded(true);
+            return;
         }
-        setHistoryLoaded(true);
-    }, [params.id, dataLoaded]);
 
-    useEffect(() => {
-        if (!historyLoaded) return;
-        const chatIdStr = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
-        if (messages.length > 0) {
-            localStorage.setItem(`chat_${chatIdStr}`, JSON.stringify({
-                messages,
-                chatTitle,
-                activeCity,
-                savedVendors: Array.from(savedVendors)
-            }));
-        }
-    }, [messages, chatTitle, activeCity, savedVendors, historyLoaded, params.id]);
+        // Fetch chat metadata
+        getChatById(chatIdStr).then(chat => {
+            if (chat) {
+                setChatTitle(chat.title);
+                setActiveCity(chat.activeCity);
+                if (chat.savedVendors) setSavedVendors(new Set(chat.savedVendors));
+            } else if (chatIdStr !== 'new') {
+                // Not in Firestore yet (could be a fresh task-ID from sidebar)
+                const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
+                setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
+                setChatTitle("New Chat");
+                setActiveCity(null);
+            }
+        });
+
+        // Listen for messages in real-time
+        const unsubscribe = listenToMessages(chatIdStr, (msgs) => {
+            if (msgs.length > 0) {
+                setMessages(msgs);
+            } else {
+                const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
+                setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
+            }
+            setHistoryLoaded(true);
+        });
+
+        return () => unsubscribe();
+    }, [params.id, dataLoaded, currentUser]);
 
     const scrollRef = useRef<HTMLDivElement>(null);
     useEffect(() => { scrollRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, typing]);
@@ -693,7 +736,7 @@ export default function ChatPage() {
      * The core logic engine (n8n node style)
      * Handles intent -> capability mapping & prerequisite checking
      */
-    const dispatchLogic = (text: string, actionData?: any, isResumption = false) => {
+    const dispatchLogic = (text: string, actionData?: any, currentChatId?: string) => {
         const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
         const intent = extractIntent(text, actionData);
         const city = resolveCity(text, activeCity);
@@ -727,7 +770,7 @@ export default function ChatPage() {
                     response.content = "No store chats yet.";
                 } else {
                     response.type = "store_cards";
-                    response.content = "Store items you can apply to your plan:";
+                    response.content = "Shop these iternaries and save event planning time";
                     response.items = storeKits.map((kit: any) => ({
                         id: kit.id,
                         title: kit.title || kit.name || "Untitled chat",
@@ -736,6 +779,8 @@ export default function ChatPage() {
                         rating: kit.rating,
                         runs: kit.runs
                     }));
+                    response.viewAllHref = "/dashboard/hosts/store";
+                    response.viewAllLabel = "View all kits";
                 }
                 setMessages(prev => [...prev, response]);
                 return;
@@ -745,6 +790,8 @@ export default function ChatPage() {
                 response.type = "vendor_cards";
                 response.content = "Top vendors across all cities:";
                 response.vendors = allVendors;
+                response.viewAllHref = "/dashboard/hosts/search";
+                response.viewAllLabel = "View all vendors";
                 response.suggestions = [{ label: "Experiences", action: "start_experiences" }];
                 setMessages(prev => [...prev, response]);
                 return;
@@ -762,6 +809,8 @@ export default function ChatPage() {
                     response.type = "vendor_cards";
                     response.content = "Top experience packages across all cities:";
                     response.vendors = experienceVendors;
+                    response.viewAllHref = "/dashboard/hosts/experiences";
+                    response.viewAllLabel = "View all experiences";
                     response.suggestions = [{ label: "Discover Vendors", action: "vendor_search" }];
                 }
                 setMessages(prev => [...prev, response]);
@@ -787,6 +836,8 @@ export default function ChatPage() {
                 // Dynamic injector for vendors
                 if (normalizedIntent === 'vendor_search' || normalizedIntent === 'start_vendor_search') {
                     response.vendors = allVendorsByCity[city] || [];
+                    response.viewAllHref = "/dashboard/hosts/search";
+                    response.viewAllLabel = "View all vendors";
                 }
                 if (normalizedIntent === "experience") {
                     const experienceVendors = (allVendorsByCity[city] || []).filter((v: any) =>
@@ -800,6 +851,8 @@ export default function ChatPage() {
                         response.type = "vendor_cards";
                         response.content = `Top experience packages in ${city}:`;
                         response.vendors = experienceVendors;
+                        response.viewAllHref = "/dashboard/hosts/experiences";
+                        response.viewAllLabel = "View all experiences";
                         response.suggestions = [{ label: "Discover Vendors", action: "vendor_search" }];
                     }
                 }
@@ -813,30 +866,59 @@ export default function ChatPage() {
                 ];
             }
 
-            setMessages(prev => [...prev, response]);
+            if (currentChatId) {
+                saveChatMessage(currentChatId, response);
+            } else {
+                setMessages(prev => [...prev, response]);
+            }
         }, 1200);
     };
 
-    const send = (text: string, actionData?: any) => {
+    const send = async (text: string, actionData?: any) => {
         if (!text.trim()) return;
         const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
-        // UI node: append user message
-        setMessages(prev => [...prev, { id: Date.now(), role: "user", content: text, time: nowStr }]);
-        setInput("");
 
-        // Pass to logic engine
-        dispatchLogic(text, actionData);
+        let chatIdStr = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
+        const isNew = chatIdStr === 'new' || chatIdStr.startsWith('task-');
+
+        if (isNew && currentUser) {
+            const newChatId = await createChat(currentUser.uid, text.substring(0, 30), activeCity);
+
+            // Persist initial greeting too so it's not lost
+            for (const m of INITIAL_MESSAGES) {
+                await saveChatMessage(newChatId, { ...m, time: nowStr });
+            }
+
+            await saveChatMessage(newChatId, { role: "user", content: text, time: nowStr });
+
+            // Trigger logic before redirecting, passing the new ID
+            dispatchLogic(text, actionData, newChatId);
+
+            router.push(`/dashboard/hosts/chat/${newChatId}`);
+            return;
+        }
+
+        if (chatIdStr !== 'new') {
+            await saveChatMessage(chatIdStr, { role: "user", content: text, time: nowStr });
+            dispatchLogic(text, actionData, chatIdStr);
+        }
+
+        setInput("");
     };
 
-    const handleSelectCity = (city: string) => {
+    const handleSelectCity = async (city: string) => {
         setActiveCity(city);
+        const chatIdStr = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
+
+        if (chatIdStr !== 'new') {
+            await updateChatMetadata(chatIdStr, { activeCity: city });
+        }
 
         // Logic Flow Node: Show greeting
-        addAgentMsg({
-            content: MARKET_DATA[city].greeting,
+        await addAgentMsg({
+            content: MARKET_DATA[city]?.greeting || `${city} — let's go. Tapped into the local vendor network. What are we planning?`,
             suggestions: [
                 { label: "Discover Vendors", action: "vendor_search" },
-                { label: "Review Budget", action: "capability", capId: "budget" }
             ]
         });
 
@@ -847,8 +929,7 @@ export default function ChatPage() {
 
             setTimeout(() => {
                 const text = actionToRun.label || actionToRun.text || "Continue";
-                // IMPORTANT: Dispatch logic directly to avoid duplicating user message in chat history
-                dispatchLogic(text, actionToRun, true);
+                dispatchLogic(text, actionToRun, chatIdStr !== 'new' ? chatIdStr : undefined);
             }, 1000);
         }
     };
@@ -860,7 +941,7 @@ export default function ChatPage() {
             addAgentMsg({
                 type: "text",
                 content: "Got it! I'm creating your event draft and finding the best vendors now.",
-                suggestions: [{ label: "Review Budget", action: "capability", capId: "budget" }]
+                suggestions: []
             });
         });
     };
@@ -876,14 +957,28 @@ export default function ChatPage() {
         });
     };
 
-    const addUserMsg = (content: string) => {
-        const now = () => new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
-        setMessages(prev => [...prev, { id: Date.now(), role: "user", content, time: now() }]);
+    const addUserMsg = async (content: string) => {
+        const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
+        const userMsg = { role: "user", content, time: nowStr };
+
+        const chatIdStr = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
+        if (chatIdStr !== 'new') {
+            await saveChatMessage(chatIdStr, userMsg);
+        } else {
+            setMessages(prev => [...prev, { ...userMsg, id: Date.now().toString() }]);
+        }
     };
 
-    const addAgentMsg = (msg: any) => {
-        const now = () => new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
-        setMessages(prev => [...prev, { id: Date.now(), role: "agent", ...msg, time: now() }]);
+    const addAgentMsg = async (msg: any) => {
+        const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
+        const agentMsg = { role: "agent", ...msg, time: nowStr };
+
+        const chatIdStr = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
+        if (chatIdStr !== 'new') {
+            await saveChatMessage(chatIdStr, agentMsg);
+        } else {
+            setMessages(prev => [...prev, { ...agentMsg, id: Date.now().toString() }]);
+        }
     };
 
     const withTyping = (delayMs: number, fn: () => void) => {
@@ -933,8 +1028,6 @@ export default function ChatPage() {
             return next;
         });
     };
-
-    const [mode, setMode] = useState<'chat' | 'planning'>('chat');
 
     const resetToNewChat = () => {
         const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
@@ -987,31 +1080,56 @@ export default function ChatPage() {
                 <ChatHeader
                     onOpenMenu={() => setIsMobileMenuOpen(true)}
                     title={chatTitle}
-                    onRename={setChatTitle}
+                    onRename={async (newTitle) => {
+                        setChatTitle(newTitle);
+                        const chatIdStr = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
+                        if (chatIdStr !== 'new') {
+                            await updateChatMetadata(chatIdStr, { title: newTitle });
+                        }
+                    }}
                     onDelete={resetToNewChat}
                     onDownload={downloadChatTranscript}
                     waddiModel={waddiModel}
-                    onChangeWaddiModel={setWaddiModel}
+                    onChangeWaddiModel={(model) => {
+                        if (model === 'pro') {
+                            if (waddiModel !== 'pro') {
+                                setIsPricingOpen(true);
+                            }
+                        } else {
+                            setWaddiModel(model);
+                        }
+                    }}
+                />
+
+                <PricingDialog
+                    open={isPricingOpen}
+                    onOpenChange={setIsPricingOpen}
+                    onUpgrade={() => {
+                        setWaddiModel('pro');
+                        addAgentMsg({
+                            content: "Welcome to Waddi Pro! You now have access to deeper planning insights and advanced negotiation features.",
+                            type: 'text'
+                        });
+                    }}
                 />
 
                 {/* Corridor Pills */}
                 <div className="flex gap-2.5 px-4 sm:px-6 py-3 border-b border-border overflow-x-auto bg-background/50 backdrop-blur-sm hide-scrollbar shrink-0">
                     {[
-                        { id: 'start_planning', label: 'Plan', icon: '📝', action: 'start_planning' },
-                        { id: 'vendors_search', label: 'Discover Vendors', icon: '🔍', action: 'vendor_search' },
-                        { id: 'experience', label: 'Experiences', icon: '✨', action: 'experience' },
-                        { id: 'store', label: 'Store', icon: '🏪', action: 'start_store' },
-                        { id: 'overview', label: 'Overview', icon: '📊' },
-                        { id: 'todo', label: 'To-do List', icon: '✅' },
-                        { id: 'timeline', label: 'Timeline', icon: '📅' },
-                        { id: 'budget', label: 'Budget', icon: '💰', action: 'budget' },
+                        { id: 'start_planning', label: 'Plan', icon: Plus, action: 'start_planning' },
+                        { id: 'vendors_search', label: 'Discover Vendors', icon: Search, action: 'vendor_search' },
+                        { id: 'experience', label: 'Experiences', icon: Sparkles, action: 'experience' },
+                        { id: 'store', label: 'Shop', icon: ShoppingBag, action: 'start_store' },
+                        { id: 'overview', label: 'My Events', icon: CalendarDays },
+                        { id: 'todo', label: 'To-do List', icon: ListTodo },
+                        { id: 'timeline', label: 'Timeline', icon: Clock3 },
                     ].map(pill => (
                         <button
                             key={pill.id}
                             onClick={() => handlePillClick(pill)}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border text-[12px] font-medium text-foreground hover:border-primary/50 hover:bg-secondary/50 transition-all whitespace-nowrap shadow-sm"
                         >
-                            <span className="text-xs">{pill.icon}</span>
+                            <pill.icon size={14} className="shrink-0" />
                             {pill.label}
                         </button>
                     ))}
@@ -1056,12 +1174,15 @@ export default function ChatPage() {
                                 onSave={handleSaveVendor}
                                 onFormSubmit={handleFormSubmit}
                                 onCalendarSelect={handleCalendarSelect}
+                                liveEvents={liveEvents}
+                                selectedEventId={selectedEventId}
+                                onEventSelect={setSelectedEventId}
                             />
                         </div>
                     ))}
                     {typing && (
                         <div className="flex items-end gap-2 mb-6 msg-animate">
-                            <img src="/images/ama.png" alt="Ama" className="w-[32px] h-[32px] rounded-full object-cover border border-border" />
+                            <img src="/images/logo.png" alt="Ama" className="w-[32px] h-[32px] rounded-full object-cover " />
                             <div className="bg-secondary/40 rounded-2xl px-4 py-3 shadow-sm border border-border/50"><Dots /></div>
                         </div>
                     )}
@@ -1076,7 +1197,7 @@ export default function ChatPage() {
                             value={input}
                             onChange={e => setInput(e.target.value)}
                             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
-                            placeholder={mode === 'chat' ? "Ask Waddi anything about this chat..." : "Tell Ama what to plan..."}
+                            placeholder="Ask Waddi anything about this chat..."
                             rows={1}
                             className="w-full bg-transparent px-5 pt-5 pb-16 text-sm focus:outline-none resize-none min-h-[100px]"
                         />
@@ -1086,59 +1207,6 @@ export default function ChatPage() {
                                 <button className="p-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors">
                                     <Plus size={18} />
                                 </button>
-
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className="flex items-center gap-1 px-3 py-1.5 text-[14px] font-medium text-foreground hover:bg-secondary rounded-lg transition-colors">
-                                            <ChevronDown size={14} className="text-muted-foreground" />
-                                            {mode === 'chat' ? 'Chat' : 'Plan'}
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-40">
-                                        <DropdownMenuItem onClick={() => setMode('chat')}>Chat Mode</DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setMode('planning')}>Plan Mode</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className="flex items-center gap-1 px-3 py-1.5 text-[14px] font-medium text-foreground hover:bg-secondary rounded-lg transition-colors max-w-[170px]">
-                                            <MapPin size={14} className="text-muted-foreground shrink-0" />
-                                            <span className="truncate">{activeCity || "All Cities"}</span>
-                                            <ChevronDown size={14} className="text-muted-foreground shrink-0" />
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-44">
-                                        <DropdownMenuItem onClick={() => setActiveCity(null)}>All Cities</DropdownMenuItem>
-                                        {CITIES.map(city => (
-                                            <DropdownMenuItem key={city.name} onClick={() => setActiveCity(city.name)}>
-                                                <span className="mr-2">{city.flag}</span>
-                                                {city.name}
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-
-                                <div className="w-px h-4 bg-border mx-1"></div>
-
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className="flex items-center gap-1 px-3 py-1.5 text-[14px] font-medium text-foreground hover:bg-secondary rounded-lg transition-colors max-w-[150px]">
-                                            <ChevronDown size={14} className="text-muted-foreground shrink-0" />
-                                            <span className="truncate">
-                                                {selectedEventId ? liveEvents.find(e => e.id === selectedEventId)?.eventName || 'Select Event' : 'Select Event'}
-                                            </span>
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-48 max-h-[300px] overflow-y-auto">
-                                        <DropdownMenuItem onClick={() => setSelectedEventId(null)}>None</DropdownMenuItem>
-                                        {liveEvents.map(event => (
-                                            <DropdownMenuItem key={event.id} onClick={() => setSelectedEventId(event.id || null)} className="truncate">
-                                                {event.eventName}
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
                             </div>
 
                             <div className="flex items-center gap-2">

@@ -46,8 +46,12 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useTheme } from "next-themes";
 import { VENDOR_DASHBOARD_DATA } from "@/lib/vendor-dashboard-data";
-import { getEvents } from "@/lib/firestore-service";
-import { DEMO_CHAT_HISTORY } from "@/lib/chat-data";
+import {
+  getEvents,
+  listenToUserChats,
+  updateChatMetadata,
+  deleteChat
+} from "@/lib/firestore-service";
 import ChatHistorySection from "./ChatHistorySection";
 
 type NavItemConfig = {
@@ -309,7 +313,28 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
   const mode = pathname?.startsWith("/dashboard/vendors") ? "vendor" : "host";
   const logoHref = mode === "vendor" ? "/dashboard/vendors" : "/dashboard/hosts";
   const [hostEventsCount, setHostEventsCount] = useState(0);
-  const [hostChatHistoryItems, setHostChatHistoryItems] = useState(DEMO_CHAT_HISTORY);
+  const [hostChatHistoryItems, setHostChatHistoryItems] = useState<any[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser) {
+      setHostChatHistoryItems([]);
+      return;
+    }
+
+    const unsubscribe = listenToUserChats(currentUser.uid, (chats) => {
+      setHostChatHistoryItems(chats);
+    });
+
+    return () => unsubscribe();
+  }, [currentUser]);
 
   useEffect(() => {
     async function loadCounts() {
@@ -323,7 +348,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
     loadCounts();
   }, []);
 
-  const hostInboxCount = 3;
+  const hostInboxCount = 0;
   const vendorOffersCount = VENDOR_DASHBOARD_DATA.leads.length;
   const vendorInboxCount = VENDOR_DASHBOARD_DATA.chats.filter(c => c.unread).length;
   const vendorEventsCount = VENDOR_DASHBOARD_DATA.bookings.length;
@@ -345,14 +370,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
     { icon: MdCreditCard, label: "Payments", href: "/dashboard/hosts/payments" },
   ];
 
-  const renameHostChatHistoryItem = (id: string, title: string) => {
-    setHostChatHistoryItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, title } : item))
-    );
+  const renameHostChatHistoryItem = async (id: string, title: string) => {
+    await updateChatMetadata(id, { title });
   };
 
-  const deleteHostChatHistoryItem = (id: string) => {
-    setHostChatHistoryItems((prev) => prev.filter((item) => item.id !== id));
+  const deleteHostChatHistoryItem = async (id: string) => {
+    await deleteChat(id);
   };
 
   const hostSecondaryNavItems: NavItemConfig[] = [];

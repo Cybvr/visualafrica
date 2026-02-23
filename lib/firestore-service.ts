@@ -94,3 +94,99 @@ export async function getEventById(id: string): Promise<SharedEvent | null> {
     if (docSnap.exists()) return docSnap.data() as SharedEvent;
     return null;
 }
+
+// ── Chat Functions ────────────────────────────────────────
+
+import { addDoc, updateDoc, serverTimestamp, onSnapshot, deleteDoc } from 'firebase/firestore';
+
+export async function getUserChats(userId: string) {
+    const q = query(
+        collection(db, 'chats'),
+        where('userId', '==', userId)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a: any, b: any) => {
+            const dateA = a.updatedAt?.seconds || 0;
+            const dateB = b.updatedAt?.seconds || 0;
+            return dateB - dateA;
+        });
+}
+
+export async function createChat(userId: string, title: string = "New Chat", city: string | null = null) {
+    const docRef = await addDoc(collection(db, 'chats'), {
+        userId,
+        title,
+        activeCity: city,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        published: false
+    });
+    return docRef.id;
+}
+
+export async function getChatById(chatId: string): Promise<any | null> {
+    const docRef = doc(db, 'chats', chatId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() };
+    }
+    return null;
+}
+
+export async function saveChatMessage(chatId: string, message: any) {
+    // Save to messages subcollection
+    const messagesRef = collection(db, 'chats', chatId, 'messages');
+    await addDoc(messagesRef, {
+        ...message,
+        timestamp: serverTimestamp()
+    });
+
+    // Update the parent chat's updatedAt
+    const chatRef = doc(db, 'chats', chatId);
+    await updateDoc(chatRef, {
+        updatedAt: serverTimestamp()
+    });
+}
+
+export function listenToMessages(chatId: string, callback: (messages: any[]) => void) {
+    const q = query(
+        collection(db, 'chats', chatId, 'messages'),
+        orderBy('timestamp', 'asc')
+    );
+    return onSnapshot(q, (snapshot) => {
+        const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(messages);
+    });
+}
+
+export async function updateChatMetadata(chatId: string, data: any) {
+    const chatRef = doc(db, 'chats', chatId);
+    await updateDoc(chatRef, {
+        ...data,
+        updatedAt: serverTimestamp()
+    });
+}
+
+export function listenToUserChats(userId: string, callback: (chats: any[]) => void) {
+    const q = query(
+        collection(db, 'chats'),
+        where('userId', '==', userId)
+    );
+    return onSnapshot(q, (snapshot) => {
+        const chats = snapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .sort((a: any, b: any) => {
+                const dateA = a.updatedAt?.seconds || 0;
+                const dateB = b.updatedAt?.seconds || 0;
+                return dateB - dateA;
+            });
+        callback(chats);
+    });
+}
+
+export async function deleteChat(chatId: string) {
+    const chatRef = doc(db, 'chats', chatId);
+    await deleteDoc(chatRef);
+}

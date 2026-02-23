@@ -11,3 +11,14 @@ node_modules/
 tsconfig.tsbuildinfo
 *-firebase-adminsdk-*.json
 *.local
+# PWA
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+public/worker-*.js
+public/worker-*.js.map
+public/fallback-*.js
+public/fallback-*.js.map
+public/swe-*.js
+public/swe-*.js.map

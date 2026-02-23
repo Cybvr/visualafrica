@@ -1,46 +1,119 @@
 "use client"
 
-import React from "react";
+import { SharedEvent } from "@/lib/types";
 import { Badge } from "./chat-elements";
 
-export const EventOverviewCard = () => (
-    <div className="bg-muted border border-border rounded-xl p-4 mt-3.5">
-        <div className="flex justify-between items-start mb-3">
-            <div>
-                <div className="font-display text-base text-foreground">Harrington Wedding</div>
-                <div className="text-xs text-muted-foreground mt-0.5">Created Feb 2 · Last updated 3 days ago</div>
-            </div>
-            <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">On Track</Badge>
-        </div>
+interface EventOverviewCardProps {
+    event?: SharedEvent;
+}
 
-        <div className="grid grid-cols-2 gap-2.5 mb-3.5">
-            {[
-                ["Date", "June 14, 2026"], ["Venue", "Sunstone Winery"],
-                ["Guest count", "178 confirmed"], ["Budget", "$48,500 / $55,000"],
-                ["Planner", "Sophie H."], ["Days out", "113 days"],
-            ].map(([label, val]) => (
-                <div key={label}>
-                    <div className="text-[10px] tracking-widest uppercase text-muted-foreground mb-0.5">{label}</div>
-                    <div className="text-[13px] text-foreground">{val}</div>
+export const EventOverviewCard = ({ event }: EventOverviewCardProps) => {
+    const formatDate = (dateStr?: string) => {
+        if (!dateStr) return "-";
+        try {
+            return new Date(dateStr).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        } catch (e) {
+            return dateStr;
+        }
+    };
+
+    const formatCurrency = (amount?: number) => {
+        if (amount === undefined || amount === null) return "-";
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(amount);
+    };
+
+    const calculateDaysOut = (dateStr?: string) => {
+        if (!dateStr) return "-";
+        try {
+            const eventDate = new Date(dateStr);
+            const today = new Date();
+            const diffTime = eventDate.getTime() - today.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays > 0 ? `${diffDays} days` : "Passed";
+        } catch (e) {
+            return "-";
+        }
+    };
+
+    const allocatedBudget = event?.bookedVendors?.reduce((acc, vendor) => {
+        const amount = parseFloat(vendor.amount.replace(/[^0-9.]/g, '')) || 0;
+        return acc + amount;
+    }, 0) || 0;
+
+    const budgetPercent = event?.budget ? Math.min(Math.round((allocatedBudget / event.budget) * 100), 100) : 0;
+
+    const budgetDisplay = () => {
+        if (!event?.budget && allocatedBudget === 0) return "-";
+        if (!event?.budget) return formatCurrency(allocatedBudget);
+        return `${formatCurrency(allocatedBudget)} / ${formatCurrency(event.budget)}`;
+    };
+
+    return (
+        <div className="bg-muted border border-border rounded-xl p-4 mt-3.5">
+            <div className="flex justify-between items-start mb-3">
+                <div>
+                    <div className="font-display text-base text-foreground">{event?.eventName || "-"}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                        {event ? `Status: ${event.status}` : "No event selected"}
+                    </div>
                 </div>
-            ))}
-        </div>
+                {event && (
+                    <Badge className={
+                        event.status === 'Confirmed' ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30" :
+                            event.status === 'Planning' ? "bg-blue-500/10 text-blue-600 border-blue-500/30" :
+                                "bg-slate-500/10 text-slate-600 border-slate-500/30"
+                    }>
+                        {event.status}
+                    </Badge>
+                )}
+            </div>
 
-        <div className="bg-card border border-border rounded-xl p-3.5">
-            <div className="flex justify-between mb-2">
-                <span className="text-[10px] tracking-widest uppercase text-muted-foreground">Budget Allocated</span>
-                <span className="font-display text-sm text-foreground">88%</span>
-            </div>
-            <div className="h-1 bg-muted rounded-full overflow-hidden mb-2.5">
-                <div className="h-full w-[88%] bg-primary rounded-full" />
-            </div>
-            <div className="flex flex-wrap gap-3.5">
-                {[["Venue", "$18,200"], ["Catering", "$14,800"], ["Florals", "$6,400"], ["Music", "$4,200"], ["Photo", "$4,900"]].map(([k, v]) => (
-                    <span key={k} className="text-[11px] text-muted-foreground">
-                        {k} <span className="text-foreground">{v}</span>
-                    </span>
+            <div className="grid grid-cols-2 gap-2.5 mb-3.5">
+                {[
+                    ["Date", formatDate(event?.date)],
+                    ["Venue", event?.location || "-"],
+                    ["Guest count", event?.guestCount ? `${event.guestCount} guests` : "-"],
+                    ["Budget", budgetDisplay()],
+                    ["Planner", event?.hostName || "-"],
+                    ["Days out", calculateDaysOut(event?.date)],
+                ].map(([label, val]) => (
+                    <div key={label}>
+                        <div className="text-[10px] tracking-widest uppercase text-muted-foreground mb-0.5">{label}</div>
+                        <div className="text-[13px] text-foreground">{val}</div>
+                    </div>
                 ))}
             </div>
+
+            <div className="bg-card border border-border rounded-xl p-3.5">
+                <div className="flex justify-between mb-2">
+                    <span className="text-[10px] tracking-widest uppercase text-muted-foreground">Budget Allocated</span>
+                    <span className="font-display text-sm text-foreground">{budgetPercent}%</span>
+                </div>
+                <div className="h-1 bg-muted rounded-full overflow-hidden mb-2.5">
+                    <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${budgetPercent}%` }} />
+                </div>
+                <div className="flex flex-wrap gap-3.5">
+                    {event?.bookedVendors && event.bookedVendors.length > 0 ? (
+                        event.bookedVendors.map((v, i) => (
+                            <span key={i} className="text-[11px] text-muted-foreground">
+                                {v.service} <span className="text-foreground">{v.amount}</span>
+                            </span>
+                        ))
+                    ) : (
+                        <span className="text-[11px] text-muted-foreground italic">No vendors booked yet</span>
+                    )}
+                </div>
+            </div>
         </div>
-    </div>
-);
+    );
+};
+

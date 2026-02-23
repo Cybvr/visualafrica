@@ -1,74 +1,102 @@
 "use client"
 
 import { useState } from "react";
+import { SharedEvent } from "@/lib/types";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
+import { ListChecks } from "lucide-react";
 
-export const TaskChecklist = () => {
-    const [checked, setChecked] = useState<Set<string>>(new Set(["venue", "dj", "invites", "makeup", "officiant"]));
-    const toggle = (id: string) => setChecked(prev => {
-        const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n;
-    });
+interface TaskChecklistProps {
+    events?: SharedEvent[];
+    selectedEventId?: string | null;
+    onEventChange?: (id: string) => void;
+}
 
-    const sections = [
-        {
-            label: "🔴 Overdue / This Week",
-            items: [
-                { id: "photo-contract", text: <>Sign photography contract — deposit due <strong>Mar 25</strong></> },
-                { id: "catering-menu", text: "Confirm final menu selections with Harvest Table Catering" },
-            ],
-        },
-        {
-            label: "🟡 Next 30 Days",
-            items: [
-                { id: "floral", text: "Finalize floral mockup review with Bloom & Branch (Apr 10 deadline)" },
-                { id: "rsvp", text: "Send RSVP reminder #2 — currently 142/178 responded" },
-                { id: "hotel", text: "Book hotel room block — The Inn at Napa Valley" },
-                { id: "shuttle", text: "Confirm shuttle logistics between venue and hotel" },
-                { id: "favors", text: "Order wedding favors — decision needed on packaging" },
-            ],
-        },
-        {
-            label: "✅ Completed",
-            items: [
-                { id: "venue", text: "Venue contract signed — Sunstone Winery" },
-                { id: "dj", text: "DJ booked — Echo Sound (reception)" },
-                { id: "invites", text: "Invitations sent — Mar 12" },
-                { id: "makeup", text: "Hair & makeup artist booked (bridal party)" },
-                { id: "officiant", text: "Officiant confirmed" },
-            ],
-        },
-    ];
+export const TaskChecklist = ({ events = [], selectedEventId, onEventChange }: TaskChecklistProps) => {
+    const [items, setItems] = useState<string[]>([
+        "Sign photography contract — deposit due Mar 25",
+        "Confirm final menu selections with Harvest Table Catering",
+        "Finalize floral mockup review with Bloom & Branch",
+        "Send RSVP reminder #2",
+        "Book hotel room block — The Inn at Napa Valley",
+        "Confirm shuttle logistics between venue and hotel",
+        "Order wedding favors — finalize packaging",
+    ]);
+    const [newItem, setNewItem] = useState("");
+
+    const handleAddItem = () => {
+        const next = newItem.trim();
+        if (!next) return;
+        setItems(prev => [...prev, next]);
+        setNewItem("");
+    };
 
     return (
-        <div className="mt-3.5 flex flex-col gap-3.5">
-            {sections.map(s => (
-                <div key={s.label}>
-                    <div className="text-[11px] tracking-widest uppercase text-muted-foreground mb-2">{s.label}</div>
-                    <div className="flex flex-col gap-1.5">
-                        {s.items.map(item => {
-                            const done = checked.has(item.id);
-                            return (
-                                <div
-                                    key={item.id}
-                                    onClick={() => toggle(item.id)}
-                                    className="flex items-start gap-2.5 text-[13px] cursor-pointer leading-relaxed"
-                                >
-                                    <div className={`w-4 h-4 rounded flex-shrink-0 mt-0.5 flex items-center justify-center text-[9px] transition-all border-[1.5px]
-                    ${done
-                                            ? "bg-primary/10 border-primary/40 text-primary"
-                                            : "bg-transparent border-border text-primary"
-                                        }`}
-                                    >
-                                        {done ? "✓" : ""}
-                                    </div>
-                                    <span className={done ? "text-muted-foreground line-through" : "text-foreground"}>
-                                        {item.text}
-                                    </span>
-                                </div>
-                            );
-                        })}
+        <div className="space-y-4 shadow-sm">
+            {events.length > 0 && (
+                <div className="flex items-center gap-2 mb-2">
+                    <Select value={selectedEventId || undefined} onValueChange={onEventChange}>
+                        <SelectTrigger className="w-full h-8 bg-secondary/30 border-border text-[12px] font-medium rounded-lg">
+                            <div className="flex items-center gap-2">
+                                <ListChecks size={14} className="text-primary" />
+                                <SelectValue placeholder="Context: Select Event" />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {events.map((ev) => (
+                                <SelectItem key={ev.id} value={ev.id} className="text-[12px]">
+                                    {ev.eventName}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            )}
+
+            {!selectedEventId ? (
+                <div className="py-8 px-4 border border-dashed border-border rounded-xl bg-secondary/10 flex flex-col items-center justify-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-secondary/30 flex items-center justify-center text-primary">
+                        <ListChecks size={20} />
+                    </div>
+                    <div className="text-[13px] font-medium text-foreground">No Event Selected</div>
+                    <div className="text-[11px] text-muted-foreground max-w-[200px]">
+                        Select an event from the dropdown above to view its task checklist.
                     </div>
                 </div>
-            ))}
+            ) : (
+                <div className="flex flex-col gap-3.5 animate-in fade-in slide-in-from-top-2 duration-500">
+                    <div className="flex items-center gap-2">
+                        <input
+                            value={newItem}
+                            onChange={(e) => setNewItem(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === "Enter") handleAddItem(); }}
+                            placeholder="Add to-do item..."
+                            className="h-8 w-full rounded-lg border border-border bg-secondary/20 px-3 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                        />
+                        <button
+                            onClick={handleAddItem}
+                            disabled={!newItem.trim()}
+                            className="h-8 px-3 rounded-lg border border-border bg-card text-[12px] font-medium text-foreground hover:bg-secondary transition-colors disabled:opacity-50"
+                        >
+                            Add
+                        </button>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        {items.map((item, idx) => (
+                            <div key={`${item}-${idx}`} className="flex items-start gap-2.5 text-[13px] leading-relaxed">
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 shrink-0" />
+                                <span className="text-foreground font-medium">{item}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

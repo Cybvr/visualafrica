@@ -49,7 +49,7 @@ export function AmaSection() {
 
         <div className="rounded-3xl border border-border bg-card p-5 shadow-lg">
           <div className="mb-4 flex items-center gap-3 border-b border-border pb-4">
-            <img src="/images/ama.png" alt="Ama" className="h-10 w-10 rounded-full object-cover" />
+            <img src="/images/logo.png" alt="Ama" className="h-10 w-10 rounded-full object-cover" />
             <div>
               <p className="text-sm font-bold text-foreground">Ama</p>
               <p className="text-xs text-muted-foreground">Online now</p>

@@ -19,6 +19,5 @@ export interface VendorOption {
 export interface TimelineEntry {
     time: string;
     label: string;
-    done?: boolean;
     note?: string;
 }

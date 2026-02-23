@@ -34,13 +34,24 @@ export const metadata: Metadata = {
   title: 'Waddi | Lagos\'s Trusted Event Planner Marketplace',
   description:
     'Connect with the finest event vendors in Lagos. Browse inspiring video reels, select vendors and receive quotes effortlessly. Plan weddings, corporate events, kids parties, and more.',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Waddi',
+  },
+  formatDetection: {
+    telephone: false,
+  },
 }
 
 export const viewport: Viewport = {
   themeColor: '#7d3aed',
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
+
 
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { AuthProvider } from '@/components/providers/auth-provider'
