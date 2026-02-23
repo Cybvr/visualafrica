@@ -1132,6 +1132,14 @@ export default function ChatPage() {
                     onPublish={async (data) => {
                         const chatIdStr = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
                         if (chatIdStr !== 'new') {
+                            // Resolve publisherName: check saved nickname first
+                            let publisherName = currentUser?.displayName || currentUser?.email || "Anonymous";
+                            if (currentUser?.uid) {
+                                const profileSnap = await getDoc(doc(db, 'userProfiles', currentUser.uid));
+                                if (profileSnap.exists() && profileSnap.data().nickname) {
+                                    publisherName = profileSnap.data().nickname;
+                                }
+                            }
                             const newMetaData = {
                                 published: true,
                                 title: data.title,
