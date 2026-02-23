@@ -79,7 +79,9 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
                     {v.tags.map((t: string) => <span key={t} className="bg-secondary text-muted-foreground text-[11px] rounded px-1.5 py-0.5">{t}</span>)}
                 </div>
                 <div className="flex justify-between items-center mt-2">
-                    <span className="text-primary font-bold text-sm">{v.price}</span>
+                    <span className="text-primary font-bold text-sm">
+                        {v.price && !String(v.price).includes('$') && !isNaN(Number(String(v.price).replace(/[^0-9.]/g, ''))) ? `$${v.price}` : v.price}
+                    </span>
                     {!showActions && (
                         <span className="text-muted-foreground hover:text-foreground transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
                             Actions <ChevronDown size={12} />
@@ -349,7 +351,9 @@ function StoreCard({ item, onAction }: { item: any; onAction?: (action: string, 
                         <div className="text-muted-foreground text-[11px] uppercase tracking-wider font-mono">{item.city}</div>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <span className="bg-primary/10 text-primary text-[11px] font-semibold rounded-full px-2 py-0.5">{item.price}</span>
+                        <span className="bg-primary/10 text-primary text-[11px] font-semibold rounded-full px-2 py-0.5">
+                            {item.price && !String(item.price).includes('$') && !isNaN(Number(String(item.price).replace(/[^0-9.]/g, ''))) ? `$${item.price}` : item.price}
+                        </span>
                     </div>
                 </div>
 
@@ -436,9 +440,10 @@ type MsgProps = {
     liveEvents: SharedEvent[];
     selectedEventId: string | null;
     onEventSelect: (id: string | null) => void;
+    onUpgradeToPro?: () => void;
 };
 
-export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onStoreAction, onSuggestion, allVendorsByCity, onFormSubmit, onCalendarSelect, liveEvents, selectedEventId, onEventSelect }: MsgProps) {
+export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onStoreAction, onSuggestion, allVendorsByCity, onFormSubmit, onCalendarSelect, liveEvents, selectedEventId, onEventSelect, onUpgradeToPro }: MsgProps) {
     const ag = msg.role === "agent";
     return (
         <div className={cn("flex gap-3.5 mb-6", ag ? "flex-row items-start" : "flex-row-reverse items-start")}>
@@ -537,11 +542,21 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                         </div>
                     ) : msg.type === "todo" ? (
                         <div className="w-full mt-1">
-                            <TaskChecklist events={liveEvents} selectedEventId={selectedEventId} onEventChange={onEventSelect} />
+                            <TaskChecklist
+                                events={liveEvents}
+                                selectedEventId={selectedEventId}
+                                onEventChange={onEventSelect}
+                                onUpgradeToPro={onUpgradeToPro}
+                            />
                         </div>
                     ) : msg.type === "timeline" ? (
                         <div className="w-full mt-1">
-                            <DayOfTimeline events={liveEvents} selectedEventId={selectedEventId} onEventChange={onEventSelect} />
+                            <DayOfTimeline
+                                events={liveEvents}
+                                selectedEventId={selectedEventId}
+                                onEventChange={onEventSelect}
+                                onUpgradeToPro={onUpgradeToPro}
+                            />
                         </div>
                     ) : msg.type === "vendors" ? (
                         <div className="w-full mt-1">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { SharedEvent } from "@/lib/types";
 import { updateEvent } from "@/lib/firestore-service";
+import { processGeminiChat } from "@/app/actions/gemini-chat";
 import {
     Select,
     SelectContent,
@@ -16,22 +17,18 @@ interface TaskChecklistProps {
     events?: SharedEvent[];
     selectedEventId?: string | null;
     onEventChange?: (id: string) => void;
+    onUpgradeToPro?: () => void;
 }
 
-const DEFAULT_TASKS = [
-    "Sign photography contract — deposit due Mar 25",
-    "Confirm final menu selections with Harvest Table Catering",
-    "Finalize floral mockup review with Bloom & Branch",
-    "Send RSVP reminder #2",
-    "Book hotel room block — The Inn at Napa Valley",
-    "Confirm shuttle logistics between venue and hotel",
-    "Order wedding favors — finalize packaging",
-];
-
-export const TaskChecklist = ({ events = [], selectedEventId, onEventChange }: TaskChecklistProps) => {
+export const TaskChecklist = ({ events = [], selectedEventId, onEventChange, onUpgradeToPro }: TaskChecklistProps) => {
     const selectedEvent = events.find(e => e.id === selectedEventId);
     const [items, setItems] = useState<string[]>([]);
     const [newItem, setNewItem] = useState("");
+    const [isSuggesting, setIsSuggesting] = useState(false);
+    const [suggestError, setSuggestError] = useState<string | null>(null);
+    const AI_SUGGESTION_LIMIT = 3;
+    const usedSuggestions = Number(selectedEvent?.aiTodoSuggestionsUsed || 0);
+    const remainingSuggestions = Math.max(0, AI_SUGGESTION_LIMIT - usedSuggestions);
 
     // Initialize items from event data or default
     useEffect(() => {
@@ -66,6 +63,69 @@ export const TaskChecklist = ({ events = [], selectedEventId, onEventChange }: T
             await updateEvent(selectedEventId, { todoList: updatedItems });
         } catch (err) {
             console.error("Failed to delete task", err);
+        }
+    };
+
+    const handleSuggestTasks = async () => {
+        if (!selectedEventId || !selectedEvent || remainingSuggestions <= 0 || isSuggesting) return;
+        setIsSuggesting(true);
+        setSuggestError(null);
+
+        try {
+            const result = await processGeminiChat(
+                [{
+                    role: "user",
+                    parts: [{
+                        text: `Suggest up to ${remainingSuggestions} practical next todo items for this event.
+Event: ${selectedEvent.eventName}
+City: ${selectedEvent.location}
+Guests: ${selectedEvent.guestCount}
+Budget: ${selectedEvent.budget}
+Existing tasks: ${items.length > 0 ? items.join(" | ") : "none"}
+
+Rules:
+- Use add_todo_item function calls only.
+- Return at most ${remainingSuggestions} calls.
+- Do not duplicate existing tasks.
+- Keep each item short and specific.`
+                    }]
+                }],
+                { forceFunctionCall: true, allowedFunctionNames: ["add_todo_item"] }
+            );
+
+            if (!result || result.type !== "function_call") {
+                setSuggestError("AI could not generate suggestions right now.");
+                return;
+            }
+
+            const calls = ((result as any).functionCalls || [])
+                .filter((call: any) => call?.name === "add_todo_item")
+                .map((call: any) => String(call?.args?.item || "").trim())
+                .filter((item: string) => !!item);
+
+            const deduped = calls.filter((item: string, idx: number) =>
+                calls.findIndex((x: string) => x.toLowerCase() === item.toLowerCase()) === idx
+                && !items.some(existing => existing.toLowerCase() === item.toLowerCase())
+            );
+            const toAdd = deduped.slice(0, remainingSuggestions);
+
+            if (toAdd.length === 0) {
+                setSuggestError("No new tasks found. Try again after updating your event details.");
+                return;
+            }
+
+            const updatedItems = [...items, ...toAdd];
+            const nextUsed = usedSuggestions + toAdd.length;
+            setItems(updatedItems);
+            await updateEvent(selectedEventId, {
+                todoList: updatedItems,
+                aiTodoSuggestionsUsed: nextUsed
+            });
+        } catch (err) {
+            console.error("Failed to suggest todo items", err);
+            setSuggestError("AI request failed. Please try again.");
+        } finally {
+            setIsSuggesting(false);
         }
     };
 
@@ -120,6 +180,22 @@ export const TaskChecklist = ({ events = [], selectedEventId, onEventChange }: T
                         </button>
                     </div>
 
+                    {remainingSuggestions <= 0 && (
+                        <div className="text-[11px] flex items-center justify-between gap-2 rounded-lg border border-amber-400/30 bg-amber-50/40 px-3 py-2">
+                            <span className="text-amber-700">Free limit reached. Upgrade for unlimited AI task suggestions.</span>
+                            <button
+                                onClick={onUpgradeToPro}
+                                className="shrink-0 h-7 px-2.5 rounded-md border border-amber-500/40 bg-white text-[11px] font-semibold text-amber-700 hover:bg-amber-100/50 transition-colors"
+                            >
+                                Switch to Waddi Pro
+                            </button>
+                        </div>
+                    )}
+
+                    {suggestError && (
+                        <div className="text-[11px] text-destructive">{suggestError}</div>
+                    )}
+
                     <div className="flex flex-col gap-1.5">
                         {items.length > 0 ? (
                             items.map((item, idx) => (
@@ -142,6 +218,16 @@ export const TaskChecklist = ({ events = [], selectedEventId, onEventChange }: T
                             </div>
                         )}
                     </div>
+
+                    <button
+                        onClick={handleSuggestTasks}
+                        disabled={isSuggesting || remainingSuggestions <= 0}
+                        className="h-8 w-full rounded-lg border border-border bg-secondary/40 text-[12px] font-medium text-foreground hover:bg-secondary transition-colors disabled:opacity-50"
+                    >
+                        {remainingSuggestions > 0
+                            ? (isSuggesting ? "Suggesting..." : `Suggest Next Tasks (${remainingSuggestions} left)`)
+                            : "Limit Reached"}
+                    </button>
                 </div>
             )}
         </div>

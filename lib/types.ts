@@ -137,6 +137,8 @@ export interface SharedEvent {
     }[];
     todoList?: string[];
     itineraryItems?: TimelineEntry[];
+    aiTodoSuggestionsUsed?: number;
+    aiItinerarySuggestionsUsed?: number;
 }
 
 export interface TimelineEntry {

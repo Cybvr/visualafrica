@@ -77,7 +77,7 @@ export default function ChatPage() {
     }, []);
 
     const handlePillClick = async (pill: any) => {
-        // If pill has an explicit action, route through the logic engine
+        // If pill has an explicit action, route through the action dispatcher
         if (pill.action) {
             const userContent = pill.id === 'store' ? "Browse Store" : (pill.action === 'vendor_search' ? "Show me vendors" : `Show me ${pill.label.toLowerCase()}`);
             send(userContent, pill);
@@ -494,6 +494,7 @@ export default function ChatPage() {
                                 liveEvents={liveEvents}
                                 selectedEventId={selectedEventId}
                                 onEventSelect={setSelectedEventId}
+                                onUpgradeToPro={() => setIsPricingOpen(true)}
                             />
                         </div>
                     ))}

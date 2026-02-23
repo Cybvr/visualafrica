@@ -400,15 +400,71 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
     };
 
     const handleGeminiAction = async (text: string, chatIdOverride?: string) => {
-        const modelHistory = [...messages, { role: "user", content: text }]
+        const getNaturalReply = async (history: { role: string; parts: { text: string }[] }[]) => {
+            const reply = await processGeminiChat(history);
+            const replyText = reply?.text && String(reply.text).trim();
+            if (replyText) return replyText;
+
+            // Retry once with a direct prompt to force a plain conversational response.
+            const retry = await processGeminiChat([
+                ...history,
+                {
+                    role: "user",
+                    parts: [{ text: `Reply naturally to this message in one short paragraph: "${text}"` }]
+                }
+            ]);
+            return retry?.text && String(retry.text).trim() ? String(retry.text).trim() : null;
+        };
+
+        const rawModelHistory = [...messages, { role: "user", content: text }]
             .slice(-14)
             .map((m: any) => ({
                 role: m.role === "user" ? "user" : "model",
                 parts: [{ text: String(m.content || "").trim() || `[${m.type || "message"}]` }]
             }));
+        const firstUserIndex = rawModelHistory.findIndex((m: any) => m.role === "user");
+        const modelHistory =
+            firstUserIndex >= 0
+                ? rawModelHistory.slice(firstUserIndex)
+                : [{ role: "user", parts: [{ text }] }];
 
         const geminiResult = await processGeminiChat(modelHistory);
-        if (!geminiResult || geminiResult.type !== "function_call") {
+        if (!geminiResult) {
+            const fallbackText = await getNaturalReply(modelHistory);
+            if (fallbackText) {
+                await persistAgentMessage({ type: "text", content: fallbackText }, chatIdOverride);
+                return true;
+            }
+            return false;
+        }
+
+        if (geminiResult.type === "error") {
+            console.error("Gemini request failed in chat hook:", (geminiResult as any).error || geminiResult);
+            return false;
+        }
+
+        if (geminiResult.type !== "function_call") {
+            const plainText = geminiResult.text && String(geminiResult.text).trim();
+            if (plainText) {
+                await persistAgentMessage(
+                    {
+                        type: "text",
+                        content: plainText,
+                        suggestions: [
+                            { label: "Start Plan", action: "start_planning" },
+                            { label: "Discover Vendors", action: "vendor_search" },
+                            { label: "View Todo", action: "todo" }
+                        ]
+                    },
+                    chatIdOverride
+                );
+                return true;
+            }
+            const fallbackText = await getNaturalReply(modelHistory);
+            if (fallbackText) {
+                await persistAgentMessage({ type: "text", content: fallbackText }, chatIdOverride);
+                return true;
+            }
             return false;
         }
 
@@ -506,9 +562,24 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
     const send = async (text: string, actionData?: any) => {
         if (!text.trim()) return;
         const nowStr = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+        const hasExplicitAction = Boolean(actionData?.action || actionData?.id);
 
         let chatIdStr = getRouteChatId();
         const isNew = chatIdStr === "new" || chatIdStr.startsWith("task-");
+
+        if (isNew && !currentUser) {
+            setMessages((prev) => [...prev, { id: Date.now().toString(), role: "user", content: text, time: nowStr }]);
+            if (hasExplicitAction) {
+                dispatchLogic(text, actionData);
+            } else {
+                await addAgentMsg({
+                    type: "text",
+                    content: "AI request failed. Open Chrome DevTools Console to see the exact Gemini error."
+                });
+            }
+            setInput("");
+            return;
+        }
 
         if (isNew && currentUser) {
             const newChatId = await createChat(currentUser.uid, text.substring(0, 30), activeCity);
@@ -518,9 +589,23 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             }
 
             await saveChatMessage(newChatId, { role: "user", content: text, time: nowStr });
-            const geminiHandled = await handleGeminiAction(text, newChatId);
-            if (!geminiHandled) {
+            if (hasExplicitAction) {
                 dispatchLogic(text, actionData, newChatId);
+                router.push(`/dashboard/hosts/chat/${newChatId}`);
+                setInput("");
+                return;
+            }
+            const geminiHandled = await handleGeminiAction(text, newChatId);
+            if (!geminiHandled && actionData) {
+                dispatchLogic(text, actionData, newChatId);
+            } else if (!geminiHandled) {
+                await persistAgentMessage(
+                    {
+                        type: "text",
+                        content: "AI request failed. Open Chrome DevTools Console to see the exact Gemini error."
+                    },
+                    newChatId
+                );
             }
 
             router.push(`/dashboard/hosts/chat/${newChatId}`);
@@ -530,9 +615,22 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
 
         if (chatIdStr !== "new") {
             await saveChatMessage(chatIdStr, { role: "user", content: text, time: nowStr });
-            const geminiHandled = await handleGeminiAction(text, chatIdStr);
-            if (!geminiHandled) {
+            if (hasExplicitAction) {
                 dispatchLogic(text, actionData, chatIdStr);
+                setInput("");
+                return;
+            }
+            const geminiHandled = await handleGeminiAction(text, chatIdStr);
+            if (!geminiHandled && actionData) {
+                dispatchLogic(text, actionData, chatIdStr);
+            } else if (!geminiHandled) {
+                await persistAgentMessage(
+                    {
+                        type: "text",
+                        content: "AI request failed. Open Chrome DevTools Console to see the exact Gemini error."
+                    },
+                    chatIdStr
+                );
             }
         }
 

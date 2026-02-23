@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { TimelineEntry, SharedEvent } from "@/lib/types";
 import { updateEvent } from "@/lib/firestore-service";
+import { processGeminiChat } from "@/app/actions/gemini-chat";
 import {
     Select,
     SelectContent,
@@ -16,13 +17,19 @@ interface DayOfTimelineProps {
     events?: SharedEvent[];
     selectedEventId?: string | null;
     onEventChange?: (id: string) => void;
+    onUpgradeToPro?: () => void;
 }
 
-export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange }: DayOfTimelineProps) => {
+export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange, onUpgradeToPro }: DayOfTimelineProps) => {
     const selectedEvent = events.find(e => e.id === selectedEventId);
     const [entries, setEntries] = useState<TimelineEntry[]>([]);
     const [newTime, setNewTime] = useState("");
     const [newLabel, setNewLabel] = useState("");
+    const [isSuggesting, setIsSuggesting] = useState(false);
+    const [suggestError, setSuggestError] = useState<string | null>(null);
+    const AI_SUGGESTION_LIMIT = 3;
+    const usedSuggestions = Number(selectedEvent?.aiItinerarySuggestionsUsed || 0);
+    const remainingSuggestions = Math.max(0, AI_SUGGESTION_LIMIT - usedSuggestions);
 
     // Initialize entries from event data
     useEffect(() => {
@@ -59,6 +66,82 @@ export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange }: D
             await updateEvent(selectedEventId, { itineraryItems: updatedEntries });
         } catch (err) {
             console.error("Failed to delete itinerary entry", err);
+        }
+    };
+
+    const handleSuggestSlots = async () => {
+        if (!selectedEventId || !selectedEvent || remainingSuggestions <= 0 || isSuggesting) return;
+        setIsSuggesting(true);
+        setSuggestError(null);
+
+        try {
+            const result = await processGeminiChat(
+                [{
+                    role: "user",
+                    parts: [{
+                        text: `Suggest up to ${remainingSuggestions} realistic itinerary slots for this event.
+Event: ${selectedEvent.eventName}
+Date: ${selectedEvent.date || "not set"}
+City: ${selectedEvent.location}
+Guests: ${selectedEvent.guestCount}
+Budget: ${selectedEvent.budget}
+Existing itinerary: ${entries.length > 0 ? entries.map((e) => `${e.time} ${e.label}`).join(" | ") : "none"}
+
+Rules:
+- Use add_itinerary_item function calls only.
+- Return at most ${remainingSuggestions} calls.
+- Include a clear time and label.
+- Avoid duplicates with existing itinerary items.`
+                    }]
+                }],
+                { forceFunctionCall: true, allowedFunctionNames: ["add_itinerary_item"] }
+            );
+
+            if (!result || result.type !== "function_call") {
+                setSuggestError("AI could not generate itinerary slots right now.");
+                return;
+            }
+
+            const slots: TimelineEntry[] = ((result as any).functionCalls || [])
+                .filter((call: any) => call?.name === "add_itinerary_item")
+                .map((call: any) => {
+                    const time = String(call?.args?.time || "").trim();
+                    const label = String(call?.args?.label || "").trim();
+                    const note = String(call?.args?.note || "").trim();
+                    if (!time || !label) return null;
+                    return note ? { time, label, note } : { time, label };
+                })
+                .filter(Boolean);
+
+            const deduped = slots.filter((slot: TimelineEntry, idx: number) =>
+                slots.findIndex((x: TimelineEntry) =>
+                    x.time.toLowerCase() === slot.time.toLowerCase() &&
+                    x.label.toLowerCase() === slot.label.toLowerCase()
+                ) === idx &&
+                !entries.some((existing) =>
+                    existing.time.toLowerCase() === slot.time.toLowerCase() &&
+                    existing.label.toLowerCase() === slot.label.toLowerCase()
+                )
+            );
+
+            const toAdd = deduped.slice(0, remainingSuggestions);
+            if (toAdd.length === 0) {
+                setSuggestError("No new slots found. Try again after adding more event details.");
+                return;
+            }
+
+            const updatedEntries = [...entries, ...toAdd];
+            const nextUsed = usedSuggestions + toAdd.length;
+            setEntries(updatedEntries);
+            await updateEvent(selectedEventId, {
+                itineraryItems: updatedEntries,
+                aiItinerarySuggestionsUsed: nextUsed
+            });
+        } catch (err) {
+            console.error("Failed to suggest itinerary slots", err);
+            setSuggestError("AI request failed. Please try again.");
+        } finally {
+            setIsSuggesting(false);
         }
     };
 
@@ -149,6 +232,32 @@ export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange }: D
                             </div>
                         )}
                     </div>
+
+                    <button
+                        onClick={handleSuggestSlots}
+                        disabled={isSuggesting || remainingSuggestions <= 0}
+                        className="h-8 w-full rounded-lg border border-border bg-secondary/40 text-[12px] font-medium text-foreground hover:bg-secondary transition-colors disabled:opacity-50"
+                    >
+                        {remainingSuggestions > 0
+                            ? (isSuggesting ? "Suggesting..." : `Suggest Next Slots (${remainingSuggestions} left)`)
+                            : "Limit Reached"}
+                    </button>
+
+                    {remainingSuggestions <= 0 && (
+                        <div className="text-[11px] flex items-center justify-between gap-2 rounded-lg border border-amber-400/30 bg-amber-50/40 px-3 py-2">
+                            <span className="text-amber-700">Free limit reached. Upgrade for unlimited AI itinerary suggestions.</span>
+                            <button
+                                onClick={onUpgradeToPro}
+                                className="shrink-0 h-7 px-2.5 rounded-md border border-amber-500/40 bg-white text-[11px] font-semibold text-amber-700 hover:bg-amber-100/50 transition-colors"
+                            >
+                                Switch to Waddi Pro
+                            </button>
+                        </div>
+                    )}
+
+                    {suggestError && (
+                        <div className="text-[11px] text-destructive">{suggestError}</div>
+                    )}
                 </div>
             )}
         </div>
