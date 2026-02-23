@@ -135,6 +135,14 @@ export interface SharedEvent {
         status: 'Confirmed' | 'Pending' | 'Declined';
         type: 'Main Guest' | 'Plus One' | 'VIP';
     }[];
+    todoList?: string[];
+    itineraryItems?: TimelineEntry[];
+}
+
+export interface TimelineEntry {
+    time: string;
+    label: string;
+    note?: string;
 }
 
 // ── Blog Types ────────────────────────────────────────────

@@ -9,13 +9,14 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getEventById } from '@/lib/firestore-service';
+import { getEventById, listenToEventById } from '@/lib/firestore-service';
 import { SharedEvent } from '@/lib/types';
 import PlanTab from '@/components/dashboard/event-tabs/PlanTab';
 import GuestsTab from '@/components/dashboard/event-tabs/GuestsTab';
 import VendorsTab from '@/components/dashboard/event-tabs/VendorsTab';
 import ContractsTab from '@/components/dashboard/event-tabs/ContractsTab';
 import InboxTab from '@/components/dashboard/event-tabs/InboxTab';
+import { TaskChecklist, DayOfTimeline } from '@/components/dashboard/chat';
 
 export default function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
@@ -42,17 +43,11 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     };
 
     useEffect(() => {
-        async function loadEvent() {
-            try {
-                const eventData = await getEventById(id);
-                setEvent(eventData);
-            } catch (error) {
-                console.error("Failed to load event:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        }
-        loadEvent();
+        const unsubscribe = listenToEventById(id, (eventData) => {
+            setEvent(eventData);
+            setIsLoading(false);
+        });
+        return () => unsubscribe();
     }, [id]);
 
     if (isLoading) {
@@ -165,6 +160,18 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         >
                             Inbox
                         </TabsTrigger>
+                        <TabsTrigger
+                            value="itinerary"
+                            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm font-medium"
+                        >
+                            Itinerary
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="todo"
+                            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-4 py-2 text-sm font-medium"
+                        >
+                            To-Do List
+                        </TabsTrigger>
                     </TabsList>
 
                     {/* Overview Tab */}
@@ -193,6 +200,24 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     {/* Inbox Tab */}
                     <TabsContent value="inbox">
                         <InboxTab />
+                    </TabsContent>
+
+                    {/* Itinerary Tab */}
+                    <TabsContent value="itinerary" className="py-6">
+                        <DayOfTimeline
+                            events={event ? [event] : []}
+                            selectedEventId={id}
+                            onEventChange={() => { }}
+                        />
+                    </TabsContent>
+
+                    {/* To-Do Tab */}
+                    <TabsContent value="todo" className="py-6">
+                        <TaskChecklist
+                            events={event ? [event] : []}
+                            selectedEventId={id}
+                            onEventChange={() => { }}
+                        />
                     </TabsContent>
                 </Tabs>
             </div>

@@ -58,19 +58,6 @@ export default function JobBrief({ event, service }: JobBriefProps) {
                     </p>
                 </div>
 
-                {event.itinerary && (
-                    <div>
-                        <h3 className="text-base font-black uppercase tracking-widest text-foreground mb-4 flex items-center gap-3">
-                            <div className="w-1.5 h-6 bg-primary rounded-full" />
-                            Itinerary
-                        </h3>
-                        <div className="bg-secondary/20 rounded-[1.5rem] p-6 border border-border/50">
-                            <p className="text-sm text-muted-foreground leading-relaxed font-medium whitespace-pre-wrap">
-                                {event.itinerary}
-                            </p>
-                        </div>
-                    </div>
-                )}
 
                 {event.themes && event.themes.length > 0 && (
                     <div>

@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SharedEvent } from "@/lib/types";
+import { updateEvent } from "@/lib/firestore-service";
 import {
     Select,
     SelectContent,
@@ -9,7 +10,7 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import { ListChecks } from "lucide-react";
+import { ListChecks, Trash2 } from "lucide-react";
 
 interface TaskChecklistProps {
     events?: SharedEvent[];
@@ -17,23 +18,55 @@ interface TaskChecklistProps {
     onEventChange?: (id: string) => void;
 }
 
+const DEFAULT_TASKS = [
+    "Sign photography contract — deposit due Mar 25",
+    "Confirm final menu selections with Harvest Table Catering",
+    "Finalize floral mockup review with Bloom & Branch",
+    "Send RSVP reminder #2",
+    "Book hotel room block — The Inn at Napa Valley",
+    "Confirm shuttle logistics between venue and hotel",
+    "Order wedding favors — finalize packaging",
+];
+
 export const TaskChecklist = ({ events = [], selectedEventId, onEventChange }: TaskChecklistProps) => {
-    const [items, setItems] = useState<string[]>([
-        "Sign photography contract — deposit due Mar 25",
-        "Confirm final menu selections with Harvest Table Catering",
-        "Finalize floral mockup review with Bloom & Branch",
-        "Send RSVP reminder #2",
-        "Book hotel room block — The Inn at Napa Valley",
-        "Confirm shuttle logistics between venue and hotel",
-        "Order wedding favors — finalize packaging",
-    ]);
+    const selectedEvent = events.find(e => e.id === selectedEventId);
+    const [items, setItems] = useState<string[]>([]);
     const [newItem, setNewItem] = useState("");
 
-    const handleAddItem = () => {
+    // Initialize items from event data or default
+    useEffect(() => {
+        if (selectedEvent) {
+            setItems(selectedEvent.todoList || []);
+        } else {
+            setItems([]);
+        }
+    }, [selectedEvent]);
+
+    const handleAddItem = async () => {
         const next = newItem.trim();
-        if (!next) return;
-        setItems(prev => [...prev, next]);
+        if (!next || !selectedEventId) return;
+
+        const updatedItems = [...items, next];
+        setItems(updatedItems);
         setNewItem("");
+
+        try {
+            await updateEvent(selectedEventId, { todoList: updatedItems });
+        } catch (err) {
+            console.error("Failed to update checklist", err);
+            // Revert on failure? For now just log
+        }
+    };
+
+    const handleDeleteItem = async (index: number) => {
+        if (!selectedEventId) return;
+        const updatedItems = items.filter((_, i) => i !== index);
+        setItems(updatedItems);
+        try {
+            await updateEvent(selectedEventId, { todoList: updatedItems });
+        } catch (err) {
+            console.error("Failed to delete task", err);
+        }
     };
 
     return (
@@ -88,12 +121,26 @@ export const TaskChecklist = ({ events = [], selectedEventId, onEventChange }: T
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        {items.map((item, idx) => (
-                            <div key={`${item}-${idx}`} className="flex items-start gap-2.5 text-[13px] leading-relaxed">
-                                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 shrink-0" />
-                                <span className="text-foreground font-medium">{item}</span>
+                        {items.length > 0 ? (
+                            items.map((item, idx) => (
+                                <div key={`${item}-${idx}`} className="flex items-center justify-between group py-1.5 px-2 hover:bg-secondary/20 rounded-lg transition-colors">
+                                    <div className="flex items-start gap-2.5 text-[13px] leading-relaxed">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 shrink-0" />
+                                        <span className="text-foreground font-medium">{item}</span>
+                                    </div>
+                                    <button
+                                        onClick={() => handleDeleteItem(idx)}
+                                        className="opacity-0 group-hover:opacity-100 p-1 hover:text-destructive transition-all"
+                                    >
+                                        <Trash2 size={12} />
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-[11px] text-muted-foreground text-center py-4">
+                                No tasks yet. Start planning!
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
             )}

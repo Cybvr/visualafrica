@@ -34,9 +34,38 @@ export async function getVendorBySlug(slug: string): Promise<Vendor | null> {
     return null;
 }
 
-export async function getEvents(): Promise<SharedEvent[]> {
-    const querySnapshot = await getDocs(collection(db, 'events'));
+export async function getEvents(userId?: string): Promise<SharedEvent[]> {
+    let q = query(collection(db, 'events'));
+    if (userId) {
+        q = query(collection(db, 'events'), where('hostId', '==', userId));
+    }
+    const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as SharedEvent));
+}
+
+export function listenToEvents(userId: string, callback: (events: SharedEvent[]) => void) {
+    const q = query(collection(db, 'events'), where('hostId', '==', userId));
+    return onSnapshot(q, (snapshot) => {
+        const events = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as SharedEvent));
+        callback(events);
+    });
+}
+
+export async function createEvent(eventData: Omit<SharedEvent, 'id'>) {
+    const docRef = await addDoc(collection(db, 'events'), {
+        ...eventData,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+    });
+    return docRef.id;
+}
+
+export async function updateEvent(eventId: string, data: Partial<SharedEvent>) {
+    const docRef = doc(db, 'events', eventId);
+    await updateDoc(docRef, {
+        ...data,
+        updatedAt: serverTimestamp()
+    });
 }
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
@@ -92,8 +121,19 @@ export async function getVendorById(id: string): Promise<Vendor | null> {
 export async function getEventById(id: string): Promise<SharedEvent | null> {
     const docRef = doc(db, 'events', id);
     const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) return docSnap.data() as SharedEvent;
+    if (docSnap.exists()) return { ...docSnap.data(), id: docSnap.id } as SharedEvent;
     return null;
+}
+
+export function listenToEventById(id: string, callback: (event: SharedEvent | null) => void) {
+    const docRef = doc(db, 'events', id);
+    return onSnapshot(docRef, (snapshot) => {
+        if (snapshot.exists()) {
+            callback({ ...snapshot.data(), id: snapshot.id } as SharedEvent);
+        } else {
+            callback(null);
+        }
+    });
 }
 
 // ── Chat Functions ────────────────────────────────────────
@@ -173,16 +213,14 @@ export async function updateChatMetadata(chatId: string, data: any) {
 export function listenToUserChats(userId: string, callback: (chats: any[]) => void) {
     const q = query(
         collection(db, 'chats'),
-        where('userId', '==', userId)
+        where('userId', '==', userId),
+        orderBy('updatedAt', 'desc')
     );
     return onSnapshot(q, (snapshot) => {
         const chats = snapshot.docs
             .map(doc => ({ id: doc.id, ...doc.data() }))
-            .sort((a: any, b: any) => {
-                const dateA = a.updatedAt?.seconds || 0;
-                const dateB = b.updatedAt?.seconds || 0;
-                return dateB - dateA;
-            });
+            // Safety net: skip any docs that don't match this userId
+            .filter((chat: any) => chat.userId === userId);
         callback(chats);
     });
 }

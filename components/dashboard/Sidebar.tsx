@@ -338,15 +338,19 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
 
   useEffect(() => {
     async function loadCounts() {
+      if (!currentUser) {
+        setHostEventsCount(0);
+        return;
+      }
       try {
-        const events = await getEvents();
+        const events = await getEvents(currentUser.uid);
         setHostEventsCount(events.length);
       } catch (error) {
         console.error("Failed to load sidebar event count:", error);
       }
     }
     loadCounts();
-  }, []);
+  }, [currentUser]);
 
   const hostInboxCount = 0;
   const vendorOffersCount = VENDOR_DASHBOARD_DATA.leads.length;

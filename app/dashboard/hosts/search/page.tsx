@@ -201,11 +201,26 @@ export default function DashboardPage() {
   const savedVendorsCount = 0; // Placeholder for now
 
   useEffect(() => {
-    async function fetchData() {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        setDisplayName('');
+        setAllEvents([]);
+        setIsLoading(false);
+        return;
+      }
+
       try {
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        const name = userDoc.exists()
+          ? (userDoc.data().displayName || currentUser.displayName || '')
+          : (currentUser.displayName || '');
+        setDisplayName(name);
+
+        // Fetch remaining data
         const [v, e, b] = await Promise.all([
           getVendors(),
-          getEvents(),
+          getEvents(currentUser.uid),
           getBlogPosts()
         ]);
         setAllVendors(v);
@@ -215,24 +230,6 @@ export default function DashboardPage() {
         console.error("Error fetching dashboard data:", error);
       } finally {
         setIsLoading(false);
-      }
-    }
-    fetchData();
-
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (!currentUser) {
-        setDisplayName('');
-        return;
-      }
-      try {
-        const userDocRef = doc(db, 'users', currentUser.uid);
-        const userDoc = await getDoc(userDocRef);
-        const name = userDoc.exists()
-          ? (userDoc.data().displayName || currentUser.displayName || '')
-          : (currentUser.displayName || '');
-        setDisplayName(name);
-      } catch {
-        setDisplayName(currentUser.displayName || '');
       }
     });
     return () => unsubscribe();
@@ -330,6 +327,42 @@ export default function DashboardPage() {
     />
   );
 
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto min-w-0 space-y-6 pb-10">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 animate-pulse">
+          <div className="space-y-3">
+            <div className="h-8 w-48 bg-muted rounded-lg" />
+            <div className="h-4 w-64 bg-muted rounded" />
+          </div>
+          <div className="h-12 w-full md:w-80 bg-muted rounded-xl" />
+        </div>
+
+        <div className="space-y-8">
+          <div className="flex flex-wrap gap-3 animate-pulse">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-10 w-32 bg-muted rounded-xl" />
+            ))}
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-6 border-b border-border pb-3 animate-pulse">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-4 w-24 bg-muted rounded" />
+              ))}
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className="aspect-[3/4] bg-muted animate-pulse rounded-[2rem]" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto min-w-0 space-y-6 pb-10">
       {/* Header */}
@@ -367,53 +400,65 @@ export default function DashboardPage() {
               <button
                 onClick={() => setActiveTab('all')}
                 className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'all'
-                  ? 'border-border text-foreground'
+                  ? 'border-foreground text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                   }`}
               >
                 All Vendors
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'all' ? 'bg-card text-foreground' : 'bg-card text-foreground'}`}>{allVendorsCount}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'all' ? 'bg-secondary text-foreground' : 'bg-secondary/50 text-muted-foreground'}`}>{allVendorsCount}</span>
               </button>
               <button
                 onClick={() => setActiveTab('experiences')}
                 className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'experiences'
-                  ? 'border-border text-foreground'
+                  ? 'border-foreground text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                   }`}
               >
                 Experiences
                 <Crown size={14} className="text-amber-500 fill-amber-500" />
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'experiences' ? 'bg-foreground text-foreground' : 'bg-secondary text-muted-foreground'}`}>{experiencesCount}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'experiences' ? 'bg-secondary text-foreground' : 'bg-secondary/50 text-muted-foreground'}`}>{experiencesCount}</span>
               </button>
               <button
                 onClick={() => setActiveTab('saved')}
                 className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'saved'
-                  ? 'border-border text-foreground'
+                  ? 'border-foreground text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                   }`}
               >
                 Saved Vendors
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'saved' ? 'bg-foreground text-foreground' : 'bg-secondary text-muted-foreground'}`}>{savedVendorsCount}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'saved' ? 'bg-secondary text-foreground' : 'bg-secondary/50 text-muted-foreground'}`}>{savedVendorsCount}</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 items-stretch">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               {displayVendors.map(vendor => (
-                <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full min-w-0">
+                <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full min-w-0 transition-transform hover:scale-[1.02]">
                   <VendorCard vendor={vendor} />
                 </Link>
               ))}
             </div>
 
             {displayVendors.length === 0 && (
-              <div className="text-center py-20 bg-white rounded-[2rem] border border-border">
-                <p className="text-muted-foreground font-bold">No vendors found matching your filters.</p>
-              </div>
-            )}
-
-            {activeTab === 'saved' && displayVendors.length === 0 && (
-              <div className="text-center py-20 bg-white rounded-[2rem] border border-border">
-                <p className="text-muted-foreground font-bold">You haven't saved any vendors yet.</p>
+              <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card p-16 md:p-32 text-center">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50" />
+                <div className="relative space-y-6">
+                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
+                    <Search size={40} />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-black text-foreground">No vendors found</h3>
+                    <p className="text-muted-foreground max-w-sm mx-auto">
+                      We couldn't find any vendors matching your current search or filters. Try adjusting your criteria.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={clearAllFilters}
+                    className="rounded-full px-8"
+                  >
+                    Clear all filters
+                  </Button>
+                </div>
               </div>
             )}
           </div>

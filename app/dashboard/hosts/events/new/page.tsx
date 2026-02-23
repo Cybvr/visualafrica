@@ -15,11 +15,14 @@ import {
     PartyPopper
 } from 'lucide-react';
 import { EVENT_THEMES } from '@/lib/constants';
+import { useAuth } from '@/components/providers/auth-provider';
+import { createEvent } from '@/lib/firestore-service';
 
 type FormStep = 1 | 2 | 3;
 
 export default function CreateEventPage() {
     const router = useRouter();
+    const { user, profile } = useAuth();
     const [step, setStep] = useState<FormStep>(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -83,11 +86,37 @@ export default function CreateEventPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!user) {
+            alert("You must be logged in to create an event.");
+            return;
+        }
+
         setIsSubmitting(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsSubmitting(false);
-        setIsSuccess(true);
+        try {
+            await createEvent({
+                hostId: user.uid,
+                hostName: profile?.displayName || user.displayName || 'Unknown Host',
+                eventName: formData.eventName,
+                date: formData.date,
+                location: formData.location,
+                guestCount: parseInt(formData.guestCount) || 0,
+                budget: parseInt(formData.budget.replace(/,/g, '')) || 0,
+                status: 'Planning',
+                image: '/placeholder.png', // Default image
+                description: formData.description,
+                bookedVendors: [],
+                leads: [],
+                categories: [],
+                themes: [formData.theme],
+                guests: []
+            });
+            setIsSuccess(true);
+        } catch (error) {
+            console.error("Error creating event:", error);
+            alert("Failed to create event. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (isSuccess) {

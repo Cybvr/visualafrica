@@ -32,7 +32,29 @@ const ExperiencesPage: React.FC = () => {
     // For demo purposes, we'll just show the same list for saved if tab is 'saved'
     const displayExperiences = activeTab === 'all' ? experiencesVendors : experiencesVendors.slice(0, 1);
 
-    if (isLoading) return <div className="p-10 text-center">Loading experiences...</div>;
+    if (isLoading) {
+        return (
+            <div className="max-w-7xl mx-auto space-y-10 pb-20">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 animate-pulse">
+                    <div className="space-y-3">
+                        <div className="h-4 w-32 bg-muted rounded" />
+                        <div className="h-10 w-64 bg-muted rounded" />
+                        <div className="h-4 w-80 bg-muted rounded" />
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="h-14 w-80 bg-muted rounded-2xl" />
+                        <div className="h-14 w-14 bg-muted rounded-2xl" />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                        <div key={i} className="aspect-[4/5] bg-muted animate-pulse rounded-[2rem]" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-7xl mx-auto space-y-10 pb-20">
@@ -85,17 +107,25 @@ const ExperiencesPage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12 items-stretch">
                 {displayExperiences.map(vendor => (
-                    <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full">
+                    <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full transition-transform hover:scale-[1.02]">
                         <VendorCard vendor={vendor} />
                     </Link>
                 ))}
 
                 {displayExperiences.length === 0 && (
-                    <div className="col-span-full py-20 text-center space-y-4">
-                        <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto">
-                            <Search className="text-muted-foreground" size={32} />
+                    <div className="col-span-full relative overflow-hidden rounded-[2.5rem] border border-border bg-card p-20 text-center">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full translate-x-1/2 -translate-y-1/2 blur-3xl" />
+                        <div className="relative space-y-6">
+                            <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto text-primary rotate-6">
+                                <Sparkles size={40} />
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-black text-foreground">No Experiences Found</h3>
+                                <p className="text-muted-foreground max-w-sm mx-auto mt-2">
+                                    We're still curating our list of ultra-exclusive experiences. Check back soon for something extraordinary.
+                                </p>
+                            </div>
                         </div>
-                        <p className="text-muted-foreground font-bold">No experiences found at the moment.</p>
                     </div>
                 )}
             </div>

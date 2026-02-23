@@ -127,15 +127,6 @@ const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
                                 className="bg-background border border-border focus-visible:ring-primary resize-none"
                             />
                         </div>
-                        <div className="md:col-span-2 space-y-2">
-                            <label className="text-sm font-medium text-muted-foreground">Itinerary</label>
-                            <Textarea
-                                rows={4}
-                                defaultValue={event.itinerary}
-                                placeholder="Outline the main schedule points..."
-                                className="bg-background border border-border focus-visible:ring-primary resize-none"
-                            />
-                        </div>
                     </div>
                 </div>
             </section>

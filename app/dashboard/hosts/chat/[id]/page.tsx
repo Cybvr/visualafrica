@@ -11,7 +11,8 @@ import {
     listenToMessages,
     updateChatMetadata,
     createChat,
-    getStoreKits
+    getStoreKits,
+    listenToEvents
 } from "@/lib/firestore-service";
 import { Vendor, BlogPost, SharedEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -642,8 +643,10 @@ export default function ChatPage() {
         if (pill.id === 'overview') {
             setTyping(true);
             try {
-                const refreshedEvents = await getEvents();
-                setLiveEvents(refreshedEvents);
+                if (currentUser) {
+                    const refreshedEvents = await getEvents(currentUser.uid);
+                    setLiveEvents(refreshedEvents);
+                }
             } catch (err) {
                 console.error("Failed to refresh events", err);
             }
@@ -656,22 +659,29 @@ export default function ChatPage() {
     };
 
     useEffect(() => {
-        async function init() {
-            const [v, evs, fetchedStoreKits] = await Promise.all([getVendors(), getEvents(), getStoreKits()]);
+        if (!currentUser) return;
+
+        const unsubscribe = listenToEvents(currentUser.uid, (evs) => {
+            setLiveEvents(evs);
+            setDataLoaded(true);
+        });
+
+        // Still need vendors and store kits once
+        getVendors().then(v => {
             const cities = ["Lagos", "Accra", "Nairobi", "Cape Town"];
             const vendorsByCity: Record<string, any[]> = {};
             cities.forEach(city => vendorsByCity[city] = buildVendorsList(v, city));
             setAllVendorsByCity(vendorsByCity);
-            setLiveEvents(evs);
+        });
 
+        getStoreKits().then(fetchedStoreKits => {
             const demoKits = DEMO_CHAT_HISTORY.filter((kit: any) => kit.published);
             const dbKitsDeduped = fetchedStoreKits.filter(dbKit => !demoKits.some((demoKit: any) => demoKit.id === dbKit.id));
             setStoreKits([...dbKitsDeduped, ...demoKits]);
+        });
 
-            setDataLoaded(true);
-        }
-        init();
-    }, []);
+        return () => unsubscribe();
+    }, [currentUser]);
 
     useEffect(() => {
         if (!dataLoaded || !currentUser) return;

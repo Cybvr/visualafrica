@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react";
-import { TimelineEntry } from "./types";
-import { SharedEvent } from "@/lib/types";
+import { useState, useEffect } from "react";
+import { TimelineEntry, SharedEvent } from "@/lib/types";
+import { updateEvent } from "@/lib/firestore-service";
 import {
     Select,
     SelectContent,
@@ -10,7 +10,7 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import { Calendar } from "lucide-react";
+import { Calendar, Trash2 } from "lucide-react";
 
 interface DayOfTimelineProps {
     events?: SharedEvent[];
@@ -19,33 +19,47 @@ interface DayOfTimelineProps {
 }
 
 export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange }: DayOfTimelineProps) => {
-    const [entries, setEntries] = useState<TimelineEntry[]>([
-        { time: "9:00 AM", label: "Bridal party arrives — hair & makeup begins" },
-        { time: "11:30 AM", label: "Vendor setup begins (florals, catering, AV)" },
-        { time: "2:30 PM", label: "First look — private garden, east terrace" },
-        { time: "3:00 PM", label: "Wedding party portraits" },
-        { time: "4:30 PM", label: "Guests arrive — cocktail hour begins", note: "Vineyard Trio — pending confirm" },
-        { time: "5:15 PM", label: "Ceremony begins at the barrel room steps" },
-        { time: "5:45 PM", label: "Cocktail hour continues while party does portraits" },
-        { time: "6:30 PM", label: "Guests seated — dinner begins" },
-        { time: "7:15 PM", label: "Toasts", note: "TBD: confirm speakers with James" },
-        { time: "8:00 PM", label: "First dance + parent dances" },
-        { time: "8:30 PM", label: "DJ reception opens — open dancing" },
-        { time: "9:30 PM", label: "Cake cutting" },
-        { time: "10:00 PM", label: "Late night snacks", note: "TBD: still deciding on station" },
-        { time: "11:00 PM", label: "Last dance + send-off (sparkler exit)" },
-        { time: "11:30 PM", label: "Venue closes — shuttle departs to hotel" },
-    ]);
+    const selectedEvent = events.find(e => e.id === selectedEventId);
+    const [entries, setEntries] = useState<TimelineEntry[]>([]);
     const [newTime, setNewTime] = useState("");
     const [newLabel, setNewLabel] = useState("");
 
-    const handleAddEntry = () => {
+    // Initialize entries from event data
+    useEffect(() => {
+        if (selectedEvent) {
+            setEntries(selectedEvent.itineraryItems || []);
+        } else {
+            setEntries([]);
+        }
+    }, [selectedEvent]);
+
+    const handleAddEntry = async () => {
         const time = newTime.trim();
         const label = newLabel.trim();
-        if (!time || !label) return;
-        setEntries(prev => [...prev, { time, label }]);
+        if (!time || !label || !selectedEventId) return;
+
+        const newEntry: TimelineEntry = { time, label };
+        const updatedEntries = [...entries, newEntry];
+        setEntries(updatedEntries);
         setNewTime("");
         setNewLabel("");
+
+        try {
+            await updateEvent(selectedEventId, { itineraryItems: updatedEntries });
+        } catch (err) {
+            console.error("Failed to update itinerary", err);
+        }
+    };
+
+    const handleDeleteEntry = async (index: number) => {
+        if (!selectedEventId) return;
+        const updatedEntries = entries.filter((_, i) => i !== index);
+        setEntries(updatedEntries);
+        try {
+            await updateEvent(selectedEventId, { itineraryItems: updatedEntries });
+        } catch (err) {
+            console.error("Failed to delete itinerary entry", err);
+        }
     };
 
     return (
@@ -108,16 +122,32 @@ export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange }: D
 
                     <div className="pl-[18px] relative transition-all duration-300">
                         <div className="absolute left-[5px] top-2 bottom-2 w-px bg-border" />
-                        {entries.map((e, i) => (
-                            <div key={`${e.time}-${e.label}-${i}`} className="relative pl-3.5 pb-2.5">
-                                <div className="absolute left-[-2px] top-2 w-[7px] h-[7px] rounded-full border-[1.5px] border-primary bg-card" />
-                                <div className="text-[11px] text-muted-foreground">{e.time}</div>
-                                <div className="text-[13px] text-foreground font-medium">
-                                    {e.label}
-                                    {e.note && <span className="text-muted-foreground text-[11px] ml-1.5 font-normal">· {e.note}</span>}
+                        {entries.length > 0 ? (
+                            entries.map((e, i) => (
+                                <div key={`${e.time}-${e.label}-${i}`} className="relative pl-3.5 pb-2.5 group hover:bg-secondary/20 rounded-lg transition-colors">
+                                    <div className="absolute left-[-2px] top-2 w-[7px] h-[7px] rounded-full border-[1.5px] border-primary bg-card" />
+                                    <div className="flex items-center justify-between px-2">
+                                        <div>
+                                            <div className="text-[11px] text-muted-foreground">{e.time}</div>
+                                            <div className="text-[13px] text-foreground font-medium">
+                                                {e.label}
+                                                {e.note && <span className="text-muted-foreground text-[11px] ml-1.5 font-normal">· {e.note}</span>}
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => handleDeleteEntry(i)}
+                                            className="opacity-0 group-hover:opacity-100 p-1 hover:text-destructive transition-all"
+                                        >
+                                            <Trash2 size={12} />
+                                        </button>
+                                    </div>
                                 </div>
+                            ))
+                        ) : (
+                            <div className="text-[11px] text-muted-foreground text-center py-4">
+                                No itinerary items yet.
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
             )}
