@@ -687,8 +687,9 @@ export default function ChatPage() {
         if (!dataLoaded || !currentUser) return;
 
         const chatIdStr = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
+        const isTransientNewChat = chatIdStr === 'new' || chatIdStr.startsWith('task-');
 
-        if (chatIdStr === 'new') {
+        if (isTransientNewChat) {
             const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
             setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
             setChatTitle("New Chat");
@@ -705,26 +706,45 @@ export default function ChatPage() {
                 setActiveCity(chat.activeCity);
                 setChatMetadata(chat);
                 if (chat.savedVendors) setSavedVendors(new Set(chat.savedVendors));
-            } else if (chatIdStr !== 'new') {
-                // Not in Firestore yet (could be a fresh task-ID from sidebar)
+            } else {
                 const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
                 setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
                 setChatTitle("New Chat");
                 setActiveCity(null);
                 setChatMetadata(null);
             }
+        }).catch((err) => {
+            console.error("Failed to load chat metadata:", err);
+            const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
+            setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
+            setChatTitle("New Chat");
+            setActiveCity(null);
+            setChatMetadata(null);
+            setHistoryLoaded(true);
         });
 
         // Listen for messages in real-time
-        const unsubscribe = listenToMessages(chatIdStr, (msgs) => {
-            if (msgs.length > 0) {
-                setMessages(msgs);
-            } else {
+        const unsubscribe = listenToMessages(
+            chatIdStr,
+            (msgs) => {
+                if (msgs.length > 0) {
+                    setMessages(msgs);
+                } else {
+                    const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
+                    setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
+                }
+                setHistoryLoaded(true);
+            },
+            (error) => {
+                console.error("Failed to listen to chat messages:", error);
                 const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
                 setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
+                setChatTitle("New Chat");
+                setActiveCity(null);
+                setChatMetadata(null);
+                setHistoryLoaded(true);
             }
-            setHistoryLoaded(true);
-        });
+        );
 
         return () => unsubscribe();
     }, [params.id, dataLoaded, currentUser]);

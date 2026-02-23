@@ -111,13 +111,6 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
     return () => unsubscribe();
   }, []);
 
-  const getInitials = (name: string) => {
-    const names = name.split(" ");
-    if (names.length >= 2) {
-      return `${names[0][0]}${names[1][0]}`.toUpperCase();
-    }
-    return name.substring(0, 2).toUpperCase();
-  };
 
   if (loading || !userProfile) {
     return (
@@ -143,17 +136,11 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
             className={`w-full hover:bg-card rounded-xl transition-colors group py-2.5 ${collapsed ? "px-1 flex items-center justify-center" : "px-3 flex items-center gap-2 text-left"
               }`}
           >
-            {userProfile.photoURL ? (
-              <img
-                src={userProfile.photoURL}
-                alt={userProfile.displayName}
-                className="w-9 h-9 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-9 h-9 bg-secondary rounded-full flex items-center justify-center text-muted-foreground text-sm font-semibold">
-                {getInitials(userProfile.displayName)}
-              </div>
-            )}
+            <img
+              src={userProfile.photoURL || "/images/waddi.png"}
+              alt={userProfile.displayName}
+              className="w-9 h-9 rounded-full object-cover"
+            />
             {!collapsed && (
               <div className="min-w-0 flex-1">
                 <div className="text-xs font-semibold text-foreground truncate">

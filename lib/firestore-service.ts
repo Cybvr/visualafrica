@@ -1,5 +1,18 @@
 import { db } from './firebase';
-import { collection, getDocs, query, where, doc, getDoc, orderBy } from 'firebase/firestore';
+import {
+    collection,
+    getDocs,
+    query,
+    where,
+    doc,
+    getDoc,
+    orderBy,
+    addDoc,
+    updateDoc,
+    serverTimestamp,
+    onSnapshot,
+    deleteDoc
+} from 'firebase/firestore';
 import { Vendor, SharedEvent, BlogPost, FAQ, PricingTier, Offering, PlatformFeature } from './types';
 
 export async function getStoreKits(): Promise<any[]> {
@@ -138,7 +151,6 @@ export function listenToEventById(id: string, callback: (event: SharedEvent | nu
 
 // ── Chat Functions ────────────────────────────────────────
 
-import { addDoc, updateDoc, serverTimestamp, onSnapshot, deleteDoc } from 'firebase/firestore';
 
 export async function getUserChats(userId: string) {
     const q = query(
@@ -191,15 +203,25 @@ export async function saveChatMessage(chatId: string, message: any) {
     });
 }
 
-export function listenToMessages(chatId: string, callback: (messages: any[]) => void) {
+export function listenToMessages(
+    chatId: string,
+    callback: (messages: any[]) => void,
+    onError?: (error: any) => void
+) {
     const q = query(
         collection(db, 'chats', chatId, 'messages'),
         orderBy('timestamp', 'asc')
     );
-    return onSnapshot(q, (snapshot) => {
-        const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        callback(messages);
-    });
+    return onSnapshot(
+        q,
+        (snapshot) => {
+            const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            callback(messages);
+        },
+        (error) => {
+            if (onError) onError(error);
+        }
+    );
 }
 
 export async function updateChatMetadata(chatId: string, data: any) {
