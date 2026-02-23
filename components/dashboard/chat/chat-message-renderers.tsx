@@ -80,7 +80,7 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
                 </div>
                 <div className="flex justify-between items-center mt-2">
                     <span className="text-primary font-bold text-sm">
-                        {v.price && !/[^\d.,+k\s$]/.test(String(v.price)) && !String(v.price).includes('$') ? `$${v.price}` : v.price}
+                        {v.price && /[0-9]/.test(String(v.price)) ? `$${String(v.price).replace(/[^\d.,+k\s]/g, '')}` : v.price}
                     </span>
                     {!showActions && (
                         <span className="text-muted-foreground hover:text-foreground transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
@@ -352,7 +352,7 @@ function StoreCard({ item, onAction }: { item: any; onAction?: (action: string, 
                     </div>
                     <div className="flex items-center gap-1.5">
                         <span className="bg-primary/10 text-primary text-[11px] font-semibold rounded-full px-2 py-0.5">
-                            {item.price && !/[^\d.,+k\s$]/.test(String(item.price)) && !String(item.price).includes('$') ? `$${item.price}` : item.price}
+                            {item.price && /[0-9]/.test(String(item.price)) ? `$${String(item.price).replace(/[^\d.,+k\s]/g, '')}` : item.price}
                         </span>
                     </div>
                 </div>
