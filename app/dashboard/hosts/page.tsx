@@ -36,7 +36,7 @@ export default function HostHomePage() {
       <div className="text-center space-y-6 py-12">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">
           <Sparkles size={14} className="fill-primary" />
-          Meet Ama
+          Meet Waddi
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">
           Your event, fully coordinated. <br />

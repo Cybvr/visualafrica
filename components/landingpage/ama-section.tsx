@@ -23,7 +23,7 @@ export function AmaSection() {
     <section className="bg-secondary/20 py-20 lg:py-24">
       <div className="container mx-auto grid max-w-6xl gap-10 px-4 lg:grid-cols-2 lg:items-center">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">Meet Ama</p>
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">Meet Waddi</p>
           <h2 className="mt-3 font-serif text-4xl font-bold leading-tight text-foreground md:text-5xl">
             Your AI event agent for planning across Africa.
           </h2>
@@ -42,7 +42,7 @@ export function AmaSection() {
           </div>
           <div className="mt-8">
             <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link href="/dashboard/hosts">Chat with Ama</Link>
+              <Link href="/dashboard/hosts">Chat with Waddi</Link>
             </Button>
           </div>
         </div>
