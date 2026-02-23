@@ -11,7 +11,7 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import { ListChecks, Trash2 } from "lucide-react";
+import { Check, ListChecks, Pencil, Trash2, X } from "lucide-react";
 
 interface TaskChecklistProps {
     events?: SharedEvent[];
@@ -24,6 +24,8 @@ export const TaskChecklist = ({ events = [], selectedEventId, onEventChange, onU
     const selectedEvent = events.find(e => e.id === selectedEventId);
     const [items, setItems] = useState<string[]>([]);
     const [newItem, setNewItem] = useState("");
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [editingValue, setEditingValue] = useState("");
     const [isSuggesting, setIsSuggesting] = useState(false);
     const [suggestError, setSuggestError] = useState<string | null>(null);
     const AI_SUGGESTION_LIMIT = 3;
@@ -37,6 +39,8 @@ export const TaskChecklist = ({ events = [], selectedEventId, onEventChange, onU
         } else {
             setItems([]);
         }
+        setEditingIndex(null);
+        setEditingValue("");
     }, [selectedEvent]);
 
     const handleAddItem = async () => {
@@ -59,10 +63,41 @@ export const TaskChecklist = ({ events = [], selectedEventId, onEventChange, onU
         if (!selectedEventId) return;
         const updatedItems = items.filter((_, i) => i !== index);
         setItems(updatedItems);
+        if (editingIndex === index) {
+            setEditingIndex(null);
+            setEditingValue("");
+        }
         try {
             await updateEvent(selectedEventId, { todoList: updatedItems });
         } catch (err) {
             console.error("Failed to delete task", err);
+        }
+    };
+
+    const handleStartEdit = (index: number) => {
+        setEditingIndex(index);
+        setEditingValue(items[index] || "");
+    };
+
+    const handleCancelEdit = () => {
+        setEditingIndex(null);
+        setEditingValue("");
+    };
+
+    const handleSaveEdit = async (index: number) => {
+        if (!selectedEventId) return;
+        const next = editingValue.trim();
+        if (!next) return;
+
+        const updatedItems = items.map((item, i) => (i === index ? next : item));
+        setItems(updatedItems);
+        setEditingIndex(null);
+        setEditingValue("");
+
+        try {
+            await updateEvent(selectedEventId, { todoList: updatedItems });
+        } catch (err) {
+            console.error("Failed to update task", err);
         }
     };
 
@@ -200,16 +235,54 @@ Rules:
                         {items.length > 0 ? (
                             items.map((item, idx) => (
                                 <div key={`${item}-${idx}`} className="flex items-center justify-between group py-1.5 px-2 hover:bg-secondary/20 rounded-lg transition-colors">
-                                    <div className="flex items-start gap-2.5 text-[13px] leading-relaxed">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 shrink-0" />
-                                        <span className="text-foreground font-medium">{item}</span>
-                                    </div>
-                                    <button
-                                        onClick={() => handleDeleteItem(idx)}
-                                        className="opacity-0 group-hover:opacity-100 p-1 hover:text-destructive transition-all"
-                                    >
-                                        <Trash2 size={12} />
-                                    </button>
+                                    {editingIndex === idx ? (
+                                        <div className="flex items-center gap-2 w-full">
+                                            <input
+                                                value={editingValue}
+                                                onChange={(e) => setEditingValue(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter") handleSaveEdit(idx);
+                                                    if (e.key === "Escape") handleCancelEdit();
+                                                }}
+                                                autoFocus
+                                                className="h-8 w-full rounded-lg border border-border bg-secondary/20 px-3 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                                            />
+                                            <button
+                                                onClick={() => handleSaveEdit(idx)}
+                                                disabled={!editingValue.trim()}
+                                                className="p-1 text-emerald-600 hover:text-emerald-700 disabled:opacity-50"
+                                            >
+                                                <Check size={12} />
+                                            </button>
+                                            <button
+                                                onClick={handleCancelEdit}
+                                                className="p-1 text-muted-foreground hover:text-foreground"
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="flex items-start gap-2.5 text-[13px] leading-relaxed">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 shrink-0" />
+                                                <span className="text-foreground font-medium">{item}</span>
+                                            </div>
+                                            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-all">
+                                                <button
+                                                    onClick={() => handleStartEdit(idx)}
+                                                    className="p-1 hover:text-primary transition-colors"
+                                                >
+                                                    <Pencil size={12} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteItem(idx)}
+                                                    className="p-1 hover:text-destructive transition-colors"
+                                                >
+                                                    <Trash2 size={12} />
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             ))
                         ) : (

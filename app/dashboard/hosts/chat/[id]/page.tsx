@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
     getVendors,
     getEvents,
@@ -50,6 +50,7 @@ import { useChatAgent } from "@/hooks/use-chat-agent";
 export default function ChatPage() {
     const params = useParams();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [messages, setMessages] = useState<any[]>(INITIAL_MESSAGES);
     const [input, setInput] = useState("");
     const [typing, setTyping] = useState(false);
@@ -68,6 +69,7 @@ export default function ChatPage() {
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
     const [pendingAction, setPendingAction] = useState<any>(null);
     const [isPricingOpen, setIsPricingOpen] = useState(false);
+    const autoPromptSentRef = useRef<string | null>(null);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -223,6 +225,18 @@ export default function ChatPage() {
         currentUser,
         storeKits
     });
+
+    useEffect(() => {
+        const routeChatId = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
+        const prefillPrompt = (searchParams.get("q") || "").trim();
+
+        if (!prefillPrompt || routeChatId !== "new") return;
+        if (!historyLoaded || !dataLoaded || autoPromptSentRef.current === prefillPrompt) return;
+
+        autoPromptSentRef.current = prefillPrompt;
+        setInput(prefillPrompt);
+        void send(prefillPrompt);
+    }, [params.id, searchParams, historyLoaded, dataLoaded, send, setInput]);
 
     const handleCalendarSelect = (date: string) => {
         addUserMsg(`Date selected: ${date}`);

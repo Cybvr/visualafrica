@@ -11,7 +11,7 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import { Calendar, Trash2 } from "lucide-react";
+import { Calendar, Check, Pencil, Trash2, X } from "lucide-react";
 
 interface DayOfTimelineProps {
     events?: SharedEvent[];
@@ -25,6 +25,10 @@ export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange, onU
     const [entries, setEntries] = useState<TimelineEntry[]>([]);
     const [newTime, setNewTime] = useState("");
     const [newLabel, setNewLabel] = useState("");
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [editingTime, setEditingTime] = useState("");
+    const [editingLabel, setEditingLabel] = useState("");
+    const [editingNote, setEditingNote] = useState("");
     const [isSuggesting, setIsSuggesting] = useState(false);
     const [suggestError, setSuggestError] = useState<string | null>(null);
     const AI_SUGGESTION_LIMIT = 3;
@@ -38,6 +42,10 @@ export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange, onU
         } else {
             setEntries([]);
         }
+        setEditingIndex(null);
+        setEditingTime("");
+        setEditingLabel("");
+        setEditingNote("");
     }, [selectedEvent]);
 
     const handleAddEntry = async () => {
@@ -62,10 +70,58 @@ export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange, onU
         if (!selectedEventId) return;
         const updatedEntries = entries.filter((_, i) => i !== index);
         setEntries(updatedEntries);
+        if (editingIndex === index) {
+            setEditingIndex(null);
+            setEditingTime("");
+            setEditingLabel("");
+            setEditingNote("");
+        }
         try {
             await updateEvent(selectedEventId, { itineraryItems: updatedEntries });
         } catch (err) {
             console.error("Failed to delete itinerary entry", err);
+        }
+    };
+
+    const handleStartEdit = (index: number) => {
+        const entry = entries[index];
+        if (!entry) return;
+        setEditingIndex(index);
+        setEditingTime(entry.time || "");
+        setEditingLabel(entry.label || "");
+        setEditingNote(entry.note || "");
+    };
+
+    const handleCancelEdit = () => {
+        setEditingIndex(null);
+        setEditingTime("");
+        setEditingLabel("");
+        setEditingNote("");
+    };
+
+    const handleSaveEdit = async (index: number) => {
+        if (!selectedEventId) return;
+        const time = editingTime.trim();
+        const label = editingLabel.trim();
+        const note = editingNote.trim();
+        if (!time || !label) return;
+
+        const updatedEntries = entries.map((entry, i) => (
+            i === index
+                ? (note ? { ...entry, time, label, note } : { ...entry, time, label, note: undefined })
+                : entry
+        ));
+
+        setEntries(updatedEntries);
+        setEditingIndex(null);
+        setEditingTime("");
+        setEditingLabel("");
+        setEditingNote("");
+
+        try {
+            await updateEvent(selectedEventId, { itineraryItems: updatedEntries });
+        } catch (err) {
+            console.error("Failed to update itinerary entry", err);
         }
     };
 
@@ -209,21 +265,76 @@ Rules:
                             entries.map((e, i) => (
                                 <div key={`${e.time}-${e.label}-${i}`} className="relative pl-3.5 pb-2.5 group hover:bg-secondary/20 rounded-lg transition-colors">
                                     <div className="absolute left-[-2px] top-2 w-[7px] h-[7px] rounded-full border-[1.5px] border-primary bg-card" />
-                                    <div className="flex items-center justify-between px-2">
-                                        <div>
-                                            <div className="text-[11px] text-muted-foreground">{e.time}</div>
-                                            <div className="text-[13px] text-foreground font-medium">
-                                                {e.label}
-                                                {e.note && <span className="text-muted-foreground text-[11px] ml-1.5 font-normal">· {e.note}</span>}
+                                    {editingIndex === i ? (
+                                        <div className="flex items-center gap-2 px-2">
+                                            <input
+                                                value={editingTime}
+                                                onChange={(event) => setEditingTime(event.target.value)}
+                                                onKeyDown={(event) => {
+                                                    if (event.key === "Enter") handleSaveEdit(i);
+                                                    if (event.key === "Escape") handleCancelEdit();
+                                                }}
+                                                autoFocus
+                                                className="h-8 w-28 rounded-lg border border-border bg-secondary/20 px-2 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                                            />
+                                            <input
+                                                value={editingLabel}
+                                                onChange={(event) => setEditingLabel(event.target.value)}
+                                                onKeyDown={(event) => {
+                                                    if (event.key === "Enter") handleSaveEdit(i);
+                                                    if (event.key === "Escape") handleCancelEdit();
+                                                }}
+                                                className="h-8 w-full rounded-lg border border-border bg-secondary/20 px-2 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                                            />
+                                            <input
+                                                value={editingNote}
+                                                onChange={(event) => setEditingNote(event.target.value)}
+                                                onKeyDown={(event) => {
+                                                    if (event.key === "Enter") handleSaveEdit(i);
+                                                    if (event.key === "Escape") handleCancelEdit();
+                                                }}
+                                                placeholder="Note (optional)"
+                                                className="h-8 w-40 rounded-lg border border-border bg-secondary/20 px-2 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                                            />
+                                            <button
+                                                onClick={() => handleSaveEdit(i)}
+                                                disabled={!editingTime.trim() || !editingLabel.trim()}
+                                                className="p-1 text-emerald-600 hover:text-emerald-700 disabled:opacity-50"
+                                            >
+                                                <Check size={12} />
+                                            </button>
+                                            <button
+                                                onClick={handleCancelEdit}
+                                                className="p-1 text-muted-foreground hover:text-foreground"
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center justify-between px-2">
+                                            <div>
+                                                <div className="text-[11px] text-muted-foreground">{e.time}</div>
+                                                <div className="text-[13px] text-foreground font-medium">
+                                                    {e.label}
+                                                    {e.note && <span className="text-muted-foreground text-[11px] ml-1.5 font-normal">· {e.note}</span>}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-all">
+                                                <button
+                                                    onClick={() => handleStartEdit(i)}
+                                                    className="p-1 hover:text-primary transition-colors"
+                                                >
+                                                    <Pencil size={12} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteEntry(i)}
+                                                    className="p-1 hover:text-destructive transition-colors"
+                                                >
+                                                    <Trash2 size={12} />
+                                                </button>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={() => handleDeleteEntry(i)}
-                                            className="opacity-0 group-hover:opacity-100 p-1 hover:text-destructive transition-all"
-                                        >
-                                            <Trash2 size={12} />
-                                        </button>
-                                    </div>
+                                    )}
                                 </div>
                             ))
                         ) : (

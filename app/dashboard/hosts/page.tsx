@@ -22,10 +22,8 @@ export default function HostHomePage() {
     e?.preventDefault();
     if (!input.trim()) return;
 
-    // Create a new chat ID and redirect
-    // In a real app, we'd save this to Firestore first
-    const newId = `chat-${Date.now()}`;
-    router.push(`/dashboard/hosts/chat/${newId}?q=${encodeURIComponent(input)}`);
+    // Route to the real new-chat flow; chat page will create/persist via send()
+    router.push(`/dashboard/hosts/chat/new?q=${encodeURIComponent(input)}`);
   };
 
   if (!mounted) return null;
