@@ -18,6 +18,7 @@ import {
     VendorGrid,
     TaskChecklist,
     DayOfTimeline,
+    BudgetPlanner,
 } from "@/components/dashboard/chat";
 
 export function Dots() {
@@ -570,6 +571,14 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                                 selectedEventId={selectedEventId}
                                 onEventChange={onEventSelect}
                                 onUpgradeToPro={onUpgradeToPro}
+                            />
+                        </div>
+                    ) : msg.type === "budget" ? (
+                        <div className="w-full mt-1">
+                            <BudgetPlanner
+                                events={liveEvents}
+                                selectedEventId={selectedEventId}
+                                onEventChange={onEventSelect}
                             />
                         </div>
                     ) : msg.type === "vendors" ? (

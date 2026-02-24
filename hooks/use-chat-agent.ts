@@ -67,6 +67,7 @@ export function useChatAgent({
     const APPROVAL_ACTIONS = new Set([
         "approve_generate_itinerary",
         "approve_generate_todo",
+        "approve_generate_budget",
         "approve_find_vendors"
     ]);
 
@@ -210,7 +211,8 @@ Rules:
                 themes: [],
                 guests: [],
                 todoList: [],
-                itineraryItems: []
+                itineraryItems: [],
+                budgetBreakdown: []
             });
             setSelectedEventId(createdEventId);
             if (eventIdRef) eventIdRef.current = createdEventId;
@@ -397,6 +399,32 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         return itineraryApplied;
     };
 
+    const generateBudgetForEvent = async (event: SharedEvent) => {
+        const budget = Math.max(0, Number(event.budget || 0));
+        const template = [
+            { category: "Venue", percent: 30 },
+            { category: "Catering", percent: 25 },
+            { category: "Decor", percent: 12 },
+            { category: "Entertainment (DJ/MC)", percent: 10 },
+            { category: "Photo/Video", percent: 10 },
+            { category: "Attire/Beauty", percent: 5 },
+            { category: "Logistics & Contingency", percent: 8 }
+        ];
+
+        let running = 0;
+        const breakdown = template.map((row, index) => {
+            const isLast = index === template.length - 1;
+            const amount = isLast
+                ? Math.max(budget - running, 0)
+                : Math.max(Math.round((budget * row.percent) / 100), 0);
+            running += amount;
+            return { ...row, amount };
+        });
+
+        await updateEvent(event.id, { budgetBreakdown: breakdown });
+        return breakdown.length;
+    };
+
     const handleApprovalAction = async (actionData: any, chatIdOverride?: string) => {
         const action = String(actionData?.action || "");
         if (!APPROVAL_ACTIONS.has(action)) return false;
@@ -450,7 +478,33 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             await persistAgentMessage(
                 {
                     type: "text",
-                    content: "Review the checklist above. Approve and I’ll fetch the top vendor matches.",
+                    content: "Review the checklist above. Approve to generate the budget plan next.",
+                    suggestions: [{ label: "Approve to continue", action: "approve_generate_budget", ...payload }]
+                },
+                chatIdOverride
+            );
+            return true;
+        }
+
+        if (action === "approve_generate_budget") {
+            await persistAgentMessage(
+                { type: "text", content: `Creating the budget plan for "${event.eventName}" now.` },
+                chatIdOverride
+            );
+            const budgetLines = await generateBudgetForEvent(event);
+            const refreshedEvent = await getEventById(event.id);
+            await persistAgentMessage(
+                {
+                    type: "budget",
+                    content: `Budget plan ready (${budgetLines} categories).`,
+                    eventId: refreshedEvent?.id || event.id
+                },
+                chatIdOverride
+            );
+            await persistAgentMessage(
+                {
+                    type: "text",
+                    content: "Review the budget allocation above. Approve and I’ll fetch the top vendor matches.",
                     suggestions: [{ label: "Approve to continue", action: "approve_find_vendors", ...payload }]
                 },
                 chatIdOverride
@@ -518,7 +572,7 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 return;
             }
 
-            if (intent === "overview" || intent === "todo" || intent === "timeline") {
+            if (intent === "overview" || intent === "todo" || intent === "timeline" || intent === "budget") {
                 response.type = intent;
                 response.content = `Here is your ${intent === "overview" ? "events overview" : (intent === "timeline" ? "itinerary" : intent)} for your planning session:`;
                 setMessages((prev) => [...prev, response]);
@@ -947,7 +1001,8 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             themes: [],
             guests: [],
             todoList: [],
-            itineraryItems: []
+            itineraryItems: [],
+            budgetBreakdown: []
         });
         setSelectedEventId(createdEventId);
         const createdEvent = await getEventById(createdEventId);

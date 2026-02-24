@@ -41,6 +41,7 @@ import {
     ShoppingBag,
     CalendarDays,
     ListTodo,
+    Wallet,
     Clock3,
     MoreHorizontal
 } from "lucide-react";
@@ -422,6 +423,7 @@ export default function ChatPage() {
                             { id: 'start_planning', label: 'Plan', icon: Plus, action: 'start_planning', primary: true },
                             { id: 'overview', label: 'My Events', icon: CalendarDays },
                             { id: 'todo', label: 'To-do', icon: ListTodo },
+                            { id: 'budget', label: 'Budget', icon: Wallet },
                         ].map(pill => (
                             <button
                                 key={pill.id}

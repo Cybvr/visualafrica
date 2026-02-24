@@ -2,6 +2,8 @@ export * from "./event-overview-card";
 export * from "./vendor-grid";
 export * from "./task-checklist";
 export * from "./day-of-timeline";
+export * from "./budget-breakdown-card";
+export * from "./budget-planner";
 export * from "./typing-indicator";
 export * from "./chat-elements";
 export * from "./types";

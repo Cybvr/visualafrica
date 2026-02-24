@@ -137,6 +137,7 @@ export interface SharedEvent {
     }[];
     todoList?: string[];
     itineraryItems?: TimelineEntry[];
+    budgetBreakdown?: BudgetAllocation[];
     aiTodoSuggestionsUsed?: number;
     aiItinerarySuggestionsUsed?: number;
 }
@@ -145,6 +146,12 @@ export interface TimelineEntry {
     time: string;
     label: string;
     note?: string;
+}
+
+export interface BudgetAllocation {
+    category: string;
+    amount: number;
+    percent: number;
 }
 
 // ── Blog Types ────────────────────────────────────────────
