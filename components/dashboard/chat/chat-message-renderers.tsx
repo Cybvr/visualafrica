@@ -540,6 +540,20 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                                 </div>
                             )}
                         </div>
+                    ) : msg.type === "event_overview" ? (
+                        <div className="w-full mt-1 space-y-4">
+                            {(() => {
+                                const event = liveEvents.find((ev) => ev.id === msg.eventId)
+                                    || (selectedEventId ? liveEvents.find((ev) => ev.id === selectedEventId) : undefined);
+                                return event ? (
+                                    <EventOverviewCard event={event} />
+                                ) : (
+                                    <div className="p-4 border border-dashed border-border rounded-xl text-center text-muted-foreground text-sm">
+                                        Event details are syncing. Try again in a moment.
+                                    </div>
+                                );
+                            })()}
+                        </div>
                     ) : msg.type === "todo" ? (
                         <div className="w-full mt-1">
                             <TaskChecklist

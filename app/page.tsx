@@ -3,9 +3,7 @@ import { Footer } from "@/app/(marketing)/common/footer"
 import { WaddiPrompt } from "@/components/landingpage/waddi-prompt"
 import { Hero } from "@/components/landingpage/hero"
 import { FeaturesGrid } from "@/components/landingpage/features-grid"
-import { AmaSection } from "@/components/landingpage/ama-section"
 import { HandpickedExperiences } from "@/components/handpicked-experiences"
-import { HottestVendors } from "@/components/landingpage/hottest-vendors"
 import { EventInsights } from "@/components/landingpage/event-insights"
 import { Testimonials } from "@/components/landingpage/testimonials"
 import { TrustSection } from "@/components/landingpage/trust"
@@ -19,10 +17,8 @@ export default function HomePage() {
       <main className="flex-1">
         <WaddiPrompt />
         <Hero />
-        <HottestVendors />
         <HandpickedExperiences />
         <FeaturesGrid />
-        <AmaSection />
         <TrustSection />
         <EventInsights />
         <Testimonials />

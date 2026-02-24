@@ -64,6 +64,12 @@ export function useChatAgent({
     currentUser,
     storeKits
 }: UseChatAgentArgs) {
+    const APPROVAL_ACTIONS = new Set([
+        "approve_generate_itinerary",
+        "approve_generate_todo",
+        "approve_find_vendors"
+    ]);
+
     const getRouteChatId = () => {
         return typeof paramsId === "string" ? paramsId : Array.isArray(paramsId) ? paramsId[0] : "new";
     };
@@ -324,6 +330,166 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         return [];
     };
 
+    const getWorkflowContext = async (args: any = {}) => {
+        const directId = args?.eventId ? String(args.eventId) : selectedEventId;
+        if (directId) {
+            const byId = await getEventById(directId);
+            if (byId) return byId;
+        }
+
+        if (args?.eventName) {
+            const query = String(args.eventName).toLowerCase();
+            const byName = liveEvents.find((ev) => ev.eventName.toLowerCase().includes(query));
+            if (byName?.id) {
+                const fresh = await getEventById(byName.id);
+                if (fresh) return fresh;
+                return byName;
+            }
+        }
+
+        if (liveEvents.length === 1) return liveEvents[0];
+        return null;
+    };
+
+    const toApprovalPayload = (event: SharedEvent) => ({
+        eventId: event.id,
+        eventName: event.eventName,
+        city: event.location,
+        guestCount: event.guestCount,
+        budget: event.budget
+    });
+
+    const generateTodoForEvent = async (event: SharedEvent, chatIdOverride?: string) => {
+        let todoApplied = 0;
+        const eventIdRef = { current: event.id };
+        const todoPrompt = `For the event "${event.eventName}" with ${event.guestCount} guests, budget ${event.budget || 0}, in ${event.location}, create a concise event planning checklist. Call add_todo_item for each task (aim for 6–8 tasks). The eventName is "${event.eventName}".`;
+        const todoCalls = await getRequiredFunctionCalls(todoPrompt, ["add_todo_item"]);
+        for (const call of todoCalls) {
+            const ok = await processFunctionCall(call.name, { ...call.args, eventId: event.id }, "", chatIdOverride, eventIdRef);
+            if (ok && call.name === "add_todo_item") todoApplied++;
+        }
+        if (todoApplied === 0) {
+            const fallbackTodo = getDefaultTodoItems(event.eventName, event.guestCount || 0, event.location || "your city");
+            for (const item of fallbackTodo) {
+                const ok = await processFunctionCall("add_todo_item", { item, eventId: event.id }, "", chatIdOverride, eventIdRef);
+                if (ok) todoApplied++;
+            }
+        }
+        return todoApplied;
+    };
+
+    const generateItineraryForEvent = async (event: SharedEvent, chatIdOverride?: string) => {
+        let itineraryApplied = 0;
+        const eventIdRef = { current: event.id };
+        const itineraryPrompt = `Build a realistic day-of itinerary for "${event.eventName}" in ${event.location}, ${event.guestCount} guests. Call add_itinerary_item for each slot (aim for 6–8 items with times like "10:00 AM"). The eventName is "${event.eventName}".`;
+        const itineraryCalls = await getRequiredFunctionCalls(itineraryPrompt, ["add_itinerary_item"]);
+        for (const call of itineraryCalls) {
+            const ok = await processFunctionCall(call.name, { ...call.args, eventId: event.id }, "", chatIdOverride, eventIdRef);
+            if (ok && call.name === "add_itinerary_item") itineraryApplied++;
+        }
+        if (itineraryApplied === 0) {
+            const fallbackItinerary = getDefaultItineraryItems();
+            for (const slot of fallbackItinerary) {
+                const ok = await processFunctionCall("add_itinerary_item", { ...slot, eventId: event.id }, "", chatIdOverride, eventIdRef);
+                if (ok) itineraryApplied++;
+            }
+        }
+        return itineraryApplied;
+    };
+
+    const handleApprovalAction = async (actionData: any, chatIdOverride?: string) => {
+        const action = String(actionData?.action || "");
+        if (!APPROVAL_ACTIONS.has(action)) return false;
+
+        const event = await getWorkflowContext(actionData);
+        if (!event) {
+            await persistAgentMessage(
+                {
+                    type: "text",
+                    content: "I couldn't find the event context for that step. Open the event card again and retry approval."
+                },
+                chatIdOverride
+            );
+            return true;
+        }
+
+        setSelectedEventId(event.id);
+        const payload = toApprovalPayload(event);
+
+        if (action === "approve_generate_itinerary") {
+            await persistAgentMessage(
+                { type: "text", content: `Creating the itinerary for "${event.eventName}" now.` },
+                chatIdOverride
+            );
+            const itineraryApplied = await generateItineraryForEvent(event, chatIdOverride);
+            await persistAgentMessage(
+                { type: "timeline", content: `Itinerary ready (${itineraryApplied} items).` },
+                chatIdOverride
+            );
+            await persistAgentMessage(
+                {
+                    type: "text",
+                    content: "Review the itinerary above. Approve to generate your checklist next.",
+                    suggestions: [{ label: "Approve to continue", action: "approve_generate_todo", ...payload }]
+                },
+                chatIdOverride
+            );
+            return true;
+        }
+
+        if (action === "approve_generate_todo") {
+            await persistAgentMessage(
+                { type: "text", content: `Creating the checklist for "${event.eventName}" now.` },
+                chatIdOverride
+            );
+            const todoApplied = await generateTodoForEvent(event, chatIdOverride);
+            await persistAgentMessage(
+                { type: "todo", content: `Checklist ready (${todoApplied} items).` },
+                chatIdOverride
+            );
+            await persistAgentMessage(
+                {
+                    type: "text",
+                    content: "Review the checklist above. Approve and I’ll fetch the top vendor matches.",
+                    suggestions: [{ label: "Approve to continue", action: "approve_find_vendors", ...payload }]
+                },
+                chatIdOverride
+            );
+            return true;
+        }
+
+        if (action === "approve_find_vendors") {
+            const city = event.location || String(actionData?.city || activeCity || "");
+            const vendorsForCity = city ? (allVendorsByCity[city] || []) : Object.values(allVendorsByCity).flat();
+            await persistAgentMessage(
+                {
+                    type: "vendor_cards",
+                    content: `Here are top vendors in ${city || "your area"} for "${event.eventName}":`,
+                    city,
+                    vendors: vendorsForCity,
+                    viewAllHref: "/dashboard/hosts/search",
+                    viewAllLabel: "View all vendors"
+                },
+                chatIdOverride
+            );
+            await persistAgentMessage(
+                {
+                    type: "text",
+                    content: "Vendors are ready. Want me to narrow this to catering, decor, photography, or music first?",
+                    suggestions: [
+                        { label: "Catering", action: "vendor_search" },
+                        { label: "Decor", action: "vendor_search" },
+                        { label: "Photography", action: "vendor_search" }
+                    ]
+                },
+                chatIdOverride
+            );
+            return true;
+        }
+
+        return false;
+    };
+
     const dispatchLogic = (text: string, actionData?: any, currentChatId?: string) => {
         const nowStr = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
         const intent = extractIntent(text, actionData);
@@ -560,65 +726,44 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         };
         let handled = false;
 
-        for (const call of allCalls) {
-            const ok = await processFunctionCall(call.name, call.args || {}, modelText, chatIdOverride, eventIdRef, actionMetrics);
-            if (ok) handled = true;
+        const createCall = allCalls.find((c) => c.name === "create_event");
+        if (createCall) {
+            const created = await processFunctionCall("create_event", createCall.args || {}, modelText, chatIdOverride, eventIdRef, actionMetrics);
+            handled = handled || created;
+
+            if (created && eventIdRef.current) {
+                const createdEvent = await getEventById(eventIdRef.current);
+                if (createdEvent) {
+                    setSelectedEventId(createdEvent.id);
+                    await persistAgentMessage(
+                        { type: "event_overview", content: "Event created. Review the card below.", eventId: createdEvent.id },
+                        chatIdOverride
+                    );
+                    await persistAgentMessage(
+                        {
+                            type: "text",
+                            content: "Approve and I’ll generate the itinerary next.",
+                            suggestions: [{ label: "Approve to continue", action: "approve_generate_itinerary", ...toApprovalPayload(createdEvent) }]
+                        },
+                        chatIdOverride
+                    );
+                    return true;
+                }
+                await persistAgentMessage(
+                    {
+                        type: "text",
+                        content: "Event created. Approve and I’ll generate the itinerary next.",
+                        suggestions: [{ label: "Approve to continue", action: "approve_generate_itinerary", eventId: eventIdRef.current }]
+                    },
+                    chatIdOverride
+                );
+                return true;
+            }
         }
 
-        if (eventIdRef.current && currentUser) {
-            const createdId = eventIdRef.current;
-            await new Promise((r) => setTimeout(r, 800));
-
-            const createCall = allCalls.find((c) => c.name === "create_event");
-            const eventName = String(createCall?.args?.eventName || "the event");
-            const city = String(createCall?.args?.city || activeCity || "");
-            const guestCount = Number(createCall?.args?.guestCount || 0);
-            const budget = Number(createCall?.args?.budget || 0);
-            let todoApplied = 0;
-            let itineraryApplied = 0;
-            const todoPrompt = `For the event "${eventName}" with ${guestCount} guests, budget ${budget}, in ${city}, create a concise event planning checklist. Call add_todo_item for each task (aim for 6–8 tasks). The eventName is "${eventName}".`;
-            const todoCalls = await getRequiredFunctionCalls(todoPrompt, ["add_todo_item"]);
-            for (const call of todoCalls) {
-                const ok = await processFunctionCall(call.name, { ...call.args, eventId: createdId }, "", chatIdOverride, eventIdRef, actionMetrics);
-                if (ok && call.name === "add_todo_item") todoApplied++;
-            }
-            if (todoApplied === 0) {
-                const fallbackTodo = getDefaultTodoItems(eventName, guestCount, city || "your city");
-                for (const item of fallbackTodo) {
-                    const ok = await processFunctionCall("add_todo_item", { item, eventId: createdId }, "", chatIdOverride, eventIdRef, actionMetrics);
-                    if (ok) todoApplied++;
-                }
-            }
-            const itineraryPrompt = `Build a realistic day-of itinerary for "${eventName}" in ${city}, ${guestCount} guests. Call add_itinerary_item for each slot (aim for 6–8 items with times like "10:00 AM"). The eventName is "${eventName}".`;
-            const itineraryCalls = await getRequiredFunctionCalls(itineraryPrompt, ["add_itinerary_item"]);
-            for (const call of itineraryCalls) {
-                const ok = await processFunctionCall(call.name, { ...call.args, eventId: createdId }, "", chatIdOverride, eventIdRef, actionMetrics);
-                if (ok && call.name === "add_itinerary_item") itineraryApplied++;
-            }
-            if (itineraryApplied === 0) {
-                const fallbackItinerary = getDefaultItineraryItems();
-                for (const slot of fallbackItinerary) {
-                    const ok = await processFunctionCall("add_itinerary_item", { ...slot, eventId: createdId }, "", chatIdOverride, eventIdRef, actionMetrics);
-                    if (ok) itineraryApplied++;
-                }
-            }
-            if (city) {
-                const vendorsForCity = allVendorsByCity[city] || [];
-                actionMetrics.vendorSearches.push({
-                    city,
-                    category: null,
-                    count: vendorsForCity.length,
-                    topVendors: vendorsForCity.slice(0, 3).map((v: any) => String(v?.name || "")).filter(Boolean)
-                });
-                actionMetrics.pendingMessages.push({
-                    type: "vendor_cards",
-                    content: `Here are top vendors in ${city} for your event:`,
-                    city,
-                    vendors: vendorsForCity,
-                    viewAllHref: "/dashboard/hosts/search",
-                    viewAllLabel: "View all vendors"
-                });
-            }
+        for (const call of allCalls.filter((c) => c.name !== "create_event")) {
+            const ok = await processFunctionCall(call.name, call.args || {}, modelText, chatIdOverride, eventIdRef, actionMetrics);
+            if (ok) handled = true;
         }
 
         if (handled) {
@@ -645,7 +790,8 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         if (isNew && !currentUser) {
             setMessages((prev) => [...prev, { id: Date.now().toString(), role: "user", content: text, time: nowStr }]);
             if (hasExplicitAction) {
-                dispatchLogic(text, actionData);
+                const approvalHandled = await handleApprovalAction(actionData);
+                if (!approvalHandled) dispatchLogic(text, actionData);
             } else {
                 await addAgentMsg({
                     type: "text",
@@ -665,7 +811,8 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
 
             await saveChatMessage(newChatId, { role: "user", content: text, time: nowStr });
             if (hasExplicitAction) {
-                dispatchLogic(text, actionData, newChatId);
+                const approvalHandled = await handleApprovalAction(actionData, newChatId);
+                if (!approvalHandled) dispatchLogic(text, actionData, newChatId);
                 router.push(`/dashboard/hosts/chat/${newChatId}`);
                 setInput("");
                 return;
@@ -691,7 +838,8 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         if (chatIdStr !== "new") {
             await saveChatMessage(chatIdStr, { role: "user", content: text, time: nowStr });
             if (hasExplicitAction) {
-                dispatchLogic(text, actionData, chatIdStr);
+                const approvalHandled = await handleApprovalAction(actionData, chatIdStr);
+                if (!approvalHandled) dispatchLogic(text, actionData, chatIdStr);
                 setInput("");
                 return;
             }
@@ -802,87 +950,23 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             itineraryItems: []
         });
         setSelectedEventId(createdEventId);
-
-        await saveChatMessage(chatIdStr, {
-            role: "agent",
-            type: "text",
-            content: `Event created: "${eventName}" in ${city}. Next I will generate your checklist.`,
-            time: nowStr
-        });
-
-        await saveChatMessage(chatIdStr, {
-            role: "agent",
-            type: "text",
-            content: "Generating checklist now.",
-            time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
-        });
-        const todoPrompt = `For the event "${eventName}" with ${guestCount} guests, budget ${budget}, in ${city}, create a concise event planning checklist. Call add_todo_item for each task (aim for 6–8 tasks). The eventName is "${eventName}".`;
-        let todoApplied = 0;
-        const todoCalls = await getRequiredFunctionCalls(todoPrompt, ["add_todo_item"]);
-        for (const call of todoCalls) {
-            const ok = await processFunctionCall(call.name, { ...call.args, eventId: createdEventId }, "", chatIdStr, { current: createdEventId });
-            if (ok && call.name === "add_todo_item") todoApplied++;
+        const createdEvent = await getEventById(createdEventId);
+        if (createdEvent) {
+            await saveChatMessage(chatIdStr, {
+                role: "agent",
+                type: "event_overview",
+                content: "Event created. Review the card below.",
+                eventId: createdEvent.id,
+                time: nowStr
+            });
+            await saveChatMessage(chatIdStr, {
+                role: "agent",
+                type: "text",
+                content: "Approve and I’ll generate the itinerary next.",
+                time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+                suggestions: [{ label: "Approve to continue", action: "approve_generate_itinerary", ...toApprovalPayload(createdEvent) }]
+            });
         }
-        if (todoApplied === 0) {
-            const fallbackTodo = getDefaultTodoItems(eventName, guestCount, city);
-            for (const item of fallbackTodo) {
-                const ok = await processFunctionCall("add_todo_item", { item, eventId: createdEventId }, "", chatIdStr, { current: createdEventId });
-                if (ok) todoApplied++;
-            }
-        }
-
-        await saveChatMessage(chatIdStr, {
-            role: "agent",
-            type: "text",
-            content: `Checklist ready (${todoApplied} items). Next I will draft your itinerary.`,
-            time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
-        });
-        const itineraryPrompt = `Build a realistic day-of itinerary for "${eventName}" in ${city}, ${guestCount} guests. Call add_itinerary_item for each slot (aim for 6–8 items with times like "10:00 AM"). The eventName is "${eventName}".`;
-        let itineraryApplied = 0;
-        const itineraryCalls = await getRequiredFunctionCalls(itineraryPrompt, ["add_itinerary_item"]);
-        for (const call of itineraryCalls) {
-            const ok = await processFunctionCall(call.name, { ...call.args, eventId: createdEventId }, "", chatIdStr, { current: createdEventId });
-            if (ok && call.name === "add_itinerary_item") itineraryApplied++;
-        }
-        if (itineraryApplied === 0) {
-            const fallbackItinerary = getDefaultItineraryItems();
-            for (const slot of fallbackItinerary) {
-                const ok = await processFunctionCall("add_itinerary_item", { ...slot, eventId: createdEventId }, "", chatIdStr, { current: createdEventId });
-                if (ok) itineraryApplied++;
-            }
-        }
-
-        await saveChatMessage(chatIdStr, {
-            role: "agent",
-            type: "text",
-            content: `Itinerary ready (${itineraryApplied} items). Next I will find vendors.`,
-            time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
-        });
-        const vendorsForCity = allVendorsByCity[city] || [];
-        await saveChatMessage(chatIdStr, {
-            role: "agent",
-            type: "vendor_cards",
-            content: `Here are top vendors in ${city} for your event:`,
-            city,
-            vendors: vendorsForCity,
-            viewAllHref: "/dashboard/hosts/search",
-            viewAllLabel: "View all vendors",
-            time: nowStr
-        });
-
-        await saveChatMessage(chatIdStr, {
-            role: "agent",
-            type: "text",
-            content: (todoApplied > 0 && itineraryApplied > 0)
-                ? `Done. Event, checklist, itinerary, and vendor options are ready for ${city}. Open Todo and Itinerary to review.`
-                : `I created your event and saved vendor options, but checklist or itinerary generation is still incomplete. Open the Todo and Itinerary tabs and I can fill any missing items immediately.`,
-            time: nowStr,
-            suggestions: [
-                { label: "View Todo", action: "todo" },
-                { label: "View Itinerary", action: "timeline" },
-                { label: "Discover Vendors", action: "vendor_search" }
-            ]
-        });
 
         setTyping(false);
         setInput("");
