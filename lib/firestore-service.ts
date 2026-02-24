@@ -201,9 +201,9 @@ export async function saveChatMessage(chatId: string, message: any) {
 
     // Update the parent chat's updatedAt
     const chatRef = doc(db, 'chats', chatId);
-    await updateDoc(chatRef, {
+    await setDoc(chatRef, {
         updatedAt: serverTimestamp()
-    });
+    }, { merge: true });
 }
 
 export function listenToMessages(
@@ -229,10 +229,10 @@ export function listenToMessages(
 
 export async function updateChatMetadata(chatId: string, data: any) {
     const chatRef = doc(db, 'chats', chatId);
-    await updateDoc(chatRef, {
+    await setDoc(chatRef, {
         ...data,
         updatedAt: serverTimestamp()
-    });
+    }, { merge: true });
 }
 
 export function listenToUserChats(userId: string, callback: (chats: any[]) => void) {

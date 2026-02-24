@@ -11,7 +11,7 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import { Calendar, Check, Pencil, Trash2, X } from "lucide-react";
+import { Calendar, Check, Download, Pencil, Trash2, X } from "lucide-react";
 
 interface DayOfTimelineProps {
     events?: SharedEvent[];
@@ -34,6 +34,101 @@ export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange, onU
     const AI_SUGGESTION_LIMIT = 3;
     const usedSuggestions = Number(selectedEvent?.aiItinerarySuggestionsUsed || 0);
     const remainingSuggestions = Math.max(0, AI_SUGGESTION_LIMIT - usedSuggestions);
+
+    const escapeIcsText = (value: string) =>
+        value
+            .replace(/\\/g, "\\\\")
+            .replace(/\n/g, "\\n")
+            .replace(/,/g, "\\,")
+            .replace(/;/g, "\\;");
+
+    const formatUtcForIcs = (date: Date) => {
+        const pad = (num: number) => String(num).padStart(2, "0");
+        return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}T${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}${pad(date.getUTCSeconds())}Z`;
+    };
+
+    const parseDateAndTime = (dateText: string, timeText: string) => {
+        const base = new Date(dateText);
+        if (Number.isNaN(base.getTime())) return null;
+
+        const trimmed = timeText.trim();
+        let hours = 0;
+        let minutes = 0;
+        const ampmMatch = trimmed.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
+        const twentyFourMatch = trimmed.match(/^(\d{1,2}):(\d{2})$/);
+
+        if (ampmMatch) {
+            hours = Number(ampmMatch[1]);
+            minutes = Number(ampmMatch[2] || 0);
+            const period = ampmMatch[3].toUpperCase();
+            if (hours === 12) hours = 0;
+            if (period === "PM") hours += 12;
+        } else if (twentyFourMatch) {
+            hours = Number(twentyFourMatch[1]);
+            minutes = Number(twentyFourMatch[2]);
+        } else {
+            return null;
+        }
+
+        if (hours > 23 || minutes > 59) return null;
+        const parsed = new Date(base);
+        parsed.setHours(hours, minutes, 0, 0);
+        return parsed;
+    };
+
+    const handleDownloadIcs = () => {
+        if (!selectedEvent || entries.length === 0) return;
+
+        const dtStamp = formatUtcForIcs(new Date());
+        const icsEvents: string[] = [];
+
+        entries.forEach((entry, index) => {
+            const start = parseDateAndTime(selectedEvent.date, entry.time);
+            if (!start) return;
+            const end = new Date(start.getTime() + 60 * 60 * 1000);
+            const uid = `${selectedEvent.id}-${index}-${start.getTime()}@visualafrica`;
+            const descriptionParts = [entry.note?.trim(), `Event: ${selectedEvent.eventName}`].filter(Boolean);
+
+            icsEvents.push(
+                "BEGIN:VEVENT",
+                `UID:${uid}`,
+                `DTSTAMP:${dtStamp}`,
+                `DTSTART:${formatUtcForIcs(start)}`,
+                `DTEND:${formatUtcForIcs(end)}`,
+                `SUMMARY:${escapeIcsText(entry.label)}`,
+                `DESCRIPTION:${escapeIcsText(descriptionParts.join(" | "))}`,
+                `LOCATION:${escapeIcsText(selectedEvent.location || "TBD")}`,
+                "END:VEVENT"
+            );
+        });
+
+        if (icsEvents.length === 0) {
+            alert("Could not generate calendar file. Check event date and itinerary times.");
+            return;
+        }
+
+        const fileBody = [
+            "BEGIN:VCALENDAR",
+            "VERSION:2.0",
+            "PRODID:-//VisualAfrica//Event Itinerary//EN",
+            "CALSCALE:GREGORIAN",
+            "METHOD:PUBLISH",
+            `X-WR-CALNAME:${escapeIcsText(`${selectedEvent.eventName} Itinerary`)}`,
+            ...icsEvents,
+            "END:VCALENDAR"
+        ].join("\r\n");
+
+        const blob = new Blob([fileBody], { type: "text/calendar;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        const safeName = (selectedEvent.eventName || "event").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        anchor.href = url;
+        anchor.download = `${safeName}-itinerary.ics`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(url);
+    };
 
     // Initialize entries from event data
     useEffect(() => {
@@ -235,6 +330,16 @@ Rules:
                 </div>
             ) : (
                 <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-500">
+                    <div className="flex justify-end">
+                        <button
+                            onClick={handleDownloadIcs}
+                            disabled={entries.length === 0}
+                            className="h-8 px-3 rounded-lg border border-border bg-card text-[12px] font-medium text-foreground hover:bg-secondary transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                        >
+                            <Download size={12} />
+                            Download .ics
+                        </button>
+                    </div>
                     <div className="flex items-center gap-2">
                         <input
                             value={newTime}

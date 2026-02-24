@@ -64,6 +64,8 @@ export function useChatAgent({
     currentUser,
     storeKits
 }: UseChatAgentArgs) {
+    type WorkflowStage = "event" | "itinerary" | "todo" | "budget" | "vendors";
+
     const APPROVAL_ACTIONS = new Set([
         "approve_generate_itinerary",
         "approve_generate_todo",
@@ -73,6 +75,22 @@ export function useChatAgent({
 
     const getRouteChatId = () => {
         return typeof paramsId === "string" ? paramsId : Array.isArray(paramsId) ? paramsId[0] : "new";
+    };
+
+    const buildWorkflowActions = (stage: WorkflowStage) => {
+        const order: WorkflowStage[] = ["event", "itinerary", "todo", "budget", "vendors"];
+        const labels: Record<WorkflowStage, string> = {
+            event: "Event created",
+            itinerary: "Itinerary generated",
+            todo: "Checklist generated",
+            budget: "Budget allocated",
+            vendors: "Vendors shortlisted"
+        };
+        const stageIndex = order.indexOf(stage);
+        return order.map((item, idx) => ({
+            label: labels[item],
+            status: idx < stageIndex ? "done" : idx === stageIndex ? "active" : "queued"
+        }));
     };
 
     const persistAgentMessage = async (msg: any, chatIdOverride?: string) => {
@@ -456,6 +474,14 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             );
             await persistAgentMessage(
                 {
+                    type: "action",
+                    content: "Planning progress",
+                    actions: buildWorkflowActions("itinerary")
+                },
+                chatIdOverride
+            );
+            await persistAgentMessage(
+                {
                     type: "text",
                     content: "Review the itinerary above. Approve to generate your checklist next.",
                     suggestions: [{ label: "Approve to continue", action: "approve_generate_todo", ...payload }]
@@ -473,6 +499,14 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             const todoApplied = await generateTodoForEvent(event, chatIdOverride);
             await persistAgentMessage(
                 { type: "todo", content: `Checklist ready (${todoApplied} items).` },
+                chatIdOverride
+            );
+            await persistAgentMessage(
+                {
+                    type: "action",
+                    content: "Planning progress",
+                    actions: buildWorkflowActions("todo")
+                },
                 chatIdOverride
             );
             await persistAgentMessage(
@@ -503,6 +537,14 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             );
             await persistAgentMessage(
                 {
+                    type: "action",
+                    content: "Planning progress",
+                    actions: buildWorkflowActions("budget")
+                },
+                chatIdOverride
+            );
+            await persistAgentMessage(
+                {
                     type: "text",
                     content: "Review the budget allocation above. Approve and I’ll fetch the top vendor matches.",
                     suggestions: [{ label: "Approve to continue", action: "approve_find_vendors", ...payload }]
@@ -523,6 +565,14 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                     vendors: vendorsForCity,
                     viewAllHref: "/dashboard/hosts/search",
                     viewAllLabel: "View all vendors"
+                },
+                chatIdOverride
+            );
+            await persistAgentMessage(
+                {
+                    type: "action",
+                    content: "Planning progress",
+                    actions: buildWorkflowActions("vendors")
                 },
                 chatIdOverride
             );
@@ -795,6 +845,14 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                     );
                     await persistAgentMessage(
                         {
+                            type: "action",
+                            content: "Planning progress",
+                            actions: buildWorkflowActions("event")
+                        },
+                        chatIdOverride
+                    );
+                    await persistAgentMessage(
+                        {
                             type: "text",
                             content: "Approve and I’ll generate the itinerary next.",
                             suggestions: [{ label: "Approve to continue", action: "approve_generate_itinerary", ...toApprovalPayload(createdEvent) }]
@@ -808,6 +866,14 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                         type: "text",
                         content: "Event created. Approve and I’ll generate the itinerary next.",
                         suggestions: [{ label: "Approve to continue", action: "approve_generate_itinerary", eventId: eventIdRef.current }]
+                    },
+                    chatIdOverride
+                );
+                await persistAgentMessage(
+                    {
+                        type: "action",
+                        content: "Planning progress",
+                        actions: buildWorkflowActions("event")
                     },
                     chatIdOverride
                 );
@@ -1012,6 +1078,13 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 type: "event_overview",
                 content: "Event created. Review the card below.",
                 eventId: createdEvent.id,
+                time: nowStr
+            });
+            await saveChatMessage(chatIdStr, {
+                role: "agent",
+                type: "action",
+                content: "Planning progress",
+                actions: buildWorkflowActions("event"),
                 time: nowStr
             });
             await saveChatMessage(chatIdStr, {

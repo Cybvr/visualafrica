@@ -6,6 +6,7 @@ import {
     getVendors,
     getEvents,
     getChatById,
+    createChat,
     saveChatMessage,
     listenToMessages,
     updateChatMetadata,
@@ -13,7 +14,6 @@ import {
     listenToEvents
 } from "@/lib/firestore-service";
 import { SharedEvent } from "@/lib/types";
-import { cn } from "@/lib/utils";
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -33,18 +33,18 @@ import {
     ChevronDown,
     Mic,
     ArrowRight,
-    MapPin,
-    Star,
-    Users,
-    Search,
-    Sparkles,
-    ShoppingBag,
-    CalendarDays,
-    ListTodo,
-    Wallet,
-    Clock3,
-    MoreHorizontal
 } from "lucide-react";
+import type { IconType } from "react-icons";
+import {
+    MdAddCircle,
+    MdEvent,
+    MdChecklist,
+    MdAccountBalanceWallet,
+    MdSchedule,
+    MdTravelExplore,
+    MdAutoAwesome,
+    MdStorefront,
+} from "react-icons/md";
 import { Dots, Msg } from "@/components/dashboard/chat/chat-message-renderers";
 import { useChatAgent } from "@/hooks/use-chat-agent";
 
@@ -105,6 +105,17 @@ export default function ChatPage() {
         const userContent = `Show me ${pill.label.toLowerCase()}`;
         send(userContent, pill);
     };
+
+    const chatQuickActions: { id: string; label: string; icon: IconType; colorClass: string; action?: string }[] = [
+        { id: 'start_planning', label: 'Plan', icon: MdAddCircle, colorClass: 'text-emerald-600', action: 'start_planning' },
+        { id: 'overview', label: 'My Events', icon: MdEvent, colorClass: 'text-indigo-600' },
+        { id: 'todo', label: 'To-do', icon: MdChecklist, colorClass: 'text-violet-600' },
+        { id: 'budget', label: 'Budget', icon: MdAccountBalanceWallet, colorClass: 'text-green-600' },
+        { id: 'timeline', label: 'Itinerary', icon: MdSchedule, colorClass: 'text-amber-600' },
+        { id: 'vendors_search', label: 'Discover Vendors', icon: MdTravelExplore, colorClass: 'text-sky-600', action: 'vendor_search' },
+        { id: 'experience', label: 'Experiences', icon: MdAutoAwesome, colorClass: 'text-pink-600', action: 'experience' },
+        { id: 'store', label: 'Shop', icon: MdStorefront, colorClass: 'text-orange-600', action: 'start_store' },
+    ];
 
     useEffect(() => {
         if (!currentUser) return;
@@ -416,58 +427,6 @@ export default function ChatPage() {
                     }}
                 />
 
-                {/* Corridor Pills - Option B Layout */}
-                <div className="flex items-center justify-between gap-2.5 px-4 sm:px-6 py-4 border-b border-border bg-background/50 backdrop-blur-md shrink-0">
-                    <div className="flex items-center gap-2.5 overflow-x-auto hide-scrollbar">
-                        {[
-                            { id: 'start_planning', label: 'Plan', icon: Plus, action: 'start_planning', primary: true },
-                            { id: 'overview', label: 'My Events', icon: CalendarDays },
-                            { id: 'todo', label: 'To-do', icon: ListTodo },
-                            { id: 'budget', label: 'Budget', icon: Wallet },
-                        ].map(pill => (
-                            <button
-                                key={pill.id}
-                                onClick={() => handlePillClick(pill)}
-                                className={cn(
-                                    "flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all whitespace-nowrap shadow-sm active:scale-95",
-                                    pill.primary
-                                        ? "bg-foreground text-background hover:bg-foreground/90"
-                                        : "bg-card border border-border text-foreground hover:bg-secondary/80"
-                                )}
-                            >
-                                <pill.icon size={16} className={cn("shrink-0", pill.primary ? "text-background" : "text-muted-foreground")} />
-                                {pill.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border text-[13px] font-semibold text-foreground hover:bg-secondary/80 transition-all shadow-sm shrink-0 active:scale-95 ml-2">
-                                <MoreHorizontal size={16} className="text-muted-foreground" />
-                                <span>More</span>
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48 p-1">
-                            {[
-                                { id: 'vendors_search', label: 'Discover Vendors', icon: Search, action: 'vendor_search' },
-                                { id: 'experience', label: 'Experiences', icon: Sparkles, action: 'experience' },
-                                { id: 'store', label: 'Shop', icon: ShoppingBag, action: 'start_store' },
-                                { id: 'timeline', label: 'Itinerary', icon: Clock3 },
-                            ].map(pill => (
-                                <DropdownMenuItem
-                                    key={pill.id}
-                                    onClick={() => handlePillClick(pill)}
-                                    className="flex items-center gap-2 cursor-pointer py-2"
-                                >
-                                    <pill.icon size={14} className="text-muted-foreground" />
-                                    <span className="text-sm font-medium">{pill.label}</span>
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-
                 <SheetContent side="left" className="p-0 w-64 border-none">
                     <Sidebar onNavigate={() => setIsMobileMenuOpen(false)} />
                 </SheetContent>
@@ -541,6 +500,26 @@ export default function ChatPage() {
                                 <button className="p-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors">
                                     <Plus size={18} />
                                 </button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button className="h-9 px-3 text-[12px] font-semibold text-foreground border border-border rounded-lg bg-card hover:bg-secondary transition-colors inline-flex items-center gap-1.5">
+                                            Actions
+                                            <ChevronDown size={14} className="text-muted-foreground" />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="start" className="w-52 p-1">
+                                        {chatQuickActions.map((pill) => (
+                                            <DropdownMenuItem
+                                                key={pill.id}
+                                                onClick={() => handlePillClick(pill)}
+                                                className="flex items-center gap-2 cursor-pointer py-2"
+                                            >
+                                                <pill.icon size={16} className={pill.colorClass} />
+                                                <span className="text-sm font-medium">{pill.label}</span>
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
 
                             <div className="flex items-center gap-2">

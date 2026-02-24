@@ -410,8 +410,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
         ) : (
           /* Expanded: logo left, collapse chevron right */
           <>
-            <Link href={logoHref} className="flex items-center min-w-0">
-              <img src="/logo.png" alt="Logo" className="h-7 w-auto min-w-[28px] object-contain shrink-0" />
+            <Link href={logoHref} className="flex items-center gap-2 min-w-0">
+              <img src="/logo.png" alt="Waddi Logo" className="h-7 w-auto min-w-[28px] object-contain shrink-0" />
+              <span className="font-logo text-xl font-normal text-foreground leading-none">
+                Waddi
+              </span>
             </Link>
             {onToggleCollapse && (
               <button
