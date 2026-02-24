@@ -33,7 +33,7 @@ export async function FeaturesGrid() {
             <div className="container mx-auto px-4">
                 <div className="relative mb-16 rounded-2xl overflow-hidden min-h-[500px] flex items-center">
                     <Image
-                        src="/images/waddi2.png"
+                        src="/images/book.jpg"
                         alt="Waddi Event Planning"
                         fill
                         className="object-cover"

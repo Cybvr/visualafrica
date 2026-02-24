@@ -76,9 +76,6 @@ export function TrustSection() {
                             })}
                         </div>
 
-                        <Button size="lg" variant="outline" className="mt-12 h-14 px-10 text-lg hover:text-primary-foreground">
-                            See how it works
-                        </Button>
                     </div>
                 </div>
             </div>
