@@ -178,6 +178,7 @@ const DropdownFilter: React.FC<{
 export default function DashboardPage() {
   const router = useRouter();
   const [displayName, setDisplayName] = useState<string>('');
+  const VENDORS_PER_PAGE = 12;
 
   // Data States
   const [allVendors, setAllVendors] = useState<Vendor[]>([]);
@@ -194,6 +195,7 @@ export default function DashboardPage() {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState<string>('All');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Counts
   const allVendorsCount = allVendors.length;
@@ -261,6 +263,7 @@ export default function DashboardPage() {
     setSelectedLocations([]);
     setSelectedType('All');
     setPriceRange([0, 10000000]);
+    setCurrentPage(1);
   };
 
   const firstName = displayName.trim().split(/\s+/)[0] || displayName;
@@ -309,6 +312,27 @@ export default function DashboardPage() {
   }
 
   const displayVendors = activeTab === 'all' || activeTab === 'experiences' ? filteredVendors : filteredVendors.slice(0, 3); // Todo: filter saved
+  const totalPages = Math.max(1, Math.ceil(displayVendors.length / VENDORS_PER_PAGE));
+  const clampedPage = Math.min(currentPage, totalPages);
+  const paginatedVendors = displayVendors.slice(
+    (clampedPage - 1) * VENDORS_PER_PAGE,
+    clampedPage * VENDORS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    activeTab,
+    searchQuery,
+    selectedType,
+    selectedCategories,
+    selectedThemes,
+    selectedLocations
+  ]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
 
   const filterBar = (
     <FilterBar
@@ -431,12 +455,38 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-              {displayVendors.map(vendor => (
+              {paginatedVendors.map(vendor => (
                 <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full min-w-0 transition-transform hover:scale-[1.02]">
                   <VendorCard vendor={vendor} />
                 </Link>
               ))}
             </div>
+
+            {displayVendors.length > VENDORS_PER_PAGE && (
+              <div className="flex items-center justify-center gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-lg"
+                  disabled={clampedPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                >
+                  Prev
+                </Button>
+                <span className="text-sm font-semibold text-muted-foreground px-3">
+                  Page {clampedPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-lg"
+                  disabled={clampedPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
 
             {displayVendors.length === 0 && (
               <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card p-16 md:p-32 text-center">

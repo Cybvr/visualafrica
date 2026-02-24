@@ -69,13 +69,34 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
         e.preventDefault();
         setLoading(true);
         try {
-            await onSubmit(formData);
+            const normalizedData = {
+                ...formData,
+                price: formData.price === "" ? null : Number(formData.price),
+            };
+            await onSubmit(normalizedData);
             router.push("/admin/vendors");
         } catch (error) {
             console.error("Submit failed:", error);
             alert("Error saving vendor");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleFileUpload = async (file?: File) => {
+        if (!file) return;
+        setUploading(true);
+        try {
+            const url = await uploadImage(file, `vendors/${Date.now()}-${file.name}`);
+            setFormData((prev) => ({ ...prev, image: url }));
+        } catch (err: any) {
+            const message = err?.code
+                ? `Upload failed (${err.code}). Paste an Image URL below or check Firebase Storage rules.`
+                : "Upload failed. Paste an Image URL below or check Firebase Storage rules.";
+            alert(message);
+            console.error("Vendor image upload error:", err);
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -124,14 +145,13 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
                         />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-sm font-bold">Price ($) *</label>
+                        <label className="text-sm font-bold">Price ($)</label>
                         <input
-                            required
                             type="number"
                             className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary"
                             value={formData.price}
                             onChange={e => setFormData({ ...formData, price: e.target.value ? Number(e.target.value) : "" as any })}
-                            placeholder="e.g. 500000"
+                            placeholder="Optional, e.g. 500000"
                         />
                     </div>
                     <div className="md:col-span-2 space-y-2">
@@ -142,17 +162,7 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
                                 e.preventDefault();
                                 e.stopPropagation();
                                 const file = e.dataTransfer.files?.[0];
-                                if (file) {
-                                    setUploading(true);
-                                    try {
-                                        const url = await uploadImage(file, `vendors/${Date.now()}-${file.name}`);
-                                        setFormData({ ...formData, image: url });
-                                    } catch (err) {
-                                        alert("Upload failed");
-                                    } finally {
-                                        setUploading(false);
-                                    }
-                                }
+                                await handleFileUpload(file);
                             }}
                             className={cn(
                                 "relative border-2 border-dashed border-border rounded-2xl p-8 transition-all flex flex-col items-center justify-center gap-4 bg-secondary/20 hover:bg-secondary/30 group cursor-pointer",
@@ -167,17 +177,7 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
                                 accept="image/*"
                                 onChange={async (e) => {
                                     const file = e.target.files?.[0];
-                                    if (file) {
-                                        setUploading(true);
-                                        try {
-                                            const url = await uploadImage(file, `vendors/${Date.now()}-${file.name}`);
-                                            setFormData({ ...formData, image: url });
-                                        } catch (err) {
-                                            alert("Upload failed");
-                                        } finally {
-                                            setUploading(false);
-                                        }
-                                    }
+                                    await handleFileUpload(file);
                                 }}
                             />
 
@@ -206,6 +206,13 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
                                 </div>
                             )}
                         </div>
+                        <input
+                            type="url"
+                            className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary"
+                            value={formData.image}
+                            onChange={e => setFormData({ ...formData, image: e.target.value })}
+                            placeholder="Or paste image URL (https://...)"
+                        />
                     </div>
                 </div>
 

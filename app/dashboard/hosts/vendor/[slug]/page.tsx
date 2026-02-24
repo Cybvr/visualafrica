@@ -10,8 +10,9 @@ interface PageProps {
 export default async function VendorDetailPage({ params }: PageProps) {
     const { slug } = await params;
     const vendor = await getVendorBySlug(slug);
+    const plainVendor = vendor ? JSON.parse(JSON.stringify(vendor)) : null;
 
-    if (!vendor) {
+    if (!plainVendor) {
         return (
             <div className="flex flex-col items-center justify-center h-full space-y-4">
                 <h1 className="text-2xl font-bold text-foreground">Vendor not found</h1>
@@ -25,5 +26,5 @@ export default async function VendorDetailPage({ params }: PageProps) {
         );
     }
 
-    return <VendorDetail vendor={vendor} />;
+    return <VendorDetail vendor={plainVendor} />;
 }

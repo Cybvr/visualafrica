@@ -507,12 +507,12 @@ export default function ChatPage() {
                                             <ChevronDown size={14} className="text-muted-foreground" />
                                         </button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-52 p-1">
+                                    <DropdownMenuContent align="start" className="w-52 p-1 bg-background">
                                         {chatQuickActions.map((pill) => (
                                             <DropdownMenuItem
                                                 key={pill.id}
                                                 onClick={() => handlePillClick(pill)}
-                                                className="flex items-center gap-2 cursor-pointer py-2"
+                                                className="flex items-center gap-2 cursor-pointer py-2 text-foreground"
                                             >
                                                 <pill.icon size={16} className={pill.colorClass} />
                                                 <span className="text-sm font-medium">{pill.label}</span>

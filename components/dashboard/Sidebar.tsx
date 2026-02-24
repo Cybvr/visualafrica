@@ -65,6 +65,7 @@ type UserProfile = {
   displayName: string;
   email: string;
   photoURL?: string;
+  role?: string;
 };
 
 const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }> = ({ mode, collapsed = false }) => {
@@ -85,12 +86,14 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
               displayName: data.displayName || currentUser.displayName || "User",
               email: data.email || currentUser.email || "",
               photoURL: data.photoURL || currentUser.photoURL || undefined,
+              role: data.role || undefined,
             });
           } else {
             setUserProfile({
               displayName: currentUser.displayName || "User",
               email: currentUser.email || "",
               photoURL: currentUser.photoURL || undefined,
+              role: undefined,
             });
           }
         } catch (error) {
@@ -99,6 +102,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
             displayName: currentUser.displayName || "User",
             email: currentUser.email || "",
             photoURL: currentUser.photoURL || undefined,
+            role: undefined,
           });
         }
       } else {
@@ -180,6 +184,15 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
               {mode === 'host' ? 'View as Vendor' : 'View as Host'}
             </Link>
           </DropdownMenuItem>
+
+          {userProfile.role === "admin" && (
+            <DropdownMenuItem asChild className="py-2 cursor-pointer flex items-center gap-2 text-foreground font-medium text-sm">
+              <Link href="/admin" className="flex items-center gap-2 w-full">
+                <MdSettings size={16} />
+                Admin
+              </Link>
+            </DropdownMenuItem>
+          )}
 
 
           <DropdownMenuSub>
@@ -441,6 +454,24 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
             />
           ))}
         </SidebarSection>
+        {secondaryNavItems.length > 0 && (
+          <div className="mt-4">
+            <SidebarSection>
+              {secondaryNavItems.map((item) => (
+                <NavItem
+                  key={item.href}
+                  icon={<item.icon size={20} />}
+                  label={item.label}
+                  active={isActive(item)}
+                  href={item.href}
+                  count={item.count}
+                  collapsed={collapsed}
+                  onNavigate={onNavigate}
+                />
+              ))}
+            </SidebarSection>
+          </div>
+        )}
         {mode === "host" && !collapsed && (
           <ChatHistorySection
             items={hostChatHistoryItems}

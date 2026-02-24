@@ -137,7 +137,7 @@ Rules:
                         <SelectTrigger className="w-full h-8 bg-secondary/30 border-border text-[12px] font-medium rounded-lg">
                             <div className="flex items-center gap-2">
                                 <Wallet size={14} className="text-primary" />
-                                <SelectValue placeholder="Context: Select Event" />
+                                <SelectValue placeholder="Select Event" />
                             </div>
                         </SelectTrigger>
                         <SelectContent>

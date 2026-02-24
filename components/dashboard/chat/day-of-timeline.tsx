@@ -304,12 +304,12 @@ Rules:
                         <SelectTrigger className="w-full h-8 bg-secondary/30 border-border text-[12px] font-medium rounded-lg">
                             <div className="flex items-center gap-2">
                                 <Calendar size={14} className="text-primary" />
-                                <SelectValue placeholder="Context: Select Event" />
+                                <SelectValue placeholder="Select Event" />
                             </div>
                         </SelectTrigger>
                         <SelectContent>
                             {events.map((ev) => (
-                                <SelectItem key={ev.id} value={ev.id} className="text-[12px]">
+                                <SelectItem key={ev.id} value={ev.id} className="text-[12px] text-foreground">
                                     {ev.eventName}
                                 </SelectItem>
                             ))}
@@ -320,7 +320,7 @@ Rules:
 
             {!selectedEventId ? (
                 <div className="py-8 px-4 border border-dashed border-border rounded-xl bg-secondary/10 flex flex-col items-center justify-center text-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-secondary/30 flex items-center justify-center text-primary">
+                    <div className="w-10 h-10 rounded-full bg-secondary/30 flex items-center justify-center text-foreground">
                         <Calendar size={20} />
                     </div>
                     <div className="text-[13px] font-medium text-foreground">No Event Selected</div>
@@ -427,7 +427,7 @@ Rules:
                                             <div className="flex items-center opacity-0 group-hover:opacity-100 transition-all">
                                                 <button
                                                     onClick={() => handleStartEdit(i)}
-                                                    className="p-1 hover:text-primary transition-colors"
+                                                    className="p-1 hover:text-foreground transition-colors"
                                                 >
                                                     <Pencil size={12} />
                                                 </button>

@@ -66,8 +66,16 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
                     "border-border"
                 )}
             >
-                <div className="flex justify-between items-start">
-                    <div>
+                <div className="flex justify-between items-start gap-3">
+                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted shrink-0 border border-border">
+                        <img
+                            src={v.image || "/placeholder.png"}
+                            alt={v.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.png"; }}
+                        />
+                    </div>
+                    <div className="flex-1 min-w-0">
                         <div className="text-foreground font-bold text-sm group-hover:text-primary transition-colors">{v.name}</div>
                         <div className="text-muted-foreground text-[11px]">{v.type}</div>
                     </div>

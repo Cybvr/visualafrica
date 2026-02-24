@@ -69,7 +69,7 @@ export function WaddiPrompt() {
                                             <Plus size={18} />
                                         </button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-80 p-1">
+                                    <DropdownMenuContent align="start" className="w-80 p-1 bg-background">
                                         {SUGGESTIONS.map((s, i) => (
                                             <DropdownMenuItem
                                                 key={i}

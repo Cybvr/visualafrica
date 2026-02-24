@@ -17,19 +17,21 @@ export default async function ExploreVendorsPage({ params }: PageProps) {
 
   const allVendors = await getVendors()
   const vendorData = isVendorDetail ? await getVendorBySlug(firstSegment) : undefined
+  const plainAllVendors = JSON.parse(JSON.stringify(allVendors))
+  const plainVendorData = vendorData ? JSON.parse(JSON.stringify(vendorData)) : undefined
   const faqs = await getFaqs()
   const vendorFaqs: FAQ[] = faqs.filter(
     (f) => f.category === "vendors" || f.category === "general"
   )
 
-  if (isVendorDetail && vendorData) {
-    return <VendorDetail vendor={vendorData} />
+  if (isVendorDetail && plainVendorData) {
+    return <VendorDetail vendor={plainVendorData} />
   }
 
   return (
     <VendorListingContent
       categorySlug={firstSegment}
-      vendors={allVendors}
+      vendors={plainAllVendors}
       faqs={vendorFaqs}
     />
   )

@@ -22,6 +22,7 @@ export function buildVendorsList(vendors: Vendor[], city: string) {
         .map(v => ({
             name: v.name,
             slug: v.slug || v.id,
+            image: v.image || "/placeholder.png",
             type: v.categories[0],
             categories: v.categories,
             tags: v.services.slice(0, 4),
