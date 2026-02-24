@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getVendors, deleteVendor, bulkUpdateVendors } from "@/lib/firestore-service";
 import { Vendor } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2, Search, ExternalLink, Save, X, LayoutGrid } from "lucide-react";
+import { Plus, Trash2, Search, ExternalLink, Save, X, LayoutGrid } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function AdminVendorsPage() {
@@ -15,6 +15,7 @@ export default function AdminVendorsPage() {
     const [isBulkEditing, setIsBulkEditing] = useState(false);
     const [editedVendors, setEditedVendors] = useState<{ [id: string]: Partial<Vendor> }>({});
     const [isSaving, setIsSaving] = useState(false);
+    const [selectedVendorIds, setSelectedVendorIds] = useState<string[]>([]);
 
     useEffect(() => {
         loadVendors();
@@ -66,6 +67,7 @@ export default function AdminVendorsPage() {
             await loadVendors();
             setIsBulkEditing(false);
             setEditedVendors({});
+            setSelectedVendorIds([]);
         } catch (error) {
             alert("Failed to save changes");
         } finally {
@@ -79,12 +81,40 @@ export default function AdminVendorsPage() {
         v.categories.some(c => c.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
+    const toggleVendorSelection = (id: string) => {
+        setSelectedVendorIds(prev =>
+            prev.includes(id) ? prev.filter(vId => vId !== id) : [...prev, id]
+        );
+    };
+
+    const selectAllFiltered = () => setSelectedVendorIds(filteredVendors.map(v => v.id));
+    const clearSelection = () => setSelectedVendorIds([]);
+    const allSelected = filteredVendors.length > 0 && selectedVendorIds.length === filteredVendors.length;
+    const allFilteredFeatured =
+        filteredVendors.length > 0 &&
+        filteredVendors.every(v => Boolean(editedVendors[v.id]?.featured ?? v.featured));
+    const toggleSelectAll = () => {
+        if (allSelected) clearSelection();
+        else selectAllFiltered();
+    };
+    const toggleBulkFeatured = (checked: boolean) => {
+        setEditedVendors(prev => {
+            const next = { ...prev };
+            filteredVendors.forEach(v => {
+                next[v.id] = { ...next[v.id], featured: checked };
+            });
+            return next;
+        });
+    };
+
     return (
         <div className="p-8 max-w-7xl mx-auto bg-background text-foreground min-h-screen">
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold">Admin: Vendors</h1>
-                    <p className="text-muted-foreground mt-1">Manage your vendor marketplace</p>
+                    <p className="text-muted-foreground mt-1">
+                        Manage your vendor marketplace • {vendors.length} vendors
+                    </p>
                 </div>
                 <div className="flex gap-3">
                     {!isBulkEditing ? (
@@ -109,6 +139,7 @@ export default function AdminVendorsPage() {
                                 onClick={() => {
                                     setIsBulkEditing(false);
                                     setEditedVendors({});
+                                    setSelectedVendorIds([]);
                                 }}
                                 disabled={isSaving}
                                 className="flex items-center gap-2"
@@ -127,18 +158,16 @@ export default function AdminVendorsPage() {
                 </div>
             </div>
 
-            {!isBulkEditing && (
-                <div className="relative mb-6">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-                    <input
-                        type="text"
-                        placeholder="Search by name, location, or category..."
-                        className="w-full bg-card border border-border rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-            )}
+            <div className="relative mb-6">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+                <input
+                    type="text"
+                    placeholder="Search by name, location, or category..."
+                    className="w-full bg-card border border-border rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
 
             {loading ? (
                 <div className="flex justify-center py-20">
@@ -149,9 +178,36 @@ export default function AdminVendorsPage() {
                     <table className="w-full text-left table-fixed">
                         <thead className="bg-secondary/50 border-b border-border">
                             <tr>
+                                {isBulkEditing && (
+                                    <th className="w-[6%] px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                                        <input
+                                            type="checkbox"
+                                            checked={allSelected}
+                                            onChange={toggleSelectAll}
+                                            className="h-4 w-4 rounded border-border"
+                                            title={allSelected ? "Deselect all" : "Select all"}
+                                        />
+                                    </th>
+                                )}
                                 <th className="w-[30%] px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Vendor Name</th>
                                 <th className="w-[25%] px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Location</th>
                                 <th className="w-[15%] px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Price ($)</th>
+                                <th className="w-[10%] px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                                    {isBulkEditing ? (
+                                        <div className="flex items-center gap-2 normal-case">
+                                            <input
+                                                type="checkbox"
+                                                checked={allFilteredFeatured}
+                                                onChange={(e) => toggleBulkFeatured(e.target.checked)}
+                                                className="h-4 w-4 rounded border-border cursor-pointer"
+                                                title={allFilteredFeatured ? "Unfeature all visible vendors" : "Feature all visible vendors"}
+                                            />
+                                            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Featured</span>
+                                        </div>
+                                    ) : (
+                                        "Featured"
+                                    )}
+                                </th>
                                 <th className="w-[15%] px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Slug</th>
                                 <th className="w-[15%] px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground text-right">Actions</th>
                             </tr>
@@ -159,6 +215,16 @@ export default function AdminVendorsPage() {
                         <tbody className="divide-y divide-border">
                             {filteredVendors.length > 0 ? filteredVendors.map((v) => (
                                 <tr key={v.id} className={cn("hover:bg-secondary/20 transition-colors", isBulkEditing && "bg-secondary/10")}>
+                                    {isBulkEditing && (
+                                        <td className="px-4 py-4">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedVendorIds.includes(v.id)}
+                                                onChange={() => toggleVendorSelection(v.id)}
+                                                className="h-4 w-4 rounded border-border"
+                                            />
+                                        </td>
+                                    )}
                                     <td className="px-6 py-4">
                                         {isBulkEditing ? (
                                             <input
@@ -167,10 +233,10 @@ export default function AdminVendorsPage() {
                                                 onChange={(e) => handleBulkEditChange(v.id, "name", e.target.value)}
                                             />
                                         ) : (
-                                            <div className="flex items-center gap-3">
+                                            <Link href={`/admin/vendors/${v.id}/edit`} className="flex items-center gap-3 hover:opacity-90">
                                                 <img src={v.image || "/placeholder.png"} className="w-8 h-8 rounded-lg object-cover" alt="" />
-                                                <div className="font-bold text-sm truncate">{v.name}</div>
-                                            </div>
+                                                <div className="font-bold text-sm truncate hover:underline">{v.name}</div>
+                                            </Link>
                                         )}
                                     </td>
                                     <td className="px-6 py-4 text-sm text-muted-foreground">
@@ -198,6 +264,23 @@ export default function AdminVendorsPage() {
                                             </span>
                                         )}
                                     </td>
+                                    <td className="px-6 py-4">
+                                        {isBulkEditing ? (
+                                            <input
+                                                type="checkbox"
+                                                checked={Boolean(editedVendors[v.id]?.featured ?? v.featured)}
+                                                onChange={(e) => handleBulkEditChange(v.id, "featured", e.target.checked)}
+                                                className="h-4 w-4 rounded border-border"
+                                            />
+                                        ) : (
+                                            <span className={cn(
+                                                "text-xs font-bold uppercase tracking-wider",
+                                                v.featured ? "text-amber-600" : "text-muted-foreground"
+                                            )}>
+                                                {v.featured ? "Yes" : "No"}
+                                            </span>
+                                        )}
+                                    </td>
                                     <td className="px-6 py-4 text-xs text-muted-foreground font-mono">
                                         {isBulkEditing ? (
                                             <input
@@ -217,11 +300,6 @@ export default function AdminVendorsPage() {
                                                         <ExternalLink size={18} />
                                                     </Link>
                                                 </Button>
-                                                <Button variant="ghost" size="icon" asChild className="text-blue-500 hover:text-blue-600 hover:bg-blue-50" title="Edit">
-                                                    <Link href={`/admin/vendors/${v.id}/edit`}>
-                                                        <Edit size={18} />
-                                                    </Link>
-                                                </Button>
                                                 <button
                                                     onClick={() => handleDelete(v.id, v.name)}
                                                     className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -239,7 +317,7 @@ export default function AdminVendorsPage() {
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-20 text-center text-muted-foreground">
+                                    <td colSpan={isBulkEditing ? 7 : 6} className="px-6 py-20 text-center text-muted-foreground">
                                         No vendors found matching your search.
                                     </td>
                                 </tr>
@@ -251,4 +329,3 @@ export default function AdminVendorsPage() {
         </div>
     );
 }
-

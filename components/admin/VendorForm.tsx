@@ -30,6 +30,7 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [slugManuallyEdited, setSlugManuallyEdited] = useState(Boolean(initialData?.slug));
     const [formData, setFormData] = useState({
         name: initialData?.name || "",
         slug: initialData?.slug || "",
@@ -37,7 +38,6 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
         price: initialData?.price || "",
         image: initialData?.image || "",
         description: initialData?.description || "",
-        shortDescription: initialData?.shortDescription || "",
         categories: initialData?.categories || [],
         eventThemes: initialData?.eventThemes || [],
         featured: initialData?.featured || false,
@@ -46,6 +46,14 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
         responseTime: initialData?.responseTime || "within 2 hours",
         areaServed: initialData?.areaServed || [],
     });
+
+    const toSlug = (value: string) =>
+        value
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-");
 
     const handleCategoryToggle = (cat: VendorCategory) => {
         setFormData(prev => ({
@@ -71,6 +79,8 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
         try {
             const normalizedData = {
                 ...formData,
+                slug: (formData.slug && formData.slug.trim()) || toSlug(formData.name),
+                shortDescription: (formData.description || formData.name || "").trim().slice(0, 140),
                 price: formData.price === "" ? null : Number(formData.price),
             };
             await onSubmit(normalizedData);
@@ -118,19 +128,28 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
                             type="text"
                             className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary"
                             value={formData.name}
-                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                            onChange={e => {
+                                const nextName = e.target.value;
+                                setFormData(prev => ({
+                                    ...prev,
+                                    name: nextName,
+                                    slug: slugManuallyEdited ? prev.slug : toSlug(nextName),
+                                }));
+                            }}
                             placeholder="e.g. Elegant Events"
                         />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-sm font-bold">Slug (URL path) *</label>
+                        <label className="text-sm font-bold">Slug (URL path)</label>
                         <input
-                            required
                             type="text"
                             className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary"
                             value={formData.slug}
-                            onChange={e => setFormData({ ...formData, slug: e.target.value })}
-                            placeholder="e.g. elegant-events"
+                            onChange={e => {
+                                setSlugManuallyEdited(true);
+                                setFormData({ ...formData, slug: toSlug(e.target.value) });
+                            }}
+                            placeholder="Auto-generated from name"
                         />
                     </div>
                     <div className="space-y-2">
@@ -214,18 +233,6 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
                             placeholder="Or paste image URL (https://...)"
                         />
                     </div>
-                </div>
-
-                <div className="space-y-2">
-                    <label className="text-sm font-bold">Short Description *</label>
-                    <input
-                        required
-                        type="text"
-                        className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary"
-                        value={formData.shortDescription}
-                        onChange={e => setFormData({ ...formData, shortDescription: e.target.value })}
-                        placeholder="Catchy one-liner"
-                    />
                 </div>
 
                 <div className="space-y-2">

@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { MapPin, Star } from "lucide-react"
 
 import { getVendors } from "@/lib/firestore-service"
 
@@ -7,61 +7,61 @@ export async function HandpickedExperiences() {
     const vendors = await getVendors()
     const experiences = vendors
         .filter(v => v.categories.includes("Experiences"))
-        .slice(0, 4)
+        .slice(0, 8)
         .map(v => ({
             id: v.id,
             slug: v.slug,
             location: v.location.split(",")[0], // Just the city
             title: v.name,
-            price: v.price ? `$${v.price.toLocaleString()}` : "Contact",
+            rating: v.rating || 0,
             image: v.image,
-            category: v.categories[0]
         }))
 
     return (
-        <section className="py-12 bg-muted/20">
+        <section className="py-12 bg-background">
             <div className="container mx-auto px-4">
-                <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                <div className="flex items-end justify-between mb-6">
                     <div>
-                        <h2 className="text-sm font-semibold uppercase tracking-widest text-primary mb-4">
-                            Handpicked experiences
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                            Explore
+                        </p>
+                        <h2 className="font-serif text-3xl md:text-5xl font-bold text-foreground">
+                            Featured Experiences
                         </h2>
-                        <h3 className="font-serif text-4xl md:text-5xl font-bold text-foreground">
-                            For your team
-                        </h3>
                     </div>
-                    <Link href="/dashboard/hosts?activeTab=experiences">
-                        <Button variant="outline" className="border-primary text-primary hover:bg-primary/5">
-                            View all pre-built events
-                        </Button>
+                    <Link
+                        href="/dashboard/hosts/search?tab=experiences"
+                        className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:tracking-[0.2em] transition-all"
+                    >
+                        View all
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
                     {experiences.map((exp) => (
-                        <Link href={`/dashboard/hosts/vendor/${exp.slug}`} key={exp.title} className="group cursor-pointer">
-                            <div>
-                                <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] mb-4">
-                                    <img
-                                        src={exp.image}
-                                        alt={exp.title}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                    <div className="absolute top-4 left-4">
-                                        <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-black text-foreground uppercase tracking-wider">
-                                            {exp.category}
-                                        </span>
-                                    </div>
+                        <Link
+                            href={`/dashboard/hosts/vendor/${exp.slug}`}
+                            key={exp.title}
+                            className="group min-w-[220px] max-w-[220px] snap-start"
+                        >
+                            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-border">
+                                <img
+                                    src={exp.image || "/placeholder.png"}
+                                    alt={exp.title}
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                                <div className="absolute top-3 right-3 bg-white/90 text-black text-[10px] font-black rounded-full px-2 py-1 flex items-center gap-1">
+                                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-500" />
+                                    {exp.rating}
                                 </div>
-                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">
-                                    {exp.location}
-                                </p>
-                                <h4 className="font-serif text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                                    {exp.title}
-                                </h4 >
-                                <p className="text-sm text-foreground">
-                                    from <span className="font-bold text-lg text-primary">{exp.price}</span>
-                                </p>
+                                <div className="absolute left-3 right-3 bottom-3 text-white">
+                                    <p className="text-sm font-black line-clamp-1">{exp.title}</p>
+                                    <p className="text-[11px] flex items-center gap-1 mt-1 text-white/90">
+                                        <MapPin className="w-3 h-3" />
+                                        {exp.location}
+                                    </p>
+                                </div>
                             </div>
                         </Link>
                     ))}

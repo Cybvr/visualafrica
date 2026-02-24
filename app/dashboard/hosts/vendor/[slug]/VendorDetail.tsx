@@ -55,9 +55,11 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor }) => {
       });
       setIsEditOpen(false);
       router.refresh();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Admin vendor update failed:", error);
-      alert("Failed to update vendor.");
+      const code = error?.code ? ` (${error.code})` : "";
+      const msg = error?.message ? `\n${error.message}` : "";
+      alert(`Failed to update vendor${code}.${msg}`);
     } finally {
       setIsSaving(false);
     }
