@@ -7,7 +7,6 @@ import {
   MdAdd,
   MdCalendarMonth,
   MdChecklist,
-  MdCreditCard,
   MdDarkMode,
   MdHelp,
   MdLightbulb,
@@ -358,7 +357,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
     { icon: MdStore, label: "Store", href: "/dashboard/hosts/store" },
     { icon: MdCalendarMonth, label: "Manage", href: "/dashboard/hosts/events", count: hostEventsCount },
     { icon: MdMail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
-    { icon: MdCreditCard, label: "Payments", href: "/dashboard/hosts/payments" },
   ];
 
   const renameHostChatHistoryItem = async (id: string, title: string) => {
@@ -375,7 +373,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
     { icon: MdSearch, label: "Search", href: "/dashboard/vendors" },
     { icon: MdMail, label: "Inbox", href: "/dashboard/vendors/inbox", count: vendorInboxCount },
     { icon: MdChecklist, label: "Jobs", href: "/dashboard/vendors/jobs", count: vendorEventsCount },
-    { icon: MdCreditCard, label: "Payments", href: "/dashboard/vendors/payments" },
   ];
 
   const vendorSecondaryNavItems: NavItemConfig[] = [];

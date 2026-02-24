@@ -7,6 +7,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import HostPaymentsPage from '@/app/dashboard/hosts/payments/page';
 
 const HostSettingsPage = () => {
     const [activeTab, setActiveTab] = useState('Profile');
@@ -20,7 +21,7 @@ const HostSettingsPage = () => {
         { icon: User, label: 'Profile' },
         { icon: Bell, label: 'Notifications' },
         { icon: Shield, label: 'Security' },
-        { icon: CreditCard, label: 'Billing' },
+        { icon: CreditCard, label: 'Payments' },
         { icon: HelpCircle, label: 'Support' },
     ];
 
@@ -170,7 +171,10 @@ const HostSettingsPage = () => {
                             </div>
                         )}
 
+                        {activeTab === 'Payments' && <HostPaymentsPage />}
+
                         {activeTab !== 'Profile' && (
+                            activeTab !== 'Payments' && (
                             <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
                                 <div className="w-20 h-20 bg-card rounded-[2rem] flex items-center justify-center text-foreground-200">
                                     <Settings size={40} strokeWidth={1} />
@@ -182,6 +186,7 @@ const HostSettingsPage = () => {
                                     </p>
                                 </div>
                             </div>
+                            )
                         )}
                     </div>
                 </div>

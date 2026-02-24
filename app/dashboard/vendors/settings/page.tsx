@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Settings, User, Shield, CreditCard, Bell } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import VendorPaymentsPage from '@/app/dashboard/vendors/payments/page';
 
 const VendorSettingsPage = () => {
     const [activeTab, setActiveTab] = useState('Account');
@@ -124,7 +125,8 @@ const VendorSettingsPage = () => {
                                 </div>
                             </div>
                         )}
-                        {(activeTab === 'Payments' || activeTab === 'Security') && <EmptyState tab={activeTab} />}
+                        {activeTab === 'Payments' && <VendorPaymentsPage />}
+                        {activeTab === 'Security' && <EmptyState tab={activeTab} />}
                     </div>
                 </div>
             </div>
