@@ -1,144 +1,76 @@
 "use client";
 
-import { useState } from "react";
-import { Mic, ArrowUp } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Sparkles, ArrowRight } from "lucide-react";
 
-type Category = "Plan" | "Budget" | "Discover" | "Track" | null;
-
-const CATEGORY_PROMPTS: Record<NonNullable<Category>, { placeholder: string; prompts: string[] }> = {
-    Plan: {
-        placeholder: "What do you want to plan?",
-        prompts: [
-            "Plan a 3-day corporate retreat in Lagos",
-            "Create a timeline for a wedding reception",
-            "Draft a run-of-show for a tech conference",
-            "Help me plan a product launch event"
-        ]
-    },
-    Budget: {
-        placeholder: "What are you budgeting for?",
-        prompts: [
-            "Create a budget for a 100-person gala",
-            "How much should I allocate for catering?",
-            "Help me reduce my event venue costs",
-            "Draft a sponsorship proposal budget"
-        ]
-    },
-    Discover: {
-        placeholder: "What are you looking for?",
-        prompts: [
-            "Find top-rated photographers in Abuja",
-            "Suggest unique venues for a product launch",
-            "Discover trending event themes for 2026",
-            "Show me the best caterers for vegetarian food"
-        ]
-    },
-    Track: {
-        placeholder: "What do you want to track?",
-        prompts: [
-            "Track my vendor payments",
-            "Create a checklist for event day",
-            "Manage my guest list RSVPs",
-            "Set up milestone reminders"
-        ]
-    }
-};
-
-const SUGGESTIONS: NonNullable<Category>[] = ["Plan", "Budget", "Discover", "Track"];
+const SUGGESTIONS = [
+    "Plan a surprise 30th birthday in Lagos for 20 guests",
+    "Find a wedding venue in Accra with ocean views",
+    "Budget for a corporate gala in Nairobi",
+    "Book a private chef for a brunch in Cape Town"
+];
 
 export function WaddiPrompt() {
-    const [query, setQuery] = useState("");
-    const [activeCategory, setActiveCategory] = useState<Category>(null);
+    const router = useRouter();
+    const [input, setInput] = useState("");
+    const [mounted, setMounted] = useState(false);
 
-    const activeConfig = activeCategory ? CATEGORY_PROMPTS[activeCategory] : null;
-    const placeholderText = activeConfig ? activeConfig.placeholder : "Ask Waddi...";
+    useEffect(() => setMounted(true), []);
+
+    const handleStartChat = (e?: React.FormEvent) => {
+        e?.preventDefault();
+        if (!input.trim()) return;
+
+        // Route to the real new-chat flow; chat page will create/persist via send()
+        router.push(`/dashboard/hosts/chat/new?q=${encodeURIComponent(input)}`);
+    };
+
+    if (!mounted) return null;
 
     return (
-        <section className="w-full bg-background pt-16 pb-8 flex flex-col items-center justify-center px-4">
-            <div className="max-w-4xl w-full flex flex-col items-center gap-8">
-                {/* Title */}
-                <div className="flex items-center gap-3">
-                    <h1 className="text-3xl md:text-5xl font-medium text-foreground tracking-tight text-center">
-                        Your event, fully coordinated. Ask anything
-                    </h1>
+        <div className="max-w-5xl mx-auto space-y-10 py-6">
+            <div className="text-center space-y-6 py-12 px-4 md:px-0">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">
+                    <Sparkles size={14} className="fill-primary" />
+                    Meet Waddi
                 </div>
+                <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">
+                    Your event, fully coordinated. <br />
+                    <span className="text-muted-foreground/60">Ask anything.</span>
+                </h1>
 
-                {/* Prompt Box */}
-                <div className="w-full bg-background rounded-[2rem] shadow-sm border border-border p-4 transition-shadow focus-within:shadow-md">
-                    <div className="flex flex-col gap-4">
-                        <textarea
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            onClick={() => {
-                                // Once they click into textarea, if they have an active category with empty query, we can keep it.
-                            }}
-                            placeholder={placeholderText}
-                            className="w-full bg-transparent resize-none border-none outline-none text-lg text-foreground placeholder:text-gray-400 min-h-[60px] px-2"
-                            rows={2}
+                <div className="max-w-2xl mx-auto relative mt-8 group">
+                    <form onSubmit={handleStartChat}>
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            placeholder="E.g. Help me plan a traditional wedding in Lagos..."
+                            className="w-full h-16 bg-card border-2 border-border rounded-2xl px-6 pr-16 text-lg focus:outline-none focus:border-primary/50 transition-all shadow-sm group-hover:shadow-md"
                         />
-
-                        <div className="flex items-center justify-between px-2">
-                            {/* Empty flex-1 to push the buttons to the right */}
-                            <div className="flex flex-1"></div>
-
-                            <div className="flex items-center gap-2">
-                                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors text-muted-foreground" title="Voice input">
-                                    <Mic className="w-5 h-5" />
-                                </button>
-                                <button
-                                    className={`p-2 rounded-full transition-colors flex items-center justify-center ${query.length > 0
-                                        ? "bg-background text-foreground hover:bg-background/90 shadow-sm"
-                                        : "bg-background text-foreground"
-                                        }`}
-                                    title="Send message"
-                                    disabled={query.trim().length === 0}
-                                    onClick={() => {
-                                        console.log("Sending query:", query);
-                                    }}
-                                >
-                                    <ArrowUp className="w-6 h-6 p-0.5" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                        <button
+                            type="submit"
+                            disabled={!input.trim()}
+                            className="absolute right-3 top-3 h-10 w-10 bg-primary text-primary-foreground rounded-xl flex items-center justify-center disabled:opacity-50 transition-all active:scale-95"
+                        >
+                            <ArrowRight size={20} strokeWidth={2.5} />
+                        </button>
+                    </form>
                 </div>
 
-                {/* Suggestions Corridor */}
-                <div className="flex flex-wrap items-center justify-center gap-3 w-full max-w-3xl">
-                    {SUGGESTIONS.map((suggestion) => (
+                <div className="flex flex-wrap justify-center gap-2 mt-4">
+                    {SUGGESTIONS.map((s, i) => (
                         <button
-                            key={suggestion}
-                            className={`px-6 py-3 rounded-full shadow-sm text-sm font-medium transition-colors border ${activeCategory === suggestion
-                                ? "bg-primary/10 text-primary border-primary/20"
-                                : "bg-card hover:bg-background text-foreground border-border"
-                                }`}
-                            onClick={() => setActiveCategory(activeCategory === suggestion ? null : suggestion)}
+                            key={i}
+                            onClick={() => { setInput(s); }}
+                            className="text-xs font-medium text-muted-foreground hover:text-foreground bg-secondary/30 hover:bg-secondary/60 border border-border px-3 py-1.5 rounded-full transition-all"
                         >
-                            {suggestion}
+                            {s}
                         </button>
                     ))}
                 </div>
-
-                {/* Sub-prompts */}
-                <div className="w-full max-w-3xl min-h-[160px] transition-all duration-300">
-                    {activeCategory && activeConfig && (
-                        <div className="w-full flex flex-col items-start gap-3 pl-4 md:pl-8 pt-4">
-                            {activeConfig.prompts.map((prompt, index) => (
-                                <button
-                                    key={index}
-                                    className={`text-left text-base transition-colors ${index === 0
-                                        ? "px-5 py-2.5 bg-[#ebebeb] hover:bg-[#e0e0e0] text-foreground rounded-full font-medium"
-                                        : "px-2 py-1.5 hover:text-foreground text-foreground rounded-lg w-full lg:w-3/4"
-                                        }`}
-                                    onClick={() => setQuery(prompt)}
-                                >
-                                    {prompt}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
             </div>
-        </section>
+        </div>
     );
 }

@@ -38,6 +38,14 @@ type UseChatAgentArgs = {
     storeKits: any[];
 };
 
+type ActionMetrics = {
+    createdEvents: { eventName: string; city: string }[];
+    todoAdded: number;
+    itineraryAdded: number;
+    vendorSearches: { city: string; category: string | null; count: number; topVendors: string[] }[];
+    pendingMessages: any[];
+};
+
 export function useChatAgent({
     paramsId,
     router,
@@ -94,12 +102,80 @@ export function useChatAgent({
         return null;
     };
 
+    const buildActionFallback = (metrics: ActionMetrics) => {
+        const parts: string[] = [];
+        const latestEvent = metrics.createdEvents[metrics.createdEvents.length - 1];
+        if (latestEvent) {
+            parts.push(`I set up "${latestEvent.eventName}" in ${latestEvent.city}.`);
+        }
+        if (metrics.todoAdded > 0 || metrics.itineraryAdded > 0) {
+            parts.push(`I added ${metrics.todoAdded} checklist items and ${metrics.itineraryAdded} itinerary items.`);
+        }
+        const latestSearch = metrics.vendorSearches[metrics.vendorSearches.length - 1];
+        if (latestSearch) {
+            const focus = latestSearch.category ? `${latestSearch.category} vendors` : "vendors";
+            const sample = latestSearch.topVendors.length > 0 ? ` Top matches include ${latestSearch.topVendors.join(", ")}.` : "";
+            parts.push(`I found ${latestSearch.count} ${focus} in ${latestSearch.city}.${sample}`);
+        }
+        const summary = parts.join(" ").trim();
+        return summary.length > 0
+            ? `${summary} Want me to refine this further based on your style and budget priorities?`
+            : "Done. I handled that and I can tune the next step around your priorities. What should I optimize first?";
+    };
+
+    const generateActionNarration = async (
+        userText: string,
+        metrics: ActionMetrics,
+        modelText?: string
+    ) => {
+        const actionLines: string[] = [];
+        if (metrics.createdEvents.length > 0) {
+            for (const ev of metrics.createdEvents.slice(-2)) {
+                actionLines.push(`- created event "${ev.eventName}" in ${ev.city}`);
+            }
+        }
+        if (metrics.todoAdded > 0) actionLines.push(`- added ${metrics.todoAdded} todo items`);
+        if (metrics.itineraryAdded > 0) actionLines.push(`- added ${metrics.itineraryAdded} itinerary items`);
+        if (metrics.vendorSearches.length > 0) {
+            for (const vs of metrics.vendorSearches.slice(-2)) {
+                actionLines.push(`- vendor search in ${vs.city}${vs.category ? ` for ${vs.category}` : ""}: ${vs.count} matches`);
+            }
+        }
+
+        if (actionLines.length === 0) return null;
+
+        const prompt = `You are Waddi, an event planning assistant.
+Write a natural response to the user after these tool actions were already completed.
+
+User message:
+"${userText}"
+
+Action results:
+${actionLines.join("\n")}
+
+Model intent (optional):
+${modelText?.trim() || "(none)"}
+
+Rules:
+- 2 to 4 sentences.
+- Natural, confident, and specific.
+- Mention what was completed.
+- If vendor results exist, include a recommendation angle.
+- End with one short next-step question.
+- No markdown, no bullets.`;
+
+        const reply = await processGeminiChat([{ role: "user", parts: [{ text: prompt }] }]);
+        const text = reply?.type === "text" ? String(reply.text || "").trim() : "";
+        return text || null;
+    };
+
     const processFunctionCall = async (
         functionName: string,
         args: any,
         _modelText: string,
         chatIdOverride?: string,
-        eventIdRef?: { current: string | null }
+        eventIdRef?: { current: string | null },
+        metrics?: ActionMetrics
     ): Promise<boolean> => {
         if (functionName === "create_event") {
             if (!currentUser) {
@@ -132,10 +208,7 @@ export function useChatAgent({
             });
             setSelectedEventId(createdEventId);
             if (eventIdRef) eventIdRef.current = createdEventId;
-            await persistAgentMessage(
-                { type: "text", content: `Event created: "${eventName}" in ${city}. Next I will generate your checklist.` },
-                chatIdOverride
-            );
+            metrics?.createdEvents.push({ eventName, city });
             return true;
         }
 
@@ -150,6 +223,7 @@ export function useChatAgent({
                     if (!nextTodo.includes(item)) nextTodo.push(item);
                     await updateEvent(freshEvent.id, { todoList: nextTodo });
                     setSelectedEventId(freshEvent.id);
+                    metrics && (metrics.todoAdded += 1);
                     return true;
                 }
             }
@@ -159,6 +233,7 @@ export function useChatAgent({
             if (!nextTodo.includes(item)) nextTodo.push(item);
             await updateEvent(targetEvent.id, { todoList: nextTodo });
             setSelectedEventId(targetEvent.id);
+            metrics && (metrics.todoAdded += 1);
             return true;
         }
 
@@ -176,6 +251,7 @@ export function useChatAgent({
                     nextItems.push(entry);
                     await updateEvent(freshEvent.id, { itineraryItems: nextItems });
                     setSelectedEventId(freshEvent.id);
+                    metrics && (metrics.itineraryAdded += 1);
                     return true;
                 }
             }
@@ -185,6 +261,7 @@ export function useChatAgent({
             nextItems.push(entry);
             await updateEvent(targetEvent.id, { itineraryItems: nextItems });
             setSelectedEventId(targetEvent.id);
+            metrics && (metrics.itineraryAdded += 1);
             return true;
         }
 
@@ -200,17 +277,20 @@ export function useChatAgent({
                 })
                 : vendorsForCity;
 
-            await persistAgentMessage(
-                {
-                    type: "vendor_cards",
-                    content: `Here are the top${category ? ` ${category}` : ""} vendors in ${city || "your area"}:`,
-                    city,
-                    vendors: filtered,
-                    viewAllHref: "/dashboard/hosts/search",
-                    viewAllLabel: "View all vendors"
-                },
-                chatIdOverride
-            );
+            metrics?.vendorSearches.push({
+                city: city || "your area",
+                category,
+                count: filtered.length,
+                topVendors: filtered.slice(0, 3).map((v: any) => String(v?.name || "")).filter(Boolean)
+            });
+            metrics?.pendingMessages.push({
+                type: "vendor_cards",
+                content: `Here are the top${category ? ` ${category}` : ""} vendors in ${city || "your area"}:`,
+                city,
+                vendors: filtered,
+                viewAllHref: "/dashboard/hosts/search",
+                viewAllLabel: "View all vendors"
+            });
             return true;
         }
 
@@ -471,10 +551,17 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         const allCalls: { name: string; args: any }[] = (geminiResult as any).functionCalls || [{ name: geminiResult.functionName!, args: geminiResult.args || {} }];
         const modelText = geminiResult.text && String(geminiResult.text).trim();
         const eventIdRef = { current: null as string | null };
+        const actionMetrics: ActionMetrics = {
+            createdEvents: [],
+            todoAdded: 0,
+            itineraryAdded: 0,
+            vendorSearches: [],
+            pendingMessages: []
+        };
         let handled = false;
 
         for (const call of allCalls) {
-            const ok = await processFunctionCall(call.name, call.args || {}, modelText, chatIdOverride, eventIdRef);
+            const ok = await processFunctionCall(call.name, call.args || {}, modelText, chatIdOverride, eventIdRef, actionMetrics);
             if (ok) handled = true;
         }
 
@@ -489,71 +576,59 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             const budget = Number(createCall?.args?.budget || 0);
             let todoApplied = 0;
             let itineraryApplied = 0;
-
-            await persistAgentMessage(
-                { type: "text", content: "Generating checklist now." },
-                chatIdOverride
-            );
             const todoPrompt = `For the event "${eventName}" with ${guestCount} guests, budget ${budget}, in ${city}, create a concise event planning checklist. Call add_todo_item for each task (aim for 6–8 tasks). The eventName is "${eventName}".`;
             const todoCalls = await getRequiredFunctionCalls(todoPrompt, ["add_todo_item"]);
             for (const call of todoCalls) {
-                const ok = await processFunctionCall(call.name, { ...call.args, eventId: createdId }, "", chatIdOverride, eventIdRef);
+                const ok = await processFunctionCall(call.name, { ...call.args, eventId: createdId }, "", chatIdOverride, eventIdRef, actionMetrics);
                 if (ok && call.name === "add_todo_item") todoApplied++;
             }
             if (todoApplied === 0) {
                 const fallbackTodo = getDefaultTodoItems(eventName, guestCount, city || "your city");
                 for (const item of fallbackTodo) {
-                    const ok = await processFunctionCall("add_todo_item", { item, eventId: createdId }, "", chatIdOverride, eventIdRef);
+                    const ok = await processFunctionCall("add_todo_item", { item, eventId: createdId }, "", chatIdOverride, eventIdRef, actionMetrics);
                     if (ok) todoApplied++;
                 }
             }
-
-            await persistAgentMessage(
-                { type: "text", content: `Checklist ready (${todoApplied} items). Next I will draft your itinerary.` },
-                chatIdOverride
-            );
             const itineraryPrompt = `Build a realistic day-of itinerary for "${eventName}" in ${city}, ${guestCount} guests. Call add_itinerary_item for each slot (aim for 6–8 items with times like "10:00 AM"). The eventName is "${eventName}".`;
             const itineraryCalls = await getRequiredFunctionCalls(itineraryPrompt, ["add_itinerary_item"]);
             for (const call of itineraryCalls) {
-                const ok = await processFunctionCall(call.name, { ...call.args, eventId: createdId }, "", chatIdOverride, eventIdRef);
+                const ok = await processFunctionCall(call.name, { ...call.args, eventId: createdId }, "", chatIdOverride, eventIdRef, actionMetrics);
                 if (ok && call.name === "add_itinerary_item") itineraryApplied++;
             }
             if (itineraryApplied === 0) {
                 const fallbackItinerary = getDefaultItineraryItems();
                 for (const slot of fallbackItinerary) {
-                    const ok = await processFunctionCall("add_itinerary_item", { ...slot, eventId: createdId }, "", chatIdOverride, eventIdRef);
+                    const ok = await processFunctionCall("add_itinerary_item", { ...slot, eventId: createdId }, "", chatIdOverride, eventIdRef, actionMetrics);
                     if (ok) itineraryApplied++;
                 }
             }
-
-            await persistAgentMessage(
-                { type: "text", content: `Itinerary ready (${itineraryApplied} items). Next I will find vendors.` },
-                chatIdOverride
-            );
             if (city) {
                 const vendorsForCity = allVendorsByCity[city] || [];
-                await persistAgentMessage(
-                    {
-                        type: "vendor_cards",
-                        content: `Here are top vendors in ${city} for your event:`,
-                        city,
-                        vendors: vendorsForCity,
-                        viewAllHref: "/dashboard/hosts/search",
-                        viewAllLabel: "View all vendors"
-                    },
-                    chatIdOverride
-                );
+                actionMetrics.vendorSearches.push({
+                    city,
+                    category: null,
+                    count: vendorsForCity.length,
+                    topVendors: vendorsForCity.slice(0, 3).map((v: any) => String(v?.name || "")).filter(Boolean)
+                });
+                actionMetrics.pendingMessages.push({
+                    type: "vendor_cards",
+                    content: `Here are top vendors in ${city} for your event:`,
+                    city,
+                    vendors: vendorsForCity,
+                    viewAllHref: "/dashboard/hosts/search",
+                    viewAllLabel: "View all vendors"
+                });
             }
+        }
 
-            await persistAgentMessage(
-                {
-                    type: "text",
-                    content: (todoApplied > 0 && itineraryApplied > 0)
-                        ? `Done. Event, checklist, itinerary, and vendor options are ready for ${city || "your area"}. Open Todo and Itinerary to review.`
-                        : `I created your event and saved vendor options, but checklist or itinerary generation is still incomplete. Open the Todo and Itinerary tabs and I can fill any missing items immediately.`,
-                },
-                chatIdOverride
-            );
+        if (handled) {
+            const naturalNarration =
+                await generateActionNarration(text, actionMetrics, modelText) ||
+                buildActionFallback(actionMetrics);
+            await persistAgentMessage({ type: "text", content: naturalNarration }, chatIdOverride);
+            for (const msg of actionMetrics.pendingMessages) {
+                await persistAgentMessage(msg, chatIdOverride);
+            }
         }
 
         return handled;
