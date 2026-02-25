@@ -74,6 +74,11 @@ export default function ChatPage() {
     const autoPromptSentRef = useRef<string | null>(null);
 
     useEffect(() => {
+        const title = (chatTitle || "New Chat").trim();
+        document.title = `${title} | Waddi`;
+    }, [chatTitle]);
+
+    useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setCurrentUser(user);
         });
