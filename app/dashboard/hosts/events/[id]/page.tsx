@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
     MapPin, Calendar, Users, Target, Clock, Rocket,
-    ChevronLeft, Share2, Printer
+    ChevronLeft, Share2, Printer, Ticket
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -112,6 +112,10 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         <div className="flex items-center gap-1 text-sm">
                             <Users size={16} className="text-muted-foreground" />
                             <span>{event.guestCount} guests</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-sm">
+                            <Ticket size={16} className="text-muted-foreground" />
+                            <span>{event.ticketPrice ? `₦${event.ticketPrice.toLocaleString('en-NG')}` : 'Free'}</span>
                         </div>
                         <div className="flex items-center gap-1 text-sm">
                             <span className="font-medium text-success">₦{(event.budget || 0).toLocaleString('en-NG')}</span>

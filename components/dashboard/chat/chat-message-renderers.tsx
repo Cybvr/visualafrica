@@ -54,7 +54,8 @@ function SuggestionBubble({ label, onClick }: { label: string; onClick: () => vo
 }
 
 function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendors: Set<string>; onSave: (v: any) => void; onVendorAction: (a: any, v: any) => void }) {
-    const isSaved = savedVendors.has(v.name);
+    const vendorKey = v?.id || v?.slug || v?.name;
+    const isSaved = vendorKey ? savedVendors.has(vendorKey) : false;
     const [showActions, setShowActions] = useState(false);
 
     return (
@@ -89,7 +90,9 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
                 </div>
                 <div className="flex justify-between items-center mt-2">
                     <span className="text-primary font-bold text-sm">
-                        {v.price !== null ? `$${Number(v.price).toLocaleString()}+` : "Contact"}
+                        {v.price === null || v.price === undefined || Number.isNaN(Number(v.price))
+                            ? "Contact for pricing"
+                            : `₦${Number(v.price).toLocaleString("en-NG")}+`}
                     </span>
                     {!showActions && (
                         <span className="text-muted-foreground hover:text-foreground transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
@@ -361,7 +364,9 @@ function StoreCard({ item, onAction }: { item: any; onAction?: (action: string, 
                     </div>
                     <div className="flex items-center gap-1.5">
                         <span className="bg-primary/10 text-primary text-[11px] font-semibold rounded-full px-2 py-0.5">
-                            {item.price !== null ? `$${Number(item.price).toLocaleString()}+` : "Contact"}
+                            {item.price === null || item.price === undefined || Number.isNaN(Number(item.price))
+                                ? "Contact for pricing"
+                                : `₦${Number(item.price).toLocaleString("en-NG")}+`}
                         </span>
                     </div>
                 </div>

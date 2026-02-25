@@ -109,6 +109,7 @@ export interface SharedEvent {
     location: string;
     guestCount: number;
     budget: number;
+    ticketPrice?: number;
     status: 'Planning' | 'Confirmed' | 'Completed';
     image: string;
     description: string;

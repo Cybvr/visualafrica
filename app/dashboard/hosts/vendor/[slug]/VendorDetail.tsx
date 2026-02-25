@@ -7,6 +7,7 @@ import { type Vendor } from '@/lib/types';
 import { useAuth } from '@/components/providers/auth-provider';
 import { updateVendor } from '@/lib/firestore-service';
 import { uploadImage } from '@/lib/upload-service';
+import { useSavedVendors } from '@/hooks/use-saved-vendors';
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,7 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor }) => {
   const router = useRouter();
   const { profile } = useAuth();
   const isAdmin = profile?.role === "admin";
+  const { savedVendorIds, toggleSavedVendor } = useSavedVendors(profile?.uid);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
   const [isUploading, setIsUploading] = React.useState(false);
@@ -250,8 +252,14 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor }) => {
             </div>
 
             <div className="space-y-2 pt-3">
-              <button className="w-full bg-primary hover:bg-primary/90 text-white py-2.5 rounded-lg font-bold text-sm shadow-sm hover:shadow-md transition-all">
-                Save Vendor
+              <button
+                onClick={() => toggleSavedVendor(vendor.id)}
+                className={`w-full py-2.5 rounded-lg font-bold text-sm shadow-sm hover:shadow-md transition-all ${savedVendorIds.has(vendor.id)
+                  ? 'bg-foreground text-background hover:bg-foreground/90'
+                  : 'bg-primary hover:bg-primary/90 text-white'
+                  }`}
+              >
+                {savedVendorIds.has(vendor.id) ? 'Saved' : 'Save Vendor'}
               </button>
               <Link
                 href={`/dashboard/hosts/inbox?vendorId=${vendor.id}`}

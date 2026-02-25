@@ -5,12 +5,16 @@ import { Search, Filter, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { type Vendor } from '@/lib/types';
 import { VendorCard } from '@/components/dashboard/vendor-card';
+import { useSavedVendors } from '@/hooks/use-saved-vendors';
+import { useAuth } from '@/components/providers/auth-provider';
 import { getVendors } from '@/lib/firestore-service';
 
 const ExperiencesPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'all' | 'saved'>('all');
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { user } = useAuth();
+    const { savedVendorIds, toggleSavedVendor } = useSavedVendors(user?.uid);
 
     useEffect(() => {
         async function fetchVendors() {
@@ -28,9 +32,8 @@ const ExperiencesPage: React.FC = () => {
 
     // Filter for experiences only
     const experiencesVendors = vendors.filter(v => v.categories.includes('Experiences'));
-
-    // For demo purposes, we'll just show the same list for saved if tab is 'saved'
-    const displayExperiences = activeTab === 'all' ? experiencesVendors : experiencesVendors.slice(0, 1);
+    const savedExperiences = experiencesVendors.filter(v => savedVendorIds.has(v.id));
+    const displayVendors = activeTab === 'saved' ? savedExperiences : experiencesVendors;
 
     if (isLoading) {
         return (
@@ -106,13 +109,17 @@ const ExperiencesPage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12 items-stretch">
-                {displayExperiences.map(vendor => (
+                {displayVendors.map(vendor => (
                     <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full transition-transform hover:scale-[1.02]">
-                        <VendorCard vendor={vendor} />
+                        <VendorCard
+                            vendor={vendor}
+                            saved={savedVendorIds.has(vendor.id)}
+                            onToggleSave={() => toggleSavedVendor(vendor.id)}
+                        />
                     </Link>
                 ))}
 
-                {displayExperiences.length === 0 && (
+                {displayVendors.length === 0 && (
                     <div className="col-span-full relative overflow-hidden rounded-[2.5rem] border border-border bg-card p-20 text-center">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full translate-x-1/2 -translate-y-1/2 blur-3xl" />
                         <div className="relative space-y-6">

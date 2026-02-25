@@ -18,6 +18,8 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
+import { useSavedVendors } from '@/hooks/use-saved-vendors';
+import { useAuth } from '@/components/providers/auth-provider';
 
 const VENDOR_TYPES = ['All', 'Regular Vendors', 'Suspended', 'New'];
 
@@ -200,7 +202,9 @@ export default function DashboardPage() {
   // Counts
   const allVendorsCount = allVendors.length;
   const experiencesCount = allVendors.filter(v => v.categories.includes('Experiences')).length;
-  const savedVendorsCount = 0; // Placeholder for now
+  const { user } = useAuth();
+  const { savedVendorIds, toggleSavedVendor } = useSavedVendors(user?.uid);
+  const savedVendorsCount = savedVendorIds.size;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -311,7 +315,9 @@ export default function DashboardPage() {
     );
   }
 
-  const displayVendors = activeTab === 'all' || activeTab === 'experiences' ? filteredVendors : filteredVendors.slice(0, 3); // Todo: filter saved
+  const displayVendors = activeTab === 'saved'
+    ? filteredVendors.filter(v => savedVendorIds.has(v.id))
+    : filteredVendors;
   const totalPages = Math.max(1, Math.ceil(displayVendors.length / VENDORS_PER_PAGE));
   const clampedPage = Math.min(currentPage, totalPages);
   const paginatedVendors = displayVendors.slice(
@@ -457,7 +463,11 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               {paginatedVendors.map(vendor => (
                 <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full min-w-0 transition-transform hover:scale-[1.02]">
-                  <VendorCard vendor={vendor} />
+                  <VendorCard
+                    vendor={vendor}
+                    saved={savedVendorIds.has(vendor.id)}
+                    onToggleSave={() => toggleSavedVendor(vendor.id)}
+                  />
                 </Link>
               ))}
             </div>

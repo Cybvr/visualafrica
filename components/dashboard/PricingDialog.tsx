@@ -87,8 +87,8 @@ export const PricingDialog: React.FC<PricingDialogProps> = ({
                         <div
                             key={tier.name}
                             className={`relative flex flex-col rounded-2xl border p-6 transition-all hover:shadow-xl ${tier.highlighted
-                                    ? "border-primary bg-primary/5 shadow-md ring-1 ring-primary"
-                                    : "border-border bg-card"
+                                ? "border-primary bg-primary/5 shadow-md ring-1 ring-primary"
+                                : "border-border bg-card"
                                 }`}
                         >
                             {tier.highlighted && (
@@ -117,10 +117,10 @@ export const PricingDialog: React.FC<PricingDialogProps> = ({
                                     onOpenChange(false);
                                 }}
                                 className={`w-full mb-8 font-bold ${tier.highlighted
-                                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                                        : tier.name === "Free"
-                                            ? "bg-muted text-muted-foreground cursor-default hover:bg-muted"
-                                            : "border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                                    : tier.name === "Free"
+                                        ? "bg-muted text-muted-foreground cursor-default hover:bg-muted"
+                                        : "border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                                     }`}
                                 variant={tier.highlighted ? "default" : "outline"}
                                 disabled={tier.name === "Free"}

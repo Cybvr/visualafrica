@@ -4,7 +4,15 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Star, Heart, MapPin } from "lucide-react"
 import type { Vendor } from "@/lib/types"
 
-export function VendorCard({ vendor }: { vendor: Vendor }) {
+export function VendorCard({
+  vendor,
+  saved = false,
+  onToggleSave,
+}: {
+  vendor: Vendor
+  saved?: boolean
+  onToggleSave?: (vendor: Vendor) => void
+}) {
   return (
     <Card className="group flex h-full flex-col overflow-hidden border-border bg-card transition-shadow hover:shadow-lg">
       <div className="relative aspect-[4/3] overflow-hidden">
@@ -30,10 +38,18 @@ export function VendorCard({ vendor }: { vendor: Vendor }) {
           </div>
         )}
         <button
-          className="absolute right-3 bottom-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
-          aria-label="Add to favorites"
+          className={`absolute right-3 bottom-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 transition-colors hover:bg-background ${
+            saved ? "text-primary" : "text-muted-foreground hover:text-foreground"
+          }`}
+          aria-label={saved ? "Remove from saved vendors" : "Save vendor"}
+          aria-pressed={saved}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            onToggleSave?.(vendor)
+          }}
         >
-          <Heart className="h-4 w-4" />
+          <Heart className={`h-4 w-4 ${saved ? "fill-primary" : ""}`} />
         </button>
       </div>
 
@@ -43,7 +59,9 @@ export function VendorCard({ vendor }: { vendor: Vendor }) {
             {vendor.categories[0]}
           </span>
           <p className="shrink-0 text-sm font-semibold text-foreground">
-            {vendor.price ?? "Contact for pricing"}
+            {vendor.price === null || vendor.price === undefined || Number.isNaN(Number(vendor.price))
+              ? "Contact for pricing"
+              : `₦${Number(vendor.price).toLocaleString("en-NG")}`}
           </p>
         </div>
 

@@ -20,6 +20,7 @@ export function buildVendorsList(vendors: Vendor[], city: string) {
     return vendors
         .filter(v => v.location.toLowerCase().includes(city.toLowerCase()))
         .map(v => ({
+            id: v.id,
             name: v.name,
             slug: v.slug || v.id,
             image: v.image || "/placeholder.png",

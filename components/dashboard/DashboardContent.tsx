@@ -9,9 +9,13 @@ import ItineraryCard from './ItineraryCard';
 import GuestManagementCard from './GuestManagementCard';
 import { getVendors } from '@/lib/firestore-service';
 import { Vendor } from '@/lib/types';
+import { useSavedVendors } from '@/hooks/use-saved-vendors';
+import { useAuth } from '@/components/providers/auth-provider';
 
 const DashboardContent: React.FC = () => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
+  const { user } = useAuth();
+  const { savedVendorIds, toggleSavedVendor } = useSavedVendors(user?.uid);
 
   useEffect(() => {
     async function loadVendors() {
@@ -69,7 +73,11 @@ const DashboardContent: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
           {vendors.slice(0, 4).map(vendor => (
             <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full">
-              <VendorCard vendor={vendor} />
+              <VendorCard
+                vendor={vendor}
+                saved={savedVendorIds.has(vendor.id)}
+                onToggleSave={() => toggleSavedVendor(vendor.id)}
+              />
             </Link>
           ))}
         </div>

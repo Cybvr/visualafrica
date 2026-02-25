@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, Calendar, Users, Plus, Loader2 } from 'lucide-react';
+import { MapPin, Calendar, Users, Plus, Loader2, Ticket } from 'lucide-react';
 import { getEvents } from '@/lib/firestore-service';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/components/providers/auth-provider';
@@ -164,6 +164,14 @@ export default function EventsPage() {
                                             <Users size={16} />
                                         </div>
                                         <span className="font-semibold">{event.guestCount} Guests</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-foreground/80">
+                                        <div className="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
+                                            <Ticket size={16} />
+                                        </div>
+                                        <span className="font-semibold">
+                                            {event.ticketPrice ? `₦${event.ticketPrice.toLocaleString('en-NG')}` : 'Free'}
+                                        </span>
                                     </div>
                                 </div>
                             </div>

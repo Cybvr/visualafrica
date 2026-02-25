@@ -204,6 +204,40 @@ export default function HostPaymentsPage() {
                 </div>
             </div>
 
+            {/* Ticket Sales */}
+            <div className="space-y-3">
+                <h3 className="text-2xl font-black text-foreground">Ticket Sales</h3>
+                <div className="bg-card border border-border rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center -space-x-3">
+                            <div className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center text-xl font-black">
+                                ✦
+                            </div>
+                            <div className="w-12 h-12 rounded-full bg-background border border-border flex items-center justify-center text-sm font-black text-muted-foreground">
+                                +
+                            </div>
+                            <div className="w-12 h-12 rounded-full bg-[#635BFF] text-white flex items-center justify-center text-xs font-black uppercase">
+                                Stripe
+                            </div>
+                        </div>
+                        <div>
+                            <h4 className="text-2xl font-black text-foreground">Start Selling Tickets</h4>
+                            <p className="text-muted-foreground mt-1 max-w-xl">
+                                Start selling tickets to your events by creating a Stripe account. It usually takes less than 5 minutes to set up.
+                            </p>
+                        </div>
+                    </div>
+                    <div>
+                        <Button className="rounded-2xl px-8 py-6 text-base font-black bg-foreground text-background hover:bg-foreground/90">
+                            Get Started
+                        </Button>
+                    </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                    Stripe is a secure payment processor with low fees that handles all ticket sales.
+                </p>
+            </div>
+
             {/* Tabs */}
             <div className="border-b border-border">
                 <div className="flex items-center gap-6">

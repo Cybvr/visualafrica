@@ -47,6 +47,7 @@ import {
 } from "react-icons/md";
 import { Dots, Msg } from "@/components/dashboard/chat/chat-message-renderers";
 import { useChatAgent } from "@/hooks/use-chat-agent";
+import { useSavedVendors } from "@/hooks/use-saved-vendors";
 
 export default function ChatPage() {
     const params = useParams();
@@ -56,7 +57,8 @@ export default function ChatPage() {
     const [input, setInput] = useState("");
     const [typing, setTyping] = useState(false);
     const [activeCity, setActiveCity] = useState<string | null>(null);
-    const [savedVendors, setSavedVendors] = useState<Set<string>>(new Set());
+    const [currentUser, setCurrentUser] = useState<any>(null);
+    const { savedVendorIds, toggleSavedVendor, mergeSavedVendors } = useSavedVendors(currentUser?.uid);
     const [allVendorsByCity, setAllVendorsByCity] = useState<Record<string, any[]>>({});
     const [liveEvents, setLiveEvents] = useState<SharedEvent[]>([]);
     const [storeKits, setStoreKits] = useState<any[]>(() => DEMO_CHAT_HISTORY.filter((kit: any) => kit.published));
@@ -65,7 +67,6 @@ export default function ChatPage() {
     const [chatMetadata, setChatMetadata] = useState<any>(null);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [historyLoaded, setHistoryLoaded] = useState(false);
-    const [currentUser, setCurrentUser] = useState<any>(null);
     const [waddiModel, setWaddiModel] = useState<'lite' | 'pro'>('lite');
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
     const [pendingAction, setPendingAction] = useState<any>(null);
@@ -164,7 +165,7 @@ export default function ChatPage() {
                 setChatTitle(chat.title);
                 setActiveCity(chat.activeCity);
                 setChatMetadata(chat);
-                if (chat.savedVendors) setSavedVendors(new Set(chat.savedVendors));
+                if (chat.savedVendors) mergeSavedVendors(chat.savedVendors);
             } else {
                 const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
                 setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
@@ -296,16 +297,15 @@ export default function ChatPage() {
     };
 
     const handleSaveVendor = (vendor: any) => {
-        setSavedVendors(prev => {
-            const next = new Set(prev);
-            if (next.has(vendor.name)) {
-                next.delete(vendor.name);
-                addAgentMsg({ content: `Removed ${vendor.name} from your saved vendors.`, type: 'text' });
-            } else {
-                next.add(vendor.name);
-                addAgentMsg({ content: `Saved ${vendor.name}! You can view your saved vendors in the Vendors tab.`, type: 'text' });
-            }
-            return next;
+        const vendorKey = vendor?.id || vendor?.slug || vendor?.name;
+        if (!vendorKey) return;
+        const isSaved = savedVendorIds.has(vendorKey);
+        toggleSavedVendor(vendorKey);
+        addAgentMsg({
+            content: isSaved
+                ? `Removed ${vendor.name} from your saved vendors.`
+                : `Saved ${vendor.name}! You can view your saved vendors in the Vendors tab.`,
+            type: 'text'
         });
     };
 
@@ -315,7 +315,6 @@ export default function ChatPage() {
         setInput("");
         setTyping(false);
         setActiveCity(null);
-        setSavedVendors(new Set());
         setChatTitle("New Chat");
         router.push("/dashboard/hosts/chat/new");
     };
@@ -456,7 +455,7 @@ export default function ChatPage() {
                                 msg={m}
                                 onSelectCity={handleSelectCity}
                                 activeCity={activeCity}
-                                savedVendors={savedVendors}
+                                savedVendors={savedVendorIds}
                                 allVendorsByCity={allVendorsByCity}
                                 onSuggestion={(s: any) => {
                                     send(s.label, s);

@@ -34,6 +34,7 @@ export default function CreateEventPage() {
         location: '',
         guestCount: '',
         budget: '',
+        ticketPrice: '',
         description: ''
     });
 
@@ -68,6 +69,7 @@ export default function CreateEventPage() {
                 location: data.location || formData.location,
                 guestCount: data.guestCount?.toString() || formData.guestCount,
                 budget: data.budget?.toString() || formData.budget,
+                ticketPrice: data.ticketPrice?.toString() || formData.ticketPrice,
                 description: data.description || formData.description
             });
 
@@ -101,6 +103,7 @@ export default function CreateEventPage() {
                 location: formData.location,
                 guestCount: parseInt(formData.guestCount) || 0,
                 budget: parseInt(formData.budget.replace(/,/g, '')) || 0,
+                ticketPrice: parseInt(formData.ticketPrice.replace(/,/g, '')) || 0,
                 status: 'Planning',
                 image: '/placeholder.png', // Default image
                 description: formData.description,
@@ -374,6 +377,19 @@ export default function CreateEventPage() {
                                             className="w-full pl-12 pr-6 py-4 bg-secondary border border-border rounded-2xl text-lg font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all"
                                             value={formData.budget}
                                             onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-black text-foreground">Ticket price (optional)</label>
+                                    <div className="relative">
+                                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">₦</span>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. 25,000"
+                                            className="w-full pl-12 pr-6 py-4 bg-secondary border border-border rounded-2xl text-lg font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all"
+                                            value={formData.ticketPrice}
+                                            onChange={(e) => setFormData({ ...formData, ticketPrice: e.target.value })}
                                         />
                                     </div>
                                 </div>
