@@ -194,6 +194,15 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
             </DropdownMenuItem>
           )}
 
+          {userProfile.role === "admin" && (
+            <DropdownMenuItem asChild className="py-2 cursor-pointer flex items-center gap-2 text-foreground font-medium text-sm">
+              <Link href="/docs" className="flex items-center gap-2 w-full">
+                <MdLightbulb size={16} />
+                Docs
+              </Link>
+            </DropdownMenuItem>
+          )}
+
 
           <DropdownMenuSub>
             <DropdownMenuSubTrigger className="py-2 cursor-pointer flex items-center gap-2 text-foreground font-medium text-sm">
