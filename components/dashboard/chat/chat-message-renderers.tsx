@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ChevronDown, MapPin, Star, Users } from "lucide-react";
+import { ChevronDown, MapPin, Star, Users, ThumbsUp, ThumbsDown, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CITY_COLORS, CITIES } from "@/lib/chat-data";
 import { SharedEvent } from "@/lib/types";
@@ -484,9 +484,11 @@ type MsgProps = {
     selectedEventId: string | null;
     onEventSelect: (id: string | null) => void;
     onUpgradeToPro?: () => void;
+    onFeedback?: (rating: "up" | "down", msg: any) => void;
+    onCopy?: (msg: any) => void;
 };
 
-export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onStoreAction, onSuggestion, allVendorsByCity, onFormSubmit, onCalendarSelect, liveEvents, selectedEventId, onEventSelect, onUpgradeToPro }: MsgProps) {
+export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onStoreAction, onSuggestion, allVendorsByCity, onFormSubmit, onCalendarSelect, liveEvents, selectedEventId, onEventSelect, onUpgradeToPro, onFeedback, onCopy }: MsgProps) {
     const ag = msg.role === "agent";
     const activeEvent =
         (msg.eventId && liveEvents.find((ev) => ev.id === msg.eventId)) ||
@@ -724,6 +726,35 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                         ) : null
                     )}
                 </div>
+
+                {ag && msg.type === "text" && (
+                    <div className="flex items-center gap-1.5 mt-2">
+                        <button
+                            type="button"
+                            aria-label="Copy response"
+                            onClick={() => onCopy && onCopy(msg)}
+                            className="h-7 w-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all flex items-center justify-center"
+                        >
+                            <Copy size={14} />
+                        </button>
+                        <button
+                            type="button"
+                            aria-label="Good response"
+                            onClick={() => onFeedback && onFeedback("up", msg)}
+                            className="h-7 w-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all flex items-center justify-center"
+                        >
+                            <ThumbsUp size={14} />
+                        </button>
+                        <button
+                            type="button"
+                            aria-label="Bad response"
+                            onClick={() => onFeedback && onFeedback("down", msg)}
+                            className="h-7 w-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all flex items-center justify-center"
+                        >
+                            <ThumbsDown size={14} />
+                        </button>
+                    </div>
+                )}
 
                 {ag && msg.suggestions && (
                     <div className="flex flex-wrap gap-1.5 mt-3">

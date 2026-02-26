@@ -8,6 +8,7 @@ import {
     getChatById,
     createChat,
     saveChatMessage,
+    saveChatFeedback,
     listenToMessages,
     updateChatMetadata,
     getStoreKits,
@@ -467,6 +468,23 @@ export default function ChatPage() {
                                 onSuggestion={(s: any) => {
                                     send(s.label, s);
                                 }}
+                                onCopy={(msg: any) => {
+                                    const content = typeof msg?.content === "string" ? msg.content : "";
+                                    if (!content) return;
+                                    navigator.clipboard.writeText(content);
+                                }}
+                                onFeedback={async (rating: "up" | "down", msg: any) => {
+                                    const chatId = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
+                                    if (!chatId || chatId === "new") return;
+                                    const content = typeof msg?.content === "string" ? msg.content : "";
+                                    await saveChatFeedback(chatId, {
+                                        messageId: msg?.id,
+                                        rating,
+                                        messageType: msg?.type,
+                                        content: content.slice(0, 500),
+                                        userId: currentUser?.uid
+                                    });
+                                }}
                                 onStoreAction={handleStoreAction}
                                 onVendorAction={handleVendorAction}
                                 onSave={handleSaveVendor}
@@ -542,7 +560,7 @@ export default function ChatPage() {
                             </div>
                         </div>
                     </div>
-                    <p className="text-[11px] text-muted-foreground mt-3 text-center opacity-60">
+                    <p className="text-[11px] text-muted-foreground mt-3 text-center opacity-60 hidden md:block">
                         Waddi can access vendors, contracts, and guest data for this event
                     </p>
                 </div>

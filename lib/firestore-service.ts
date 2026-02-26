@@ -206,6 +206,14 @@ export async function saveChatMessage(chatId: string, message: any) {
     }, { merge: true });
 }
 
+export async function saveChatFeedback(chatId: string, payload: { messageId?: string; rating: "up" | "down"; messageType?: string; content?: string; userId?: string }) {
+    const feedbackRef = collection(db, 'chats', chatId, 'feedback');
+    await addDoc(feedbackRef, {
+        ...payload,
+        createdAt: serverTimestamp()
+    });
+}
+
 export function listenToMessages(
     chatId: string,
     callback: (messages: any[]) => void,
