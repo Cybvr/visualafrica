@@ -164,8 +164,8 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
         </DropdownMenuTrigger>
         <DropdownMenuContent
           className="w-44 rounded-xl shadow-lg bg-background p-1"
-          side="right"
-          align="end"
+          side="top"
+          align="start"
           sideOffset={12}
         >
           <DropdownMenuItem
