@@ -4,25 +4,25 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  MdAdd,
-  MdCalendarMonth,
-  MdChecklist,
-  MdDarkMode,
-  MdHelp,
-  MdLightbulb,
-  MdLogout,
-  MdMail,
-  MdOutlineWbSunny,
-  MdPerson,
-  MdSearch,
-  MdSettings,
-  MdComputer,
-  MdExpandMore,
-  MdChevronLeft,
-  MdChevronRight,
-  MdStore,
-} from "react-icons/md";
-import { IconType } from "react-icons";
+  Plus,
+  Calendar,
+  CheckSquare,
+  Moon,
+  HelpCircle,
+  Lightbulb,
+  LogOut,
+  Mail,
+  Sun,
+  User,
+  Search,
+  Settings,
+  Laptop,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Store,
+  type LucideIcon,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,7 +54,7 @@ import {
 import ChatHistorySection from "./ChatHistorySection";
 
 type NavItemConfig = {
-  icon: IconType;
+  icon: LucideIcon;
   label: string;
   href: string;
   count?: number;
@@ -155,7 +155,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
               </div>
             )}
             {!collapsed && (
-              <MdExpandMore
+              <ChevronDown
                 size={16}
                 className="text-foreground transition-transform group-data-[state=open]:rotate-180"
               />
@@ -173,14 +173,14 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
             className="py-2 cursor-pointer flex items-center gap-2 text-foreground font-medium text-sm"
           >
             <Link href={mode === 'host' ? '/dashboard/hosts/settings' : '/dashboard/vendors/settings'} className="flex items-center gap-2 w-full">
-              <MdSettings size={16} />
+              <Settings size={16} />
               Settings
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild className="py-2 cursor-pointer flex items-center gap-2 text-foreground font-medium text-sm">
             <Link href={mode === 'host' ? '/dashboard/vendors' : '/dashboard/hosts'} className="flex items-center gap-2 w-full">
-              {mode === 'host' ? <MdChecklist size={16} /> : <MdPerson size={16} />}
+              {mode === 'host' ? <CheckSquare size={16} /> : <User size={16} />}
               {mode === 'host' ? 'View as Vendor' : 'View as Host'}
             </Link>
           </DropdownMenuItem>
@@ -188,7 +188,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
           {userProfile.role === "admin" && (
             <DropdownMenuItem asChild className="py-2 cursor-pointer flex items-center gap-2 text-foreground font-medium text-sm">
               <Link href="/admin" className="flex items-center gap-2 w-full">
-                <MdSettings size={16} />
+                <Settings size={16} />
                 Admin
               </Link>
             </DropdownMenuItem>
@@ -197,7 +197,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
           {userProfile.role === "admin" && (
             <DropdownMenuItem asChild className="py-2 cursor-pointer flex items-center gap-2 text-foreground font-medium text-sm">
               <Link href="/docs" className="flex items-center gap-2 w-full">
-                <MdLightbulb size={16} />
+                <Lightbulb size={16} />
                 Docs
               </Link>
             </DropdownMenuItem>
@@ -206,19 +206,19 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
 
           <DropdownMenuSub>
             <DropdownMenuSubTrigger className="py-2 cursor-pointer flex items-center gap-2 text-foreground font-medium text-sm">
-              {theme === "light" ? <MdOutlineWbSunny size={16} /> : theme === "dark" ? <MdDarkMode size={16} /> : <MdComputer size={16} />}
+              {theme === "light" ? <Sun size={16} /> : theme === "dark" ? <Moon size={16} /> : <Laptop size={16} />}
               Theme
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent className="min-w-[120px]">
                 <DropdownMenuItem onClick={() => setTheme("light")} className="cursor-pointer gap-2">
-                  <MdOutlineWbSunny size={14} /> Light
+                  <Sun size={14} /> Light
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setTheme("dark")} className="cursor-pointer gap-2">
-                  <MdDarkMode size={14} /> Dark
+                  <Moon size={14} /> Dark
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setTheme("system")} className="cursor-pointer gap-2">
-                  <MdComputer size={14} /> System
+                  <Laptop size={14} /> System
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
@@ -226,7 +226,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
 
           <Link href="/support">
             <DropdownMenuItem className="py-2 cursor-pointer flex items-center gap-2 text-foreground font-medium text-sm">
-              <MdHelp size={16} />
+              <HelpCircle size={16} />
               Support
             </DropdownMenuItem>
           </Link>
@@ -243,7 +243,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
             }}
             className="py-2 cursor-pointer flex items-center gap-2 text-red-600 focus:text-red-700 focus:bg-red-50 text-sm"
           >
-            <MdLogout size={16} />
+            <LogOut size={16} />
             Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -279,7 +279,7 @@ const NavItem: React.FC<{
           : "text-foreground hover:bg-card hover:text-foreground"
         }`}
     >
-      <span className={active ? "text-foreground" : "text-foreground group-hover:text-foreground"}>
+      <span className="text-muted-foreground">
         {icon}
       </span>
       {!collapsed && <span className="text-sm font-medium leading-tight">{label}</span>}
@@ -374,11 +374,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
   }, [pathname]);
 
   const hostPrimaryNavItems: NavItemConfig[] = [
-    { icon: MdAdd, label: "New Task", href: `/dashboard/hosts/chat/${freshTaskId}` },
-    { icon: MdSearch, label: "Search", href: "/dashboard/hosts/search", matchPaths: ["/dashboard/hosts/vendor/"] },
-    { icon: MdStore, label: "Store", href: "/dashboard/hosts/store" },
-    { icon: MdCalendarMonth, label: "Manage", href: "/dashboard/hosts/events", count: hostEventsCount },
-    { icon: MdMail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
+    { icon: Plus, label: "New Task", href: `/dashboard/hosts/chat/${freshTaskId}` },
+    { icon: Search, label: "Search", href: "/dashboard/hosts/search", matchPaths: ["/dashboard/hosts/vendor/"] },
+    { icon: Store, label: "Store", href: "/dashboard/hosts/store" },
+    { icon: Calendar, label: "Manage", href: "/dashboard/hosts/events", count: hostEventsCount },
+    { icon: Mail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
   ];
 
   const renameHostChatHistoryItem = async (id: string, title: string) => {
@@ -392,9 +392,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
   const hostSecondaryNavItems: NavItemConfig[] = [];
 
   const vendorPrimaryNavItems: NavItemConfig[] = [
-    { icon: MdSearch, label: "Search", href: "/dashboard/vendors" },
-    { icon: MdMail, label: "Inbox", href: "/dashboard/vendors/inbox", count: vendorInboxCount },
-    { icon: MdChecklist, label: "Jobs", href: "/dashboard/vendors/jobs", count: vendorEventsCount },
+    { icon: Search, label: "Search", href: "/dashboard/vendors" },
+    { icon: Mail, label: "Inbox", href: "/dashboard/vendors/inbox", count: vendorInboxCount },
+    { icon: CheckSquare, label: "Jobs", href: "/dashboard/vendors/jobs", count: vendorEventsCount },
   ];
 
   const vendorSecondaryNavItems: NavItemConfig[] = [];
@@ -423,7 +423,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
               className="absolute inset-0 hidden md:flex items-center justify-center w-full h-full text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto"
               aria-label="Expand sidebar"
             >
-              <MdChevronRight size={22} />
+              <ChevronRight size={22} />
             </button>
           </div>
         ) : (
@@ -441,7 +441,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
                 className="hidden md:inline-flex items-center justify-center w-8 h-8 text-foreground hover:text-foreground hover:bg-card rounded-lg transition-colors"
                 aria-label="Collapse sidebar"
               >
-                <MdChevronLeft size={20} />
+                <ChevronLeft size={20} />
               </button>
             )}
           </>
@@ -453,7 +453,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
           {primaryNavItems.map((item) => (
             <NavItem
               key={item.href}
-              icon={<item.icon size={20} />}
+              icon={<item.icon size={20} className="text-muted-foreground" />}
               label={item.label}
               active={isActive(item)}
               href={item.href}
@@ -469,7 +469,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
               {secondaryNavItems.map((item) => (
                 <NavItem
                   key={item.href}
-                  icon={<item.icon size={20} />}
+                  icon={<item.icon size={20} className="text-muted-foreground" />}
                   label={item.label}
                   active={isActive(item)}
                   href={item.href}

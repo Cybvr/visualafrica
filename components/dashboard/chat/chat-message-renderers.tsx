@@ -515,9 +515,7 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
     };
     return (
         <div className={cn("flex gap-3.5 mb-6", ag ? "flex-row items-start" : "flex-row-reverse items-start")}>
-            {ag ? (
-                <img src="/images/logo.png" alt="Waddi" className="w-[32px] h-[32px] rounded-full object-cover shrink-0 mt-0.5" />
-            ) : null}
+            {ag ? null : null}
 
             <div className={cn("flex-1 min-w-0 flex flex-col", ag ? "items-start" : "items-end")}>
                 <div className={cn("w-full max-w-[95%] sm:max-w-[480px]", ag ? "text-left" : "text-right")}>

@@ -507,8 +507,8 @@ export default function ChatPage() {
                 </div>
             </div>
 
-            <div className="p-4 sm:p-6 bg-background/80 backdrop-blur-md">
-                <div className="max-w-4xl mx-auto">
+            <div className="bg-background/80 backdrop-blur-md pt-2">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-4 sm:pb-6">
                     <div className="relative bg-card border border-border rounded-[24px] shadow-sm overflow-hidden focus-within:border-primary/50 transition-all">
                         <textarea
                             value={input}
