@@ -13,6 +13,8 @@ const DEFAULT_MODEL_CANDIDATES = [
 type GeminiCallOptions = {
     forceFunctionCall?: boolean;
     allowedFunctionNames?: string[];
+    useSearch?: boolean;
+    systemInstruction?: string;
 };
 
 export async function processGeminiChat(
@@ -24,6 +26,39 @@ export async function processGeminiChat(
         new Set([configuredModel, ...DEFAULT_MODEL_CANDIDATES].filter((m): m is string => !!m))
     );
 
+    const buildSystemInstruction = () =>
+        options?.systemInstruction?.trim() ||
+        `You are Waddi, an intelligent event planner assistant for African cities (Lagos, Accra, Nairobi, Cape Town, Abuja, Kampala, Dar es Salaam).
+When users share event details, ALWAYS call create_event with the parsed details.
+Do NOT call add_todo_item, add_itinerary_item, or find_vendors in the same turn as create_event unless the user explicitly asks to skip approvals and do everything at once.
+When looking for vendors, use find_vendors with the event city.
+For normal conversation (when no tool is needed), reply naturally and conversationally, then end with one short action-oriented question that moves the user toward a concrete next step in Waddi.
+Be concise and action-oriented.`;
+
+    const callSearchModel = async (modelName: string, prompt: string) => {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
+        const body = {
+            systemInstruction: { parts: [{ text: buildSystemInstruction() }] },
+            contents: [{ parts: [{ text: prompt }] }],
+            tools: [{ google_search: {} }]
+        };
+        const res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+            body: JSON.stringify(body)
+        });
+        const json = await res.json();
+        if (!res.ok) {
+            const err: any = new Error(json?.error?.message || "Gemini search request failed");
+            (err as any).status = res.status;
+            throw err;
+        }
+        const parts = json?.candidates?.[0]?.content?.parts || [];
+        const text = parts.map((p: any) => p?.text || "").join("").trim();
+        const groundingMetadata = json?.candidates?.[0]?.groundingMetadata;
+        return { text, groundingMetadata };
+    };
+
     try {
         const allowList = Array.isArray(options?.allowedFunctionNames)
             ? options!.allowedFunctionNames!.filter(Boolean)
@@ -32,14 +67,15 @@ export async function processGeminiChat(
         let lastModelError: any = null;
         for (const modelName of modelCandidates) {
             try {
+                if (options?.useSearch) {
+                    const prompt = chatHistory[chatHistory.length - 1]?.parts?.[0]?.text || "";
+                    const result = await callSearchModel(modelName, prompt);
+                    return { type: "text", text: result.text, groundingMetadata: result.groundingMetadata };
+                }
+
                 const model = genAI.getGenerativeModel({
                     model: modelName,
-                    systemInstruction: `You are Waddi, an intelligent event planner assistant for African cities (Lagos, Accra, Nairobi, Cape Town, Abuja, Kampala, Dar es Salaam).
-When users share event details, ALWAYS call create_event with the parsed details.
-Do NOT call add_todo_item, add_itinerary_item, or find_vendors in the same turn as create_event unless the user explicitly asks to skip approvals and do everything at once.
-When looking for vendors, use find_vendors with the event city.
-For normal conversation (when no tool is needed), reply naturally and conversationally, then end with one short action-oriented question that moves the user toward a concrete next step in Waddi.
-Be concise and action-oriented.`,
+                    systemInstruction: buildSystemInstruction(),
                     tools: [
                         {
                             functionDeclarations: [

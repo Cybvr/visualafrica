@@ -5,9 +5,10 @@ import { Badge } from "./chat-elements";
 
 interface EventOverviewCardProps {
     event?: SharedEvent;
+    onAction?: (action: any) => void;
 }
 
-export const EventOverviewCard = ({ event }: EventOverviewCardProps) => {
+export const EventOverviewCard = ({ event, onAction }: EventOverviewCardProps) => {
     const formatDate = (dateStr?: string) => {
         if (!dateStr) return "-";
         try {
@@ -113,7 +114,18 @@ export const EventOverviewCard = ({ event }: EventOverviewCardProps) => {
                     )}
                 </div>
             </div>
+
+            {event && onAction && (
+                <div className="mt-3 flex items-center gap-2 border border-border rounded-full px-2 py-1">
+                    <button
+                        onClick={() => onAction({ label: "Search flight deals", action: "search_flights", eventId: event.id })}
+                        className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none"
+                    >
+                        <span className="text-[14px]">✈️</span> <span className="hidden sm:inline">Search flight deals</span>
+                        <span className="sm:hidden">Flights</span>
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
-

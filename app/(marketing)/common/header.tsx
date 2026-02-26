@@ -136,13 +136,13 @@ export function Header() {
           </Link>
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
+              <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
                 Platform
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-[500px] border-none bg-background p-4 shadow-2xl rounded-3xl">
                 <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                   <div className="col-span-2 pb-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Platform Features</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Platform Features</span>
                   </div>
                   {platformFeatures.map((feature) => {
                     const Icon = platformIconMap[feature.title]
@@ -150,7 +150,7 @@ export function Header() {
                       <DropdownMenuItem key={feature.title} asChild className="p-0 focus:bg-transparent">
                         <Link href={feature.href} className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
                           {Icon && (
-                            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-card text-primary">
+                            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-card text-foreground">
                               <Icon className="h-4 w-4" />
                             </span>
                           )}
@@ -158,7 +158,7 @@ export function Header() {
                             <span className="text-sm font-bold text-foreground">
                               {feature.title}
                             </span>
-                            <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                            <p className="mt-0.5 text-xs text-foreground line-clamp-2">
                               {feature.description}
                             </p>
                           </div>
@@ -171,13 +171,13 @@ export function Header() {
             </DropdownMenu>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
+              <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
                 Solutions
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-[600px] border-none bg-background p-6 shadow-2xl rounded-3xl">
                 <div className="grid grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Event Types</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground/60 block border-b border-border/50 pb-1">Event Types</span>
                     <div className="space-y-1">
                       {eventTypes.map((item) => {
                         const Icon = "slug" in item ? offeringIconMap[item.slug] : null
@@ -185,7 +185,7 @@ export function Header() {
                           <DropdownMenuItem key={item.label} asChild className="p-0 focus:bg-transparent">
                             <Link href={item.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
                               {Icon && (
-                                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-foreground">
                                   <Icon className="h-4 w-4" />
                                 </span>
                               )}
@@ -200,7 +200,7 @@ export function Header() {
                   </div>
 
                   <div className="space-y-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block border-b border-border/50 pb-1">Service Solutions</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground/60 block border-b border-border/50 pb-1">Service Solutions</span>
                     <div className="space-y-1">
                       {serviceSolutions.map((item) => {
                         const Icon = "slug" in item ? offeringIconMap[item.slug] : null
@@ -208,7 +208,7 @@ export function Header() {
                           <DropdownMenuItem key={item.label} asChild className="p-0 focus:bg-transparent">
                             <Link href={item.href} className="group flex items-center gap-3 rounded-2xl p-2 transition-all hover:bg-secondary/50">
                               {Icon && (
-                                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-foreground">
                                   <Icon className="h-4 w-4" />
                                 </span>
                               )}
@@ -226,24 +226,24 @@ export function Header() {
             </DropdownMenu>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
+              <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
                 Resources
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-[280px] border-none bg-background p-4 shadow-2xl rounded-3xl">
                 <div className="space-y-2">
                   <div className="pb-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Learn More</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Learn More</span>
                   </div>
                   <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
                     <Link href="/blog" className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
-                      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-foreground">
                         <BookOpen className="h-4 w-4" />
                       </span>
                       <div className="min-w-0 flex-1">
                         <span className="text-sm font-bold text-foreground">
                           Blog
                         </span>
-                        <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                        <p className="mt-0.5 text-xs text-foreground line-clamp-2">
                           Tips, guides, and inspiration for planning amazing events
                         </p>
                       </div>
@@ -251,14 +251,14 @@ export function Header() {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
                     <Link href="/support" className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
-                      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-foreground">
                         <Users className="h-4 w-4" />
                       </span>
                       <div className="min-w-0 flex-1">
                         <span className="text-sm font-bold text-foreground">
                           Support
                         </span>
-                        <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                        <p className="mt-0.5 text-xs text-foreground line-clamp-2">
                           Find answers to common questions and get help
                         </p>
                       </div>
@@ -270,7 +270,7 @@ export function Header() {
 
             <Link
               href="/pricing"
-              className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
               Pricing
             </Link>
@@ -279,14 +279,14 @@ export function Header() {
 
         <div className="hidden w-[180px] flex-shrink-0 items-center justify-end gap-3 lg:flex">
           <Link href="/request-demo">
-            <Button variant="outline" size="sm" className="flex items-center gap-2 border-primary/20 text-primary hover:bg-primary hover:text-foreground">
+            <Button variant="outline" size="sm" className="flex items-center gap-2 border-primary/20 text-foreground hover:bg-primary hover:text-foreground">
               Request a Demo
             </Button>
           </Link>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Button size="sm" className="bg-primary text-foreground-foreground hover:bg-primary/90">
                   Account <ChevronDown className="ml-1 h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
@@ -301,7 +301,7 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <Link href="/auth/login">
-              <Button size="sm" className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button size="sm" className="flex items-center gap-2 bg-primary text-foreground-foreground hover:bg-primary/90">
                 Sign In
               </Button>
             </Link>
@@ -328,7 +328,7 @@ export function Header() {
                     <Link
                       key={feature.title}
                       href={feature.href}
-                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                      className="text-sm font-medium text-foreground transition-colors hover:text-foreground"
                       onClick={() => setMobileOpen(false)}
                     >
                       {feature.title}
@@ -348,7 +348,7 @@ export function Header() {
                   <Link
                     key={item.label}
                     href={item.href}
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-sm font-medium text-foreground transition-colors hover:text-foreground"
                     onClick={() => setMobileOpen(false)}
                   >
                     {item.label}
@@ -371,7 +371,7 @@ export function Header() {
               </Link>
               <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
                 <Link href="/request-demo" onClick={() => setMobileOpen(false)}>
-                  <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-foreground">
+                  <Button variant="outline" className="w-full border-primary text-foreground hover:bg-primary hover:text-foreground">
                     Request a Demo
                   </Button>
                 </Link>

@@ -134,7 +134,25 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
     );
 }
 
-function VendorCardMsg({ msg, savedVendors, onSave, onVendorAction, activeCity, allVendorsByCity }: { msg: any; savedVendors: Set<string>; onSave: (v: any) => void; onVendorAction: (a: any, v: any) => void; activeCity: string | null, allVendorsByCity: Record<string, any[]> }) {
+function VendorCardMsg({
+    msg,
+    savedVendors,
+    onSave,
+    onVendorAction,
+    activeCity,
+    allVendorsByCity,
+    activeEvent,
+    onAction
+}: {
+    msg: any;
+    savedVendors: Set<string>;
+    onSave: (v: any) => void;
+    onVendorAction: (a: any, v: any) => void;
+    activeCity: string | null;
+    allVendorsByCity: Record<string, any[]>;
+    activeEvent?: SharedEvent;
+    onAction?: (action: any) => void;
+}) {
     const targetCity = msg.city || activeCity;
     const allForCity = targetCity ? allVendorsByCity[targetCity] || [] : [];
     const sourceVendors = (msg.vendors && msg.vendors.length > 0) ? msg.vendors : allForCity;
@@ -161,6 +179,17 @@ function VendorCardMsg({ msg, savedVendors, onSave, onVendorAction, activeCity, 
                 >
                     {viewAllLabel} ({sourceVendors.length})
                 </Link>
+            )}
+            {activeEvent && onAction && (
+                <div className="w-full max-w-[480px] mt-2 flex items-center gap-2 border border-border rounded-full px-2 py-1">
+                    <button
+                        onClick={() => onAction({ label: "Search flight deals", action: "search_flights", eventId: activeEvent.id })}
+                        className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none"
+                    >
+                        <span className="text-[14px]">✈️</span> <span className="hidden sm:inline">Search flight deals</span>
+                        <span className="sm:hidden">Flights</span>
+                    </button>
+                </div>
             )}
         </div>
     );
@@ -459,6 +488,10 @@ type MsgProps = {
 
 export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onStoreAction, onSuggestion, allVendorsByCity, onFormSubmit, onCalendarSelect, liveEvents, selectedEventId, onEventSelect, onUpgradeToPro }: MsgProps) {
     const ag = msg.role === "agent";
+    const activeEvent =
+        (msg.eventId && liveEvents.find((ev) => ev.id === msg.eventId)) ||
+        (selectedEventId ? liveEvents.find((ev) => ev.id === selectedEventId) : undefined) ||
+        (liveEvents.length === 1 ? liveEvents[0] : undefined);
     return (
         <div className={cn("flex gap-3.5 mb-6", ag ? "flex-row items-start" : "flex-row-reverse items-start")}>
             {ag ? (
@@ -497,13 +530,33 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                         </div>
                     ) : msg.type === "vendor_cards" ? (
                         <div className="mt-1">
-                            <VendorCardMsg msg={msg} savedVendors={savedVendors} onSave={onSave} onVendorAction={onVendorAction} activeCity={activeCity} allVendorsByCity={allVendorsByCity} />
+                            <VendorCardMsg
+                                msg={msg}
+                                savedVendors={savedVendors}
+                                onSave={onSave}
+                                onVendorAction={onVendorAction}
+                                activeCity={activeCity}
+                                allVendorsByCity={allVendorsByCity}
+                                activeEvent={activeEvent}
+                                onAction={onSuggestion}
+                            />
                         </div>
                     ) : msg.type === "action" ? (
                         <div className="w-full mt-1">
                             <div className="bg-secondary/20 rounded-2xl p-4 border border-border/50 w-full shadow-sm">
                                 <div className="text-foreground text-sm font-bold mb-3">{msg.content}</div>
                                 {msg.actions.map((a: any, idx: number) => <Step key={idx} a={a} />)}
+                                {activeEvent && (
+                                    <div className="mt-3 flex items-center gap-2 border border-border rounded-full px-2 py-1">
+                                        <button
+                                            onClick={() => onSuggestion({ label: "Search flight deals", action: "search_flights", eventId: activeEvent.id })}
+                                            className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none"
+                                        >
+                                            <span className="text-[14px]">✈️</span> <span className="hidden sm:inline">Search flight deals</span>
+                                            <span className="sm:hidden">Flights</span>
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ) : msg.type === "ama_flow_card" ? (
@@ -544,11 +597,11 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                         </div>
                     ) : msg.type === "overview" ? (
                         <div className="w-full mt-1 space-y-4">
-                            {liveEvents && liveEvents.length > 0 ? (
-                                liveEvents.map((event: SharedEvent) => (
-                                    <EventOverviewCard key={event.id} event={event} />
-                                ))
-                            ) : (
+                                    {liveEvents && liveEvents.length > 0 ? (
+                                        liveEvents.map((event: SharedEvent) => (
+                                            <EventOverviewCard key={event.id} event={event} onAction={onSuggestion} />
+                                        ))
+                                    ) : (
                                 <div className="p-4 border border-dashed border-border rounded-xl text-center text-muted-foreground text-sm">
                                     No events found in your account.
                                 </div>
@@ -560,7 +613,7 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                                 const event = liveEvents.find((ev) => ev.id === msg.eventId)
                                     || (selectedEventId ? liveEvents.find((ev) => ev.id === selectedEventId) : undefined);
                                 return event ? (
-                                    <EventOverviewCard event={event} />
+                                    <EventOverviewCard event={event} onAction={onSuggestion} />
                                 ) : (
                                     <div className="p-4 border border-dashed border-border rounded-xl text-center text-muted-foreground text-sm">
                                         Event details are syncing. Try again in a moment.
@@ -593,6 +646,43 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                                 selectedEventId={selectedEventId}
                                 onEventChange={onEventSelect}
                             />
+                        </div>
+                    ) : msg.type === "flight_deals" ? (
+                        <div className="w-full mt-1">
+                            <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-3">
+                                <div className="text-sm font-bold text-foreground">{msg.title || "Flight deal guidance"}</div>
+                                <div className="space-y-2">
+                                    {(msg.deals || []).map((d: any, i: number) => (
+                                        <div key={`${d.label}-${i}`} className="border border-border/60 rounded-xl p-3">
+                                            <div className="text-[13px] font-semibold text-foreground">{d.label || "Deal"}</div>
+                                            <div className="text-[11px] text-muted-foreground mt-0.5">
+                                                {[d.price, d.dates].filter(Boolean).join(" · ")}
+                                            </div>
+                                            <div className="text-[11px] text-muted-foreground mt-1">
+                                                {d.source ? `Source: ${d.source}` : ""}
+                                            </div>
+                                            {d.url && (
+                                                <div className="text-[11px] text-primary mt-1 break-all">{d.url}</div>
+                                            )}
+                                        </div>
+                                    ))}
+                                    {(!msg.deals || msg.deals.length === 0) && (
+                                        <div className="text-[12px] text-muted-foreground">No deals found. Try different dates or origin.</div>
+                                    )}
+                                </div>
+                                {msg.sources && msg.sources.length > 0 && (
+                                    <div className="pt-2 border-t border-border/60">
+                                        <div className="text-[10px] tracking-widest uppercase text-muted-foreground mb-1">Sources</div>
+                                        <div className="text-[11px] text-muted-foreground space-y-1">
+                                            {msg.sources.map((s: any, i: number) => (
+                                                <div key={`${s.title}-${i}`} className="break-all">
+                                                    {s.title || "Source"}{s.url ? ` — ${s.url}` : ""}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ) : msg.type === "vendors" ? (
                         <div className="w-full mt-1">

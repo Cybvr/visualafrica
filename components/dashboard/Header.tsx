@@ -27,12 +27,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenMenu }) => {
 
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <Link href="/support">
-            <Button variant="outline" size="sm" className="hidden lg:flex items-center gap-2 border-primary/20 hover:bg-primary/5 hover:border-primary/40 text-primary h-9 rounded-xl px-4">
-              <FileText size={16} />
-              <span className="font-semibold text-xs">Resources</span>
-            </Button>
-          </Link>
+
         </div>
 
         <button className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">

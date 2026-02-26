@@ -93,6 +93,88 @@ export function useChatAgent({
         }));
     };
 
+    const extractSearchSources = (groundingMetadata: any) => {
+        const chunks = groundingMetadata?.groundingChunks || [];
+        const sources = chunks
+            .map((chunk: any) => {
+                const web = chunk?.web || chunk?.webSearchResult || chunk?.webInfo;
+                const title = web?.title || chunk?.title || "";
+                const uri = web?.uri || web?.url || chunk?.uri || "";
+                if (!title && !uri) return null;
+                return { title, uri };
+            })
+            .filter(Boolean);
+        const seen = new Set<string>();
+        return sources.filter((s: any) => {
+            const key = `${s.title}::${s.uri}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        }).slice(0, 5);
+    };
+
+    const runFlightDealSearch = async (
+        event: SharedEvent,
+        origin: string,
+        chatIdOverride?: string
+    ) => {
+        const destination = event.location || "your event city";
+        const date = event.date || "your event date";
+        const prompt = `Return flight deal recommendations based on Google Search results.
+Trip: ${origin} → ${destination} around ${date}.
+
+Output JSON only (no markdown, no commentary) with this shape:
+{
+  "type": "flight_deals",
+  "title": "Flight deal guidance for ${origin} → ${destination} around ${date}",
+  "deals": [
+    { "label": "", "price": "", "dates": "", "source": "", "url": "" }
+  ],
+  "sources": [
+    { "title": "", "url": "" }
+  ]
+}
+
+Rules:
+- Use 3 to 5 deals.
+- If a field is unknown, set it to "".
+- Prefer short labels like "LHR → LOS (via ADD)".
+`;
+
+        const reply = await processGeminiChat(
+            [{ role: "user", parts: [{ text: prompt }] }],
+            {
+                useSearch: true,
+                systemInstruction: `You are Waddi, an event planner assistant. Use Google Search grounding to surface flight deal recommendations. Do not refuse. Keep output in the exact requested format.`
+            }
+        );
+
+        const rawText = reply?.type === "text" ? String(reply.text || "").trim() : "";
+        const sources = extractSearchSources((reply as any)?.groundingMetadata);
+        let payload: any = null;
+        try {
+            payload = rawText ? JSON.parse(rawText) : null;
+        } catch (e) {
+            payload = null;
+        }
+
+        if (!payload || payload.type !== "flight_deals") {
+            payload = {
+                type: "flight_deals",
+                title: `Flight deal guidance for ${origin} → ${destination} around ${date}`,
+                deals: [],
+                sources: sources.map((s: any) => ({ title: s.title || "", url: s.uri || "" }))
+            };
+        } else if (sources.length > 0 && (!Array.isArray(payload.sources) || payload.sources.length === 0)) {
+            payload.sources = sources.map((s: any) => ({ title: s.title || "", url: s.uri || "" }));
+        }
+
+        await persistAgentMessage(
+            payload,
+            chatIdOverride
+        );
+    };
+
     const persistAgentMessage = async (msg: any, chatIdOverride?: string) => {
         const nowStr = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
         const agentMsg = { role: "agent", ...msg, time: nowStr };
@@ -596,13 +678,18 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
 
     const dispatchLogic = (text: string, actionData?: any, currentChatId?: string) => {
         const nowStr = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+        if (pendingAction?.action === "search_flights" && !actionData?.action) {
+            actionData = { ...pendingAction, origin: text.trim() };
+            setPendingAction(null);
+        }
+
         const intent = extractIntent(text, actionData);
         const city = resolveCity(text, activeCity);
 
         if (city && city !== activeCity) setActiveCity(city);
 
         setTyping(true);
-        setTimeout(() => {
+        setTimeout(async () => {
             setTyping(false);
 
             let response: any = {
@@ -613,6 +700,32 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             };
             const normalizedIntent = intent === "start_experiences" ? "experience" : intent;
             const allVendors = Object.values(allVendorsByCity).flat();
+            const activeEvent = resolveTargetEvent(actionData);
+
+            if (normalizedIntent === "search_flights") {
+                if (!activeEvent) {
+                    response.content = "Which event should I use for the flight search?";
+                    setMessages((prev) => [...prev, response]);
+                    if (currentChatId) saveChatMessage(currentChatId, response);
+                    return;
+                }
+
+                let inferredOrigin = String(actionData?.origin || "").trim()
+                    || String(activeCity || "").trim();
+                if (!inferredOrigin || (activeEvent.location && inferredOrigin.toLowerCase() === activeEvent.location.toLowerCase())) {
+                    inferredOrigin = "your city";
+                }
+
+                await persistAgentMessage(
+                    {
+                        type: "text",
+                        content: `Flight deal guidance for ${inferredOrigin} → ${activeEvent.location || "your event city"} around ${activeEvent.date || "your event date"}:`
+                    },
+                    currentChatId
+                );
+                await runFlightDealSearch(activeEvent, inferredOrigin, currentChatId);
+                return;
+            }
 
             if (intent === "start_planning") {
                 response.type = "event_form";
@@ -903,6 +1016,27 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         if (!text.trim()) return;
         const nowStr = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
         const hasExplicitAction = Boolean(actionData?.action || actionData?.id);
+
+        const pendingFlight = pendingAction?.action === "search_flights";
+        if (pendingFlight && !hasExplicitAction) {
+            let chatIdStr = getRouteChatId();
+            const isNew = chatIdStr === "new" || chatIdStr.startsWith("task-");
+            if (isNew && currentUser) {
+                chatIdStr = await createChat(currentUser.uid, text.substring(0, 30), activeCity);
+                for (const m of INITIAL_MESSAGES) {
+                    await saveChatMessage(chatIdStr, { ...m, time: nowStr });
+                }
+                router.push(`/dashboard/hosts/chat/${chatIdStr}`);
+            }
+            if (chatIdStr !== "new") {
+                await saveChatMessage(chatIdStr, { role: "user", content: text, time: nowStr });
+            } else {
+                setMessages((prev) => [...prev, { id: Date.now().toString(), role: "user", content: text, time: nowStr }]);
+            }
+            dispatchLogic(text, pendingAction, chatIdStr !== "new" ? chatIdStr : undefined);
+            setInput("");
+            return;
+        }
 
         let chatIdStr = getRouteChatId();
         const isNew = chatIdStr === "new" || chatIdStr.startsWith("task-");

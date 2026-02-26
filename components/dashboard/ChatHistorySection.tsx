@@ -92,7 +92,7 @@ const ChatHistorySection: React.FC<ChatHistorySectionProps> = ({
     <>
       <div className={variant === "whatsapp" ? "space-y-2" : "mt-5"}>
         {showHeader && (
-          <div className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          <div className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-widest text-foreground">
             Chat History
           </div>
         )}
@@ -117,7 +117,7 @@ const ChatHistorySection: React.FC<ChatHistorySectionProps> = ({
                       const parent = target.parentElement;
                       if (parent) {
                         parent.textContent = initialsFor(chat.title);
-                        parent.className = "w-10 h-10 rounded-full shrink-0 border border-border bg-secondary text-xs font-black text-muted-foreground flex items-center justify-center";
+                        parent.className = "w-10 h-10 rounded-full shrink-0 border border-border bg-secondary text-xs font-black text-foreground flex items-center justify-center";
                       }
                     }}
                   />
@@ -147,14 +147,14 @@ const ChatHistorySection: React.FC<ChatHistorySectionProps> = ({
                   onClick={() => router.push(`/dashboard/hosts/chat/${chat.id}`)}
                   className={variant === "whatsapp"
                     ? "flex-1 min-w-0 text-left leading-tight"
-                    : "flex-1 text-left text-sm font-medium leading-tight text-muted-foreground group-hover:text-foreground truncate px-1 py-1"
+                    : "flex-1 text-left text-sm font-medium leading-tight text-foreground group-hover:text-foreground truncate px-1 py-1"
                   }
                 >
                   <div className={variant === "whatsapp" ? "text-sm font-semibold text-foreground truncate" : ""}>
                     {chat.title}
                   </div>
                   {variant === "whatsapp" && (
-                    <div className="text-xs text-muted-foreground truncate">Last message preview…</div>
+                    <div className="text-xs text-foreground truncate">Last message preview…</div>
                   )}
                 </button>
               )}
@@ -163,7 +163,7 @@ const ChatHistorySection: React.FC<ChatHistorySectionProps> = ({
                   <button
                     type="button"
                     aria-label={`Actions for ${chat.title}`}
-                    className="h-7 w-7 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                    className="h-7 w-7 inline-flex items-center justify-center rounded-md text-foreground hover:text-foreground hover:bg-secondary transition-colors"
                   >
                     <MdMoreHoriz size={18} />
                   </button>

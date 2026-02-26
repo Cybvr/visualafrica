@@ -149,7 +149,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
                 <div className="text-xs font-semibold text-foreground truncate">
                   {userProfile.displayName}
                 </div>
-                <div className="text-[10px] text-muted-foreground truncate">
+                <div className="text-[10px] text-foreground truncate">
                   Free Plan
                 </div>
               </div>
@@ -157,7 +157,7 @@ const ProfileDropdown: React.FC<{ mode: 'host' | 'vendor'; collapsed?: boolean }
             {!collapsed && (
               <MdExpandMore
                 size={16}
-                className="text-muted-foreground transition-transform group-data-[state=open]:rotate-180"
+                className="text-foreground transition-transform group-data-[state=open]:rotate-180"
               />
             )}
           </button>
@@ -276,16 +276,16 @@ const NavItem: React.FC<{
         : "flex items-center gap-3 py-2 px-3"
         } ${active
           ? "text-foreground bg-secondary font-semibold shadow-sm"
-          : "text-muted-foreground hover:bg-card hover:text-foreground"
+          : "text-foreground hover:bg-card hover:text-foreground"
         }`}
     >
-      <span className={active ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"}>
+      <span className={active ? "text-foreground" : "text-foreground group-hover:text-foreground"}>
         {icon}
       </span>
       {!collapsed && <span className="text-sm font-medium leading-tight">{label}</span>}
       {count !== undefined && (
         <span
-          className={`${collapsed ? "absolute top-1 right-1" : "ml-auto"} text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${active ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
+          className={`${collapsed ? "absolute top-1 right-1" : "ml-auto"} text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${active ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"
             }`}
         >
           {count}
@@ -438,7 +438,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
             {onToggleCollapse && (
               <button
                 onClick={onToggleCollapse}
-                className="hidden md:inline-flex items-center justify-center w-8 h-8 text-muted-foreground hover:text-foreground hover:bg-card rounded-lg transition-colors"
+                className="hidden md:inline-flex items-center justify-center w-8 h-8 text-foreground hover:text-foreground hover:bg-card rounded-lg transition-colors"
                 aria-label="Collapse sidebar"
               >
                 <MdChevronLeft size={20} />
