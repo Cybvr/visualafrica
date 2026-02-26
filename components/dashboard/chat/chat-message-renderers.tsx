@@ -106,26 +106,26 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
                         <button
                             onClick={(e) => { e.stopPropagation(); onVendorAction && onVendorAction({ id: 'message' }, v); }}
                             className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none">
-                            <span className="text-[14px]">💬</span> <span className="hidden sm:inline">Message</span>
+                            <span className="text-[16px]">💬</span> <span className="hidden sm:inline">Message</span>
                         </button>
                         <div className="w-[1px] h-3 bg-border"></div>
                         <button
                             onClick={(e) => { e.stopPropagation(); onVendorAction && onVendorAction({ id: 'contract' }, v); }}
                             className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none">
-                            <span className="text-[14px]">📄</span> <span className="hidden sm:inline">Brief</span>
+                            <span className="text-[16px]">📄</span> <span className="hidden sm:inline">Brief</span>
                         </button>
                         <div className="w-[1px] h-3 bg-border"></div>
                         <button
                             onClick={(e) => { e.stopPropagation(); onSave(v); }}
                             className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none">
-                            <span className="text-[14px]">🔖</span> <span className="hidden sm:inline">Save</span>
+                            <span className="text-[16px]">🔖</span> <span className="hidden sm:inline">Save</span>
                         </button>
                         <div className="w-[1px] h-3 bg-border"></div>
                         <Link
                             href={`/dashboard/hosts/vendor/${v.slug}`}
                             onClick={(e) => e.stopPropagation()}
                             className="flex-1 text-[11px] font-semibold py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full transition-all flex justify-center items-center gap-1.5 leading-none">
-                            <span className="text-[14px]">👤</span> <span className="hidden sm:inline">View</span>
+                            <span className="text-[16px]">👤</span> <span className="hidden sm:inline">View</span>
                         </Link>
                     </div>
                 )}
@@ -165,7 +165,7 @@ function VendorCardMsg({
         <div className="w-full">
             <div className="mb-3">
                 {msg.city && <CityBadge city={msg.city} />}
-                <div className="text-foreground text-[14px] leading-relaxed">{msg.content}</div>
+                <div className="text-foreground text-[16px] leading-relaxed">{msg.content}</div>
             </div>
             <div className="w-full max-w-[480px] space-y-3">
                 {shown.map((v: any) => (
@@ -186,7 +186,7 @@ function VendorCardMsg({
                         onClick={() => onAction({ label: "Search flight deals", action: "search_flights", eventId: activeEvent.id })}
                         className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none"
                     >
-                        <span className="text-[14px]">✈️</span> <span className="hidden sm:inline">Search flight deals</span>
+                        <span className="text-[16px]">✈️</span> <span className="hidden sm:inline">Search flight deals</span>
                         <span className="sm:hidden">Flights</span>
                     </button>
                 </div>
@@ -233,7 +233,7 @@ function CommunityCard({ item }: { item: any }) {
                 </div>
             </div>
             <div className="p-4">
-                <div className="text-[14px] font-black leading-tight mb-1 text-foreground">{item.eventName}</div>
+                <div className="text-[16px] font-black leading-tight mb-1 text-foreground">{item.eventName}</div>
                 <div className="text-[11px] text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
                     {item.description}
                 </div>
@@ -335,7 +335,7 @@ function AmaFlowCard({ msg }: { msg: any }) {
     return (
         <div className="w-full space-y-2.5">
             {msg.kicker && <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-bold">{msg.kicker}</div>}
-            {msg.content && <div className="text-foreground text-[14px] leading-relaxed whitespace-pre-line">{msg.content}</div>}
+            {msg.content && <div className="text-foreground text-[16px] leading-relaxed whitespace-pre-line">{msg.content}</div>}
             {msg.meta && <div className="text-[12px] text-primary font-medium">{msg.meta}</div>}
 
             {tableHeaders.length > 0 && tableRows.length > 0 && (
@@ -417,20 +417,20 @@ function StoreCard({ item, onAction }: { item: any; onAction?: (action: string, 
                         <button
                             onClick={(e) => { e.stopPropagation(); onAction && onAction('apply', item); }}
                             className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none">
-                            <span className="text-[14px]">⚡</span> <span className="hidden sm:inline">Apply</span>
+                            <span className="text-[16px]">⚡</span> <span className="hidden sm:inline">Apply</span>
                         </button>
                         <div className="w-[1px] h-3 bg-border"></div>
                         <button
                             onClick={(e) => { e.stopPropagation(); onAction && onAction('buy', item); }}
                             className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none">
-                            <span className="text-[14px]">💰</span> <span className="hidden sm:inline">Buy Kit</span>
+                            <span className="text-[16px]">💰</span> <span className="hidden sm:inline">Buy Kit</span>
                         </button>
                         <div className="w-[1px] h-3 bg-border"></div>
                         <Link
                             href={`/dashboard/hosts/chat/${item.id}`}
                             onClick={(e) => e.stopPropagation()}
                             className="flex-1 text-[11px] font-semibold py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full transition-all flex justify-center items-center gap-1.5 leading-none">
-                            <span className="text-[14px]">👁️</span> <span className="hidden sm:inline">Preview</span>
+                            <span className="text-[16px]">👁️</span> <span className="hidden sm:inline">Preview</span>
                         </Link>
                     </div>
                 )}
@@ -449,7 +449,7 @@ function StoreListMsg({ msg, onStoreAction }: { msg: any; onStoreAction?: (actio
         <div className="w-full">
             <div className="mb-3">
                 {msg.city && <CityBadge city={msg.city} />}
-                <div className="text-foreground text-[14px] leading-relaxed">{msg.content}</div>
+                <div className="text-foreground text-[16px] leading-relaxed">{msg.content}</div>
             </div>
             <div className="w-full max-w-[480px] space-y-3">
                 {shown.map((item: any) => (
@@ -515,11 +515,7 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
         <div className={cn("flex gap-3.5 mb-6", ag ? "flex-row items-start" : "flex-row-reverse items-start")}>
             {ag ? (
                 <img src="/images/logo.png" alt="Waddi" className="w-[32px] h-[32px] rounded-full object-cover shrink-0 mt-0.5" />
-            ) : (
-                <div className="w-[32px] h-[32px] rounded-full bg-primary text-primary-foreground flex-shrink-0 mt-0.5 flex items-center justify-center text-[10px] font-bold shadow-sm">
-                    YOU
-                </div>
-            )}
+            ) : null}
 
             <div className={cn("flex-1 min-w-0 flex flex-col", ag ? "items-start" : "items-end")}>
                 <div className={cn("w-full max-w-[95%] sm:max-w-[480px]", ag ? "text-left" : "text-right")}>
@@ -559,7 +555,7 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                                             onClick={() => onSuggestion({ label: "Search flight deals", action: "search_flights", eventId: activeEvent.id })}
                                             className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none"
                                         >
-                                            <span className="text-[14px]">✈️</span> <span className="hidden sm:inline">Search flight deals</span>
+                                            <span className="text-[16px]">✈️</span> <span className="hidden sm:inline">Search flight deals</span>
                                             <span className="sm:hidden">Flights</span>
                                         </button>
                                     </div>
@@ -572,28 +568,28 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                         </div>
                     ) : msg.type === "knowledge" ? (
                         <div className="w-full space-y-2 mt-1">
-                            {msg.content && <div className="text-[14px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
                                 <KnowledgeCard item={msg.data} />
                             </div>
                         </div>
                     ) : msg.type === "community" ? (
                         <div className="w-full space-y-2 mt-1">
-                            {msg.content && <div className="text-[14px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
                                 <CommunityCard item={msg.data} />
                             </div>
                         </div>
                     ) : msg.type === "event_form" ? (
                         <div className="w-full space-y-2 mt-1">
-                            {msg.content && <div className="text-[14px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
                                 <EventForm onSubmit={onFormSubmit} defaultCity={activeCity} />
                             </div>
                         </div>
                     ) : msg.type === "calendar_picker" ? (
                         <div className="w-full space-y-2 mt-1">
-                            {msg.content && <div className="text-[14px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
                                 <CalendarPicker onSelect={onCalendarSelect} />
                             </div>
@@ -718,10 +714,10 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                     ) : (
                         msg.content ? (
                             <div className={cn(
-                                "text-[14px] leading-relaxed whitespace-pre-line mt-1 inline-block",
+                                "text-[16px] leading-relaxed whitespace-pre-line mt-1 inline-block",
                                 ag
                                     ? "text-foreground text-left"
-                                    : "bg-secondary/30 border border-border shadow-sm rounded-2xl px-4 py-3 rounded-tr-[4px] text-left"
+                                    : "bg-secondary/30 rounded-2xl px-4 py-3 rounded-tr-[4px] text-left"
                             )}>
                                 {msg.content}
                             </div>
