@@ -1,16 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search, Mail, MessageCircle } from "lucide-react"
+import { Search, Mail, MessageCircle, Sparkles } from "lucide-react"
+import { FaWhatsapp } from "react-icons/fa"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { FAQ, FAQCategory } from "@/lib/types"
 
 interface SupportContentProps {
@@ -21,6 +17,13 @@ interface SupportContentProps {
 export default function SupportContent({ faqs, categories }: SupportContentProps) {
     const [searchQuery, setSearchQuery] = useState("")
     const [activeCategory, setActiveCategory] = useState("all")
+    const [messages, setMessages] = useState<{ role: "bot" | "user"; text: string }[]>([
+        {
+            role: "bot",
+            text: "Hey! I can help with payments, vendor bookings, and event planning. Pick a topic to get started."
+        }
+    ])
+    const scrollRef = useRef<HTMLDivElement>(null)
 
     const filteredFaqs = faqs.filter(faq => {
         const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -28,93 +31,145 @@ export default function SupportContent({ faqs, categories }: SupportContentProps
         const matchesCategory = activeCategory === "all" || faq.category === activeCategory
         return matchesSearch && matchesCategory
     })
+    const initialOptions = useMemo(() => faqs.slice(0, 6), [faqs])
+
+    const addFaqExchange = (faq: FAQ) => {
+        setMessages((prev) => [
+            ...prev,
+            { role: "user", text: faq.question },
+            { role: "bot", text: faq.answer }
+        ])
+    }
+
+    const handleAsk = () => {
+        const query = searchQuery.trim()
+        if (!query) return
+        if (filteredFaqs.length > 0) {
+            addFaqExchange(filteredFaqs[0])
+        } else {
+            setMessages((prev) => [
+                ...prev,
+                { role: "user", text: query },
+                { role: "bot", text: "I couldn’t find a direct match. Try another topic or contact support below." }
+            ])
+        }
+        setSearchQuery("")
+    }
+
+    useEffect(() => {
+        const el = scrollRef.current
+        if (!el) return
+        el.scrollTo({ top: el.scrollHeight, behavior: "smooth" })
+    }, [messages])
 
     return (
-        <div className="flex flex-col gap-12 lg:flex-row">
-            {/* Sidebar Categories */}
-            <aside className="w-full lg:w-64 space-y-4">
-                <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground/60 px-4">Categories</h2>
-                <nav className="flex flex-wrap gap-2 lg:flex-col">
-                    <button
-                        onClick={() => setActiveCategory("all")}
-                        className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all lg:rounded-xl lg:text-left ${activeCategory === "all"
-                            ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                            : "bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                            }`}
-                    >
-                        All Questions
-                    </button>
-                    {categories.map((cat) => (
-                        <button
-                            key={cat.id}
-                            onClick={() => setActiveCategory(cat.id)}
-                            className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all lg:rounded-xl lg:text-left ${activeCategory === cat.id
-                                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                                : "bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                                }`}
-                        >
-                            {cat.label}
-                        </button>
-                    ))}
-                </nav>
-            </aside>
-
-            {/* Questions List */}
-            <div className="flex-1 space-y-8">
-                {filteredFaqs.length > 0 ? (
-                    <Accordion type="single" collapsible className="w-full space-y-4 border-none">
-                        {filteredFaqs.map((faq) => (
-                            <AccordionItem
-                                key={faq.id}
-                                value={`item-${faq.id}`}
-                                className="rounded-2xl border border-border bg-card px-4 py-2 shadow-sm transition-all hover:shadow-md data-[state=open]:border-primary/30 data-[state=open]:shadow-primary/5"
-                            >
-                                <AccordionTrigger className="text-left font-serif text-lg font-bold hover:no-underline">
-                                    {faq.question}
-                                </AccordionTrigger>
-                                <AccordionContent className="text-base leading-relaxed text-muted-foreground">
-                                    {faq.answer}
-                                </AccordionContent>
-                            </AccordionItem>
-                        ))}
-                    </Accordion>
-                ) : (
-                    <div className="rounded-3xl border border-dashed border-border p-12 text-center">
-                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary text-muted-foreground">
-                            <Search className="h-8 w-8" />
+        <div className="w-full flex justify-center">
+            <div className="w-full max-w-2xl h-[calc(100vh-5rem)] sm:h-[calc(100vh-6rem)] rounded-3xl border border-border bg-card shadow-sm overflow-hidden flex flex-col">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+                    <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center overflow-hidden">
+                            <img src="/logo.png" alt="Waddi" className="h-5 w-5 object-contain" />
                         </div>
-                        <h3 className="mt-4 text-xl font-bold">No results found</h3>
-                        <p className="mt-2 text-muted-foreground">We couldn't find any answers matching your search. Try different keywords or contact us directly.</p>
-                        <Button variant="outline" className="mt-6 rounded-xl" onClick={() => { setSearchQuery(""); setActiveCategory("all") }}>
-                            Clear Search
+                        <div>
+                            <div className="text-sm font-bold">Waddi Support</div>
+                            <div className="text-[11px] text-muted-foreground">+2349053066692 · support@waddibot.com</div>
+                        </div>
+                    </div>
+                    <div className="hidden sm:flex items-center gap-2 text-[11px] text-muted-foreground">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                        Online
+                    </div>
+                </div>
+
+                <div
+                    ref={scrollRef}
+                    className="px-6 py-6 space-y-5 bg-[radial-gradient(circle_at_top,_hsl(var(--secondary)/0.35),_transparent_60%)] overflow-y-auto flex-1"
+                >
+                    {messages.map((m, idx) => (
+                        <div
+                            key={`${m.role}-${idx}`}
+                            className={m.role === "user" ? "flex flex-col items-end" : "flex flex-col items-start"}
+                        >
+                            <div
+                                className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${m.role === "user"
+                                    ? "bg-primary text-primary-foreground"
+                                    : "bg-secondary/50 text-foreground"
+                                    }`}
+                            >
+                                {m.text}
+                            </div>
+                            {idx === 0 && m.role === "bot" && initialOptions.length > 0 && (
+                                <div className="max-w-[85%] mt-2 rounded-2xl bg-secondary/50 px-4 py-3 text-sm text-foreground">
+                                    <div className="flex flex-wrap gap-2">
+                                        {initialOptions.map((faq) => (
+                                            <button
+                                                key={faq.id}
+                                                onClick={() => addFaqExchange(faq)}
+                                                className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
+                                            >
+                                                {faq.question}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {filteredFaqs.length === 0 && (
+                        <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+                            No answers matched that search. Try different keywords or message support directly.
+                        </div>
+                    )}
+                </div>
+
+                <div className="border-t border-border px-6 py-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                        <div className="flex-1 flex items-center gap-2 rounded-2xl border border-border bg-background px-2 py-2">
+                            <div className="flex items-center gap-2">
+                                <TooltipProvider delayDuration={120}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button variant="ghost" aria-label="Email support" className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-foreground">
+                                                <Mail className="h-4 w-4" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>Email support</TooltipContent>
+                                    </Tooltip>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button asChild variant="ghost" aria-label="WhatsApp" className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-foreground">
+                                                <Link href="https://wa.me/">
+                                                    <FaWhatsapp className="h-4 w-4" />
+                                                </Link>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>Chat with support</TooltipContent>
+                                    </Tooltip>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button asChild variant="ghost" aria-label="Plan with Waddi" className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-foreground">
+                                                <Link href="/dashboard/hosts">
+                                                    <Sparkles className="h-4 w-4" />
+                                                </Link>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>Plan with Waddi</TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
+                            <input
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Ask a question..."
+                                className="w-full bg-transparent text-sm outline-none"
+                            />
+                        </div>
+                        <Button onClick={handleAsk} className="h-11 rounded-2xl bg-primary px-6 font-bold text-foreground hover:bg-primary/90">
+                            Ask
                         </Button>
                     </div>
-                )}
 
-                {/* Hero Search Integration - Search state is shared inside here */}
-                {/* Still have questions */}
-                <div className="mt-16 rounded-3xl bg-gradient-to-br from-secondary/50 to-secondary/20 p-8 lg:p-12 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <MessageCircle className="w-32 h-32" />
-                    </div>
-                    <div className="relative">
-                        <h2 className="font-serif text-2xl font-bold md:text-3xl">Still have questions?</h2>
-                        <p className="mt-4 max-w-xl text-muted-foreground leading-relaxed">
-                            Can't find the answer you're looking for? Our support team is here to help you with anything you need to make your event a success.
-                        </p>
-                        <div className="mt-8 flex flex-wrap gap-4">
-                            <Button className="h-12 rounded-xl bg-primary px-8 font-bold text-foreground hover:bg-primary/90">
-                                <Mail className="mr-2 h-4 w-4" />
-                                Email Support
-                            </Button>
-                            <Button asChild variant="outline" className="h-12 rounded-xl border-primary/20 bg-background px-8 font-bold text-primary hover:bg-primary/10">
-                                <Link href="/dashboard/hosts">
-                                    <MessageCircle className="mr-2 h-4 w-4" />
-                                    Chat with Ama
-                                </Link>
-                            </Button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
