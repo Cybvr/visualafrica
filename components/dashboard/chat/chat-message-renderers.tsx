@@ -492,6 +492,25 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
         (msg.eventId && liveEvents.find((ev) => ev.id === msg.eventId)) ||
         (selectedEventId ? liveEvents.find((ev) => ev.id === selectedEventId) : undefined) ||
         (liveEvents.length === 1 ? liveEvents[0] : undefined);
+    const isGroundingRedirect = (url?: string) =>
+        !!url && url.includes("grounding-api-redirect");
+    const toFallbackSearchUrl = (title?: string) => {
+        if (!title) return "";
+        return `https://www.google.com/search?q=${encodeURIComponent(title)}`;
+    };
+    const formatUrl = (url?: string, title?: string) => {
+        if (!url) return "";
+        try {
+            const u = new URL(url);
+            const host = u.hostname.replace(/^www\./, "");
+            const path = u.pathname.replace(/\/$/, "");
+            const shortPath = path.length > 24 ? `${path.slice(0, 24)}…` : path;
+            return `${host}${shortPath ? shortPath : ""}`;
+        } catch (e) {
+            const fallback = title ? toFallbackSearchUrl(title) : url;
+            return fallback.length > 32 ? `${fallback.slice(0, 32)}…` : fallback;
+        }
+    };
     return (
         <div className={cn("flex gap-3.5 mb-6", ag ? "flex-row items-start" : "flex-row-reverse items-start")}>
             {ag ? (
@@ -503,18 +522,6 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
             )}
 
             <div className={cn("flex-1 min-w-0 flex flex-col", ag ? "items-start" : "items-end")}>
-                <div className={cn("text-[11px] text-muted-foreground mb-1 flex items-center gap-2", !ag && "justify-end")}>
-                    {ag ? (
-                        <>
-                            <span className="font-semibold text-foreground/80">Waddi</span>
-                            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Lite</span>
-                        </>
-                    ) : (
-                        <span className="font-semibold text-foreground/80">You</span>
-                    )}
-                    <span className="opacity-50 font-medium">{msg.time}</span>
-                </div>
-
                 <div className={cn("w-full max-w-[95%] sm:max-w-[480px]", ag ? "text-left" : "text-right")}>
                     {msg.type === "city_picker" ? (
                         <div className="flex flex-col gap-2 w-full mt-1">
@@ -597,11 +604,11 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                         </div>
                     ) : msg.type === "overview" ? (
                         <div className="w-full mt-1 space-y-4">
-                                    {liveEvents && liveEvents.length > 0 ? (
-                                        liveEvents.map((event: SharedEvent) => (
-                                            <EventOverviewCard key={event.id} event={event} onAction={onSuggestion} />
-                                        ))
-                                    ) : (
+                            {liveEvents && liveEvents.length > 0 ? (
+                                liveEvents.map((event: SharedEvent) => (
+                                    <EventOverviewCard key={event.id} event={event} onAction={onSuggestion} />
+                                ))
+                            ) : (
                                 <div className="p-4 border border-dashed border-border rounded-xl text-center text-muted-foreground text-sm">
                                     No events found in your account.
                                 </div>
@@ -662,7 +669,14 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                                                 {d.source ? `Source: ${d.source}` : ""}
                                             </div>
                                             {d.url && (
-                                                <div className="text-[11px] text-primary mt-1 break-all">{d.url}</div>
+                                                <a
+                                                    href={isGroundingRedirect(d.url) ? toFallbackSearchUrl(d.source || d.label) : d.url}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="text-[11px] text-primary mt-1 break-all underline hover:no-underline"
+                                                >
+                                                    {formatUrl(d.url, d.source || d.label)}
+                                                </a>
                                             )}
                                         </div>
                                     ))}
@@ -676,7 +690,20 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                                         <div className="text-[11px] text-muted-foreground space-y-1">
                                             {msg.sources.map((s: any, i: number) => (
                                                 <div key={`${s.title}-${i}`} className="break-all">
-                                                    {s.title || "Source"}{s.url ? ` — ${s.url}` : ""}
+                                                    {s.title || "Source"}
+                                                    {s.url || s.title ? (
+                                                        <>
+                                                            {" — "}
+                                                            <a
+                                                                href={isGroundingRedirect(s.url) ? toFallbackSearchUrl(s.title) : (s.url || toFallbackSearchUrl(s.title))}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="text-primary underline hover:no-underline"
+                                                            >
+                                                                {formatUrl(s.url || toFallbackSearchUrl(s.title), s.title)}
+                                                            </a>
+                                                        </>
+                                                    ) : null}
                                                 </div>
                                             ))}
                                         </div>
@@ -691,10 +718,10 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                     ) : (
                         msg.content ? (
                             <div className={cn(
-                                "rounded-2xl px-4 py-3 text-[14px] leading-relaxed whitespace-pre-line shadow-sm border mt-1 inline-block",
+                                "text-[14px] leading-relaxed whitespace-pre-line mt-1 inline-block",
                                 ag
-                                    ? "bg-card border-border text-foreground rounded-tl-[4px] text-left"
-                                    : "bg-secondary/30 border-border text-foreground rounded-tr-[4px] text-left"
+                                    ? "text-foreground text-left"
+                                    : "bg-secondary/30 border border-border shadow-sm rounded-2xl px-4 py-3 rounded-tr-[4px] text-left"
                             )}>
                                 {msg.content}
                             </div>
