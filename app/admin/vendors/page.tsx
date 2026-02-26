@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getVendors, deleteVendor, bulkUpdateVendors } from "@/lib/firestore-service";
-import { Vendor } from "@/lib/types";
+import { Vendor, VendorCategory, EventTheme } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2, Search, ExternalLink, Save, X, LayoutGrid, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Search, ExternalLink, Save, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { uploadImage } from "@/lib/upload-service";
+import { VENDOR_CATEGORIES, EVENT_THEMES } from "@/lib/constants";
+
+type BulkListMode = "add" | "remove" | "replace";
 
 export default function AdminVendorsPage() {
     const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -18,6 +21,10 @@ export default function AdminVendorsPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [selectedVendorIds, setSelectedVendorIds] = useState<string[]>([]);
     const [uploadingImageId, setUploadingImageId] = useState<string | null>(null);
+    const [bulkCategoryMode, setBulkCategoryMode] = useState<BulkListMode>("add");
+    const [bulkThemeMode, setBulkThemeMode] = useState<BulkListMode>("add");
+    const [bulkCategories, setBulkCategories] = useState<VendorCategory[]>([]);
+    const [bulkThemes, setBulkThemes] = useState<EventTheme[]>([]);
 
 
     useEffect(() => {
@@ -103,17 +110,53 @@ export default function AdminVendorsPage() {
     const selectAllFiltered = () => setSelectedVendorIds(filteredVendors.map(v => v.id));
     const clearSelection = () => setSelectedVendorIds([]);
     const allSelected = filteredVendors.length > 0 && selectedVendorIds.length === filteredVendors.length;
-    const featuredIds = filteredVendors
-        .filter(v => Boolean(editedVendors[v.id]?.featured ?? v.featured))
-        .map(v => v.id);
-    const allFeaturedSelected =
-        featuredIds.length > 0 &&
-        selectedVendorIds.length === featuredIds.length &&
-        featuredIds.every(id => selectedVendorIds.includes(id));
     const hasUnsavedChanges = Object.keys(editedVendors).length > 0;
     const selectedCount = selectedVendorIds.length;
     const totalVendorCount = vendors.length;
     const filteredVendorCount = filteredVendors.length;
+    const categoryOptions = VENDOR_CATEGORIES.filter((c) => c !== "All Categories");
+    const themeOptions = EVENT_THEMES.filter((t) => t !== "All Themes");
+
+    const applyListByMode = <T extends string>(current: T[], values: T[], mode: BulkListMode): T[] => {
+        const set = new Set(current);
+        if (mode === "replace") return [...new Set(values)];
+        if (mode === "add") {
+            values.forEach((v) => set.add(v));
+            return Array.from(set);
+        }
+        values.forEach((v) => set.delete(v));
+        return Array.from(set);
+    };
+
+    const applyCategoriesToSelected = () => {
+        if (!selectedVendorIds.length || !bulkCategories.length) return;
+        setEditedVendors((prev) => {
+            const next = { ...prev };
+            selectedVendorIds.forEach((id) => {
+                const vendor = vendors.find((v) => v.id === id);
+                if (!vendor) return;
+                const current = (next[id]?.categories as VendorCategory[] | undefined) ?? vendor.categories ?? [];
+                const updated = applyListByMode(current, bulkCategories, bulkCategoryMode);
+                next[id] = { ...(next[id] ?? {}), categories: updated };
+            });
+            return next;
+        });
+    };
+
+    const applyThemesToSelected = () => {
+        if (!selectedVendorIds.length || !bulkThemes.length) return;
+        setEditedVendors((prev) => {
+            const next = { ...prev };
+            selectedVendorIds.forEach((id) => {
+                const vendor = vendors.find((v) => v.id === id);
+                if (!vendor) return;
+                const current = (next[id]?.eventThemes as EventTheme[] | undefined) ?? vendor.eventThemes ?? [];
+                const updated = applyListByMode(current, bulkThemes, bulkThemeMode);
+                next[id] = { ...(next[id] ?? {}), eventThemes: updated };
+            });
+            return next;
+        });
+    };
 
     const deleteSelectedVendors = async () => {
         if (!selectedVendorIds.length) return;
@@ -257,7 +300,7 @@ export default function AdminVendorsPage() {
                                         <div className="flex items-center gap-3">
                                             <div className="relative group shrink-0">
                                                 <img
-                                                    src={(editedVendors[v.id]?.image ?? v.image) || "/placeholder.png"}
+                                                    src={editedVendors[v.id]?.image ?? v.image}
                                                     className="w-10 h-10 rounded-lg object-cover border border-border cursor-pointer group-hover:opacity-70 transition-opacity"
                                                     alt=""
                                                     onClick={() => document.getElementById(`file-input-${v.id}`)?.click()}
@@ -357,8 +400,67 @@ export default function AdminVendorsPage() {
             )}
 
             {selectedCount > 0 && (
-                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
-                    <div className="flex items-center gap-2 rounded-full border border-border bg-background/95 backdrop-blur px-3 py-2 shadow-lg">
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[min(92vw,980px)]">
+                    <div className="mb-2 rounded-xl border border-border bg-background/95 backdrop-blur p-3 shadow-lg">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Categories</p>
+                                <div className="flex gap-2">
+                                    <select
+                                        value={bulkCategoryMode}
+                                        onChange={(e) => setBulkCategoryMode(e.target.value as BulkListMode)}
+                                        className="h-8 rounded border border-border bg-background px-2 text-xs"
+                                    >
+                                        <option value="add">Add</option>
+                                        <option value="remove">Remove</option>
+                                        <option value="replace">Replace</option>
+                                    </select>
+                                    <select
+                                        multiple
+                                        value={bulkCategories}
+                                        onChange={(e) => setBulkCategories(Array.from(e.target.selectedOptions).map((o) => o.value as VendorCategory))}
+                                        className="min-h-20 flex-1 rounded border border-border bg-background px-2 py-1 text-xs"
+                                    >
+                                        {categoryOptions.map((cat) => (
+                                            <option key={cat} value={cat}>{cat}</option>
+                                        ))}
+                                    </select>
+                                    <Button size="sm" className="h-8 text-xs self-start" onClick={applyCategoriesToSelected} disabled={!bulkCategories.length}>
+                                        Apply
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Themes</p>
+                                <div className="flex gap-2">
+                                    <select
+                                        value={bulkThemeMode}
+                                        onChange={(e) => setBulkThemeMode(e.target.value as BulkListMode)}
+                                        className="h-8 rounded border border-border bg-background px-2 text-xs"
+                                    >
+                                        <option value="add">Add</option>
+                                        <option value="remove">Remove</option>
+                                        <option value="replace">Replace</option>
+                                    </select>
+                                    <select
+                                        multiple
+                                        value={bulkThemes}
+                                        onChange={(e) => setBulkThemes(Array.from(e.target.selectedOptions).map((o) => o.value as EventTheme))}
+                                        className="min-h-20 flex-1 rounded border border-border bg-background px-2 py-1 text-xs"
+                                    >
+                                        {themeOptions.map((theme) => (
+                                            <option key={theme} value={theme}>{theme}</option>
+                                        ))}
+                                    </select>
+                                    <Button size="sm" className="h-8 text-xs self-start" onClick={applyThemesToSelected} disabled={!bulkThemes.length}>
+                                        Apply
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 rounded-full border border-border bg-background/95 backdrop-blur px-3 py-2 shadow-lg w-fit">
                         <span className="text-xs font-semibold px-2 py-1 rounded-full bg-primary/10 text-primary">
                             {selectedCount} selected
                         </span>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Share, Menu, MoreVertical, ChevronDown, Store, Download, ImagePlus, Loader2 } from 'lucide-react';
+import { MessageSquareShare, Menu, MoreVertical, ChevronDown, Store, Download, ImagePlus, Loader2 } from 'lucide-react';
 import { storage } from '@/lib/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,7 @@ import {
 interface ChatHeaderProps {
   onOpenMenu?: () => void;
   title?: string;
+  sharePath?: string;
   onRename?: (nextTitle: string) => void;
   onDelete?: () => void;
   onDownload?: () => void;
@@ -52,6 +53,7 @@ interface ChatHeaderProps {
 const ChatHeader: React.FC<ChatHeaderProps> = ({
   onOpenMenu,
   title = "Ama",
+  sharePath,
   onRename,
   onDelete,
   onDownload,
@@ -117,7 +119,9 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     setIsEditingTitle(false);
   };
 
-  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const shareUrl = typeof window !== "undefined" && sharePath
+    ? `${window.location.origin}${sharePath}`
+    : "";
 
   const copyShareLink = async () => {
     if (!shareUrl) return;
@@ -225,17 +229,19 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               <TooltipContent>Publish to Store</TooltipContent>
             </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setIsShareOpen(true)}
-                  className={iconActionClass}
-                >
-                  <Share size={18} />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>Share Chat</TooltipContent>
-            </Tooltip>
+            {sharePath && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setIsShareOpen(true)}
+                    className={iconActionClass}
+                  >
+                    <MessageSquareShare size={18} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Share Chat</TooltipContent>
+              </Tooltip>
+            )}
 
             <Tooltip>
               <TooltipTrigger asChild>
@@ -314,7 +320,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           <DialogHeader>
             <DialogTitle>Share chat</DialogTitle>
             <DialogDescription>
-              Send this link so someone can open this chat.
+              Send this link so someone can open a read-only shared page.
             </DialogDescription>
           </DialogHeader>
 

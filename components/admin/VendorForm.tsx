@@ -101,8 +101,8 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
             setFormData((prev) => ({ ...prev, image: url }));
         } catch (err: any) {
             const message = err?.code
-                ? `Upload failed (${err.code}). Paste an Image URL below or check Firebase Storage rules.`
-                : "Upload failed. Paste an Image URL below or check Firebase Storage rules.";
+                ? `Upload failed (${err.code}). Check Firebase Storage rules and try again.`
+                : "Upload failed. Check Firebase Storage rules and try again.";
             alert(message);
             console.error("Vendor image upload error:", err);
         } finally {
@@ -225,13 +225,6 @@ export default function VendorForm({ initialData, onSubmit, title }: VendorFormP
                                 </div>
                             )}
                         </div>
-                        <input
-                            type="url"
-                            className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary"
-                            value={formData.image}
-                            onChange={e => setFormData({ ...formData, image: e.target.value })}
-                            placeholder="Or paste image URL (https://...)"
-                        />
                     </div>
                 </div>
 

@@ -72,6 +72,8 @@ export default function ChatPage() {
     const [pendingAction, setPendingAction] = useState<any>(null);
     const [isPricingOpen, setIsPricingOpen] = useState(false);
     const autoPromptSentRef = useRef<string | null>(null);
+    const chatIdStr = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "new";
+    const canShareChat = chatIdStr !== "new" && !chatIdStr.startsWith("task-");
 
     useEffect(() => {
         const title = (chatTitle || "New Chat").trim();
@@ -364,9 +366,9 @@ export default function ChatPage() {
                 <ChatHeader
                     onOpenMenu={() => setIsMobileMenuOpen(true)}
                     title={chatTitle}
+                    sharePath={canShareChat ? `/share/chat/${chatIdStr}` : undefined}
                     onRename={async (newTitle) => {
                         setChatTitle(newTitle);
-                        const chatIdStr = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
                         if (chatIdStr !== 'new') {
                             await updateChatMetadata(chatIdStr, { title: newTitle });
                         }
