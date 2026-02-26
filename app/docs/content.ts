@@ -160,7 +160,7 @@ export const overviewTiptapDoc = {
       content: [
         {
           type: "text",
-          text: "Waddi is how people discover what is happening in cities worth celebrating and book the vendors that make it unforgettable. We connect hosts to trusted talent and make planning feel clear from discovery to booking.",
+          text: "Waddi is where great experiences get discovered, planned, and booked. For people who want to show up, and hosts who need the right talent to make it happen.",
         },
       ],
     },
