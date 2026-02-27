@@ -38,7 +38,9 @@ export function WaddiPrompt() {
         <div className="max-w-5xl mx-auto space-y-10 py-6">
             <div className="text-center space-y-6 py-12 px-4 md:px-0">
                 <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">
-                    Your event, fully coordinated.
+                    Stop planning.
+                    <br />
+                    Start living it.
                 </h1>
 
                 <div className="max-w-2xl mx-auto relative mt-8 group">
