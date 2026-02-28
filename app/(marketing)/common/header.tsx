@@ -67,8 +67,6 @@ export function Header() {
   const [user, setUser] = useState<AuthUser>(null)
   const [solutions, setSolutions] = useState<Offering[]>([])
   const [platformFeatures, setPlatformFeatures] = useState<PlatformFeature[]>([])
-  const [installPromptEvent, setInstallPromptEvent] = useState<any>(null)
-  const [isInstalling, setIsInstalling] = useState(false)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -91,24 +89,6 @@ export function Header() {
       }
     }
     loadMenuData()
-  }, [])
-
-  useEffect(() => {
-    const onBeforeInstallPrompt = (event: Event) => {
-      // event.preventDefault()
-      setInstallPromptEvent(event)
-    }
-
-    const onAppInstalled = () => {
-      setInstallPromptEvent(null)
-    }
-
-    window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt)
-    window.addEventListener("appinstalled", onAppInstalled)
-    return () => {
-      window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt)
-      window.removeEventListener("appinstalled", onAppInstalled)
-    }
   }, [])
 
   const eventTypes = useMemo(
@@ -144,21 +124,7 @@ export function Header() {
     }
   }
 
-  const handleInstallApp = async () => {
-    if (!installPromptEvent || isInstalling) return
-    setIsInstalling(true)
-    try {
-      await installPromptEvent.prompt()
-      const result = await installPromptEvent.userChoice
-      if (result?.outcome === "accepted") {
-        setInstallPromptEvent(null)
-      }
-    } catch (error) {
-      console.error("Install prompt failed:", error)
-    } finally {
-      setIsInstalling(false)
-    }
-  }
+  const guestCtaLabel = "Log in"
 
   return (
     <header className="sticky top-0 z-50 w-full pt-2">
@@ -314,17 +280,6 @@ export function Header() {
         </div>
 
         <div className="hidden w-[180px] flex-shrink-0 items-center justify-end gap-3 lg:flex">
-          {installPromptEvent && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleInstallApp}
-              disabled={isInstalling}
-              className="border-primary/20 text-foreground hover:bg-primary hover:text-foreground"
-            >
-              {isInstalling ? "Installing..." : "Install App"}
-            </Button>
-          )}
           <Link href="/request-demo">
             <Button variant="outline" size="sm" className="flex items-center gap-2 border-primary/20 text-foreground hover:bg-primary hover:text-foreground">
               Request a Demo
@@ -349,7 +304,7 @@ export function Header() {
           ) : (
             <Link href="/auth/login">
               <Button size="sm" className="flex items-center gap-2 bg-primary text-foreground-foreground hover:bg-primary/90">
-                Sign In
+                {guestCtaLabel}
               </Button>
             </Link>
           )}
@@ -417,16 +372,6 @@ export function Header() {
                 Pricing
               </Link>
               <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
-                {installPromptEvent && (
-                  <Button
-                    variant="outline"
-                    onClick={handleInstallApp}
-                    disabled={isInstalling}
-                    className="w-full border-primary text-foreground hover:bg-primary hover:text-foreground"
-                  >
-                    {isInstalling ? "Installing..." : "Install App"}
-                  </Button>
-                )}
                 <Link href="/request-demo" onClick={() => setMobileOpen(false)}>
                   <Button variant="outline" className="w-full border-primary text-foreground hover:bg-primary hover:text-foreground">
                     Request a Demo
@@ -445,8 +390,8 @@ export function Header() {
                   </>
                 ) : (
                   <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
-                    <Button className="w-full bg-primary text-foreground hover:bg-primary/90">
-                      Sign In
+                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                      {guestCtaLabel}
                     </Button>
                   </Link>
                 )}
