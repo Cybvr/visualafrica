@@ -6,8 +6,8 @@ import Link from "next/link"
 
 export function Hero() {
     return (
-        <section className="px-4 md:px-6 pt-2 pb-12">
-            <div className="mx-auto max-w-7xl rounded-[3rem] border border-border bg-card/50 overflow-hidden px-8 py-16 lg:px-16 lg:py-24 relative">
+        <section className="h-screen px-4 py-2 md:px-6">
+            <div className="relative mx-auto flex h-full max-w-7xl items-center overflow-hidden rounded-[3rem] border border-border bg-card/50 px-8 py-16 lg:px-16 lg:py-24">
                 {/* Background Glow */}
                 <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 

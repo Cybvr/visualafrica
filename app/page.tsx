@@ -6,11 +6,13 @@ import { Features } from "@/components/landingpage/features"
 import { HowItWorks } from "@/components/landingpage/how-it-works"
 import { Locations } from "@/components/landingpage/locations"
 import { Button } from "@/components/ui/button"
+import { PwaAuthGate } from "@/components/pwa-auth-gate"
 import Link from "next/link"
 
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col">
+      <PwaAuthGate />
       <Header />
       <main className="flex-1">
         <WaddiPrompt />

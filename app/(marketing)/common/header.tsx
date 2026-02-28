@@ -303,7 +303,7 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <Link href="/auth/login">
-              <Button size="sm" className="flex items-center gap-2 bg-primary text-foreground-foreground hover:bg-primary/90">
+              <Button size="sm" className="flex items-center gap-2 bg-card text-foreground-foreground hover:bg-primary/90">
                 {guestCtaLabel}
               </Button>
             </Link>
@@ -373,14 +373,14 @@ export function Header() {
               </Link>
               <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
                 <Link href="/request-demo" onClick={() => setMobileOpen(false)}>
-                  <Button variant="outline" className="w-full border-primary text-foreground hover:bg-primary hover:text-foreground">
+                  <Button variant="outline" className="w-full ">
                     Request a Demo
                   </Button>
                 </Link>
                 {user ? (
                   <>
                     <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
-                      <Button className="w-full bg-secondary text-secondary-foreground">
+                      <Button className="w-full ">
                         Dashboard
                       </Button>
                     </Link>
@@ -390,7 +390,7 @@ export function Header() {
                   </>
                 ) : (
                   <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
-                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                    <Button className="w-full ">
                       {guestCtaLabel}
                     </Button>
                   </Link>

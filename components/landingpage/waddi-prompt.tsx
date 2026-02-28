@@ -35,67 +35,68 @@ export function WaddiPrompt() {
     if (!mounted) return null;
 
     return (
-        <div className="max-w-5xl mx-auto space-y-10 py-6">
-            <div className="text-center space-y-6 py-12 px-4 md:px-0">
-                <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">
-                    Stop planning.
-                    <br />
-                    Start living it.
-                </h1>
+        <section className="h-[100dvh] px-4 py-2 md:px-6">
+            <div className="mx-auto flex h-full max-w-5xl items-center justify-center">
+                <div className="w-full text-center space-y-6 py-12 md:px-0">
+                    <h1 className="text-4xl md:text-3xl font-bold text-foreground tracking-tight">
+                        Stop planning.
+                        Start living it.
+                    </h1>
 
-                <div className="max-w-2xl mx-auto relative mt-8 group">
-                    <form onSubmit={handleStartChat}>
-                        <div className="relative bg-card rounded-2xl shadow-sm group-hover:shadow-md transition-all overflow-hidden">
-                            <textarea
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter" && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleStartChat();
-                                    }
-                                }}
-                                placeholder="E.g. Help me plan a traditional wedding in Lagos..."
-                                rows={1}
-                                className="w-full bg-transparent px-6 pt-5 pb-16 text-base focus:outline-none resize-none min-h-[108px]"
-                            />
+                    <div className="max-w-2xl mx-auto relative mt-8 group">
+                        <form onSubmit={handleStartChat}>
+                            <div className="relative bg-card rounded-2xl shadow-sm group-hover:shadow-md transition-all overflow-hidden">
+                                <textarea
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" && !e.shiftKey) {
+                                            e.preventDefault();
+                                            handleStartChat();
+                                        }
+                                    }}
+                                    placeholder="E.g. Help me plan a traditional wedding in Lagos..."
+                                    rows={1}
+                                    className="w-full bg-transparent px-6 pt-5 pb-16 text-base focus:outline-none resize-none min-h-[108px]"
+                                />
 
-                            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button
-                                            type="button"
-                                            className="h-10 w-10 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors inline-flex items-center justify-center"
-                                            aria-label="Open sample prompts"
-                                        >
-                                            <Plus size={18} />
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-80 p-1 bg-background">
-                                        {SUGGESTIONS.map((s, i) => (
-                                            <DropdownMenuItem
-                                                key={i}
-                                                onClick={() => setInput(s)}
-                                                className="py-2 whitespace-normal leading-relaxed cursor-pointer"
+                                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button
+                                                type="button"
+                                                className="h-10 w-10 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors inline-flex items-center justify-center"
+                                                aria-label="Open sample prompts"
                                             >
-                                                {s}
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                                <Plus size={18} />
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="start" className="w-80 p-1 bg-background">
+                                            {SUGGESTIONS.map((s, i) => (
+                                                <DropdownMenuItem
+                                                    key={i}
+                                                    onClick={() => setInput(s)}
+                                                    className="py-2 whitespace-normal leading-relaxed cursor-pointer"
+                                                >
+                                                    {s}
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
 
-                                <button
-                                    type="submit"
-                                    disabled={!input.trim()}
-                                    className="h-10 w-10 bg-primary text-primary-foreground rounded-xl flex items-center justify-center disabled:opacity-50 transition-all active:scale-95"
-                                >
-                                    <ArrowRight size={20} strokeWidth={2.5} />
-                                </button>
+                                    <button
+                                        type="submit"
+                                        disabled={!input.trim()}
+                                        className="h-10 w-10 bg-primary text-primary-foreground rounded-xl flex items-center justify-center disabled:opacity-50 transition-all active:scale-95"
+                                    >
+                                        <ArrowRight size={20} strokeWidth={2.5} />
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 }
