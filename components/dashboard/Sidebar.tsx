@@ -18,8 +18,8 @@ import {
   Settings,
   Laptop,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
   Store,
   type LucideIcon,
 } from "lucide-react";
@@ -376,8 +376,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
   const hostPrimaryNavItems: NavItemConfig[] = [
     { icon: Plus, label: "New Task", href: `/dashboard/hosts/chat/${freshTaskId}` },
     { icon: Search, label: "Search", href: "/dashboard/hosts/search", matchPaths: ["/dashboard/hosts/vendor/"] },
+    { icon: Calendar, label: "Manage", href: "/dashboard/hosts/events" },
     { icon: Store, label: "Store", href: "/dashboard/hosts/store" },
-    { icon: Calendar, label: "Manage", href: "/dashboard/hosts/events", count: hostEventsCount },
     { icon: Mail, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },
   ];
 
@@ -420,10 +420,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
             </Link>
             <button
               onClick={onToggleCollapse}
-              className="absolute inset-0 hidden md:flex items-center justify-center w-full h-full text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto"
+              className="absolute inset-0 hidden md:flex items-center justify-center w-full h-full text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto"
               aria-label="Expand sidebar"
             >
-              <ChevronRight size={22} />
+              <PanelLeftOpen size={22} />
             </button>
           </div>
         ) : (
@@ -438,10 +438,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
             {onToggleCollapse && (
               <button
                 onClick={onToggleCollapse}
-                className="hidden md:inline-flex items-center justify-center w-8 h-8 text-foreground hover:text-foreground hover:bg-card rounded-lg transition-colors"
+                className="hidden md:inline-flex items-center justify-center w-8 h-8 text-muted-foreground/50 hover:text-muted-foreground  rounded-lg transition-colors"
                 aria-label="Collapse sidebar"
               >
-                <ChevronLeft size={20} />
+                <PanelLeftClose size={20} />
               </button>
             )}
           </>

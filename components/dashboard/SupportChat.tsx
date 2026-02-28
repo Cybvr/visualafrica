@@ -132,21 +132,21 @@ export default function SupportChat({ faqs, categories, className = "" }: Suppor
                         >
                             {m.text}
                         </div>
-                            {idx === 0 && m.role === "bot" && initialOptions.length > 0 && (
-                                <div className="max-w-[85%] mt-2 rounded-2xl bg-secondary/50 px-4 py-3 text-sm text-foreground">
-                                    <div className="flex flex-wrap gap-2">
-                                        {initialOptions.map((opt) => (
-                                            <button
-                                                key={opt.id}
-                                                onClick={() => addWorkflowExchange(opt)}
-                                                className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all font-sans"
-                                            >
-                                                {opt.label}
-                                            </button>
-                                        ))}
-                                    </div>
+                        {idx === 0 && m.role === "bot" && initialOptions.length > 0 && (
+                            <div className="max-w-[85%] mt-2 rounded-2xl bg-secondary/50 px-4 py-3 text-sm text-foreground">
+                                <div className="flex flex-wrap gap-2">
+                                    {initialOptions.map((opt) => (
+                                        <button
+                                            key={opt.id}
+                                            onClick={() => addWorkflowExchange(opt)}
+                                            className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all font-sans"
+                                        >
+                                            {opt.label}
+                                        </button>
+                                    ))}
                                 </div>
-                            )}
+                            </div>
+                        )}
                     </div>
                 ))}
 
@@ -218,7 +218,7 @@ export default function SupportChat({ faqs, categories, className = "" }: Suppor
                             className="w-full bg-transparent text-sm outline-none"
                         />
                     </div>
-                    <Button onClick={handleAsk} className="h-11 rounded-2xl bg-primary px-6 font-bold text-foreground hover:bg-primary/90">
+                    <Button onClick={handleAsk} className="h-11 rounded-2xl  px-6 font-bold ">
                         Ask
                     </Button>
                 </div>

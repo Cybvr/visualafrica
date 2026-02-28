@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from 'react';
-import { useState } from 'react';
-import { Layout, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { SharedEvent } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -42,89 +41,81 @@ interface PlanTabProps {
 }
 
 const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
-    const [isPublic, setIsPublic] = useState(false);
-
     return (
-        <div className="max-w-4xl mx-auto space-y-8 py-6">
+        <div className="max-w-4xl mx-auto space-y-6 py-3">
             {/* Event Details Section */}
-            <section className="space-y-6">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                        <Layout size={18} />
-                    </div>
-                    <h2 className="text-xl font-semibold text-foreground">Event Details</h2>
-                </div>
-
-                <div className="space-y-6 bg-background p-6 rounded-lg border border-border">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
+            <section className="space-y-4">
+                <h2 className="text-base font-semibold text-foreground">Event Details</h2>
+                <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
                             <label className="text-sm font-medium text-muted-foreground">Display Name</label>
                             <Input
                                 type="text"
                                 defaultValue={event.eventName}
-                                className="bg-background border border-border focus-visible:ring-primary"
+                                className="h-10 bg-background border-border"
                             />
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                             <label className="text-sm font-medium text-muted-foreground">Location</label>
                             <Input
                                 type="text"
                                 defaultValue={event.location}
-                                className="bg-background border border-border focus-visible:ring-primary"
+                                className="h-10 bg-background border-border"
                             />
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                             <label className="text-sm font-medium text-muted-foreground">Date</label>
                             <Input
                                 type="text"
                                 defaultValue={event.date}
-                                className="bg-background border border-border focus-visible:ring-primary"
+                                className="h-10 bg-background border-border"
                             />
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                             <label className="text-sm font-medium text-muted-foreground">Guest Count</label>
                             <Input
                                 type="number"
                                 defaultValue={event.guestCount}
-                                className="bg-background border border-border focus-visible:ring-primary"
+                                className="h-10 bg-background border-border"
                             />
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                             <label className="text-sm font-medium text-muted-foreground">Event Category</label>
                             <Select defaultValue={event.categories?.[0]}>
-                                <SelectTrigger className="bg-background border border-border focus:ring-primary h-12 rounded-xl">
+                                <SelectTrigger className="h-10 bg-background border-border rounded-md">
                                     <SelectValue placeholder="Select a category" />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-xl">
+                                <SelectContent>
                                     {CATEGORIES.map((cat) => (
-                                        <SelectItem key={cat} value={cat} className="rounded-lg">
+                                        <SelectItem key={cat} value={cat}>
                                             {cat}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                             <label className="text-sm font-medium text-muted-foreground">Design Theme</label>
                             <Select defaultValue={event.themes?.[0]}>
-                                <SelectTrigger className="bg-background border border-border focus:ring-primary h-12 rounded-xl">
+                                <SelectTrigger className="h-10 bg-background border-border rounded-md">
                                     <SelectValue placeholder="Select a theme" />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-xl">
+                                <SelectContent>
                                     {THEMES.map((theme) => (
-                                        <SelectItem key={theme} value={theme} className="rounded-lg">
+                                        <SelectItem key={theme} value={theme}>
                                             {theme}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="md:col-span-2 space-y-2">
+                        <div className="md:col-span-2 space-y-1.5">
                             <label className="text-sm font-medium text-muted-foreground">Event Description</label>
                             <Textarea
                                 rows={4}
                                 defaultValue={event.description}
-                                className="bg-background border border-border focus-visible:ring-primary resize-none"
+                                className="bg-background border-border resize-none"
                             />
                         </div>
                     </div>
@@ -174,31 +165,19 @@ const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
             {/* Success Metrics Section */}
             <section className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                            <Plus size={18} />
-                        </div>
-                        <h3 className="text-lg font-medium text-foreground">Success Metrics</h3>
-                    </div>
-                    <Button variant="ghost" size="sm" className="text-accent font-medium">
+                    <h3 className="text-base font-semibold text-foreground">Success Metrics</h3>
+                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground px-2">
                         Add Metric
                     </Button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {event.metrics?.map((metric: { label: string; value: string }, i: number) => (
-                        <div key={i} className="bg-background p-4 rounded-lg border border-border group relative">
+                        <div key={i} className="bg-background p-3 rounded-md border border-border">
                             <div className="flex items-center gap-2">
                                 <p className="text-xs text-muted-foreground">{metric.label}</p>
-                                <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="ml-auto h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                    <Plus size={14} className="rotate-45" />
-                                </Button>
                             </div>
-                            <p className="text-lg font-medium text-foreground">{metric.value}</p>
+                            <p className="text-base font-medium text-foreground">{metric.value}</p>
                         </div>
                     ))}
                 </div>
@@ -206,7 +185,7 @@ const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
 
 
             <div className="flex justify-end">
-                <Button size="lg" className="shadow-sm">
+                <Button size="sm" className="rounded-md">
                     Save Changes
                 </Button>
             </div>

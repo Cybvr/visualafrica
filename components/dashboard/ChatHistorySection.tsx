@@ -78,7 +78,7 @@ const ChatHistorySection: React.FC<ChatHistorySectionProps> = ({
       <div className="mt-5">
         {showHeader && (
           <div className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-widest text-foreground">
-            Chat History
+            Chats
           </div>
         )}
         <div className="space-y-0.5">
