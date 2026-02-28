@@ -45,7 +45,7 @@ export function WaddiPrompt() {
 
                 <div className="max-w-2xl mx-auto relative mt-8 group">
                     <form onSubmit={handleStartChat}>
-                        <div className="relative bg-card border-2 border-border rounded-2xl shadow-sm group-hover:shadow-md focus-within:border-primary/50 transition-all overflow-hidden">
+                        <div className="relative bg-card rounded-2xl shadow-sm group-hover:shadow-md transition-all overflow-hidden">
                             <textarea
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
