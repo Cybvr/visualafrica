@@ -49,9 +49,18 @@ export default function CreateEventPage() {
 
         setIsAILoading(true);
         try {
+            const idToken = await user?.getIdToken();
+            if (!idToken) {
+                alert("Please sign in again.");
+                return;
+            }
+
             const response = await fetch('/api/event-ai', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`,
+                },
                 body: JSON.stringify({ prompt: aiPrompt })
             });
 

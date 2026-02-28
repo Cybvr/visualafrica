@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: ShareChatPageProps): Promise<
     const { id } = await params;
     const chatSnap = await adminDb.collection("chats").doc(id).get();
 
-    if (!chatSnap.exists) {
+    if (!chatSnap.exists || chatSnap.data()?.published !== true) {
         return { title: "Shared Chat Not Found | Waddi" };
     }
 
@@ -34,7 +34,7 @@ export default async function ShareChatPage({ params }: ShareChatPageProps) {
     const chatRef = adminDb.collection("chats").doc(id);
     const chatSnap = await chatRef.get();
 
-    if (!chatSnap.exists) {
+    if (!chatSnap.exists || chatSnap.data()?.published !== true) {
         notFound();
     }
 

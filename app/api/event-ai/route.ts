@@ -1,14 +1,34 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { adminAuth } from "@/lib/firebase-admin";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
     try {
-        const { prompt } = await req.json();
-
         if (!process.env.GEMINI_API_KEY) {
-            return NextResponse.json({ error: "Gemini API Key is missing. Please add GEMINI_API_KEY to your .env file." }, { status: 500 });
+            return NextResponse.json({ error: "Service unavailable." }, { status: 503 });
+        }
+
+        const authHeader = req.headers.get("authorization") || req.headers.get("Authorization");
+        const idToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+
+        if (!idToken) {
+            return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+        }
+
+        try {
+            await adminAuth.verifyIdToken(idToken);
+        } catch {
+            return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+        }
+
+        const { prompt } = await req.json();
+        if (typeof prompt !== "string" || !prompt.trim()) {
+            return NextResponse.json({ error: "Prompt is required." }, { status: 400 });
+        }
+        if (prompt.length > 2000) {
+            return NextResponse.json({ error: "Prompt is too long." }, { status: 400 });
         }
 
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -64,6 +84,6 @@ Translate relative dates (like "next month" or "this December") to absolute date
         return NextResponse.json(eventData);
     } catch (error) {
         console.error("Yinka AI Error:", error);
-        return NextResponse.json({ error: "Failed to process request with Yinka." }, { status: 500 });
+        return NextResponse.json({ error: "Failed to process request." }, { status: 500 });
     }
 }

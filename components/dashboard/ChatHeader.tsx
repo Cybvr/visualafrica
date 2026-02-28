@@ -207,7 +207,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
                 <MoreVertical size={18} />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-48 bg-card">
               <DropdownMenuItem
                 onClick={() => {
                   setPublishData({
