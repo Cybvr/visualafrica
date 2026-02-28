@@ -3,33 +3,80 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Plus } from "lucide-react";
+import { signInWithPopup } from "firebase/auth";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { useAuth } from "@/components/providers/auth-provider";
+import { auth, googleProvider } from "@/lib/firebase";
 
 const SUGGESTIONS = [
     "Plan a surprise 30th birthday in Lagos for 20 guests",
     "Find a wedding venue in Accra with ocean views",
+    "Help me plan traditional wedding",
     "Budget for a corporate gala in Nairobi",
     "Book a private chef for a brunch in Cape Town"
 ];
 
 export function WaddiPrompt() {
     const router = useRouter();
+    const { user, loading } = useAuth();
     const [input, setInput] = useState("");
     const [mounted, setMounted] = useState(false);
+    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+    const [isSigningIn, setIsSigningIn] = useState(false);
+    const [authError, setAuthError] = useState<string | null>(null);
+    const [pendingPrompt, setPendingPrompt] = useState("");
 
     useEffect(() => setMounted(true), []);
 
+    const startChat = (prompt: string) => {
+        router.push(`/dashboard/hosts/chat/new?q=${encodeURIComponent(prompt)}`);
+    };
+
     const handleStartChat = (e?: React.FormEvent) => {
         e?.preventDefault();
-        if (!input.trim()) return;
+        const prompt = input.trim();
+        if (!prompt) return;
+        if (loading) return;
+
+        if (!user) {
+            setPendingPrompt(prompt);
+            setAuthError(null);
+            setIsAuthDialogOpen(true);
+            return;
+        }
 
         // Route to the real new-chat flow; chat page will create/persist via send()
-        router.push(`/dashboard/hosts/chat/new?q=${encodeURIComponent(input)}`);
+        startChat(prompt);
+    };
+
+    const handleGoogleLogin = async () => {
+        setIsSigningIn(true);
+        setAuthError(null);
+
+        try {
+            await signInWithPopup(auth, googleProvider);
+            const prompt = pendingPrompt || input.trim();
+            setIsAuthDialogOpen(false);
+            if (prompt) startChat(prompt);
+        } catch (error) {
+            console.error("Login error:", error);
+            setAuthError("Sign in failed. Please try again.");
+        } finally {
+            setIsSigningIn(false);
+        }
     };
 
     if (!mounted) return null;
@@ -97,6 +144,30 @@ export function WaddiPrompt() {
                     </div>
                 </div>
             </div>
+
+            <Dialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Sign in to continue</DialogTitle>
+                        <DialogDescription>
+                            Sign in and we will continue planning with your prompt.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-3">
+                        <Button
+                            type="button"
+                            onClick={handleGoogleLogin}
+                            disabled={isSigningIn}
+                            className="w-full"
+                        >
+                            {isSigningIn ? "Signing in..." : "Continue with Google"}
+                        </Button>
+                        {authError && (
+                            <p className="text-sm text-destructive">{authError}</p>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </section>
     );
 }
