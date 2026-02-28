@@ -509,7 +509,7 @@ export default function ChatPage() {
 
             <div className="bg-background/80 backdrop-blur-md pt-2">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-4 sm:pb-6">
-                    <div className="relative bg-card border border-border rounded-[24px] shadow-sm overflow-hidden focus-within:border-primary/50 transition-all">
+                    <div className="relative bg-card rounded-[24px] shadow-sm overflow-hidden transition-all">
                         <textarea
                             value={input}
                             onChange={e => setInput(e.target.value)}

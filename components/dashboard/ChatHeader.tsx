@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -30,12 +31,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 
 interface ChatHeaderProps {
   onOpenMenu?: () => void;
@@ -205,86 +200,58 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           )}
         </div>
 
-        <TooltipProvider delayDuration={120}>
-          <div className="flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => {
-                    setPublishData({
-                      title,
-                      city: initialPublishData?.city || '',
-                      price: initialPublishData?.price || '',
-                      description: initialPublishData?.description || '',
-                      category: initialPublishData?.category || '',
-                      image: initialPublishData?.image || ''
-                    });
-                    setIsPublishOpen(true);
-                  }}
-                  className={iconActionClass}
-                >
-                  <Store size={18} />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>Publish to Store</TooltipContent>
-            </Tooltip>
-
-            {sharePath && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setIsShareOpen(true)}
-                    className={iconActionClass}
-                  >
-                    <MessageSquareShare size={18} />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>Share Chat</TooltipContent>
-              </Tooltip>
-            )}
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={onDownload}
-                  className={iconActionClass}
-                >
-                  <Download size={18} />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>Download Chat</TooltipContent>
-            </Tooltip>
-
-            <DropdownMenu>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuTrigger asChild>
-                    <button className={iconActionClass}>
-                      <MoreVertical size={18} />
-                    </button>
-                  </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent>More</TooltipContent>
-              </Tooltip>
-              <DropdownMenuContent align="end" className="w-32">
-                <DropdownMenuItem
-                  onClick={() => {
-                    setEditingTitle(title);
-                    setIsEditingTitle(true);
-                  }}
-                >
-                  Rename
+        <div className="flex items-center gap-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className={iconActionClass} aria-label="Chat options">
+                <MoreVertical size={18} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem
+                onClick={() => {
+                  setPublishData({
+                    title,
+                    city: initialPublishData?.city || '',
+                    price: initialPublishData?.price || '',
+                    description: initialPublishData?.description || '',
+                    category: initialPublishData?.category || '',
+                    image: initialPublishData?.image || ''
+                  });
+                  setIsPublishOpen(true);
+                }}
+              >
+                <Store size={16} className="mr-2" />
+                Publish to Store
+              </DropdownMenuItem>
+              {sharePath && (
+                <DropdownMenuItem onClick={() => setIsShareOpen(true)}>
+                  <MessageSquareShare size={16} className="mr-2" />
+                  Share Chat
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setIsDeleteOpen(true)}
-                  className="text-red-600 focus:text-red-700"
-                >
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </TooltipProvider>
+              )}
+              <DropdownMenuItem onClick={onDownload}>
+                <Download size={16} className="mr-2" />
+                Download Chat
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  setEditingTitle(title);
+                  setIsEditingTitle(true);
+                }}
+              >
+                Rename
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setIsDeleteOpen(true)}
+                className="text-red-600 focus:text-red-700"
+              >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
