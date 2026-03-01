@@ -1,114 +1,110 @@
 "use client";
 
 import React from 'react';
-import { Users, Mail, Plus, ExternalLink } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 import { SharedEvent } from '@/lib/types';
+import { DashboardFilter } from '../DashboardFilter';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface GuestsTabProps {
     event: SharedEvent;
 }
 
 const GuestsTab: React.FC<GuestsTabProps> = ({ event }) => {
-    const confirmedCount = event.guests.filter(g => g.status === 'Confirmed').length;
-    const pendingCount = event.guests.filter(g => g.status === 'Pending').length;
+    const [activeStatus, setActiveStatus] = React.useState('All');
+    const [searchQuery, setSearchQuery] = React.useState('');
+
+    const statusesInData = Array.from(new Set(event.guests.map(g => g.status)));
+    const tabs = ['All', ...statusesInData];
+    const statusCounts = event.guests.reduce<Record<string, number>>((acc, guest) => {
+        acc[guest.status] = (acc[guest.status] || 0) + 1;
+        return acc;
+    }, {});
+
+    const filteredGuests = event.guests.filter(guest => {
+        const matchesStatus = activeStatus === 'All' || guest.status === activeStatus;
+        const matchesSearch = guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            guest.email?.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesStatus && matchesSearch;
+    });
 
     return (
-        <div className="max-w-7xl mx-auto space-y-5">
-            <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold tracking-tight text-foreground">Guests</h2>
-                <button className="h-8 px-3 rounded-md text-sm font-medium border border-border bg-background text-foreground flex items-center gap-1.5 hover:bg-card">
-                    <Plus size={16} />
-                    Add Guest
-                </button>
+        <div className="max-w-7xl mx-auto space-y-6 pt-2">
+            <div className="flex flex-col gap-6">
+                <DashboardFilter
+                    placeholder="Search guests..."
+                    onSearchChange={setSearchQuery}
+                />
+
+                <div className="flex items-center gap-1 border-b border-border overflow-x-auto pb-[2px]">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveStatus(tab)}
+                            className={`px-3 py-2 text-xs font-medium transition-all border-b-2 -mb-[2px] whitespace-nowrap ${activeStatus === tab
+                                ? 'border-primary text-foreground'
+                                : 'border-transparent text-muted-foreground hover:text-foreground'
+                                }`}
+                        >
+                            <span className="inline-flex items-center gap-1.5">
+                                <span>{tab}</span>
+                                <span className="rounded-full bg-secondary px-1.5 py-0.5 text-[10px] leading-none text-muted-foreground">
+                                    {tab === 'All' ? event.guests.length : (statusCounts[tab] || 0)}
+                                </span>
+                            </span>
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                <div className="lg:col-span-2 space-y-4">
-                    <div className="border border-border rounded-xl p-4">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-semibold text-foreground">Registration List</h3>
-                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                <span>{confirmedCount} Going</span>
-                                <span>{pendingCount} Pending</span>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            {event.guests.length > 0 ? event.guests.map((guest) => (
-                                <div key={guest.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-background">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-8 h-8 bg-secondary text-foreground text-xs font-bold flex items-center justify-center rounded-full uppercase">
+            <div className="rounded-xl border border-border bg-card overflow-hidden">
+                <Table>
+                    <TableHeader className="bg-secondary/30">
+                        <TableRow>
+                            <TableHead className="h-10 px-4 text-xs font-medium">Guest</TableHead>
+                            <TableHead className="h-10 px-4 text-xs font-medium">Type</TableHead>
+                            <TableHead className="h-10 px-4 text-xs font-medium">Status</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {filteredGuests.length > 0 ? filteredGuests.map((guest) => (
+                            <TableRow key={guest.id}>
+                                <TableCell className="px-4 py-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-xs font-medium uppercase text-foreground">
                                             {guest.name[0]}
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-semibold text-foreground">{guest.name}</p>
-                                            <p className="text-xs text-muted-foreground uppercase tracking-tight">{guest.type}</p>
+                                        <div className="min-w-0">
+                                            <p className="truncate text-sm font-medium text-foreground">{guest.name}</p>
+                                            <p className="truncate text-xs text-muted-foreground">{guest.email}</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <span className={`px-2 py-0.5 rounded-md text-xs font-medium border ${guest.status === 'Confirmed'
-                                            ? 'bg-secondary text-foreground border-border'
-                                            : (guest.status === 'Pending'
-                                                ? 'bg-secondary text-muted-foreground border-border'
-                                                : 'bg-secondary text-foreground border-border')
-                                            }`}>
-                                            {guest.status}
-                                        </span>
-                                        <button title={`Email ${guest.email}`} className="p-1.5 text-muted-foreground hover:text-foreground"><Mail size={15} /></button>
+                                </TableCell>
+                                <TableCell className="px-4 py-3 text-sm text-muted-foreground">{guest.type}</TableCell>
+                                <TableCell className="px-4 py-3">
+                                    <span className={`rounded-md border px-2 py-1 text-[10px] font-medium ${guest.status === 'Confirmed'
+                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                                        : (guest.status === 'Pending'
+                                            ? 'bg-amber-50 text-amber-700 border-amber-100'
+                                            : 'bg-secondary text-muted-foreground border-transparent')
+                                        }`}>
+                                        {guest.status}
+                                    </span>
+                                </TableCell>
+                            </TableRow>
+                        )) : (
+                            <TableRow>
+                                <TableCell colSpan={3} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                                    <div className="flex flex-col items-center gap-2">
+                                        <Users size={24} className="opacity-30" />
+                                        No guests match your search.
                                     </div>
-                                </div>
-                            )) : (
-                                <div className="py-8 text-center text-muted-foreground text-sm">
-                                    No guests registered yet.
-                                </div>
-                            )}
-                        </div>
-                        {event.guests.length > 0 && (
-                            <button className="w-full mt-4 h-9 border border-border text-foreground text-sm rounded-md hover:bg-card transition-colors">
-                                Load more guests
-                            </button>
+                                </TableCell>
+                            </TableRow>
                         )}
-                    </div>
-                </div>
-
-                <div className="space-y-4">
-                    <div className="border border-border rounded-xl p-4 space-y-3 bg-background">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-semibold text-foreground">RSVP Page</h3>
-                            <div className="px-1.5 py-0.5 text-[10px] font-semibold uppercase rounded border border-border text-muted-foreground">Live</div>
-                        </div>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
-                            Your RSVP page is live at:
-                            <br />
-                            <span className="text-foreground font-medium">Waddi.events/{event.eventName.toLowerCase().replace(/\s+/g, '-')}</span>
-                        </p>
-                        <div className="flex gap-2">
-                            <button className="flex-1 h-8 border border-border rounded-md text-sm font-medium hover:bg-card">Edit Page</button>
-                            <button className="h-8 w-8 border border-border rounded-md inline-flex items-center justify-center hover:bg-card"><ExternalLink size={16} /></button>
-                        </div>
-                    </div>
-
-                    <div className="border border-border rounded-xl p-4 space-y-3">
-                        <h3 className="text-sm font-semibold text-foreground">Quick Actions</h3>
-                        <div className="space-y-2">
-                            <button className="w-full flex items-center gap-3 p-3 hover:bg-card rounded-md transition-colors border border-border">
-                                <div className="w-8 h-8 bg-secondary text-muted-foreground rounded-md flex items-center justify-center"><Mail size={16} /></div>
-                                <div className="text-left">
-                                    <p className="font-semibold text-sm text-foreground">Send Email Invite</p>
-                                    <p className="text-xs text-muted-foreground">Remind pending guests</p>
-                                </div>
-                            </button>
-                            <button className="w-full flex items-center gap-3 p-3 hover:bg-card rounded-md transition-colors border border-border">
-                                <div className="w-8 h-8 bg-secondary text-muted-foreground rounded-md flex items-center justify-center"><Users size={16} /></div>
-                                <div className="text-left">
-                                    <p className="font-semibold text-sm text-foreground">Export List</p>
-                                    <p className="text-xs text-muted-foreground">Download CSV/PDF</p>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                    </TableBody>
+                </Table>
             </div>
         </div>
     );

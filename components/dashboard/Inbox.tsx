@@ -92,7 +92,7 @@ export default function Inbox({ conversations: initialConversations, userType, t
         <div className="flex h-[calc(100dvh-7.5rem)] md:h-[calc(100dvh-9rem)] bg-background border border-border rounded-lg overflow-hidden shadow-sm">
             {/* Sidebar */}
             <div className={cn(
-                "w-full md:w-80 lg:w-96 border-r border-border flex flex-col bg-muted/20",
+                "w-full md:w-72 lg:w-80 border-r border-border flex flex-col bg-muted/20",
                 mobileView === 'chat' ? "hidden md:flex" : "flex"
             )}>
                 <div className="p-4 border-b border-border">
@@ -121,46 +121,20 @@ export default function Inbox({ conversations: initialConversations, userType, t
                                 key={chat.id}
                                 onClick={() => { setActiveChatId(chat.id); setMobileView('chat'); }}
                                 className={cn(
-                                    "w-full p-4 text-left transition-colors flex items-start gap-3 hover:bg-muted/50",
+                                    "w-full p-4 text-left transition-colors flex items-center gap-3 hover:bg-muted/50",
                                     activeChatId === chat.id ? 'bg-muted/80' : ''
                                 )}
                             >
-                                <Avatar className="w-12 h-12 rounded-full shrink-0">
+                                <Avatar className="w-10 h-10 rounded-full shrink-0">
                                     <AvatarImage src={chat.avatar} className="object-cover" />
-                                    <AvatarFallback className="bg-primary/10 text-primary font-medium text-lg">
+                                    <AvatarFallback className="bg-primary/10 text-primary font-medium">
                                         {chat.name.charAt(0)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1 min-w-0">
-                                    <div className="flex justify-between items-start mb-1">
-                                        <h4 className="font-medium text-foreground truncate text-sm">{chat.name}</h4>
-                                        <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">{chat.time}</span>
-                                    </div>
-                                    <p className={cn(
-                                        "text-sm truncate mb-1",
-                                        chat.unread ? "text-foreground font-medium" : "text-muted-foreground"
-                                    )}>
-                                        {chat.lastMsg}
-                                    </p>
-                                    <div className="flex items-center justify-between mt-1">
-                                        <div className="flex items-center gap-2">
-                                            {chat.eventName && (
-                                                <span className="text-xs text-muted-foreground truncate max-w-[120px]">
-                                                    {chat.eventName}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <span className={cn(
-                                            "px-2 py-0.5 rounded-full text-xs font-medium border",
-                                            chat.status === 'booked' || chat.status === 'paid' || chat.status === 'confirmed'
-                                                ? 'bg-green-50 text-green-700 border-green-200'
-                                                : 'bg-primary/5 text-primary border-primary/10'
-                                        )}>
-                                            {chat.status}
-                                        </span>
-                                    </div>
+                                    <h4 className="font-medium truncate text-xs text-foreground">{chat.name}</h4>
+                                    <span className="block mt-0.5 text-[10px] text-muted-foreground whitespace-nowrap">{chat.time}</span>
                                 </div>
-                                {chat.unread && <div className="w-2 h-2 bg-primary rounded-full shrink-0 self-center" />}
                             </button>
                         ))
                     ) : (
@@ -318,4 +292,3 @@ export default function Inbox({ conversations: initialConversations, userType, t
         </div>
     );
 }
-

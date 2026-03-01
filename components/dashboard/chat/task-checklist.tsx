@@ -11,7 +11,9 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Check, ListChecks, Pencil, Trash2, X } from "lucide-react";
+import { DashboardFilter } from "../DashboardFilter";
 
 interface TaskChecklistProps {
     events?: SharedEvent[];
@@ -24,6 +26,7 @@ export const TaskChecklist = ({ events = [], selectedEventId, onEventChange, onU
     const selectedEvent = events.find(e => e.id === selectedEventId);
     const [items, setItems] = useState<string[]>([]);
     const [newItem, setNewItem] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [editingValue, setEditingValue] = useState("");
     const [isSuggesting, setIsSuggesting] = useState(false);
@@ -164,6 +167,13 @@ Rules:
         }
     };
 
+    const filteredItems = items
+        .map((item, index) => ({ item, index }))
+        .filter(({ item }) => {
+            if (!searchQuery.trim()) return true;
+            return item.toLowerCase().includes(searchQuery.toLowerCase());
+        });
+
     return (
         <div className="space-y-4 shadow-sm">
             {events.length > 0 && (
@@ -197,7 +207,11 @@ Rules:
                     </div>
                 </div>
             ) : (
-                <div className="flex flex-col gap-3.5 animate-in fade-in slide-in-from-top-2 duration-500">
+                <div className="flex flex-col gap-3.5">
+                    <DashboardFilter
+                        placeholder="Search tasks..."
+                        onSearchChange={setSearchQuery}
+                    />
                     <div className="flex items-center gap-2">
                         <input
                             value={newItem}
@@ -231,65 +245,82 @@ Rules:
                         <div className="text-[11px] text-destructive">{suggestError}</div>
                     )}
 
-                    <div className="flex flex-col gap-1.5">
-                        {items.length > 0 ? (
-                            items.map((item, idx) => (
-                                <div key={`${item}-${idx}`} className="flex items-center justify-between group py-1.5 px-2 hover:bg-secondary/20 rounded-lg transition-colors">
-                                    {editingIndex === idx ? (
-                                        <div className="flex items-center gap-2 w-full">
-                                            <input
-                                                value={editingValue}
-                                                onChange={(e) => setEditingValue(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === "Enter") handleSaveEdit(idx);
-                                                    if (e.key === "Escape") handleCancelEdit();
-                                                }}
-                                                autoFocus
-                                                className="h-8 w-full rounded-lg border border-border bg-secondary/20 px-3 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
-                                            />
-                                            <button
-                                                onClick={() => handleSaveEdit(idx)}
-                                                disabled={!editingValue.trim()}
-                                                className="p-1 text-emerald-600 hover:text-emerald-700 disabled:opacity-50"
-                                            >
-                                                <Check size={12} />
-                                            </button>
-                                            <button
-                                                onClick={handleCancelEdit}
-                                                className="p-1 text-muted-foreground hover:text-foreground"
-                                            >
-                                                <X size={12} />
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <div className="flex items-start gap-2.5 text-[13px] leading-relaxed">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 shrink-0" />
-                                                <span className="text-foreground font-medium">{item}</span>
-                                            </div>
-                                            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-all">
-                                                <button
-                                                    onClick={() => handleStartEdit(idx)}
-                                                    className="p-1 hover:text-primary transition-colors"
-                                                >
-                                                    <Pencil size={12} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteItem(idx)}
-                                                    className="p-1 hover:text-destructive transition-colors"
-                                                >
-                                                    <Trash2 size={12} />
-                                                </button>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                            ))
-                        ) : (
-                            <div className="text-[11px] text-muted-foreground text-center py-4">
-                                No tasks yet. Start planning!
-                            </div>
-                        )}
+                    <div className="rounded-xl border border-border bg-card overflow-hidden">
+                        <Table>
+                            <TableHeader className="bg-secondary/30">
+                                <TableRow>
+                                    <TableHead className="h-10 px-4 text-xs font-medium">Task</TableHead>
+                                    <TableHead className="h-10 px-4 text-xs font-medium text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredItems.length > 0 ? (
+                                    filteredItems.map(({ item, index }) => (
+                                        <TableRow key={`${item}-${index}`}>
+                                            {editingIndex === index ? (
+                                                <>
+                                                    <TableCell className="px-4 py-3">
+                                                        <input
+                                                            value={editingValue}
+                                                            onChange={(e) => setEditingValue(e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") handleSaveEdit(index);
+                                                                if (e.key === "Escape") handleCancelEdit();
+                                                            }}
+                                                            autoFocus
+                                                            className="h-8 w-full rounded-lg border border-border bg-secondary/20 px-3 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell className="px-4 py-3 text-right">
+                                                        <div className="inline-flex items-center gap-1">
+                                                            <button
+                                                                onClick={() => handleSaveEdit(index)}
+                                                                disabled={!editingValue.trim()}
+                                                                className="p-1 text-emerald-600 hover:text-emerald-700 disabled:opacity-50"
+                                                            >
+                                                                <Check size={12} />
+                                                            </button>
+                                                            <button
+                                                                onClick={handleCancelEdit}
+                                                                className="p-1 text-muted-foreground hover:text-foreground"
+                                                            >
+                                                                <X size={12} />
+                                                            </button>
+                                                        </div>
+                                                    </TableCell>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <TableCell className="px-4 py-3 text-sm text-foreground">{item}</TableCell>
+                                                    <TableCell className="px-4 py-3 text-right">
+                                                        <div className="inline-flex items-center gap-1">
+                                                            <button
+                                                                onClick={() => handleStartEdit(index)}
+                                                                className="p-1 text-muted-foreground hover:text-primary transition-colors"
+                                                            >
+                                                                <Pencil size={12} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteItem(index)}
+                                                                className="p-1 text-muted-foreground hover:text-destructive transition-colors"
+                                                            >
+                                                                <Trash2 size={12} />
+                                                            </button>
+                                                        </div>
+                                                    </TableCell>
+                                                </>
+                                            )}
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={2} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                                            {items.length === 0 ? "No tasks yet. Start planning!" : "No tasks match your search."}
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
 
                     <button

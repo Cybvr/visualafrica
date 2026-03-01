@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Clock, CheckCircle, FileText, ChevronRight, MapPin, XCircle, CreditCard, AlertCircle } from 'lucide-react';
+import { Clock, CheckCircle, ChevronRight, MapPin, XCircle, CreditCard, AlertCircle } from 'lucide-react';
 import { getVendors } from '@/lib/firestore-service';
 import { SharedEvent, Vendor } from '@/lib/types';
 import { DashboardFilter } from '../DashboardFilter';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const STATUS_MAP: Record<string, { color: string; icon: React.ReactNode }> = {
     'Deciding': { color: 'text-amber-600 bg-amber-50', icon: <Clock size={16} /> },
@@ -63,19 +64,21 @@ const VendorsTab: React.FC<VendorsTabProps> = ({ event }) => {
     });
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="max-w-6xl mx-auto space-y-6 pt-2">
             <div className="flex flex-col gap-6">
-                <DashboardFilter
-                    placeholder="Search vendors or services..."
-                    onSearchChange={setSearchQuery}
-                />
+                <div className="w-full">
+                    <DashboardFilter
+                        placeholder="Search vendors..."
+                        onSearchChange={setSearchQuery}
+                    />
+                </div>
 
-                <div className="flex items-center gap-2 border-b border-border text-[10px]">
+                <div className="flex items-center gap-1 border-b border-border overflow-x-auto pb-[2px]">
                     {tabs.map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveStatus(tab)}
-                            className={`px-6 py-4 font-black transition-all border-b-2 -mb-[2px] uppercase tracking-[0.2em] ${activeStatus === tab
+                            className={`px-3 py-2 text-xs font-medium transition-all border-b-2 -mb-[2px] whitespace-nowrap ${activeStatus === tab
                                 ? 'border-primary text-foreground'
                                 : 'border-transparent text-muted-foreground hover:text-foreground'
                                 }`}
@@ -86,63 +89,61 @@ const VendorsTab: React.FC<VendorsTabProps> = ({ event }) => {
                 </div>
             </div>
 
-            <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
-                <table className="w-full text-left">
-                    <thead className="bg-secondary/30 border-b border-border">
-                        <tr>
-                            <th className="px-8 py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Vendor</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Service</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Contact</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Status</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest text-right">Price</th>
-                            <th className="px-8 py-4"></th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
+            <div className="rounded-xl border border-border bg-card overflow-hidden">
+                <Table>
+                    <TableHeader className="bg-secondary/30">
+                        <TableRow>
+                            <TableHead className="h-10 px-4 text-xs font-medium">Vendor</TableHead>
+                            <TableHead className="h-10 px-4 text-xs font-medium">Service</TableHead>
+                            <TableHead className="h-10 px-4 text-xs font-medium">Contact</TableHead>
+                            <TableHead className="h-10 px-4 text-xs font-medium">Status</TableHead>
+                            <TableHead className="h-10 px-4 text-xs font-medium text-right">Price</TableHead>
+                            <TableHead className="h-10 px-4" />
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
                         {filteredRequests.length > 0 ? (
                             filteredRequests.map((req) => {
                                 const statusConfig = STATUS_MAP[req.status] || { color: 'text-muted-foreground bg-secondary', icon: <Clock size={16} /> };
                                 return (
-                                    <tr
+                                    <TableRow
                                         key={req.id}
                                         onClick={() => window.location.href = `${window.location.pathname}/vendors/${req.id}`}
-                                        className="group hover:bg-secondary/50 transition-colors cursor-pointer"
+                                        className="group cursor-pointer hover:bg-secondary/40"
                                     >
-                                        <td className="px-8 py-6">
-                                            <div className="font-bold text-foreground">{req.name}</div>
-                                            <div className="flex items-center gap-1 mt-1 text-[10px] text-muted-foreground font-bold uppercase truncate">
-                                                <MapPin size={12} className="text-muted-foreground opacity-50" />
+                                        <TableCell className="px-4 py-3">
+                                            <div className="font-medium text-foreground">{req.name}</div>
+                                            <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground truncate">
+                                                <MapPin size={12} className="opacity-60" />
                                                 {req.location}
                                             </div>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <div className="text-sm font-medium text-foreground">{req.categories[0]}</div>
-                                            <div className="text-[10px] text-muted-foreground font-bold uppercase mt-1">Updated {req.date}</div>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <div className="font-bold text-foreground text-sm">{req.phone}</div>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border border-transparent ${statusConfig.color}`}>
+                                        </TableCell>
+                                        <TableCell className="px-4 py-3">
+                                            <div className="text-sm text-foreground">{req.categories[0]}</div>
+                                            <div className="mt-1 text-xs text-muted-foreground">Updated {req.date}</div>
+                                        </TableCell>
+                                        <TableCell className="px-4 py-3 text-sm">{req.phone}</TableCell>
+                                        <TableCell className="px-4 py-3">
+                                            <div className={`inline-flex items-center gap-2 rounded-full border border-transparent px-2.5 py-1 text-[10px] font-medium ${statusConfig.color}`}>
                                                 {statusConfig.icon} {req.status}
                                             </div>
-                                        </td>
-                                        <td className="px-8 py-6 text-right font-black text-foreground">{req.priceDisplay}</td>
-                                        <td className="px-8 py-6 text-right">
-                                            <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors inline" />
-                                        </td>
-                                    </tr>
-                                )
+                                        </TableCell>
+                                        <TableCell className="px-4 py-3 text-right text-sm font-medium">{req.priceDisplay}</TableCell>
+                                        <TableCell className="px-4 py-3 text-right">
+                                            <ChevronRight size={16} className="inline text-muted-foreground group-hover:text-primary transition-colors" />
+                                        </TableCell>
+                                    </TableRow>
+                                );
                             })
                         ) : (
-                            <tr>
-                                <td colSpan={5} className="px-8 py-16 text-center text-muted-foreground">
+                            <TableRow>
+                                <TableCell colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
                                     No vendors found in this category.
-                                </td>
-                            </tr>
+                                </TableCell>
+                            </TableRow>
                         )}
-                    </tbody>
-                </table>
+                    </TableBody>
+                </Table>
             </div>
         </div>
     );

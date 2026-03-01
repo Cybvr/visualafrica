@@ -42,10 +42,12 @@ interface PlanTabProps {
 
 const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
     return (
-        <div className="max-w-4xl mx-auto space-y-6 py-3">
+        <div className="max-w-4xl mx-auto space-y-8 pt-2">
             {/* Event Details Section */}
-            <section className="space-y-4">
-                <h2 className="text-base font-semibold text-foreground">Event Details</h2>
+            <section className="space-y-6">
+                <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                    <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">General Information</h3>
+                </div>
                 <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1.5">

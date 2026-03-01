@@ -11,7 +11,9 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar, Check, Download, Pencil, Trash2, X } from "lucide-react";
+import { DashboardFilter } from "../DashboardFilter";
 
 interface DayOfTimelineProps {
     events?: SharedEvent[];
@@ -25,6 +27,7 @@ export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange, onU
     const [entries, setEntries] = useState<TimelineEntry[]>([]);
     const [newTime, setNewTime] = useState("");
     const [newLabel, setNewLabel] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [editingTime, setEditingTime] = useState("");
     const [editingLabel, setEditingLabel] = useState("");
@@ -203,7 +206,7 @@ export const DayOfTimeline = ({ events = [], selectedEventId, onEventChange, onU
 
         const updatedEntries = entries.map((entry, i) => (
             i === index
-                ? (note ? { ...entry, time, label, note } : { ...entry, time, label, note: undefined })
+                ? { ...entry, time, label, ...(note ? { note } : {}) }
                 : entry
         ));
 
@@ -296,6 +299,18 @@ Rules:
         }
     };
 
+    const filteredEntries = entries
+        .map((entry, index) => ({ entry, index }))
+        .filter(({ entry }) => {
+            if (!searchQuery.trim()) return true;
+            const query = searchQuery.toLowerCase();
+            return (
+                entry.time.toLowerCase().includes(query) ||
+                entry.label.toLowerCase().includes(query) ||
+                (entry.note || "").toLowerCase().includes(query)
+            );
+        });
+
     return (
         <div className="space-y-4">
             {events.length > 0 && (
@@ -329,7 +344,11 @@ Rules:
                     </div>
                 </div>
             ) : (
-                <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-500">
+                <div className="space-y-3">
+                    <DashboardFilter
+                        placeholder="Search itinerary..."
+                        onSearchChange={setSearchQuery}
+                    />
                     <div className="flex justify-end">
                         <button
                             onClick={handleDownloadIcs}
@@ -364,89 +383,109 @@ Rules:
                         </button>
                     </div>
 
-                    <div className="pl-[18px] relative transition-all duration-300">
-                        <div className="absolute left-[5px] top-2 bottom-2 w-px bg-border" />
-                        {entries.length > 0 ? (
-                            entries.map((e, i) => (
-                                <div key={`${e.time}-${e.label}-${i}`} className="relative pl-3.5 pb-2.5 group hover:bg-secondary/20 rounded-lg transition-colors">
-                                    <div className="absolute left-[-2px] top-2 w-[7px] h-[7px] rounded-full border-[1.5px] border-primary bg-card" />
-                                    {editingIndex === i ? (
-                                        <div className="flex items-center gap-2 px-2">
-                                            <input
-                                                value={editingTime}
-                                                onChange={(event) => setEditingTime(event.target.value)}
-                                                onKeyDown={(event) => {
-                                                    if (event.key === "Enter") handleSaveEdit(i);
-                                                    if (event.key === "Escape") handleCancelEdit();
-                                                }}
-                                                autoFocus
-                                                className="h-8 w-28 rounded-lg border border-border bg-secondary/20 px-2 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
-                                            />
-                                            <input
-                                                value={editingLabel}
-                                                onChange={(event) => setEditingLabel(event.target.value)}
-                                                onKeyDown={(event) => {
-                                                    if (event.key === "Enter") handleSaveEdit(i);
-                                                    if (event.key === "Escape") handleCancelEdit();
-                                                }}
-                                                className="h-8 w-full rounded-lg border border-border bg-secondary/20 px-2 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
-                                            />
-                                            <input
-                                                value={editingNote}
-                                                onChange={(event) => setEditingNote(event.target.value)}
-                                                onKeyDown={(event) => {
-                                                    if (event.key === "Enter") handleSaveEdit(i);
-                                                    if (event.key === "Escape") handleCancelEdit();
-                                                }}
-                                                placeholder="Note (optional)"
-                                                className="h-8 w-40 rounded-lg border border-border bg-secondary/20 px-2 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
-                                            />
-                                            <button
-                                                onClick={() => handleSaveEdit(i)}
-                                                disabled={!editingTime.trim() || !editingLabel.trim()}
-                                                className="p-1 text-emerald-600 hover:text-emerald-700 disabled:opacity-50"
-                                            >
-                                                <Check size={12} />
-                                            </button>
-                                            <button
-                                                onClick={handleCancelEdit}
-                                                className="p-1 text-muted-foreground hover:text-foreground"
-                                            >
-                                                <X size={12} />
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center justify-between px-2">
-                                            <div>
-                                                <div className="text-[11px] text-muted-foreground">{e.time}</div>
-                                                <div className="text-[13px] text-foreground font-medium">
-                                                    {e.label}
-                                                    {e.note && <span className="text-muted-foreground text-[11px] ml-1.5 font-normal">· {e.note}</span>}
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-all">
-                                                <button
-                                                    onClick={() => handleStartEdit(i)}
-                                                    className="p-1 hover:text-foreground transition-colors"
-                                                >
-                                                    <Pencil size={12} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteEntry(i)}
-                                                    className="p-1 hover:text-destructive transition-colors"
-                                                >
-                                                    <Trash2 size={12} />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))
-                        ) : (
-                            <div className="text-[11px] text-muted-foreground text-center py-4">
-                                No itinerary items yet.
-                            </div>
-                        )}
+                    <div className="rounded-xl border border-border bg-card overflow-hidden">
+                        <Table>
+                            <TableHeader className="bg-secondary/30">
+                                <TableRow>
+                                    <TableHead className="h-10 px-4 text-xs font-medium">Time</TableHead>
+                                    <TableHead className="h-10 px-4 text-xs font-medium">Activity</TableHead>
+                                    <TableHead className="h-10 px-4 text-xs font-medium">Note</TableHead>
+                                    <TableHead className="h-10 px-4 text-xs font-medium text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredEntries.length > 0 ? (
+                                    filteredEntries.map(({ entry: e, index }) => (
+                                        <TableRow key={`${e.time}-${e.label}-${index}`}>
+                                            {editingIndex === index ? (
+                                                <>
+                                                    <TableCell className="px-4 py-3">
+                                                        <input
+                                                            value={editingTime}
+                                                            onChange={(event) => setEditingTime(event.target.value)}
+                                                            onKeyDown={(event) => {
+                                                                if (event.key === "Enter") handleSaveEdit(index);
+                                                                if (event.key === "Escape") handleCancelEdit();
+                                                            }}
+                                                            autoFocus
+                                                            className="h-8 w-full rounded-lg border border-border bg-secondary/20 px-2 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell className="px-4 py-3">
+                                                        <input
+                                                            value={editingLabel}
+                                                            onChange={(event) => setEditingLabel(event.target.value)}
+                                                            onKeyDown={(event) => {
+                                                                if (event.key === "Enter") handleSaveEdit(index);
+                                                                if (event.key === "Escape") handleCancelEdit();
+                                                            }}
+                                                            className="h-8 w-full rounded-lg border border-border bg-secondary/20 px-2 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell className="px-4 py-3">
+                                                        <input
+                                                            value={editingNote}
+                                                            onChange={(event) => setEditingNote(event.target.value)}
+                                                            onKeyDown={(event) => {
+                                                                if (event.key === "Enter") handleSaveEdit(index);
+                                                                if (event.key === "Escape") handleCancelEdit();
+                                                            }}
+                                                            placeholder="Optional"
+                                                            className="h-8 w-full rounded-lg border border-border bg-secondary/20 px-2 text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell className="px-4 py-3 text-right">
+                                                        <div className="inline-flex items-center gap-1">
+                                                            <button
+                                                                onClick={() => handleSaveEdit(index)}
+                                                                disabled={!editingTime.trim() || !editingLabel.trim()}
+                                                                className="p-1 text-emerald-600 hover:text-emerald-700 disabled:opacity-50"
+                                                            >
+                                                                <Check size={12} />
+                                                            </button>
+                                                            <button
+                                                                onClick={handleCancelEdit}
+                                                                className="p-1 text-muted-foreground hover:text-foreground"
+                                                            >
+                                                                <X size={12} />
+                                                            </button>
+                                                        </div>
+                                                    </TableCell>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <TableCell className="px-4 py-3 text-xs text-muted-foreground">{e.time}</TableCell>
+                                                    <TableCell className="px-4 py-3 text-sm font-medium text-foreground">{e.label}</TableCell>
+                                                    <TableCell className="px-4 py-3 text-xs text-muted-foreground">{e.note || "—"}</TableCell>
+                                                    <TableCell className="px-4 py-3 text-right">
+                                                        <div className="inline-flex items-center gap-1">
+                                                            <button
+                                                                onClick={() => handleStartEdit(index)}
+                                                                className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+                                                            >
+                                                                <Pencil size={12} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteEntry(index)}
+                                                                className="p-1 text-muted-foreground hover:text-destructive transition-colors"
+                                                            >
+                                                                <Trash2 size={12} />
+                                                            </button>
+                                                        </div>
+                                                    </TableCell>
+                                                </>
+                                            )}
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                                            {entries.length === 0 ? "No itinerary items yet." : "No itinerary items match your search."}
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
 
                     <button
