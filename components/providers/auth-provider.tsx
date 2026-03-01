@@ -43,6 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         displayName: currentUser.displayName || '',
                         photoURL: currentUser.photoURL || undefined,
                         role: 'host', // Default role
+                        subscriptionPlan: 'free',
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                     };

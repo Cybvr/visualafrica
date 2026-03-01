@@ -26,6 +26,7 @@ import {
     DayOfTimeline,
     BudgetPlanner,
 } from "@/components/dashboard/chat";
+import TicketsTab from "@/components/dashboard/event-tabs/TicketsTab";
 
 export function Dots() {
     return (
@@ -407,7 +408,7 @@ function EventForm({
     );
 }
 
-function TicketForm({ onSubmit, eventName }: { onSubmit: (data: any) => void; eventName?: string }) {
+function TicketForm({ onSubmit, eventName, eventId }: { onSubmit: (data: any) => void; eventName?: string; eventId?: string }) {
     const [data, setData] = useState({ name: "", price: "", quantity: "", description: "" });
     return (
         <div className="bg-card border border-border rounded-2xl p-4 w-full space-y-3 shadow-sm">
@@ -447,12 +448,53 @@ function TicketForm({ onSubmit, eventName }: { onSubmit: (data: any) => void; ev
                 />
             </div>
             <button
-                onClick={() => onSubmit(data)}
+                onClick={() => onSubmit({ ...data, eventId })}
                 disabled={!data.name || !data.price || !data.quantity}
                 className="w-full bg-primary text-primary-foreground font-bold py-2 rounded-lg text-sm transition-all active:scale-95 disabled:opacity-50"
             >
                 Add Ticket Tier
             </button>
+        </div>
+    );
+}
+
+function TicketWorkspace({
+    events,
+    selectedEventId,
+    onEventChange
+}: {
+    events: SharedEvent[];
+    selectedEventId: string | null;
+    onEventChange: (id: string | null) => void;
+}) {
+    const selectedEvent =
+        (selectedEventId ? events.find((event) => event.id === selectedEventId) : undefined) ||
+        (events.length === 1 ? events[0] : undefined);
+
+    return (
+        <div className="space-y-3">
+            {events.length > 0 && (
+                <Select value={selectedEventId || undefined} onValueChange={(value) => onEventChange(value || null)}>
+                    <SelectTrigger className="w-full max-w-[320px] h-10 bg-card border-border">
+                        <SelectValue placeholder="Select event" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {events.map((event) => (
+                            <SelectItem key={event.id} value={event.id}>
+                                {event.eventName}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            )}
+
+            {!selectedEvent ? (
+                <div className="p-4 border border-dashed border-border rounded-xl text-center text-muted-foreground text-sm">
+                    {events.length === 0 ? "No events found in your account." : "Select an event to manage tickets."}
+                </div>
+            ) : (
+                <TicketsTab event={selectedEvent} />
+            )}
         </div>
     );
 }
@@ -916,7 +958,7 @@ export function Msg({
                         <div className="w-full space-y-2 mt-1">
                             {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
-                                <TicketForm onSubmit={onTicketFormSubmit} eventName={activeEvent?.eventName} />
+                                <TicketForm onSubmit={onTicketFormSubmit} eventName={activeEvent?.eventName} eventId={msg.eventId || activeEvent?.id} />
                             </div>
                         </div>
                     ) : msg.type === "flight_form" ? (
@@ -1000,6 +1042,15 @@ export function Msg({
                         <div className="w-full mt-1 space-y-3">
                             {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
                             <BudgetPlanner
+                                events={liveEvents}
+                                selectedEventId={selectedEventId}
+                                onEventChange={onEventSelect}
+                            />
+                        </div>
+                    ) : msg.type === "tickets" ? (
+                        <div className="w-full mt-1 space-y-3">
+                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            <TicketWorkspace
                                 events={liveEvents}
                                 selectedEventId={selectedEventId}
                                 onEventChange={onEventSelect}

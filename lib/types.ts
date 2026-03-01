@@ -32,6 +32,7 @@ export type VendorCategory =
     | "Experiences";
 
 export type UserRole = 'admin' | 'host' | 'vendor';
+export type SubscriptionPlan = 'free' | 'pro' | 'max' | 'admin';
 
 export interface TeamMember {
     id: string;
@@ -46,6 +47,7 @@ export interface UserProfile {
     displayName: string;
     photoURL?: string;
     role: UserRole;
+    subscriptionPlan?: SubscriptionPlan;
     teamMembers?: TeamMember[];
     createdAt: string;
     updatedAt: string;
@@ -143,6 +145,13 @@ export interface SharedEvent {
         email: string;
         status: 'Confirmed' | 'Pending' | 'Declined';
         type: 'Main Guest' | 'Plus One' | 'VIP';
+    }[];
+    tickets?: {
+        id: string;
+        name: string;
+        price: number;
+        quantity: number;
+        description?: string;
     }[];
     todoList?: string[];
     itineraryItems?: TimelineEntry[];

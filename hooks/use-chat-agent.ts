@@ -6,10 +6,13 @@ import {
     createChat,
     createEvent,
     getEventById,
+    MessageLimitReachedError,
     saveChatMessage,
+    saveUserChatMessage,
     updateChatMetadata,
     updateEvent
 } from "@/lib/firestore-service";
+import type { MessageQuota } from "@/lib/message-usage";
 import { SharedEvent, TimelineEntry } from "@/lib/types";
 import {
     extractIntent,
@@ -36,6 +39,7 @@ type UseChatAgentArgs = {
     setPendingAction: Dispatch<SetStateAction<any>>;
     currentUser: any;
     storeKits: any[];
+    onQuotaChange?: (quota: MessageQuota) => void;
 };
 
 type ActionMetrics = {
@@ -62,7 +66,8 @@ export function useChatAgent({
     pendingAction,
     setPendingAction,
     currentUser,
-    storeKits
+    storeKits,
+    onQuotaChange
 }: UseChatAgentArgs) {
     type WorkflowStage = "event" | "itinerary" | "todo" | "budget" | "vendors" | "ticketing";
 
@@ -326,6 +331,31 @@ Rules:
             await saveChatMessage(targetChatId, agentMsg);
         } else {
             setMessages((prev) => [...prev, { ...agentMsg, id: Date.now().toString() }]);
+        }
+    };
+
+    const persistUserMessage = async (chatId: string, content: string, nowStr: string) => {
+        const userMsg = { role: "user", content, time: nowStr };
+
+        if (!currentUser?.uid) {
+            await saveChatMessage(chatId, userMsg);
+            return { ok: true as const };
+        }
+
+        try {
+            const quota = await saveUserChatMessage(chatId, userMsg, currentUser.uid);
+            if (onQuotaChange) onQuotaChange(quota);
+            return { ok: true as const };
+        } catch (error: any) {
+            if (error instanceof MessageLimitReachedError) {
+                if (onQuotaChange) onQuotaChange(error.quota);
+                await persistAgentMessage({
+                    type: "text",
+                    content: `You've hit your monthly message limit for the ${error.quota.plan.toUpperCase()} plan. Your quota resets on ${new Date(error.quota.resetAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}.`
+                }, chatId);
+                return { ok: false as const, code: "PLAN_LIMIT_REACHED" as const };
+            }
+            throw error;
         }
     };
 
@@ -961,10 +991,14 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 return;
             }
 
-            if (intent === "start_ticketing") {
-                response.type = "ticket_form";
+            if (intent === "start_ticketing" || intent === "tickets") {
+                response.type = "tickets";
                 const event = resolveTargetEvent(actionData);
-                response.content = `Let's set up ticketing for **${event?.eventName || "your event"}**. What tiers are you thinking?`;
+                if (event?.id) {
+                    setSelectedEventId(event.id);
+                    response.eventId = event.id;
+                }
+                response.content = `Here is your ticketing workspace for **${event?.eventName || "your event"}**.`;
                 setMessages((prev) => [...prev, response]);
                 if (currentChatId) saveChatMessage(currentChatId, response);
                 return;
@@ -1292,7 +1326,11 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 router.push(`/dashboard/hosts/chat/${chatIdStr}`);
             }
             if (chatIdStr !== "new") {
-                await saveChatMessage(chatIdStr, { role: "user", content: text, time: nowStr });
+                const persisted = await persistUserMessage(chatIdStr, text, nowStr);
+                if (!persisted.ok) {
+                    setInput("");
+                    return;
+                }
             } else {
                 setMessages((prev) => [...prev, { id: Date.now().toString(), role: "user", content: text, time: nowStr }]);
             }
@@ -1326,7 +1364,12 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 await saveChatMessage(newChatId, { ...m, time: nowStr });
             }
 
-            await saveChatMessage(newChatId, { role: "user", content: text, time: nowStr });
+            const persisted = await persistUserMessage(newChatId, text, nowStr);
+            if (!persisted.ok) {
+                router.push(`/dashboard/hosts/chat/${newChatId}`);
+                setInput("");
+                return;
+            }
             if (hasExplicitAction) {
                 const approvalHandled = await handleApprovalAction(actionData, newChatId);
                 if (!approvalHandled) dispatchLogic(text, actionData, newChatId);
@@ -1353,7 +1396,11 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         }
 
         if (chatIdStr !== "new") {
-            await saveChatMessage(chatIdStr, { role: "user", content: text, time: nowStr });
+            const persisted = await persistUserMessage(chatIdStr, text, nowStr);
+            if (!persisted.ok) {
+                setInput("");
+                return;
+            }
             if (hasExplicitAction) {
                 const approvalHandled = await handleApprovalAction(actionData, chatIdStr);
                 if (!approvalHandled) dispatchLogic(text, actionData, chatIdStr);
@@ -1383,7 +1430,8 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
 
         const chatIdStr = getRouteChatId();
         if (chatIdStr !== "new") {
-            await saveChatMessage(chatIdStr, userMsg);
+            const persisted = await persistUserMessage(chatIdStr, content, nowStr);
+            if (!persisted.ok) return;
         } else {
             setMessages((prev) => [...prev, { ...userMsg, id: Date.now().toString() }]);
         }
@@ -1451,7 +1499,11 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         }
 
         const userText = `${isEditing ? "Update event" : "Event"}: ${eventName}${date ? `, Date: ${date}` : ""}${eventType ? `, Type: ${eventType}` : ""}, ${guestCount} guests, budget ${budget}, city ${city}${categories.length ? `, Categories: ${data.categories}` : ""}`;
-        await saveChatMessage(chatIdStr, { role: "user", content: userText, time: nowStr });
+        const formPersisted = await persistUserMessage(chatIdStr, userText, nowStr);
+        if (!formPersisted.ok) {
+            setInput("");
+            return;
+        }
 
         setTyping(true);
         let targetEventId = editEventId;
@@ -1529,21 +1581,50 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
 
         let chatIdStr = getRouteChatId();
         if (chatIdStr !== "new") {
-            await saveChatMessage(chatIdStr, { role: "user", content: userText, time: nowStr });
+            const persisted = await persistUserMessage(chatIdStr, userText, nowStr);
+            if (!persisted.ok) return;
         }
 
         setTyping(true);
-        if (selectedEventId) {
-            const price = Number(String(data.price).replace(/[^0-9.]/g, "")) || 0;
-            await updateEvent(selectedEventId, { ticketPrice: price });
+        const targetEvent =
+            (data?.eventId ? await getEventById(String(data.eventId)) : null) ||
+            (selectedEventId ? await getEventById(selectedEventId) : null) ||
+            resolveTargetEvent(data);
+
+        if (!targetEvent?.id) {
+            setTyping(false);
+            await persistAgentMessage(
+                {
+                    type: "text",
+                    content: "I couldn't find which event to add this ticket to. Open your event in chat first, then try again."
+                },
+                chatIdStr !== "new" ? chatIdStr : undefined
+            );
+            return;
         }
+        setSelectedEventId(targetEvent.id);
+
+        const price = Number(String(data.price).replace(/[^0-9.]/g, "")) || 0;
+        const quantity = Number(data.quantity) || 0;
+        const nextTickets = [...(targetEvent.tickets || [])];
+        nextTickets.push({
+            id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            name: String(data.name || "General Admission"),
+            price,
+            quantity,
+            description: data.description || ""
+        });
+        await updateEvent(targetEvent.id, {
+            tickets: nextTickets,
+            ticketPrice: price // Keep for backward compatibility/default
+        });
 
         setTimeout(async () => {
             setTyping(false);
             const responseMsg = {
                 role: "agent",
                 type: "text",
-                content: `Ticket tier **${data.name}** added successfully. Anything else for your event setup?`,
+                content: `Ticket tier **${data.name}** added to **${targetEvent.eventName}**. Anything else for your event setup?`,
                 time: nowStr,
                 suggestions: [
                     { label: "Add another tier", action: "start_ticketing" },

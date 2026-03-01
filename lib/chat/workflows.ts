@@ -9,7 +9,7 @@ export const extractIntent = (text: string, actionData?: any) => {
     if (lower.includes("edit event") || lower.includes("update event") || lower.includes("change event")) return "edit_event";
     if (lower.includes("budget") || lower.includes("price") || lower.includes("cost")) return "budget";
     if (lower.includes("flight") || lower.includes("airfare") || lower.includes("airline")) return "search_flights";
-    if (lower.includes("ticket") || lower.includes("ticketing")) return "start_ticketing";
+    if (lower.includes("ticket") || lower.includes("ticketing")) return "tickets";
     if (lower.includes("vendor") || lower.includes("search") || lower.includes("find") || lower.includes("caterer") || lower.includes("dj")) return "vendor_search";
     if (lower.includes("book") || lower.includes("confirm") || lower.includes("hold")) return "book";
     if (lower.includes("negotiate") || lower.includes("deal") || lower.includes("discount")) return "negotiate";

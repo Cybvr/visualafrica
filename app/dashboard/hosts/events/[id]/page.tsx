@@ -22,6 +22,7 @@ import ContractsTab from '@/components/dashboard/event-tabs/ContractsTab';
 import InboxTab from '@/components/dashboard/event-tabs/InboxTab';
 import WebsiteTab from '@/components/dashboard/event-tabs/WebsiteTab';
 import FlightsTab from '@/components/dashboard/event-tabs/FlightsTab';
+import TicketsTab from '@/components/dashboard/event-tabs/TicketsTab';
 import { TaskChecklist, DayOfTimeline } from '@/components/dashboard/chat';
 
 const parseCsvRow = (row: string): string[] => {
@@ -204,6 +205,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         { value: "overview", label: "Overview", meta: "Event plan", scope: "local", icon: LayoutDashboard },
         { value: "vendors", label: "Vendors", meta: `${event.bookedVendors.length} booked`, scope: "local", icon: Store },
         { value: "guests", label: "Guests", meta: `${event.guests.length} invited`, scope: "local", icon: Users },
+        { value: "tickets", label: "Tickets", meta: event.ticketPrice ? `₦${event.ticketPrice.toLocaleString('en-NG')}` : 'Free', scope: "local", icon: Ticket },
         { value: "contracts", label: "Contracts", meta: "Uploaded docs", scope: "docs", icon: FileText },
         { value: "inbox", label: "Inbox", meta: "Messages", scope: "local", icon: Inbox },
         { value: "itinerary", label: "Itinerary", meta: "Agent generated", scope: "docs", icon: Calendar },
@@ -228,6 +230,9 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         }
         if (activeTab === "website") {
             return <WebsiteTab event={event} />;
+        }
+        if (activeTab === "tickets") {
+            return <TicketsTab event={event} />;
         }
         if (activeTab === "contracts") {
             return <ContractsTab eventId={id} bookedVendors={event.bookedVendors} />;

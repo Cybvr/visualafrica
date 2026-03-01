@@ -7,15 +7,15 @@ import {
     getVendors,
     getEvents,
     getChatById,
-    createChat,
-    saveChatMessage,
     saveChatFeedback,
     listenToMessages,
     updateChatMetadata,
     getStoreKits,
+    getUserMessageQuota,
     listenToEvents
 } from "@/lib/firestore-service";
 import { SharedEvent } from "@/lib/types";
+import type { MessageQuota } from "@/lib/message-usage";
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -43,6 +43,7 @@ import {
     MdChecklist,
     MdAccountBalanceWallet,
     MdSchedule,
+    MdLocalActivity,
     MdTravelExplore,
     MdAutoAwesome,
     MdStorefront,
@@ -79,9 +80,8 @@ export default function ChatPage() {
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
     const [pendingAction, setPendingAction] = useState<any>(null);
     const [isPricingOpen, setIsPricingOpen] = useState(false);
-    const [messageUsage, setMessageUsage] = useState(0);
+    const [messageQuota, setMessageQuota] = useState<MessageQuota | null>(null);
     const [showSuggestions, setShowSuggestions] = useState(true);
-    const MESSAGE_LIMIT = 15;
     const autoPromptSentRef = useRef<string | null>(null);
     const chatIdStr = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "new";
     const canShareChat = chatIdStr !== "new" && !chatIdStr.startsWith("task-");
@@ -99,20 +99,17 @@ export default function ChatPage() {
     }, []);
 
     useEffect(() => {
-        if (typeof window === "undefined") return;
         if (!currentUser?.uid) {
-            setMessageUsage(0);
+            setMessageQuota(null);
             return;
         }
-        const saved = window.localStorage.getItem(`waddi-message-usage:${currentUser.uid}`);
-        setMessageUsage(saved ? Number(saved) || 0 : 0);
-    }, [currentUser?.uid]);
 
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-        if (!currentUser?.uid) return;
-        window.localStorage.setItem(`waddi-message-usage:${currentUser.uid}`, String(messageUsage));
-    }, [currentUser?.uid, messageUsage]);
+        getUserMessageQuota(currentUser.uid)
+            .then(setMessageQuota)
+            .catch((error) => {
+                console.error("Failed to load message quota:", error);
+            });
+    }, [currentUser?.uid]);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -134,7 +131,7 @@ export default function ChatPage() {
         // If pill has an explicit action, route through the action dispatcher
         if (pill.action) {
             const userContent = pill.id === 'store' ? "Browse Store" : (pill.action === 'vendor_search' ? "Show me vendors" : `Show me ${pill.label.toLowerCase()}`);
-            sendWithTokenTracking(userContent, pill);
+            void sendWithTokenTracking(userContent, pill);
             return;
         }
 
@@ -154,7 +151,7 @@ export default function ChatPage() {
         // Fallback for static UI views (Overview, Todo, etc)
         // If it's a new chat, use send to ensure it's created and persisted
         const userContent = `Show me ${pill.label.toLowerCase()}`;
-        sendWithTokenTracking(userContent, pill);
+        void sendWithTokenTracking(userContent, pill);
     };
 
     const chatQuickActions: { id: string; label: string; icon: IconType; colorClass: string; action?: string }[] = [
@@ -163,6 +160,7 @@ export default function ChatPage() {
         { id: 'todo', label: 'To-do', icon: MdChecklist, colorClass: 'text-violet-600' },
         { id: 'budget', label: 'Budget', icon: MdAccountBalanceWallet, colorClass: 'text-green-600' },
         { id: 'timeline', label: 'Itinerary', icon: MdSchedule, colorClass: 'text-amber-600' },
+        { id: 'tickets', label: 'Tickets', icon: MdLocalActivity, colorClass: 'text-rose-600', action: 'tickets' },
         { id: 'vendors_search', label: 'Discover Vendors', icon: MdTravelExplore, colorClass: 'text-sky-600', action: 'vendor_search' },
         { id: 'experience', label: 'Experiences', icon: MdAutoAwesome, colorClass: 'text-pink-600', action: 'experience' },
         { id: 'store', label: 'Shop', icon: MdStorefront, colorClass: 'text-orange-600', action: 'start_store' },
@@ -293,17 +291,28 @@ export default function ChatPage() {
         pendingAction,
         setPendingAction,
         currentUser,
-        storeKits
+        storeKits,
+        onQuotaChange: setMessageQuota
     });
 
-    const rawPercent = Math.round((messageUsage / MESSAGE_LIMIT) * 100);
+    const messageUsage = messageQuota?.used || 0;
+    const messageLimit = messageQuota?.limit || 0;
+    const isUnlimited = messageQuota?.isUnlimited || false;
+    const hardLimitReached = !isUnlimited && messageQuota !== null && (messageQuota.remaining || 0) <= 0;
+    const rawPercent = isUnlimited || messageLimit === 0 ? 100 : Math.round((messageUsage / messageLimit) * 100);
     const messagePercent = messageUsage > 0 ? Math.min(100, Math.max(1, rawPercent)) : 0;
 
-    const sendWithTokenTracking = (text: string, actionData?: any) => {
+    const sendWithTokenTracking = async (text: string, actionData?: any) => {
         const normalized = (text || "").trim();
         if (!normalized) return;
-        setMessageUsage((prev) => prev + 1);
-        send(normalized, actionData);
+        if (hardLimitReached) {
+            await addAgentMsg({
+                type: "text",
+                content: `Message limit reached. Your quota resets on ${messageQuota ? new Date(messageQuota.resetAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "the next cycle"}.`
+            });
+            return;
+        }
+        await send(normalized, actionData);
     };
 
     useEffect(() => {
@@ -325,7 +334,6 @@ export default function ChatPage() {
         autoPromptSentRef.current = autoKey;
         const seedPrompt = prefillPrompt || "Find flight deals for my event";
         setInput(seedPrompt);
-        setMessageUsage((prev) => prev + 1);
 
         if (flightAction) {
             void send(seedPrompt, {
@@ -557,10 +565,10 @@ export default function ChatPage() {
                                 onSuggestion={(s: any) => {
                                     if (s?.action === "dismiss_suggestions") {
                                         setShowSuggestions(false);
-                                        send(s.label || "I'm good", s);
+                                        void send(s.label || "I'm good", s);
                                         return;
                                     }
-                                    sendWithTokenTracking(s.label, s);
+                                    void sendWithTokenTracking(s.label, s);
                                 }}
                                 onCopy={(msg: any) => {
                                     const content = typeof msg?.content === "string" ? msg.content : "";
@@ -610,9 +618,10 @@ export default function ChatPage() {
                         <textarea
                             value={input}
                             onChange={e => setInput(e.target.value)}
-                            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendWithTokenTracking(input); } }}
+                            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void sendWithTokenTracking(input); } }}
                             placeholder="Ask Waddi anything about this chat..."
                             rows={1}
+                            disabled={hardLimitReached}
                             className="w-full bg-transparent px-5 pt-5 pb-16 text-sm focus:outline-none resize-none min-h-[100px]"
                         />
 
@@ -652,18 +661,18 @@ export default function ChatPage() {
                                             hsl(var(--background)) ${messagePercent}% 100%
                                         )`
                                     }}
-                                    title={`${messageUsage} / ${MESSAGE_LIMIT} messages`}
+                                    title={isUnlimited ? "Unlimited messages" : `${messageUsage} / ${messageLimit} messages`}
                                 >
                                     <div className="absolute inset-[5px] rounded-full bg-card flex items-center justify-center">
-                                        <span className="text-[9px] font-semibold text-foreground leading-none">{messagePercent}%</span>
+                                        <span className="text-[9px] font-semibold text-foreground leading-none">{isUnlimited ? "∞" : `${messagePercent}%`}</span>
                                     </div>
                                 </div>
                                 <button className="p-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors">
                                     <Mic size={18} />
                                 </button>
                                 <button
-                                    onClick={() => sendWithTokenTracking(input)}
-                                    disabled={!input.trim()}
+                                    onClick={() => void sendWithTokenTracking(input)}
+                                    disabled={!input.trim() || hardLimitReached}
                                     className="h-10 w-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center disabled:opacity-50 transition-all active:scale-95 shadow-lg shrink-0"
                                 >
                                     <ArrowRight size={20} strokeWidth={2.5} />

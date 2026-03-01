@@ -13,10 +13,24 @@ import {
     onSnapshot,
     deleteDoc,
     setDoc,
-    writeBatch
+    writeBatch,
+    runTransaction
 } from 'firebase/firestore';
 
 import { Vendor, SharedEvent, BlogPost, FAQ, PricingTier, Offering, PlatformFeature } from './types';
+import { buildMessageQuota, getCurrentPeriodKey } from './message-usage';
+
+export class MessageLimitReachedError extends Error {
+    code: string;
+    quota: ReturnType<typeof buildMessageQuota>;
+
+    constructor(quota: ReturnType<typeof buildMessageQuota>) {
+        super('PLAN_LIMIT_REACHED');
+        this.name = 'MessageLimitReachedError';
+        this.code = 'PLAN_LIMIT_REACHED';
+        this.quota = quota;
+    }
+}
 
 export async function getStoreKits(): Promise<any[]> {
     const q = query(
@@ -210,11 +224,101 @@ export async function getChatById(chatId: string): Promise<any | null> {
     return null;
 }
 
+export async function getUserMessageQuota(userId: string) {
+    const periodKey = getCurrentPeriodKey();
+    const userRef = doc(db, 'users', userId);
+    const usageRef = doc(db, 'messageUsage', userId);
+
+    const [userSnap, usageSnap] = await Promise.all([getDoc(userRef), getDoc(usageRef)]);
+    const profile = userSnap.exists() ? (userSnap.data() as any) : null;
+    const usageData = usageSnap.exists() ? usageSnap.data() as any : null;
+    const used = usageData?.periodKey === periodKey ? Number(usageData?.used || 0) : 0;
+
+    return buildMessageQuota({
+        profile,
+        used,
+        periodKey
+    });
+}
+
+export async function saveUserChatMessage(chatId: string, message: any, userId: string) {
+    const periodKey = getCurrentPeriodKey();
+
+    const result = await runTransaction(db, async (tx) => {
+        const chatRef = doc(db, 'chats', chatId);
+        const usageRef = doc(db, 'messageUsage', userId);
+        const userRef = doc(db, 'users', userId);
+        const messageRef = doc(collection(db, 'chats', chatId, 'messages'));
+
+        const [chatSnap, usageSnap, userSnap] = await Promise.all([
+            tx.get(chatRef),
+            tx.get(usageRef),
+            tx.get(userRef)
+        ]);
+
+        if (!chatSnap.exists()) {
+            throw new Error('CHAT_NOT_FOUND');
+        }
+
+        const chatData = chatSnap.data() as any;
+        if (chatData?.userId !== userId) {
+            throw new Error('CHAT_ACCESS_DENIED');
+        }
+
+        const profile = userSnap.exists() ? (userSnap.data() as any) : null;
+        const usageData = usageSnap.exists() ? (usageSnap.data() as any) : null;
+        const used = usageData?.periodKey === periodKey ? Number(usageData?.used || 0) : 0;
+        const quota = buildMessageQuota({
+            profile,
+            used,
+            periodKey
+        });
+
+        if (!quota.isUnlimited && quota.limit !== null && used >= quota.limit) {
+            throw new MessageLimitReachedError(quota);
+        }
+
+        const nextUsed = used + 1;
+        const nextQuota = buildMessageQuota({
+            profile,
+            used: nextUsed,
+            periodKey
+        });
+
+        tx.set(messageRef, {
+            ...message,
+            timestamp: serverTimestamp()
+        });
+
+        tx.set(chatRef, {
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+
+        tx.set(usageRef, {
+            uid: userId,
+            periodKey,
+            used: nextUsed,
+            plan: nextQuota.plan,
+            limit: nextQuota.limit ?? -1,
+            updatedAt: serverTimestamp(),
+            createdAt: usageSnap.exists() ? (usageData?.createdAt || serverTimestamp()) : serverTimestamp()
+        }, { merge: true });
+
+        return nextQuota;
+    });
+
+    return result;
+}
+
 export async function saveChatMessage(chatId: string, message: any) {
+    const sanitizedMessage = Object.fromEntries(
+        Object.entries(message || {}).filter(([, value]) => value !== undefined)
+    );
+
     // Save to messages subcollection
     const messagesRef = collection(db, 'chats', chatId, 'messages');
     await addDoc(messagesRef, {
-        ...message,
+        ...sanitizedMessage,
         timestamp: serverTimestamp()
     });
 

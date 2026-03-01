@@ -18,6 +18,44 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == ownerField;
     }
 
+    function currentPeriodKey() {
+      return request.time.year() * 100 + request.time.month();
+    }
+
+    function userPlan() {
+      return (isSignedIn() &&
+              exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscriptionPlan in ['free', 'pro', 'max', 'admin'])
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscriptionPlan
+        : 'free';
+    }
+
+    function messageLimit() {
+      return (isAdmin() || userPlan() == 'admin')
+        ? -1
+        : (userPlan() == 'max' ? 1000 : (userPlan() == 'pro' ? 50 : 15));
+    }
+
+    function validUsageAfterIncrement(userId) {
+      return existsAfter(/databases/$(database)/documents/messageUsage/$(userId)) &&
+             getAfter(/databases/$(database)/documents/messageUsage/$(userId)).data.uid == request.auth.uid &&
+             getAfter(/databases/$(database)/documents/messageUsage/$(userId)).data.periodKey == currentPeriodKey() &&
+             getAfter(/databases/$(database)/documents/messageUsage/$(userId)).data.used is int &&
+             (
+               (!exists(/databases/$(database)/documents/messageUsage/$(userId)) &&
+                getAfter(/databases/$(database)/documents/messageUsage/$(userId)).data.used == 1) ||
+               (exists(/databases/$(database)/documents/messageUsage/$(userId)) &&
+                get(/databases/$(database)/documents/messageUsage/$(userId)).data.periodKey == currentPeriodKey() &&
+                getAfter(/databases/$(database)/documents/messageUsage/$(userId)).data.used ==
+                  get(/databases/$(database)/documents/messageUsage/$(userId)).data.used + 1) ||
+               (exists(/databases/$(database)/documents/messageUsage/$(userId)) &&
+                get(/databases/$(database)/documents/messageUsage/$(userId)).data.periodKey != currentPeriodKey() &&
+                getAfter(/databases/$(database)/documents/messageUsage/$(userId)).data.used == 1)
+             ) &&
+             (messageLimit() == -1 ||
+              getAfter(/databases/$(database)/documents/messageUsage/$(userId)).data.used <= messageLimit());
+    }
+
     // Vendors: Public read for marketplace pages.
     match /vendors/{vendorId} {
       allow read: if true;
@@ -66,18 +104,37 @@ service cloud.firestore {
       allow create: if isSignedIn() &&
                     request.auth.uid == userId &&
                     request.resource.data.uid == request.auth.uid &&
-                    request.resource.data.role in ['host', 'vendor'];
+                    request.resource.data.role in ['host', 'vendor'] &&
+                    (
+                      !('subscriptionPlan' in request.resource.data) ||
+                      request.resource.data.subscriptionPlan == 'free'
+                    );
       allow update: if isAdmin() ||
                     (isSignedIn() &&
                      request.auth.uid == userId &&
                      request.resource.data.uid == resource.data.uid &&
-                     request.resource.data.role == resource.data.role);
+                     request.resource.data.role == resource.data.role &&
+                     request.resource.data.subscriptionPlan == resource.data.subscriptionPlan);
       allow delete: if isAdmin() || (isSignedIn() && request.auth.uid == userId);
     }
 
     // User settings/profile data
     match /userProfiles/{userId} {
       allow read, write: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+    }
+
+    match /messageUsage/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create, update: if isSignedIn() &&
+                            request.auth.uid == userId &&
+                            request.resource.data.uid == request.auth.uid &&
+                            request.resource.data.periodKey == currentPeriodKey() &&
+                            request.resource.data.used is int &&
+                            request.resource.data.used >= 1 &&
+                            request.resource.data.plan in ['free', 'pro', 'max', 'admin'] &&
+                            request.resource.data.limit is int &&
+                            validUsageAfterIncrement(userId);
+      allow delete: if false;
     }
 
     // Chats and Store Kits
@@ -94,7 +151,12 @@ service cloud.firestore {
       match /messages/{messageId} {
         allow read: if get(/databases/$(database)/documents/chats/$(chatId)).data.published == true || 
                      (isSignedIn() && (get(/databases/$(database)/documents/chats/$(chatId)).data.userId == request.auth.uid || isAdmin()));
-        allow create: if isSignedIn() && (get(/databases/$(database)/documents/chats/$(chatId)).data.userId == request.auth.uid || isAdmin());
+        allow create: if isSignedIn() &&
+                      (get(/databases/$(database)/documents/chats/$(chatId)).data.userId == request.auth.uid || isAdmin()) &&
+                      (
+                        request.resource.data.role != 'user' ||
+                        validUsageAfterIncrement(request.auth.uid)
+                      );
         allow update, delete: if isAdmin();
       }
 
