@@ -120,16 +120,38 @@ export async function updateEvent(eventId: string, data: Partial<SharedEvent>) {
 export async function getBlogPosts(): Promise<BlogPost[]> {
     const q = query(collection(db, 'blogPosts'), orderBy('date', 'desc'));
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => doc.data() as BlogPost);
+    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as BlogPost));
 }
 
 export async function getBlogPostById(id: string): Promise<BlogPost | null> {
     const docRef = doc(db, 'blogPosts', id);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-        return docSnap.data() as BlogPost;
+        return { ...docSnap.data(), id: docSnap.id } as BlogPost;
     }
     return null;
+}
+
+export async function createBlogPost(postData: Omit<BlogPost, 'id'>) {
+    const docRef = await addDoc(collection(db, 'blogPosts'), {
+        ...postData,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+    });
+    return docRef.id;
+}
+
+export async function updateBlogPost(id: string, data: Partial<BlogPost>) {
+    const docRef = doc(db, 'blogPosts', id);
+    await updateDoc(docRef, {
+        ...data,
+        updatedAt: serverTimestamp()
+    });
+}
+
+export async function deleteBlogPost(id: string) {
+    const docRef = doc(db, 'blogPosts', id);
+    await deleteDoc(docRef);
 }
 
 export async function getFaqs(): Promise<FAQ[]> {

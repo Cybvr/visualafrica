@@ -11,6 +11,7 @@ import { uploadImage } from "@/lib/upload-service";
 import { VENDOR_CATEGORIES, EVENT_THEMES } from "@/lib/constants";
 import { useAuth } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
+import AdminNav from "@/components/admin/AdminNav";
 
 type BulkListMode = "add" | "remove" | "replace";
 
@@ -214,40 +215,43 @@ export default function AdminVendorsPage() {
                         {searchTerm.trim() ? ` • ${filteredVendorCount} shown` : ""}
                     </p>
                 </div>
-                <div className="flex gap-3">
-                    {hasUnsavedChanges && (
+                <div className="flex flex-col gap-4 items-end">
+                    <AdminNav />
+                    <div className="flex gap-3">
+                        {hasUnsavedChanges && (
+                            <Button
+                                variant="ghost"
+                                onClick={() => {
+                                    setEditedVendors({});
+                                    setSelectedVendorIds([]);
+                                }}
+                                disabled={isSaving}
+                                className="flex items-center gap-2 text-red-500 hover:text-red-600 hover:bg-red-50"
+                            >
+                                <X size={18} /> Discard Changes
+                            </Button>
+                        )}
                         <Button
-                            variant="ghost"
-                            onClick={() => {
-                                setEditedVendors({});
-                                setSelectedVendorIds([]);
-                            }}
-                            disabled={isSaving}
-                            className="flex items-center gap-2 text-red-500 hover:text-red-600 hover:bg-red-50"
+                            onClick={saveBulkChanges}
+                            disabled={isSaving || !hasUnsavedChanges}
+                            className={cn(
+                                "flex items-center gap-2 transition-all",
+                                hasUnsavedChanges ? "bg-green-600 hover:bg-green-700 text-white" : "bg-muted text-muted-foreground"
+                            )}
                         >
-                            <X size={18} /> Discard Changes
+                            {isSaving ? (
+                                <><Loader2 size={18} className="animate-spin" /> Saving...</>
+                            ) : (
+                                <><Save size={18} /> Save All Changes</>
+                            )}
                         </Button>
-                    )}
-                    <Button
-                        onClick={saveBulkChanges}
-                        disabled={isSaving || !hasUnsavedChanges}
-                        className={cn(
-                            "flex items-center gap-2 transition-all",
-                            hasUnsavedChanges ? "bg-green-600 hover:bg-green-700 text-white" : "bg-muted text-muted-foreground"
-                        )}
-                    >
-                        {isSaving ? (
-                            <><Loader2 size={18} className="animate-spin" /> Saving...</>
-                        ) : (
-                            <><Save size={18} /> Save All Changes</>
-                        )}
-                    </Button>
-                    <div className="w-px bg-border mx-1" />
-                    <Button asChild className="bg-primary text-primary-foreground">
-                        <Link href="/admin/vendors/new" className="flex items-center gap-2">
-                            <Plus size={18} /> Add New Vendor
-                        </Link>
-                    </Button>
+                        <div className="w-px bg-border mx-1" />
+                        <Button asChild className="bg-primary text-primary-foreground font-bold">
+                            <Link href="/admin/vendors/new" className="flex items-center gap-2">
+                                <Plus size={18} /> Add New Vendor
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
             </div>
 
