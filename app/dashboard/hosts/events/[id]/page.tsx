@@ -174,7 +174,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-[210px_minmax(0,1fr)] gap-6 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-[210px_minmax(0,1fr)] gap-4 lg:gap-6 items-start">
                     <aside className="space-y-2">
                         <div className="flex items-center gap-1.5">
                             {[
@@ -199,32 +199,57 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                             })}
                         </div>
 
-                        {filteredNavItems.map((item) => {
-                            const isActive = activeTab === item.value;
-                            const ItemIcon = item.icon;
-                            return (
-                                <button
-                                    key={item.value}
-                                    type="button"
-                                    onClick={() => handleTabChange(item.value)}
-                                    className={`w-full rounded-lg border px-2.5 py-1.5 text-left transition-colors ${isActive
-                                        ? "bg-card border-border"
-                                        : "bg-secondary/30 border-transparent hover:bg-card hover:border-border"
-                                        }`}
-                                >
-                                    <div className="flex items-center justify-between gap-3">
-                                        <div className="min-w-0 flex items-center gap-2.5">
-                                            <ItemIcon size={15} className="shrink-0 text-muted-foreground" />
-                                            <div className="min-w-0">
-                                                <p className="text-sm font-medium text-foreground truncate">{item.label}</p>
-                                                <p className="text-xs text-muted-foreground truncate">{item.meta}</p>
+                        <div className="lg:hidden -mx-1 px-1 overflow-x-auto pb-1">
+                            <div className="flex items-center gap-2 min-w-max">
+                                {filteredNavItems.map((item) => {
+                                    const isActive = activeTab === item.value;
+                                    const ItemIcon = item.icon;
+                                    return (
+                                        <button
+                                            key={item.value}
+                                            type="button"
+                                            onClick={() => handleTabChange(item.value)}
+                                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors ${isActive
+                                                ? "bg-foreground text-background border-foreground"
+                                                : "bg-card text-foreground border-border hover:bg-secondary"
+                                                }`}
+                                        >
+                                            <ItemIcon size={14} className={isActive ? "text-background" : "text-muted-foreground"} />
+                                            <span>{item.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="hidden lg:block space-y-2">
+                            {filteredNavItems.map((item) => {
+                                const isActive = activeTab === item.value;
+                                const ItemIcon = item.icon;
+                                return (
+                                    <button
+                                        key={item.value}
+                                        type="button"
+                                        onClick={() => handleTabChange(item.value)}
+                                        className={`w-full rounded-lg border px-2.5 py-1.5 text-left transition-colors ${isActive
+                                            ? "bg-card border-border"
+                                            : "bg-secondary/30 border-transparent hover:bg-card hover:border-border"
+                                            }`}
+                                    >
+                                        <div className="flex items-center justify-between gap-3">
+                                            <div className="min-w-0 flex items-center gap-2.5">
+                                                <ItemIcon size={15} className="shrink-0 text-muted-foreground" />
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-medium text-foreground truncate">{item.label}</p>
+                                                    <p className="text-xs text-muted-foreground truncate">{item.meta}</p>
+                                                </div>
                                             </div>
+                                            <ChevronRight size={14} className="text-muted-foreground" />
                                         </div>
-                                        <ChevronRight size={14} className="text-muted-foreground" />
-                                    </div>
-                                </button>
-                            );
-                        })}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </aside>
 
                     <section className="min-w-0 bg-card rounded-xl shadow-sm p-3 md:p-4 flex flex-col h-full">

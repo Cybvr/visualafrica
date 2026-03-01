@@ -1,224 +1,279 @@
-import React from "react";
+import React, { useState } from "react";
 import { WebsiteTemplateProps } from "./types";
 
-const MinimalScheduleTemplate: React.FC<WebsiteTemplateProps> = ({ event }) => {
+const VibrantSpotlightTemplate: React.FC<WebsiteTemplateProps> = ({ event }) => {
+  const [rsvpDone, setRsvpDone] = useState(false);
+
   return (
     <div
       style={{
         fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-        background: "#f5f0e8",
-        minHeight: "100%",
-        padding: "0",
+        background: "#0a0a0a",
+        color: "#fff",
+        minHeight: "100vh",
         position: "relative",
       }}
     >
-      {/* Top bar */}
-      <div
-        style={{
-          background: "#1a1a1a",
-          padding: "10px 20px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <span style={{ fontSize: "8px", letterSpacing: "3px", color: "#888", textTransform: "uppercase" }}>
-          Event Schedule
-        </span>
-        <span style={{ fontSize: "8px", letterSpacing: "2px", color: "#555", textTransform: "uppercase" }}>
-          {event.date}
-        </span>
-      </div>
+      {/* ── HERO ── */}
+      <section style={{ position: "relative", height: "100vh", minHeight: "600px", overflow: "hidden" }}>
+        <img
+          src={event.image || "/placeholder.png"}
+          alt={event.eventName}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
+          }}
+        />
+        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 40%, #0a0a0a 100%)" }} />
 
-      {/* Big number accent */}
-      <div style={{ position: "relative", padding: "28px 20px 0", overflow: "hidden" }}>
+        {/* Nav */}
+        <nav
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            padding: "28px 40px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            zIndex: 10,
+          }}
+        >
+          <span style={{ fontSize: "11px", letterSpacing: "4px", textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}>
+            Waddi Events
+          </span>
+          <span
+            style={{
+              fontSize: "9px",
+              letterSpacing: "3px",
+              textTransform: "uppercase",
+              background: "#ff3c00",
+              color: "#fff",
+              padding: "6px 14px",
+            }}
+          >
+            {event.status || "Open"}
+          </span>
+        </nav>
+
+        {/* Hero text */}
         <div
           style={{
             position: "absolute",
-            top: "-10px",
-            right: "-10px",
-            fontSize: "120px",
-            fontWeight: "900",
-            color: "#e8e1d4",
-            lineHeight: 1,
-            letterSpacing: "-6px",
-            userSelect: "none",
-            pointerEvents: "none",
+            bottom: "80px",
+            left: "40px",
+            right: "40px",
+            zIndex: 10,
           }}
         >
-          {new Date().getFullYear()}
-        </div>
-
-        {/* Event name */}
-        <h1
-          style={{
-            fontSize: "30px",
-            fontWeight: "900",
-            lineHeight: "1.0",
-            letterSpacing: "-1.5px",
-            margin: "0 0 4px",
-            color: "#1a1a1a",
-            textTransform: "uppercase",
-            position: "relative",
-            zIndex: 1,
-            maxWidth: "75%",
-          }}
-        >
-          {event.eventName}
-        </h1>
-
-        {/* Thick underline accent */}
-        <div style={{ display: "flex", gap: "3px", marginBottom: "24px" }}>
-          <div style={{ height: "4px", width: "40px", background: "#1a1a1a" }} />
-          <div style={{ height: "4px", width: "10px", background: "#d4a843" }} />
-        </div>
-      </div>
-
-      {/* Info strips */}
-      <div style={{ padding: "0 20px", marginBottom: "20px" }}>
-        {[
-          { label: "Location", value: event.location },
-          { label: "Guests", value: `${event.guestCount} attending` },
-          { label: "Theme", value: event.themes?.[0] || "Event Experience" },
-        ].map(({ label, value }, i) => (
-          <div
-            key={label}
+          <p style={{ fontSize: "10px", letterSpacing: "4px", textTransform: "uppercase", color: "#ff3c00", marginBottom: "16px" }}>
+            {event.date}
+          </p>
+          <h1
             style={{
-              display: "flex",
-              alignItems: "stretch",
-              borderBottom: "1px solid #c8bfaf",
-              paddingBottom: "12px",
-              marginBottom: "12px",
+              fontSize: "clamp(40px, 8vw, 72px)",
+              fontWeight: "900",
+              lineHeight: "1.0",
+              letterSpacing: "-2px",
+              textTransform: "uppercase",
+              margin: "0 0 20px",
+              maxWidth: "700px",
             }}
           >
-            {/* Left index */}
-            <div
-              style={{
-                width: "24px",
-                flexShrink: 0,
-                display: "flex",
-                alignItems: "flex-start",
-                paddingTop: "2px",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "8px",
-                  fontWeight: "700",
-                  color: "#d4a843",
-                  letterSpacing: "1px",
-                }}
-              >
-                0{i + 1}
-              </span>
-            </div>
+            {event.eventName}
+          </h1>
+          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.55)", letterSpacing: "2px", textTransform: "uppercase", margin: 0 }}>
+            {event.location}
+          </p>
+        </div>
 
-            {/* Content */}
-            <div style={{ flex: 1 }}>
-              <p
-                style={{
-                  fontSize: "8px",
-                  letterSpacing: "2.5px",
-                  textTransform: "uppercase",
-                  color: "#9c9080",
-                  margin: "0 0 2px",
-                }}
-              >
-                {label}
-              </p>
-              <p
-                style={{
-                  fontSize: "14px",
-                  fontWeight: "700",
-                  color: "#1a1a1a",
-                  margin: 0,
-                  letterSpacing: "-0.3px",
-                }}
-              >
-                {value}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Schedule block */}
-      <div
-        style={{
-          margin: "0 20px 20px",
-          background: "#1a1a1a",
-          padding: "16px 18px",
-        }}
-      >
-        <p
+        {/* Scroll hint */}
+        <div
           style={{
-            fontSize: "8px",
-            letterSpacing: "3px",
-            textTransform: "uppercase",
-            color: "#d4a843",
-            margin: "0 0 14px",
+            position: "absolute",
+            bottom: "28px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "6px",
+            zIndex: 10,
+            opacity: 0.35,
           }}
         >
+          <div style={{ width: "1px", height: "36px", background: "#fff" }} />
+          <span style={{ fontSize: "7px", letterSpacing: "2px", textTransform: "uppercase" }}>Scroll</span>
+        </div>
+      </section>
+
+      {/* ── ABOUT ── */}
+      <section style={{ padding: "100px 40px", maxWidth: "900px", margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "60px", alignItems: "start" }}>
+          <div>
+            <p style={{ fontSize: "9px", letterSpacing: "3px", textTransform: "uppercase", color: "#ff3c00", marginBottom: "16px" }}>
+              About
+            </p>
+            <div style={{ width: "40px", height: "3px", background: "#ff3c00" }} />
+          </div>
+          <div>
+            <p style={{ fontSize: "17px", lineHeight: "1.85", color: "rgba(255,255,255,0.7)", margin: "0 0 40px" }}>
+              {event.description || "An unforgettable experience awaits. Join us for an evening of celebration, connection, and memories that will last a lifetime."}
+            </p>
+            <div style={{ display: "flex", gap: "40px" }}>
+              {[
+                { label: "Guests", value: event.guestCount },
+                { label: "Vendors", value: event.bookedVendors?.length || 0 },
+                { label: "Theme", value: event.themes?.[0] || "Celebration" },
+              ].map(({ label, value }) => (
+                <div key={label}>
+                  <p style={{ fontSize: "28px", fontWeight: "900", color: "#fff", margin: "0 0 4px", letterSpacing: "-1px" }}>{value}</p>
+                  <p style={{ fontSize: "8px", letterSpacing: "2px", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", margin: 0 }}>{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div style={{ borderTop: "1px solid #181818", margin: "0 40px" }} />
+
+      {/* ── SCHEDULE ── */}
+      <section style={{ padding: "100px 40px", maxWidth: "900px", margin: "0 auto" }}>
+        <p style={{ fontSize: "9px", letterSpacing: "3px", textTransform: "uppercase", color: "#ff3c00", marginBottom: "60px" }}>
           Run of Show
         </p>
-
         {[
-          { time: "3:00", label: "Guest Arrival" },
-          { time: "4:30", label: "Main Program" },
-          { time: "7:00", label: "Reception" },
-        ].map(({ time, label }, i, arr) => (
+          { time: "3:00 PM", title: "Guest Arrival", desc: "Doors open, welcome drinks served" },
+          { time: "4:30 PM", title: "Main Program", desc: "The evening's central experience begins" },
+          { time: "7:00 PM", title: "Reception", desc: "Dinner, dancing, and celebration" },
+        ].map(({ time, title, desc }, i) => (
           <div
             key={time}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "14px",
-              paddingBottom: i < arr.length - 1 ? "10px" : 0,
-              marginBottom: i < arr.length - 1 ? "10px" : 0,
-              borderBottom: i < arr.length - 1 ? "1px solid #2e2e2e" : "none",
+              display: "grid",
+              gridTemplateColumns: "130px 1fr",
+              gap: "40px",
+              paddingBottom: "48px",
+              marginBottom: "48px",
+              borderBottom: "1px solid #141414",
             }}
           >
-            <span
-              style={{
-                fontWeight: "900",
-                fontSize: "13px",
-                color: "#f5f0e8",
-                fontVariantNumeric: "tabular-nums",
-                minWidth: "36px",
-                letterSpacing: "-0.5px",
-              }}
-            >
-              {time}
-            </span>
-            <span style={{ fontSize: "8px", color: "#555", letterSpacing: "1px" }}>PM</span>
-            <span
-              style={{
-                fontSize: "11px",
-                color: "#a09880",
-                textTransform: "uppercase",
-                letterSpacing: "1.5px",
-              }}
-            >
-              {label}
-            </span>
+            <div style={{ paddingTop: "4px" }}>
+              <p style={{ fontSize: "12px", fontWeight: "700", color: "#ff3c00", margin: "0 0 6px", letterSpacing: "1px" }}>{time}</p>
+              <p style={{ fontSize: "8px", color: "#2a2a2a", letterSpacing: "1px", margin: 0 }}>0{i + 1}</p>
+            </div>
+            <div>
+              <p style={{ fontSize: "20px", fontWeight: "800", color: "#fff", margin: "0 0 8px", letterSpacing: "-0.5px", textTransform: "uppercase" }}>{title}</p>
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.35)", margin: 0, lineHeight: "1.7" }}>{desc}</p>
+            </div>
           </div>
         ))}
-      </div>
+      </section>
 
-      {/* Bottom strip */}
-      <div
+      <div style={{ borderTop: "1px solid #181818", margin: "0 40px" }} />
+
+      {/* ── HOST & DETAILS ── */}
+      <section style={{ padding: "100px 40px", maxWidth: "900px", margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+          <div style={{ background: "#0f0f0f", border: "1px solid #1a1a1a", padding: "36px" }}>
+            <p style={{ fontSize: "9px", letterSpacing: "3px", textTransform: "uppercase", color: "#ff3c00", margin: "0 0 24px" }}>Hosted By</p>
+            <p style={{ fontSize: "24px", fontWeight: "800", color: "#fff", margin: "0 0 10px", letterSpacing: "-0.5px" }}>{event.hostName || "Waddi Host"}</p>
+            <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)", margin: 0, lineHeight: "1.7" }}>
+              Bringing this experience to life with care and intention.
+            </p>
+          </div>
+          <div style={{ background: "#0f0f0f", border: "1px solid #1a1a1a", padding: "36px" }}>
+            <p style={{ fontSize: "9px", letterSpacing: "3px", textTransform: "uppercase", color: "#ff3c00", margin: "0 0 24px" }}>Details</p>
+            {[
+              ["Date", event.date],
+              ["Location", event.location],
+              ["Budget", `₦${(event.budget || 0).toLocaleString("en-NG")}`],
+            ].map(([k, v]) => (
+              <div
+                key={k}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "baseline",
+                  paddingBottom: "12px",
+                  marginBottom: "12px",
+                  borderBottom: "1px solid #1a1a1a",
+                }}
+              >
+                <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "1px" }}>{k}</span>
+                <span style={{ fontSize: "13px", color: "#fff", fontWeight: "600" }}>{v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── RSVP SECTION ── */}
+      <section style={{ background: "#ff3c00", padding: "120px 40px", textAlign: "center" }}>
+        <p style={{ fontSize: "9px", letterSpacing: "4px", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: "24px" }}>
+          Secure Your Spot
+        </p>
+        <h2
+          style={{
+            fontSize: "clamp(36px, 6vw, 64px)",
+            fontWeight: "900",
+            letterSpacing: "-2px",
+            textTransform: "uppercase",
+            margin: "0 0 48px",
+            lineHeight: 1,
+          }}
+        >
+          Will You Be There?
+        </h2>
+        {rsvpDone ? (
+          <p style={{ fontSize: "13px", letterSpacing: "3px", textTransform: "uppercase", color: "rgba(255,255,255,0.8)" }}>
+            ✓ You&apos;re on the list
+          </p>
+        ) : (
+          <button
+            onClick={() => setRsvpDone(true)}
+            style={{
+              background: "#fff",
+              color: "#ff3c00",
+              border: "none",
+              padding: "20px 64px",
+              fontSize: "10px",
+              fontWeight: "900",
+              letterSpacing: "4px",
+              textTransform: "uppercase",
+              cursor: "pointer",
+              fontFamily: "'Helvetica Neue', sans-serif",
+            }}
+            onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.opacity = "0.88")}
+            onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.opacity = "1")}
+          >
+            RSVP Now
+          </button>
+        )}
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer
         style={{
-          margin: "0 20px 24px",
+          padding: "32px 40px",
           display: "flex",
-          gap: "8px",
+          justifyContent: "space-between",
+          alignItems: "center",
+          borderTop: "1px solid #141414",
         }}
       >
-        <div style={{ flex: 1, background: "#1a1a1a", height: "4px" }} />
-        <div style={{ width: "24px", background: "#d4a843", height: "4px" }} />
-        <div style={{ width: "8px", background: "#1a1a1a", height: "4px" }} />
-      </div>
+        <span style={{ fontSize: "9px", letterSpacing: "3px", textTransform: "uppercase", color: "#2a2a2a" }}>Waddi Events</span>
+        <span style={{ fontSize: "9px", letterSpacing: "2px", textTransform: "uppercase", color: "#2a2a2a" }}>{event.eventName}</span>
+      </footer>
     </div>
   );
 };
 
-export default MinimalScheduleTemplate;
+export default VibrantSpotlightTemplate;
