@@ -315,10 +315,14 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
                     <div className="flex items-center gap-3">
                         <ShareEventDialog event={event} teamMembers={teamMembers} hostPhoto={hostPhoto} />
-                        <Button className="h-10 gap-2 rounded-xl px-4 font-bold">
-                            <Rocket size={18} />
-                            Publish
-                        </Button>
+                        <Link
+                            href={`/e/${event.id}`}
+                            target="_blank"
+                            className="bg-card hover:bg-secondary/50 border border-border flex items-center gap-2 h-10 px-4 rounded-xl font-bold transition-colors"
+                        >
+                            <Globe size={18} />
+                            View Site
+                        </Link>
                     </div>
                 </div>
 
@@ -405,7 +409,16 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                             <div className="flex flex-col">
                                 <p className="text-sm font-medium text-foreground">{activeItem.label}</p>
                                 {activeTab === 'website' && (
-                                    <p className="text-xs text-muted-foreground">Waddi.events/{event.eventName.toLowerCase().replace(/\s+/g, "-")}</p>
+                                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                        <span>Website:</span>
+                                        <a
+                                            href={`/e/${event.id}`}
+                                            target="_blank"
+                                            className="text-primary hover:underline font-medium"
+                                        >
+                                            {typeof window !== 'undefined' ? `${window.location.host}/e/${event.id}` : `/e/${event.id}`}
+                                        </a>
+                                    </div>
                                 )}
                                 {activeTab === 'guests' && guestImportMessage && (
                                     <p className="text-xs text-muted-foreground">{guestImportMessage}</p>

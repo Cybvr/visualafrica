@@ -259,13 +259,12 @@ const GuestWebsite: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${
-                      guest.status === "Confirmed"
+                    <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${guest.status === "Confirmed"
                         ? "bg-green-100 text-green-700"
                         : guest.status === "Declined"
                           ? "bg-red-100 text-red-700"
                           : "bg-amber-100 text-amber-700"
-                    }`}>
+                      }`}>
                       {guest.status}
                     </span>
                     <button className="p-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"><Mail size={16} /></button>
@@ -286,7 +285,11 @@ const GuestWebsite: React.FC = () => {
             </div>
             <div>
               <h3 className="text-xl font-bold mb-2">RSVP Website</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">Your custom guest portal is live at:<br /><span className="text-foreground font-medium">Waddi.events/may-offsite</span></p>
+              <p className="text-muted-foreground text-sm leading-relaxed">Your custom guest portal is live at:<br />
+                <a href={`/e/${event.id}`} target="_blank" className="text-foreground font-medium hover:underline">
+                  {typeof window !== 'undefined' ? `${window.location.host}/e/${event.id}` : `/e/${event.id}`}
+                </a>
+              </p>
             </div>
             <div className="flex gap-2">
               <button className="flex-1 bg-card text-foreground py-3 rounded-xl font-bold text-sm hover:bg-card">Edit Site</button>

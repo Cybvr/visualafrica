@@ -14,7 +14,8 @@ import {
     deleteDoc,
     setDoc,
     writeBatch,
-    runTransaction
+    runTransaction,
+    Timestamp
 } from 'firebase/firestore';
 
 import { Vendor, SharedEvent, BlogPost, FAQ, PricingTier, Offering, PlatformFeature } from './types';
@@ -32,6 +33,35 @@ export class MessageLimitReachedError extends Error {
     }
 }
 
+function toPlainValue(value: unknown): unknown {
+    if (value instanceof Timestamp) {
+        return value.toDate().toISOString();
+    }
+
+    if (value instanceof Date) {
+        return value.toISOString();
+    }
+
+    if (Array.isArray(value)) {
+        return value.map((item) => toPlainValue(item));
+    }
+
+    if (value && typeof value === 'object') {
+        return Object.fromEntries(
+            Object.entries(value as Record<string, unknown>).map(([key, nestedValue]) => [
+                key,
+                toPlainValue(nestedValue)
+            ])
+        );
+    }
+
+    return value;
+}
+
+function toPlainObject<T>(value: T): T {
+    return toPlainValue(value) as T;
+}
+
 export async function getStoreKits(): Promise<any[]> {
     const q = query(
         collection(db, 'chats'),
@@ -43,7 +73,7 @@ export async function getStoreKits(): Promise<any[]> {
 
 export async function getVendors(): Promise<Vendor[]> {
     const querySnapshot = await getDocs(collection(db, 'vendors'));
-    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Vendor));
+    return querySnapshot.docs.map(doc => toPlainObject({ ...doc.data(), id: doc.id } as Vendor));
 }
 
 export async function getVendorBySlug(slug: string): Promise<Vendor | null> {
@@ -51,14 +81,14 @@ export async function getVendorBySlug(slug: string): Promise<Vendor | null> {
     const q = query(collection(db, 'vendors'), where('slug', '==', slug));
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {
-        return { ...querySnapshot.docs[0].data(), id: querySnapshot.docs[0].id } as Vendor;
+        return toPlainObject({ ...querySnapshot.docs[0].data(), id: querySnapshot.docs[0].id } as Vendor);
     }
 
     // 2. Fallback to document ID
     const docRef = doc(db, 'vendors', slug);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-        return { ...docSnap.data(), id: docSnap.id } as Vendor;
+        return toPlainObject({ ...docSnap.data(), id: docSnap.id } as Vendor);
     }
 
     return null;
@@ -68,7 +98,7 @@ export async function getEvents(userId?: string, userEmail?: string): Promise<Sh
     if (!userId && !userEmail) {
         const q = query(collection(db, 'events'));
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as SharedEvent));
+        return querySnapshot.docs.map(doc => toPlainObject({ ...doc.data(), id: doc.id } as SharedEvent));
     }
 
     const eventsMap = new Map<string, SharedEvent>();
@@ -77,7 +107,7 @@ export async function getEvents(userId?: string, userEmail?: string): Promise<Sh
         const q1 = query(collection(db, 'events'), where('hostId', '==', userId));
         const snap1 = await getDocs(q1);
         snap1.docs.forEach(doc => {
-            eventsMap.set(doc.id, { ...doc.data(), id: doc.id } as SharedEvent);
+            eventsMap.set(doc.id, toPlainObject({ ...doc.data(), id: doc.id } as SharedEvent));
         });
     }
 
@@ -85,7 +115,7 @@ export async function getEvents(userId?: string, userEmail?: string): Promise<Sh
         const q2 = query(collection(db, 'events'), where('sharedWith', 'array-contains', userEmail));
         const snap2 = await getDocs(q2);
         snap2.docs.forEach(doc => {
-            eventsMap.set(doc.id, { ...doc.data(), id: doc.id } as SharedEvent);
+            eventsMap.set(doc.id, toPlainObject({ ...doc.data(), id: doc.id } as SharedEvent));
         });
     }
 
@@ -95,7 +125,7 @@ export async function getEvents(userId?: string, userEmail?: string): Promise<Sh
 export function listenToEvents(userId: string, callback: (events: SharedEvent[]) => void) {
     const q = query(collection(db, 'events'), where('hostId', '==', userId));
     return onSnapshot(q, (snapshot) => {
-        const events = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as SharedEvent));
+        const events = snapshot.docs.map(doc => toPlainObject({ ...doc.data(), id: doc.id } as SharedEvent));
         callback(events);
     });
 }
@@ -185,14 +215,14 @@ export async function getPlatformFeatures(): Promise<PlatformFeature[]> {
 export async function getVendorById(id: string): Promise<Vendor | null> {
     const docRef = doc(db, 'vendors', id);
     const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) return docSnap.data() as Vendor;
+    if (docSnap.exists()) return toPlainObject(docSnap.data() as Vendor);
     return null;
 }
 
 export async function getEventById(id: string): Promise<SharedEvent | null> {
     const docRef = doc(db, 'events', id);
     const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) return { ...docSnap.data(), id: docSnap.id } as SharedEvent;
+    if (docSnap.exists()) return toPlainObject({ ...docSnap.data(), id: docSnap.id } as SharedEvent);
     return null;
 }
 
@@ -200,7 +230,7 @@ export function listenToEventById(id: string, callback: (event: SharedEvent | nu
     const docRef = doc(db, 'events', id);
     return onSnapshot(docRef, (snapshot) => {
         if (snapshot.exists()) {
-            callback({ ...snapshot.data(), id: snapshot.id } as SharedEvent);
+            callback(toPlainObject({ ...snapshot.data(), id: snapshot.id } as SharedEvent));
         } else {
             callback(null);
         }
