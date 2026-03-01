@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/components/providers/auth-provider";
 import { auth, googleProvider } from "@/lib/firebase";
+import { cn } from "@/lib/utils";
 
 const SUGGESTIONS = [
     "Plan a surprise 30th birthday in Lagos for 20 guests",
@@ -29,7 +30,11 @@ const SUGGESTIONS = [
     "Book a private chef for a brunch in Cape Town"
 ];
 
-export function WaddiPrompt() {
+type WaddiPromptProps = {
+    mode?: "marketing" | "dashboard";
+};
+
+export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
     const router = useRouter();
     const { user, loading } = useAuth();
     const [input, setInput] = useState("");
@@ -81,8 +86,13 @@ export function WaddiPrompt() {
 
     if (!mounted) return null;
 
+    const sectionClassName =
+        mode === "dashboard"
+            ? "h-full min-h-[28rem]"
+            : "h-[calc(100svh-5.5rem)] min-h-[34rem]";
+
     return (
-        <section className="h-full min-h-[28rem] px-4 md:px-6">
+        <section className={cn("px-4 md:px-6", sectionClassName)}>
             <div className="mx-auto grid h-full max-w-5xl place-items-center">
                 <div className="w-full text-center space-y-6 md:px-0">
                     <h1 className="text-4xl md:text-3xl font-bold text-foreground tracking-tight">

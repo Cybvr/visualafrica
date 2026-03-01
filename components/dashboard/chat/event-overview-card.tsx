@@ -86,6 +86,8 @@ export const EventOverviewCard = ({ event, onAction }: EventOverviewCardProps) =
                     ["Budget", budgetDisplay()],
                     ["Planner", event?.hostName || "-"],
                     ["Days out", calculateDaysOut(event?.date)],
+                    ["Categories", event?.categories?.join(", ") || "-"],
+                    ["Tags", event?.themes?.join(", ") || "-"],
                 ].map(([label, val]) => (
                     <div key={label}>
                         <div className="text-[10px] tracking-widest uppercase text-muted-foreground mb-0.5">{label}</div>

@@ -281,14 +281,14 @@ export function Header() {
 
         <div className="hidden w-[180px] flex-shrink-0 items-center justify-end gap-3 lg:flex">
           <Link href="/request-demo">
-            <Button variant="outline" size="sm" className="flex items-center gap-2 border-primary/20 text-foreground hover:bg-primary hover:text-foreground">
+            <Button variant="outline" size="sm" className="flex items-center gap-2 border-primary/20 text-foreground  hover:text-foreground">
               Request a Demo
             </Button>
           </Link>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="sm" className="bg-primary text-foreground-foreground hover:bg-primary/90">
+                <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                   Account <ChevronDown className="ml-1 h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>

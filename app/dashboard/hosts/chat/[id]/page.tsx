@@ -245,7 +245,8 @@ export default function ChatPage() {
         addAgentMsg,
         dispatchLogic,
         handleSelectCity,
-        handleFormSubmit
+        handleFormSubmit,
+        handleTicketFormSubmit
     } = useChatAgent({
         paramsId: params.id,
         router,
@@ -518,6 +519,7 @@ export default function ChatPage() {
                                 onVendorAction={handleVendorAction}
                                 onSave={handleSaveVendor}
                                 onFormSubmit={handleFormSubmit}
+                                onTicketFormSubmit={handleTicketFormSubmit}
                                 onCalendarSelect={handleCalendarSelect}
                                 liveEvents={liveEvents}
                                 selectedEventId={selectedEventId}

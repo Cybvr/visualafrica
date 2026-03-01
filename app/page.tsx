@@ -15,7 +15,7 @@ export default function HomePage() {
       <PwaAuthGate />
       <Header />
       <main className="flex-1">
-        <WaddiPrompt />
+        <WaddiPrompt mode="marketing" />
         <Hero />
 
         <section className="py-20 bg-background">

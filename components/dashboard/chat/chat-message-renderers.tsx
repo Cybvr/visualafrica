@@ -248,10 +248,19 @@ function CommunityCard({ item }: { item: any }) {
 }
 
 function EventForm({ onSubmit, defaultCity }: { onSubmit: (data: any) => void; defaultCity?: string | null }) {
-    const [data, setData] = useState({ name: "", guests: "", budget: "", city: defaultCity || "" });
+    const [data, setData] = useState({
+        name: "",
+        guests: "",
+        budget: "",
+        city: defaultCity || "",
+        date: "",
+        type: "",
+        categories: "",
+        tags: ""
+    });
     return (
         <div className="bg-card border border-border rounded-2xl p-4 w-full space-y-3 shadow-sm">
-            <div className="text-[13px] font-bold text-foreground">Almost there! Just the basics:</div>
+            <div className="text-[13px] font-bold text-foreground">Tell us about your event:</div>
             <div className="space-y-2">
                 <input
                     type="text"
@@ -260,20 +269,38 @@ function EventForm({ onSubmit, defaultCity }: { onSubmit: (data: any) => void; d
                     value={data.name}
                     onChange={e => setData({ ...data, name: e.target.value })}
                 />
-                <input
-                    type="number"
-                    placeholder="Guest Count"
-                    className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
-                    value={data.guests}
-                    onChange={e => setData({ ...data, guests: e.target.value })}
-                />
-                <input
-                    type="text"
-                    placeholder="Budget (e.g. $5k)"
-                    className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
-                    value={data.budget}
-                    onChange={e => setData({ ...data, budget: e.target.value })}
-                />
+                <div className="grid grid-cols-2 gap-2">
+                    <input
+                        type="date"
+                        placeholder="Date"
+                        className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                        value={data.date}
+                        onChange={e => setData({ ...data, date: e.target.value })}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Event Type (e.g. Wedding)"
+                        className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                        value={data.type}
+                        onChange={e => setData({ ...data, type: e.target.value })}
+                    />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                    <input
+                        type="number"
+                        placeholder="Guest Count"
+                        className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                        value={data.guests}
+                        onChange={e => setData({ ...data, guests: e.target.value })}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Budget (e.g. ₦1M)"
+                        className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                        value={data.budget}
+                        onChange={e => setData({ ...data, budget: e.target.value })}
+                    />
+                </div>
                 <Select value={data.city} onValueChange={(value) => setData({ ...data, city: value })}>
                     <SelectTrigger className="w-full bg-secondary/50 border-border text-sm">
                         <SelectValue placeholder="Select City" />
@@ -284,6 +311,20 @@ function EventForm({ onSubmit, defaultCity }: { onSubmit: (data: any) => void; d
                         ))}
                     </SelectContent>
                 </Select>
+                <input
+                    type="text"
+                    placeholder="Categories (e.g. DJ, Catering, Decor)"
+                    className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                    value={data.categories}
+                    onChange={e => setData({ ...data, categories: e.target.value })}
+                />
+                <input
+                    type="text"
+                    placeholder="Tags (optional, comma separated)"
+                    className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                    value={data.tags}
+                    onChange={e => setData({ ...data, tags: e.target.value })}
+                />
             </div>
             <button
                 onClick={() => onSubmit(data)}
@@ -295,6 +336,57 @@ function EventForm({ onSubmit, defaultCity }: { onSubmit: (data: any) => void; d
         </div>
     );
 }
+
+function TicketForm({ onSubmit, eventName }: { onSubmit: (data: any) => void; eventName?: string }) {
+    const [data, setData] = useState({ name: "", price: "", quantity: "", description: "" });
+    return (
+        <div className="bg-card border border-border rounded-2xl p-4 w-full space-y-3 shadow-sm">
+            <div className="text-[13px] font-bold text-foreground flex items-center gap-2">
+                <span className="text-xl">🎫</span>
+                Set up tickets {eventName ? `for ${eventName}` : ""}:
+            </div>
+            <div className="space-y-2">
+                <input
+                    type="text"
+                    placeholder="Ticket Type (e.g. VIP, General Admission)"
+                    className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                    value={data.name}
+                    onChange={e => setData({ ...data, name: e.target.value })}
+                />
+                <div className="grid grid-cols-2 gap-2">
+                    <input
+                        type="text"
+                        placeholder="Price (₦)"
+                        className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                        value={data.price}
+                        onChange={e => setData({ ...data, price: e.target.value })}
+                    />
+                    <input
+                        type="number"
+                        placeholder="Quantity"
+                        className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                        value={data.quantity}
+                        onChange={e => setData({ ...data, quantity: e.target.value })}
+                    />
+                </div>
+                <textarea
+                    placeholder="Description (Optional)"
+                    className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50 h-20 resize-none pt-2"
+                    value={data.description}
+                    onChange={e => setData({ ...data, description: e.target.value })}
+                />
+            </div>
+            <button
+                onClick={() => onSubmit(data)}
+                disabled={!data.name || !data.price || !data.quantity}
+                className="w-full bg-primary text-primary-foreground font-bold py-2 rounded-lg text-sm transition-all active:scale-95 disabled:opacity-50"
+            >
+                Add Ticket Tier
+            </button>
+        </div>
+    );
+}
+
 
 function CalendarPicker({ onSelect }: { onSelect: (date: string) => void }) {
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -479,6 +571,7 @@ type MsgProps = {
     onSuggestion: (suggestion: any) => void;
     allVendorsByCity: Record<string, any[]>;
     onFormSubmit: (data: any) => void;
+    onTicketFormSubmit: (data: any) => void;
     onCalendarSelect: (date: string) => void;
     liveEvents: SharedEvent[];
     selectedEventId: string | null;
@@ -488,7 +581,7 @@ type MsgProps = {
     onCopy?: (msg: any) => void;
 };
 
-export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onStoreAction, onSuggestion, allVendorsByCity, onFormSubmit, onCalendarSelect, liveEvents, selectedEventId, onEventSelect, onUpgradeToPro, onFeedback, onCopy }: MsgProps) {
+export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onStoreAction, onSuggestion, allVendorsByCity, onFormSubmit, onTicketFormSubmit, onCalendarSelect, liveEvents, selectedEventId, onEventSelect, onUpgradeToPro, onFeedback, onCopy }: MsgProps) {
     const ag = msg.role === "agent";
     const activeEvent =
         (msg.eventId && liveEvents.find((ev) => ev.id === msg.eventId)) ||
@@ -585,6 +678,13 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                             {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
                                 <EventForm onSubmit={onFormSubmit} defaultCity={activeCity} />
+                            </div>
+                        </div>
+                    ) : msg.type === "ticket_form" ? (
+                        <div className="w-full space-y-2 mt-1">
+                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            <div className="w-full">
+                                <TicketForm onSubmit={onTicketFormSubmit} eventName={activeEvent?.eventName} />
                             </div>
                         </div>
                     ) : msg.type === "calendar_picker" ? (

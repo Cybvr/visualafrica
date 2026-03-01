@@ -64,7 +64,7 @@ export function useChatAgent({
     currentUser,
     storeKits
 }: UseChatAgentArgs) {
-    type WorkflowStage = "event" | "itinerary" | "todo" | "budget" | "vendors";
+    type WorkflowStage = "event" | "itinerary" | "todo" | "budget" | "vendors" | "ticketing";
 
     const APPROVAL_ACTIONS = new Set([
         "approve_generate_itinerary",
@@ -78,13 +78,14 @@ export function useChatAgent({
     };
 
     const buildWorkflowActions = (stage: WorkflowStage) => {
-        const order: WorkflowStage[] = ["event", "itinerary", "todo", "budget", "vendors"];
+        const order: WorkflowStage[] = ["event", "vendors", "itinerary", "todo", "budget", "ticketing"];
         const labels: Record<WorkflowStage, string> = {
             event: "Event created",
             itinerary: "Itinerary generated",
             todo: "Checklist generated",
             budget: "Budget allocated",
-            vendors: "Vendors shortlisted"
+            vendors: "Vendors shortlisted",
+            ticketing: "Ticketing set up"
         };
         const stageIndex = order.indexOf(stage);
         return order.map((item, idx) => ({
@@ -594,7 +595,7 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             await persistAgentMessage(
                 {
                     type: "text",
-                    content: "Review the checklist above. Approve to generate the budget plan next.",
+                    content: "Review the checklist above. Approve to generate the budget plan.",
                     suggestions: [{ label: "Approve to continue", action: "approve_generate_budget", ...payload }]
                 },
                 chatIdOverride
@@ -628,8 +629,8 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             await persistAgentMessage(
                 {
                     type: "text",
-                    content: "Review the budget allocation above. Approve and I’ll fetch the top vendor matches.",
-                    suggestions: [{ label: "Approve to continue", action: "approve_find_vendors", ...payload }]
+                    content: "Budget plan ready. Should we set up your event ticketing now?",
+                    suggestions: [{ label: "Set up Tickets", action: "start_ticketing", ...payload }]
                 },
                 chatIdOverride
             );
@@ -663,9 +664,9 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                     type: "text",
                     content: "Vendors are ready. Want me to narrow this to catering, decor, photography, or music first?",
                     suggestions: [
+                        { label: "Approve to generate itinerary", action: "approve_generate_itinerary", ...payload },
                         { label: "Catering", action: "vendor_search" },
-                        { label: "Decor", action: "vendor_search" },
-                        { label: "Photography", action: "vendor_search" }
+                        { label: "Decor", action: "vendor_search" }
                     ]
                 },
                 chatIdOverride
@@ -729,7 +730,16 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
 
             if (intent === "start_planning") {
                 response.type = "event_form";
-                response.content = "Share your event details and I'll build your plan.";
+                response.content = "Share your event details and I'll build your plan across vendor, itineraries and budget.";
+                setMessages((prev) => [...prev, response]);
+                if (currentChatId) saveChatMessage(currentChatId, response);
+                return;
+            }
+
+            if (intent === "start_ticketing") {
+                response.type = "ticket_form";
+                const event = resolveTargetEvent(actionData);
+                response.content = `Let's set up ticketing for **${event?.eventName || "your event"}**. What tiers are you thinking?`;
                 setMessages((prev) => [...prev, response]);
                 if (currentChatId) saveChatMessage(currentChatId, response);
                 return;
@@ -1167,6 +1177,11 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         const guestCount = Number(data.guests) || 0;
         const budget = Number(String(data.budget || "0").replace(/[^0-9.]/g, "")) || 0;
         const city = String(data.city || activeCity || "Lagos");
+        const date = String(data.date || "");
+        const eventType = String(data.type || "");
+        const categories = String(data.categories || "").split(",").map(c => c.trim()).filter(Boolean);
+        const themes = String(data.tags || "").split(",").map(t => t.trim()).filter(Boolean);
+        if (eventType && !themes.includes(eventType)) themes.push(eventType);
 
         if (data.city) setActiveCity(city);
 
@@ -1180,7 +1195,7 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             router.push(`/dashboard/hosts/chat/${chatIdStr}`);
         }
 
-        const userText = `My event: ${eventName}, ${guestCount} guests, budget ${budget}, city ${city}`;
+        const userText = `Event: ${eventName}${date ? `, Date: ${date}` : ""}${eventType ? `, Type: ${eventType}` : ""}, ${guestCount} guests, budget ${budget}, city ${city}${categories.length ? `, Categories: ${data.categories}` : ""}`;
         await saveChatMessage(chatIdStr, { role: "user", content: userText, time: nowStr });
 
         setTyping(true);
@@ -1188,17 +1203,17 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             hostId: currentUser.uid,
             hostName: currentUser.displayName || currentUser.email || "Host",
             eventName,
-            date: String(data.date || ""),
+            date,
             location: city,
             guestCount,
             budget,
             status: "Planning",
             image: "/placeholder.png",
-            description: `Planning workspace for ${eventName}`,
+            description: `Planning workspace for ${eventName}${eventType ? ` (${eventType})` : ""}`,
             bookedVendors: [],
             leads: [],
-            categories: [],
-            themes: [],
+            categories,
+            themes,
             guests: [],
             todoList: [],
             itineraryItems: [],
@@ -1224,14 +1239,54 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             await saveChatMessage(chatIdStr, {
                 role: "agent",
                 type: "text",
-                content: "Approve and I’ll generate the itinerary next.",
+                content: `Event setup complete. I see you're looking for vendors in **${categories.join(", ") || "various categories"}**. Approve and I’ll generate vendor recommendations and your itinerary next.`,
                 time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
-                suggestions: [{ label: "Approve to continue", action: "approve_generate_itinerary", ...toApprovalPayload(createdEvent) }]
+                suggestions: [{ label: "Approve to start recommendations", action: "approve_find_vendors", ...toApprovalPayload(createdEvent) }]
             });
         }
 
         setTyping(false);
         setInput("");
+    };
+
+    const handleTicketFormSubmit = async (data: any) => {
+        if (!currentUser) {
+            addAgentMsg({ type: "text", content: "Please sign in to manage ticketing." });
+            return;
+        }
+
+        const nowStr = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+        const userText = `Add ${data.name} ticket tier: ₦${data.price} (Limit: ${data.quantity})`;
+
+        let chatIdStr = getRouteChatId();
+        if (chatIdStr !== "new") {
+            await saveChatMessage(chatIdStr, { role: "user", content: userText, time: nowStr });
+        }
+
+        setTyping(true);
+        if (selectedEventId) {
+            const price = Number(String(data.price).replace(/[^0-9.]/g, "")) || 0;
+            await updateEvent(selectedEventId, { ticketPrice: price });
+        }
+
+        setTimeout(async () => {
+            setTyping(false);
+            const responseMsg = {
+                role: "agent",
+                type: "text",
+                content: `Ticket tier **${data.name}** added successfully. Anything else for your event setup?`,
+                time: nowStr,
+                suggestions: [
+                    { label: "Add another tier", action: "start_ticketing" },
+                    { label: "View itinerary", action: "timeline" }
+                ]
+            };
+            if (chatIdStr !== "new") {
+                await saveChatMessage(chatIdStr, responseMsg);
+            } else {
+                setMessages((prev) => [...prev, { ...responseMsg, id: (Date.now() + 1).toString() }]);
+            }
+        }, 1200);
     };
 
     return {
@@ -1241,6 +1296,7 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         addAgentMsg,
         dispatchLogic,
         handleSelectCity,
-        handleFormSubmit
+        handleFormSubmit,
+        handleTicketFormSubmit
     };
 }
