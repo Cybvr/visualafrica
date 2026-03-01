@@ -314,15 +314,7 @@ export default function InboxTab({ event }: InboxTabProps) {
         );
     });
 
-    if (!activeChat) {
-        return (
-            <div className="rounded-xl border border-border bg-background p-6 text-sm text-muted-foreground">
-                No vendor conversations yet for this event.
-            </div>
-        );
-    }
-
-    const activeVendorPath = `/dashboard/hosts/vendor/${activeChat.vendorSlug}`;
+    const activeVendorPath = activeChat ? `/dashboard/hosts/vendor/${activeChat.vendorSlug}` : '';
 
     return (
         <div className="flex flex-col gap-3 h-[70vh] min-h-[500px] mb-6">
@@ -400,7 +392,7 @@ export default function InboxTab({ event }: InboxTabProps) {
                                 onClick={() => { setActiveChatId(chat.id); setActiveView('chat'); }}
                                 className={cn(
                                     "w-full p-4 text-left hover:bg-muted/50 transition-colors flex items-center gap-3",
-                                    activeChat.id === chat.id ? 'bg-muted' : ''
+                                    activeChatId === chat.id ? 'bg-muted' : ''
                                 )}
                             >
                                 <Avatar className="w-10 h-10 rounded-lg border border-border shrink-0">
@@ -437,138 +429,146 @@ export default function InboxTab({ event }: InboxTabProps) {
                     "flex-1 flex flex-col bg-background min-h-0",
                     activeView === 'list' ? "hidden" : "flex"
                 )}>
-                    <div className="p-4 bg-muted/5 border-b border-border flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                                onClick={() => setActiveView('list')}
-                            >
-                                <ArrowLeft size={18} />
-                            </Button>
-                            <Link
-                                href={activeVendorPath}
-                                className="flex items-center gap-2 rounded-md px-1 py-0.5 -mx-1"
-                            >
-                                <Avatar className="w-8 h-8 rounded-lg border border-border shrink-0">
-                                    <AvatarImage src={activeChat.avatarUrl} alt={activeChat.name} className="object-cover" />
-                                    <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-bold text-xs">
-                                        {activeChat.avatarFallback}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="min-w-0">
-                                    <h4 className="text-sm font-medium text-foreground truncate">{activeChat.name}</h4>
-                                    <span className="mt-0.5 inline-flex max-w-full items-center rounded-md bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-foreground/80 truncate">
-                                        {activeChat.category}
-                                    </span>
-                                </div>
-                            </Link>
-                        </div>
-
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-8 gap-2 rounded-md font-semibold text-xs border-border bg-card">
-                                    {activeChat.status.charAt(0).toUpperCase() + activeChat.status.slice(1)}
-                                    <ChevronDown className="h-3 w-3" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="rounded-xl p-2 min-w-[180px]">
-                                {['Requested', 'Sent', 'Quoted', 'Negotiating', 'Booked'].map((status) => (
-                                    <DropdownMenuItem
-                                        key={status}
-                                        onSelect={() => updateStatus(activeChat.id, status.toLowerCase())}
-                                        className="rounded-lg font-medium text-xs"
+                    {activeChat ? (
+                        <>
+                            <div className="p-4 bg-muted/5 border-b border-border flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                        onClick={() => setActiveView('list')}
                                     >
-                                        Mark as {status}
-                                    </DropdownMenuItem>
-                                ))}
-                                <div className="h-px bg-border my-1" />
-                                <DropdownMenuItem
-                                    onSelect={() => updateStatus(activeChat.id, 'declined')}
-                                    className="text-red-600 rounded-lg font-medium text-xs focus:bg-red-50 focus:text-red-600"
-                                >
-                                    Decline / Cancel
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/5">
-                        {activeChat.messages.map((message) => (
-                            <div
-                                key={message.id}
-                                className={cn(
-                                    "flex items-start gap-3 max-w-[85%] sm:max-w-[75%]",
-                                    message.isMe ? "justify-end ml-auto" : "mr-auto"
-                                )}
-                            >
-                                <div
-                                    className={cn(
-                                        "p-3 rounded-2xl shadow-sm text-sm leading-relaxed font-medium",
-                                        message.isMe
-                                            ? "bg-primary text-primary-foreground rounded-tr-none"
-                                            : "bg-card border border-border rounded-tl-none text-foreground"
-                                    )}
-                                >
-                                    {message.text}
-                                    {message.attachment?.type === 'event' && (
-                                        <div className="mt-3 p-3 rounded-xl bg-background/10 shadow-sm flex items-center justify-between gap-4 border border-background/20">
-                                            <div className="flex items-center gap-3 min-w-0">
-                                                <div className="w-10 h-10 rounded-lg bg-background/20 flex items-center justify-center shrink-0">
-                                                    <CalendarDays size={20} />
-                                                </div>
-                                                <div className="min-w-0 text-primary-foreground">
-                                                    <p className="text-xs font-bold uppercase tracking-widest opacity-80">Event Invitation</p>
-                                                    <p className="text-sm font-semibold truncate">{message.attachment.eventName}</p>
-                                                </div>
-                                            </div>
-                                            <Link
-                                                href={`/dashboard/hosts/events/${message.attachment.eventId}`}
-                                                className="shrink-0 text-xs font-bold bg-background text-primary px-4 py-2 rounded-lg hover:bg-background/90 transition-colors"
-                                            >
-                                                View Event
-                                            </Link>
+                                        <ArrowLeft size={18} />
+                                    </Button>
+                                    <Link
+                                        href={activeVendorPath}
+                                        className="flex items-center gap-2 rounded-md px-1 py-0.5 -mx-1"
+                                    >
+                                        <Avatar className="w-8 h-8 rounded-lg border border-border shrink-0">
+                                            <AvatarImage src={activeChat.avatarUrl} alt={activeChat.name} className="object-cover" />
+                                            <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-bold text-xs">
+                                                {activeChat.avatarFallback}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="min-w-0">
+                                            <h4 className="text-sm font-medium text-foreground truncate">{activeChat.name}</h4>
+                                            <span className="mt-0.5 inline-flex max-w-full items-center rounded-md bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-foreground/80 truncate">
+                                                {activeChat.category}
+                                            </span>
                                         </div>
-                                    )}
+                                    </Link>
+                                </div>
+
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="sm" className="h-8 gap-2 rounded-md font-semibold text-xs border-border bg-card">
+                                            {activeChat.status.charAt(0).toUpperCase() + activeChat.status.slice(1)}
+                                            <ChevronDown className="h-3 w-3" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="rounded-xl p-2 min-w-[180px]">
+                                        {['Requested', 'Sent', 'Quoted', 'Negotiating', 'Booked'].map((status) => (
+                                            <DropdownMenuItem
+                                                key={status}
+                                                onSelect={() => updateStatus(activeChat.id, status.toLowerCase())}
+                                                className="rounded-lg font-medium text-xs"
+                                            >
+                                                Mark as {status}
+                                            </DropdownMenuItem>
+                                        ))}
+                                        <div className="h-px bg-border my-1" />
+                                        <DropdownMenuItem
+                                            onSelect={() => updateStatus(activeChat.id, 'declined')}
+                                            className="text-red-600 rounded-lg font-medium text-xs focus:bg-red-50 focus:text-red-600"
+                                        >
+                                            Decline / Cancel
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/5">
+                                {activeChat.messages.map((message) => (
+                                    <div
+                                        key={message.id}
+                                        className={cn(
+                                            "flex items-start gap-3 max-w-[85%] sm:max-w-[75%]",
+                                            message.isMe ? "justify-end ml-auto" : "mr-auto"
+                                        )}
+                                    >
+                                        <div
+                                            className={cn(
+                                                "p-3 rounded-2xl shadow-sm text-sm leading-relaxed font-medium",
+                                                message.isMe
+                                                    ? "bg-primary text-primary-foreground rounded-tr-none"
+                                                    : "bg-card border border-border rounded-tl-none text-foreground"
+                                            )}
+                                        >
+                                            {message.text}
+                                            {message.attachment?.type === 'event' && (
+                                                <div className="mt-3 p-3 rounded-xl bg-background/10 shadow-sm flex items-center justify-between gap-4 border border-background/20">
+                                                    <div className="flex items-center gap-3 min-w-0">
+                                                        <div className="w-10 h-10 rounded-lg bg-background/20 flex items-center justify-center shrink-0">
+                                                            <CalendarDays size={20} />
+                                                        </div>
+                                                        <div className="min-w-0 text-primary-foreground">
+                                                            <p className="text-xs font-bold uppercase tracking-widest opacity-80">Event Invitation</p>
+                                                            <p className="text-sm font-semibold truncate">{message.attachment.eventName}</p>
+                                                        </div>
+                                                    </div>
+                                                    <Link
+                                                        href={`/dashboard/hosts/events/${message.attachment.eventId}`}
+                                                        className="shrink-0 text-xs font-bold bg-background text-primary px-4 py-2 rounded-lg hover:bg-background/90 transition-colors"
+                                                    >
+                                                        View Event
+                                                    </Link>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="p-4 bg-background border-t border-border">
+                                <div className="flex gap-2">
+                                    <Textarea
+                                        placeholder="Type your response..."
+                                        value={messageInput}
+                                        onChange={(e) => setMessageInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleSendMessage();
+                                            }
+                                        }}
+                                        className="flex-1 px-3 py-2 rounded-xl border-border bg-muted/10 focus:bg-background resize-none min-h-[44px] max-h-[120px] font-medium text-sm transition-colors"
+                                    />
+                                    <Button
+                                        title="Share Current Event"
+                                        onClick={handleShareEvent}
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-11 w-11 shrink-0 rounded-xl shadow-sm transition-all text-primary border-primary/20 bg-primary/5 hover:bg-primary/10"
+                                    >
+                                        <CalendarDays size={20} />
+                                    </Button>
+                                    <Button
+                                        size="icon"
+                                        className="h-11 w-11 rounded-xl shrink-0 shadow-lg shadow-primary/20"
+                                        onClick={handleSendMessage}
+                                        disabled={!messageInput.trim()}
+                                    >
+                                        <Send size={20} />
+                                    </Button>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-
-                    <div className="p-4 bg-background border-t border-border">
-                        <div className="flex gap-2">
-                            <Textarea
-                                placeholder="Type your response..."
-                                value={messageInput}
-                                onChange={(e) => setMessageInput(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleSendMessage();
-                                    }
-                                }}
-                                className="flex-1 px-3 py-2 rounded-xl border-border bg-muted/10 focus:bg-background resize-none min-h-[44px] max-h-[120px] font-medium text-sm transition-colors"
-                            />
-                            <Button
-                                title="Share Current Event"
-                                onClick={handleShareEvent}
-                                variant="outline"
-                                size="icon"
-                                className="h-11 w-11 shrink-0 rounded-xl shadow-sm transition-all text-primary border-primary/20 bg-primary/5 hover:bg-primary/10"
-                            >
-                                <CalendarDays size={20} />
-                            </Button>
-                            <Button
-                                size="icon"
-                                className="h-11 w-11 rounded-xl shrink-0 shadow-lg shadow-primary/20"
-                                onClick={handleSendMessage}
-                                disabled={!messageInput.trim()}
-                            >
-                                <Send size={20} />
-                            </Button>
+                        </>
+                    ) : (
+                        <div className="flex flex-1 items-center justify-center p-8 text-center text-sm text-muted-foreground">
+                            No vendor conversations yet for this event. Use compose to start one.
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>
