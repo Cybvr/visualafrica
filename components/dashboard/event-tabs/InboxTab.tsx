@@ -23,7 +23,7 @@ export default function InboxTab() {
     const [activeChat, setActiveChat] = useState(CHATS[0]);
     const [chats, setChats] = useState(CHATS);
     const [searchQuery, setSearchQuery] = useState('');
-    const [mobileView, setMobileView] = useState<'list' | 'chat'>('list');
+    const [activeView, setActiveView] = useState<'list' | 'chat'>('list');
 
     const updateStatus = (chatId: number, newStatus: string) => {
         setChats(prev => prev.map(chat =>
@@ -46,24 +46,24 @@ export default function InboxTab() {
 
     return (
         <div className="flex flex-col gap-3 h-[70vh] min-h-[500px] mb-6">
-            <div className={cn(mobileView === 'chat' && "hidden md:block")}>
+            <div className={cn(activeView === 'chat' && "hidden")}>
                 <DashboardFilter
                     placeholder="Search chats..."
                     onSearchChange={setSearchQuery}
                 />
             </div>
 
-            <div className="flex-1 flex flex-col md:flex-row bg-background border border-border rounded-xl overflow-hidden shadow-sm">
+            <div className="flex-1 flex flex-col bg-background border border-border rounded-xl overflow-hidden shadow-sm">
                 {/* Sidebar */}
                 <div className={cn(
-                    "w-full md:w-64 border-r border-border flex flex-col min-h-0 bg-muted/5",
-                    mobileView === 'chat' ? "hidden md:flex" : "flex"
+                    "w-full border-r border-border flex flex-col min-h-0 bg-muted/5",
+                    activeView === 'chat' ? "hidden" : "flex"
                 )}>
                     <div className="flex-1 overflow-y-auto divide-y divide-border">
                         {filteredChats.map((chat) => (
                             <button
                                 key={chat.id}
-                                onClick={() => { setActiveChat(chat); setMobileView('chat'); }}
+                                onClick={() => { setActiveChat(chat); setActiveView('chat'); }}
                                 className={cn(
                                     "w-full p-4 text-left hover:bg-muted/50 transition-colors flex items-center gap-3",
                                     activeChat.id === chat.id ? 'bg-muted' : ''
@@ -73,7 +73,7 @@ export default function InboxTab() {
                                     {chat.avatar}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h4 className="text-xs font-semibold text-foreground truncate">{chat.name}</h4>
+                                    <h4 className="text-sm font-medium text-foreground truncate">{chat.name}</h4>
                                     <span className="block mt-0.5 text-[10px] text-muted-foreground uppercase tracking-wide font-medium">
                                         {chat.time}
                                     </span>
@@ -89,7 +89,7 @@ export default function InboxTab() {
                 {/* Chat Area */}
                 <div className={cn(
                     "flex-1 flex flex-col bg-background min-h-0",
-                    mobileView === 'list' ? "hidden md:flex" : "flex"
+                    activeView === 'list' ? "hidden" : "flex"
                 )}>
                     {/* Chat Header */}
                     <div className="p-4 bg-muted/5 border-b border-border flex items-center justify-between">
@@ -97,8 +97,8 @@ export default function InboxTab() {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="md:hidden h-8 w-8 text-muted-foreground hover:text-foreground"
-                                onClick={() => setMobileView('list')}
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                onClick={() => setActiveView('list')}
                             >
                                 <ArrowLeft size={18} />
                             </Button>
@@ -106,7 +106,7 @@ export default function InboxTab() {
                                 <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
                                     {activeChat.avatar}
                                 </div>
-                                <h4 className="text-sm font-bold text-foreground truncate">{activeChat.name}</h4>
+                                <h4 className="text-sm font-medium text-foreground truncate">{activeChat.name}</h4>
                             </div>
                         </div>
 

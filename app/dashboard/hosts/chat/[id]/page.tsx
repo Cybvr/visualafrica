@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Lora } from "next/font/google";
 import {
     getVendors,
     getEvents,
@@ -50,6 +51,12 @@ import { Dots, Msg } from "@/components/dashboard/chat/chat-message-renderers";
 import { useChatAgent } from "@/hooks/use-chat-agent";
 import { useSavedVendors } from "@/hooks/use-saved-vendors";
 
+const lora = Lora({
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700"],
+    display: "swap",
+});
+
 export default function ChatPage() {
     const params = useParams();
     const router = useRouter();
@@ -73,6 +80,7 @@ export default function ChatPage() {
     const [pendingAction, setPendingAction] = useState<any>(null);
     const [isPricingOpen, setIsPricingOpen] = useState(false);
     const [messageUsage, setMessageUsage] = useState(0);
+    const [showSuggestions, setShowSuggestions] = useState(true);
     const MESSAGE_LIMIT = 15;
     const autoPromptSentRef = useRef<string | null>(null);
     const chatIdStr = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "new";
@@ -105,6 +113,22 @@ export default function ChatPage() {
         if (!currentUser?.uid) return;
         window.localStorage.setItem(`waddi-message-usage:${currentUser.uid}`, String(messageUsage));
     }, [currentUser?.uid, messageUsage]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (!currentUser?.uid) {
+            setShowSuggestions(true);
+            return;
+        }
+        const stored = window.localStorage.getItem(`waddi-show-suggestions:${currentUser.uid}`);
+        setShowSuggestions(stored !== "false");
+    }, [currentUser?.uid]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (!currentUser?.uid) return;
+        window.localStorage.setItem(`waddi-show-suggestions:${currentUser.uid}`, String(showSuggestions));
+    }, [currentUser?.uid, showSuggestions]);
 
     const handlePillClick = async (pill: any) => {
         // If pill has an explicit action, route through the action dispatcher
@@ -485,7 +509,7 @@ export default function ChatPage() {
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
-            <div className="flex-1 overflow-y-auto">
+            <div className={`flex-1 overflow-y-auto ${lora.className}`}>
                 <div className="p-4 sm:p-6 space-y-6 max-w-4xl mx-auto w-full">
                     {messages.map((m, idx) => (
                         <div key={m.id} className="msg-animate" style={{ animationDelay: `${Math.min(idx, 8) * 0.05}s` }}>
@@ -496,6 +520,11 @@ export default function ChatPage() {
                                 savedVendors={savedVendorIds}
                                 allVendorsByCity={allVendorsByCity}
                                 onSuggestion={(s: any) => {
+                                    if (s?.action === "dismiss_suggestions") {
+                                        setShowSuggestions(false);
+                                        send(s.label || "I'm good", s);
+                                        return;
+                                    }
                                     sendWithTokenTracking(s.label, s);
                                 }}
                                 onCopy={(msg: any) => {
@@ -525,6 +554,7 @@ export default function ChatPage() {
                                 selectedEventId={selectedEventId}
                                 onEventSelect={setSelectedEventId}
                                 onUpgradeToPro={() => setIsPricingOpen(true)}
+                                showSuggestions={showSuggestions}
                             />
                         </div>
                     ))}
@@ -608,6 +638,17 @@ export default function ChatPage() {
                     <p className="text-[11px] text-muted-foreground mt-3 text-center opacity-60 hidden md:block">
                         Waddi can access vendors, contracts, and guest data for this event
                     </p>
+                    {!showSuggestions && (
+                        <div className="mt-2 flex justify-center">
+                            <button
+                                type="button"
+                                onClick={() => setShowSuggestions(true)}
+                                className="text-[11px] text-muted-foreground hover:text-foreground underline underline-offset-4"
+                            >
+                                Show suggestions
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

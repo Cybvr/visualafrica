@@ -14,6 +14,12 @@ import {
     SelectValue
 } from "@/components/ui/select";
 import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
     EventOverviewCard,
     VendorGrid,
     TaskChecklist,
@@ -247,17 +253,57 @@ function CommunityCard({ item }: { item: any }) {
     );
 }
 
-function EventForm({ onSubmit, defaultCity }: { onSubmit: (data: any) => void; defaultCity?: string | null }) {
+function EventForm({
+    onSubmit,
+    defaultCity,
+    initialData,
+    mode = "create"
+}: {
+    onSubmit: (data: any) => void;
+    defaultCity?: string | null;
+    initialData?: any;
+    mode?: "create" | "edit";
+}) {
+    const CATEGORY_OPTIONS = [
+        "Venues",
+        "Catering",
+        "Decorations",
+        "Photographers",
+        "Entertainment",
+        "Event Planners",
+        "Makeup Artists",
+        "Party Equipment",
+        "Cakes & Sweets",
+        "Experiences",
+    ];
+
     const [data, setData] = useState({
-        name: "",
-        guests: "",
-        budget: "",
-        city: defaultCity || "",
-        date: "",
-        type: "",
-        categories: "",
-        tags: ""
+        eventId: initialData?.eventId || "",
+        name: initialData?.name || "",
+        guests: initialData?.guests || "",
+        budget: initialData?.budget || "",
+        city: initialData?.city || defaultCity || "",
+        date: initialData?.date || "",
+        type: initialData?.type || "",
+        categories: initialData?.categories || "",
+        tags: initialData?.tags || ""
     });
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(
+        () =>
+            String(initialData?.categories || "")
+                .split(",")
+                .map((c) => c.trim())
+                .filter(Boolean)
+    );
+
+    const toggleCategory = (category: string) => {
+        const next = selectedCategories.includes(category)
+            ? selectedCategories.filter((c) => c !== category)
+            : [...selectedCategories, category];
+        setSelectedCategories(next);
+        setData((prev) => ({ ...prev, categories: next.join(", ") }));
+    };
+
     return (
         <div className="bg-card border border-border rounded-2xl p-4 w-full space-y-3 shadow-sm">
             <div className="text-[13px] font-bold text-foreground">Tell us about your event:</div>
@@ -311,13 +357,30 @@ function EventForm({ onSubmit, defaultCity }: { onSubmit: (data: any) => void; d
                         ))}
                     </SelectContent>
                 </Select>
-                <input
-                    type="text"
-                    placeholder="Categories (e.g. DJ, Catering, Decor)"
-                    className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
-                    value={data.categories}
-                    onChange={e => setData({ ...data, categories: e.target.value })}
-                />
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <button
+                            type="button"
+                            className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50 text-left flex items-center justify-between"
+                        >
+                            <span className={selectedCategories.length ? "text-foreground" : "text-muted-foreground"}>
+                                {selectedCategories.length ? selectedCategories.join(", ") : "Select categories"}
+                            </span>
+                            <ChevronDown size={16} className="text-muted-foreground" />
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-[--radix-dropdown-menu-trigger-width] bg-background">
+                        {CATEGORY_OPTIONS.map((category) => (
+                            <DropdownMenuCheckboxItem
+                                key={category}
+                                checked={selectedCategories.includes(category)}
+                                onCheckedChange={() => toggleCategory(category)}
+                            >
+                                {category}
+                            </DropdownMenuCheckboxItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
                 <input
                     type="text"
                     placeholder="Tags (optional, comma separated)"
@@ -331,7 +394,7 @@ function EventForm({ onSubmit, defaultCity }: { onSubmit: (data: any) => void; d
                 disabled={!data.name || !data.guests || !data.budget || !data.city}
                 className="w-full bg-primary text-primary-foreground font-bold py-2 rounded-lg text-sm transition-all active:scale-95 disabled:opacity-50"
             >
-                Create Event
+                {mode === "edit" ? "Update Event" : "Create Event"}
             </button>
         </div>
     );
@@ -579,9 +642,30 @@ type MsgProps = {
     onUpgradeToPro?: () => void;
     onFeedback?: (rating: "up" | "down", msg: any) => void;
     onCopy?: (msg: any) => void;
+    showSuggestions?: boolean;
 };
 
-export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVendorAction, onStoreAction, onSuggestion, allVendorsByCity, onFormSubmit, onTicketFormSubmit, onCalendarSelect, liveEvents, selectedEventId, onEventSelect, onUpgradeToPro, onFeedback, onCopy }: MsgProps) {
+export function Msg({
+    msg,
+    onSelectCity,
+    activeCity,
+    savedVendors,
+    onSave,
+    onVendorAction,
+    onStoreAction,
+    onSuggestion,
+    allVendorsByCity,
+    onFormSubmit,
+    onTicketFormSubmit,
+    onCalendarSelect,
+    liveEvents,
+    selectedEventId,
+    onEventSelect,
+    onUpgradeToPro,
+    onFeedback,
+    onCopy,
+    showSuggestions = true
+}: MsgProps) {
     const ag = msg.role === "agent";
     const activeEvent =
         (msg.eventId && liveEvents.find((ev) => ev.id === msg.eventId)) ||
@@ -677,7 +761,12 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                         <div className="w-full space-y-2 mt-1">
                             {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
-                                <EventForm onSubmit={onFormSubmit} defaultCity={activeCity} />
+                                <EventForm
+                                    onSubmit={onFormSubmit}
+                                    defaultCity={activeCity}
+                                    initialData={msg.formData}
+                                    mode={msg.mode || "create"}
+                                />
                             </div>
                         </div>
                     ) : msg.type === "ticket_form" ? (
@@ -854,11 +943,18 @@ export function Msg({ msg, onSelectCity, activeCity, savedVendors, onSave, onVen
                     </div>
                 )}
 
-                {ag && msg.suggestions && (
+                {ag && msg.suggestions && showSuggestions && (
                     <div className="flex flex-wrap gap-1.5 mt-3">
                         {msg.suggestions.map((s: any, i: number) => (
                             <SuggestionBubble key={i} label={s.label} onClick={() => onSuggestion(s)} />
                         ))}
+                        <button
+                            type="button"
+                            onClick={() => onSuggestion({ label: "I'm good", action: "dismiss_suggestions" })}
+                            className="bg-secondary/40 border border-border hover:bg-secondary text-foreground text-[12px] px-3 py-1.5 rounded-full transition-all duration-200 active:scale-95 whitespace-nowrap"
+                        >
+                            I&apos;m good
+                        </button>
                     </div>
                 )}
             </div>

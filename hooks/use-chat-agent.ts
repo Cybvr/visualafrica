@@ -736,6 +736,44 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 return;
             }
 
+            if (intent === "dismiss_suggestions") {
+                response.type = "text";
+                response.content = "Perfect. I’ll pause suggestions for now. If you need anything else, just tell me.";
+                setMessages((prev) => [...prev, response]);
+                if (currentChatId) saveChatMessage(currentChatId, response);
+                return;
+            }
+
+            if (intent === "edit_event") {
+                const event = resolveTargetEvent(actionData);
+                if (!event) {
+                    response.type = "text";
+                    response.content = "I couldn't find which event to edit. Open an event card and try again.";
+                    setMessages((prev) => [...prev, response]);
+                    if (currentChatId) saveChatMessage(currentChatId, response);
+                    return;
+                }
+
+                response.type = "event_form";
+                response.mode = "edit";
+                response.eventId = event.id;
+                response.content = `Getting event details for **${event.eventName}**. Update the form below.`;
+                response.formData = {
+                    eventId: event.id,
+                    name: event.eventName || "",
+                    guests: String(event.guestCount || ""),
+                    budget: String(event.budget || ""),
+                    city: event.location || "",
+                    date: event.date || "",
+                    type: event.themes?.[0] || "",
+                    categories: (event.categories || []).join(", "),
+                    tags: (event.themes || []).join(", ")
+                };
+                setMessages((prev) => [...prev, response]);
+                if (currentChatId) saveChatMessage(currentChatId, response);
+                return;
+            }
+
             if (intent === "start_ticketing") {
                 response.type = "ticket_form";
                 const event = resolveTargetEvent(actionData);
@@ -1182,6 +1220,8 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         const categories = String(data.categories || "").split(",").map(c => c.trim()).filter(Boolean);
         const themes = String(data.tags || "").split(",").map(t => t.trim()).filter(Boolean);
         if (eventType && !themes.includes(eventType)) themes.push(eventType);
+        const editEventId = String(data.eventId || "").trim();
+        const isEditing = Boolean(editEventId);
 
         if (data.city) setActiveCity(city);
 
@@ -1195,38 +1235,52 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             router.push(`/dashboard/hosts/chat/${chatIdStr}`);
         }
 
-        const userText = `Event: ${eventName}${date ? `, Date: ${date}` : ""}${eventType ? `, Type: ${eventType}` : ""}, ${guestCount} guests, budget ${budget}, city ${city}${categories.length ? `, Categories: ${data.categories}` : ""}`;
+        const userText = `${isEditing ? "Update event" : "Event"}: ${eventName}${date ? `, Date: ${date}` : ""}${eventType ? `, Type: ${eventType}` : ""}, ${guestCount} guests, budget ${budget}, city ${city}${categories.length ? `, Categories: ${data.categories}` : ""}`;
         await saveChatMessage(chatIdStr, { role: "user", content: userText, time: nowStr });
 
         setTyping(true);
-        const createdEventId = await createEvent({
-            hostId: currentUser.uid,
-            hostName: currentUser.displayName || currentUser.email || "Host",
-            eventName,
-            date,
-            location: city,
-            guestCount,
-            budget,
-            status: "Planning",
-            image: "/placeholder.png",
-            description: `Planning workspace for ${eventName}${eventType ? ` (${eventType})` : ""}`,
-            bookedVendors: [],
-            leads: [],
-            categories,
-            themes,
-            guests: [],
-            todoList: [],
-            itineraryItems: [],
-            budgetBreakdown: []
-        });
-        setSelectedEventId(createdEventId);
-        const createdEvent = await getEventById(createdEventId);
-        if (createdEvent) {
+        let targetEventId = editEventId;
+        if (isEditing) {
+            await updateEvent(editEventId, {
+                eventName,
+                date,
+                location: city,
+                guestCount,
+                budget,
+                categories,
+                themes,
+                description: `Planning workspace for ${eventName}${eventType ? ` (${eventType})` : ""}`
+            });
+        } else {
+            targetEventId = await createEvent({
+                hostId: currentUser.uid,
+                hostName: currentUser.displayName || currentUser.email || "Host",
+                eventName,
+                date,
+                location: city,
+                guestCount,
+                budget,
+                status: "Planning",
+                image: "/placeholder.png",
+                description: `Planning workspace for ${eventName}${eventType ? ` (${eventType})` : ""}`,
+                bookedVendors: [],
+                leads: [],
+                categories,
+                themes,
+                guests: [],
+                todoList: [],
+                itineraryItems: [],
+                budgetBreakdown: []
+            });
+        }
+        setSelectedEventId(targetEventId);
+        const savedEvent = await getEventById(targetEventId);
+        if (savedEvent) {
             await saveChatMessage(chatIdStr, {
                 role: "agent",
                 type: "event_overview",
-                content: "Event created. Review the card below.",
-                eventId: createdEvent.id,
+                content: `${isEditing ? "Event updated" : "Event created"}. Review the card below.`,
+                eventId: savedEvent.id,
                 time: nowStr
             });
             await saveChatMessage(chatIdStr, {
@@ -1239,9 +1293,9 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             await saveChatMessage(chatIdStr, {
                 role: "agent",
                 type: "text",
-                content: `Event setup complete. I see you're looking for vendors in **${categories.join(", ") || "various categories"}**. Approve and I’ll generate vendor recommendations and your itinerary next.`,
+                content: `${isEditing ? "Event update complete" : "Event setup complete"}. I see you're looking for vendors in **${categories.join(", ") || "various categories"}**. Approve and I’ll generate vendor recommendations and your itinerary next.`,
                 time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
-                suggestions: [{ label: "Approve to start recommendations", action: "approve_find_vendors", ...toApprovalPayload(createdEvent) }]
+                suggestions: [{ label: "Approve to start recommendations", action: "approve_find_vendors", ...toApprovalPayload(savedEvent) }]
             });
         }
 

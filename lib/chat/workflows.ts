@@ -6,6 +6,7 @@ export const extractIntent = (text: string, actionData?: any) => {
     const directAction = actionData?.capId || actionData?.action || actionData?.id;
     if (directAction) return directAction;
 
+    if (lower.includes("edit event") || lower.includes("update event") || lower.includes("change event")) return "edit_event";
     if (lower.includes("budget") || lower.includes("price") || lower.includes("cost")) return "budget";
     if (lower.includes("flight") || lower.includes("airfare") || lower.includes("airline")) return "search_flights";
     if (lower.includes("ticket") || lower.includes("ticketing")) return "start_ticketing";

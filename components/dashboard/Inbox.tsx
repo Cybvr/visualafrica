@@ -47,7 +47,7 @@ export default function Inbox({ conversations: initialConversations, userType, t
     const [searchQuery, setSearchQuery] = useState('');
     const [activeChatId, setActiveChatId] = useState(initialConversations[0]?.id);
     const [messageInput, setMessageInput] = useState('');
-    const [mobileView, setMobileView] = useState<'list' | 'chat'>('list');
+    const [activeView, setActiveView] = useState<'list' | 'chat'>('list');
 
     const activeChat = conversations.find(c => c.id === activeChatId);
 
@@ -92,8 +92,8 @@ export default function Inbox({ conversations: initialConversations, userType, t
         <div className="flex h-[calc(100dvh-6rem)] md:h-[calc(100dvh-9rem)] bg-background border border-border rounded-2xl overflow-hidden shadow-xl">
             {/* Sidebar */}
             <div className={cn(
-                "w-full md:w-80 lg:w-96 border-r border-border flex flex-col bg-muted/5",
-                mobileView === 'chat' ? "hidden md:flex" : "flex"
+                "w-full border-r border-border flex flex-col bg-muted/5",
+                activeView === 'chat' ? "hidden" : "flex"
             )}>
                 <div className="p-6 border-b border-border">
                     <div className="flex items-center justify-between mb-6">
@@ -119,7 +119,7 @@ export default function Inbox({ conversations: initialConversations, userType, t
                         filteredConversations.map((chat) => (
                             <button
                                 key={chat.id}
-                                onClick={() => { setActiveChatId(chat.id); setMobileView('chat'); }}
+                                onClick={() => { setActiveChatId(chat.id); setActiveView('chat'); }}
                                 className={cn(
                                     "w-full p-4 md:p-5 text-left transition-all flex items-center gap-4 hover:bg-muted/50 border-l-4 border-transparent",
                                     activeChatId === chat.id ? 'bg-primary/5 border-primary shadow-[inset_0_0_20px_rgba(var(--primary),0.02)]' : ''
@@ -166,7 +166,7 @@ export default function Inbox({ conversations: initialConversations, userType, t
             {/* Chat Area */}
             <div className={cn(
                 "flex-1 flex flex-col bg-background",
-                mobileView === 'list' ? "hidden md:flex" : "flex"
+                activeView === 'list' ? "hidden" : "flex"
             )}>
                 {activeChat ? (
                     <>
@@ -176,8 +176,8 @@ export default function Inbox({ conversations: initialConversations, userType, t
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="md:hidden rounded-full h-10 w-10 shrink-0 text-muted-foreground"
-                                    onClick={() => setMobileView('list')}
+                                    className="rounded-full h-10 w-10 shrink-0 text-muted-foreground"
+                                    onClick={() => setActiveView('list')}
                                 >
                                     <ArrowLeft size={20} />
                                 </Button>

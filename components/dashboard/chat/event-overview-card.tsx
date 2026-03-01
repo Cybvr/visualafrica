@@ -126,6 +126,13 @@ export const EventOverviewCard = ({ event, onAction }: EventOverviewCardProps) =
                         <span className="text-[14px]">✈️</span> <span className="hidden sm:inline">Search flight deals</span>
                         <span className="sm:hidden">Flights</span>
                     </button>
+                    <button
+                        onClick={() => onAction({ label: "Edit event", action: "edit_event", eventId: event.id })}
+                        className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none"
+                    >
+                        <span className="text-[14px]">✏️</span> <span className="hidden sm:inline">Edit event</span>
+                        <span className="sm:hidden">Edit</span>
+                    </button>
                 </div>
             )}
         </div>

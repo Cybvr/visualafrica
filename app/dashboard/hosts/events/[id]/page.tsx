@@ -6,11 +6,11 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
     MapPin, Calendar, Users, Rocket,
     ChevronLeft, ChevronRight, Share2, Printer, Ticket,
-    Plus, Mail, Download,
+    Plus, Mail, Download, Upload,
     LayoutDashboard, Store, FileText, Inbox, ListChecks, Globe, LucideIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { listenToEventById } from '@/lib/firestore-service';
+import { listenToEventById, updateEvent } from '@/lib/firestore-service';
 import { SharedEvent } from '@/lib/types';
 import PlanTab from '@/components/dashboard/event-tabs/PlanTab';
 import GuestsTab from '@/components/dashboard/event-tabs/GuestsTab';
@@ -20,11 +20,53 @@ import InboxTab from '@/components/dashboard/event-tabs/InboxTab';
 import WebsiteTab from '@/components/dashboard/event-tabs/WebsiteTab';
 import { TaskChecklist, DayOfTimeline } from '@/components/dashboard/chat';
 
+const parseCsvRow = (row: string): string[] => {
+    const cells: string[] = [];
+    let current = "";
+    let inQuotes = false;
+    for (let i = 0; i < row.length; i += 1) {
+        const char = row[i];
+        const next = row[i + 1];
+        if (char === '"') {
+            if (inQuotes && next === '"') {
+                current += '"';
+                i += 1;
+            } else {
+                inQuotes = !inQuotes;
+            }
+            continue;
+        }
+        if (char === "," && !inQuotes) {
+            cells.push(current.trim());
+            current = "";
+            continue;
+        }
+        current += char;
+    }
+    cells.push(current.trim());
+    return cells;
+};
+
+const normalizeStatus = (value: string): SharedEvent["guests"][number]["status"] => {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "confirmed" || normalized === "going" || normalized === "yes") return "Confirmed";
+    if (normalized === "declined" || normalized === "no") return "Declined";
+    return "Pending";
+};
+
+const normalizeType = (value: string): SharedEvent["guests"][number]["type"] => {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "vip") return "VIP";
+    if (normalized === "plus one" || normalized === "plus-one" || normalized === "plusone") return "Plus One";
+    return "Main Guest";
+};
+
 export default function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const importInputRef = React.useRef<HTMLInputElement>(null);
 
     // Get active tab from URL or default to 'overview'
     const currentTab = searchParams.get('tab') || 'overview';
@@ -32,6 +74,8 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     const [activeFilter, setActiveFilter] = useState<'all' | 'local' | 'docs'>('all');
     const [event, setEvent] = useState<SharedEvent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isImportingGuests, setIsImportingGuests] = useState(false);
+    const [guestImportMessage, setGuestImportMessage] = useState<string | null>(null);
 
     // Sync state with URL
     useEffect(() => {
@@ -52,6 +96,80 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         });
         return () => unsubscribe();
     }, [id]);
+
+    const handleImportGuestsCsv = async (file: File) => {
+        if (!event) return;
+        setGuestImportMessage(null);
+        setIsImportingGuests(true);
+
+        try {
+            const text = await file.text();
+            const lines = text
+                .split(/\r?\n/)
+                .map((line) => line.trim())
+                .filter(Boolean);
+
+            if (lines.length < 2) {
+                setGuestImportMessage("CSV is empty. Add at least one guest row.");
+                return;
+            }
+
+            const headers = parseCsvRow(lines[0]).map((h) => h.toLowerCase());
+            const getHeaderIndex = (candidates: string[]) => headers.findIndex((h) => candidates.includes(h));
+            const nameIndex = getHeaderIndex(["name", "full name", "guest"]);
+            const emailIndex = getHeaderIndex(["email", "email address"]);
+            const statusIndex = getHeaderIndex(["status", "rsvp"]);
+            const typeIndex = getHeaderIndex(["type", "guest type"]);
+
+            if (nameIndex === -1 && emailIndex === -1) {
+                setGuestImportMessage("CSV must include at least a name or email column.");
+                return;
+            }
+
+            const imported: SharedEvent["guests"] = [];
+            lines.slice(1).forEach((line) => {
+                const cols = parseCsvRow(line);
+                const name = nameIndex >= 0 ? (cols[nameIndex] ?? "").trim() : "";
+                const email = emailIndex >= 0 ? (cols[emailIndex] ?? "").trim() : "";
+                if (!name && !email) return;
+                imported.push({
+                    id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                    name: name || email,
+                    email,
+                    status: normalizeStatus(statusIndex >= 0 ? (cols[statusIndex] ?? "") : ""),
+                    type: normalizeType(typeIndex >= 0 ? (cols[typeIndex] ?? "") : ""),
+                });
+            });
+
+            if (imported.length === 0) {
+                setGuestImportMessage("No valid guest rows found in CSV.");
+                return;
+            }
+
+            const mergedByKey = new Map<string, SharedEvent["guests"][number]>();
+            event.guests.forEach((guest) => {
+                const key = guest.email?.toLowerCase() || guest.id;
+                mergedByKey.set(key, guest);
+            });
+            imported.forEach((guest) => {
+                const key = guest.email?.toLowerCase() || guest.id;
+                const existing = mergedByKey.get(key);
+                mergedByKey.set(key, existing ? { ...existing, ...guest, id: existing.id } : guest);
+            });
+
+            const nextGuests = Array.from(mergedByKey.values());
+            await updateEvent(event.id, {
+                guests: nextGuests,
+                guestCount: nextGuests.length,
+            });
+            setGuestImportMessage(`Imported ${imported.length} guest${imported.length === 1 ? "" : "s"}.`);
+        } catch (error) {
+            console.error("Failed to import guests:", error);
+            setGuestImportMessage("Could not import CSV. Please try again.");
+        } finally {
+            setIsImportingGuests(false);
+        }
+    };
 
     if (isLoading) {
         return <div className="max-w-4xl mx-auto py-12 text-center text-muted-foreground">Loading event...</div>;
@@ -259,12 +377,37 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                 {activeTab === 'website' && (
                                     <p className="text-xs text-muted-foreground">Waddi.events/{event.eventName.toLowerCase().replace(/\s+/g, "-")}</p>
                                 )}
+                                {activeTab === 'guests' && guestImportMessage && (
+                                    <p className="text-xs text-muted-foreground">{guestImportMessage}</p>
+                                )}
                             </div>
 
                             <div className="flex flex-wrap items-center gap-2">
                                 {/* Tab-Specific Actions */}
                                 {activeTab === 'guests' && (
                                     <>
+                                        <input
+                                            ref={importInputRef}
+                                            type="file"
+                                            accept=".csv,text/csv"
+                                            className="hidden"
+                                            onChange={async (e) => {
+                                                const file = e.target.files?.[0];
+                                                if (!file) return;
+                                                await handleImportGuestsCsv(file);
+                                                e.currentTarget.value = "";
+                                            }}
+                                        />
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="h-8 gap-1.5 rounded-md px-2.5"
+                                            onClick={() => importInputRef.current?.click()}
+                                            disabled={isImportingGuests}
+                                        >
+                                            <Upload size={14} />
+                                            {isImportingGuests ? "Importing..." : "Import CSV"}
+                                        </Button>
                                         <Button variant="outline" size="sm" className="h-8 gap-1.5 rounded-md px-2.5">
                                             <Plus size={14} />
                                             New
