@@ -1,37 +1,306 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Send, ChevronDown, ArrowLeft } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Send, ChevronDown, ArrowLeft, SquarePen, CalendarDays } from 'lucide-react';
+import Link from 'next/link';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/dropdown-menu";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { DashboardFilter } from '../DashboardFilter';
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
+import { getVendors } from '@/lib/firestore-service';
+import { useAuth } from '@/components/providers/auth-provider';
+import { useSavedVendors } from '@/hooks/use-saved-vendors';
+import { SharedEvent, Vendor } from '@/lib/types';
 
-const CHATS = [
-    { id: 1, name: 'The Monarch', lastMsg: 'The quote is ready for your review.', time: '10:30 AM', unread: true, avatar: 'M', status: 'quoted', location: 'Lekki, Lagos', price: 'NGN 5,000,000' },
-    { id: 2, name: 'Naija Gourmet Flavors', lastMsg: 'Tasting scheduled for next Tuesday.', time: 'Yesterday', unread: false, avatar: 'N', status: 'booked', location: 'Ikoyi, Lagos', price: 'NGN 15,000/Guest' },
-    { id: 3, name: 'Eko Lens Studio', lastMsg: 'Portfolio updated with new wedding samples.', time: 'Mon', unread: false, avatar: 'E', status: 'requested', location: 'Ikeja, Lagos', price: 'NGN 450,000' },
-];
+interface EventMessage {
+    id: string;
+    text: string;
+    isMe: boolean;
+    attachment?: {
+        type: 'event';
+        eventId: string;
+        eventName: string;
+    };
+}
 
-export default function InboxTab() {
-    const [activeChat, setActiveChat] = useState(CHATS[0]);
-    const [chats, setChats] = useState(CHATS);
+interface EventChat {
+    id: string;
+    vendorId: string;
+    vendorSlug: string;
+    name: string;
+    category: string;
+    lastMsg: string;
+    time: string;
+    unread: boolean;
+    avatarUrl?: string;
+    avatarFallback: string;
+    status: string;
+    location: string;
+    price: string;
+    messages: EventMessage[];
+}
+
+interface ComposeContact {
+    id: string;
+    name: string;
+    slug: string;
+    category: string;
+    location: string;
+    price: number | null;
+    logo?: string;
+}
+
+interface InboxTabProps {
+    event: SharedEvent;
+}
+
+const formatPrice = (value: number | null | undefined): string => {
+    if (typeof value !== "number") return "TBD";
+    return `NGN ${value.toLocaleString('en-NG')}`;
+};
+
+export default function InboxTab({ event }: InboxTabProps) {
+    const { user } = useAuth();
+    const { savedVendorIds } = useSavedVendors(user?.uid);
+
+    const [allVendors, setAllVendors] = useState<Vendor[]>([]);
+    const [chats, setChats] = useState<EventChat[]>([]);
+    const [activeChatId, setActiveChatId] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [activeView, setActiveView] = useState<'list' | 'chat'>('list');
+    const [messageInput, setMessageInput] = useState('');
+    const [isComposerOpen, setIsComposerOpen] = useState(false);
+    const [selectedContactId, setSelectedContactId] = useState('');
+    const [composerMessage, setComposerMessage] = useState('');
 
-    const updateStatus = (chatId: number, newStatus: string) => {
-        setChats(prev => prev.map(chat =>
+    useEffect(() => {
+        let cancelled = false;
+        async function loadVendors() {
+            try {
+                const vendors = await getVendors();
+                if (!cancelled) {
+                    setAllVendors(vendors);
+                }
+            } catch (error) {
+                console.error("Failed to load vendors for event inbox:", error);
+                if (!cancelled) {
+                    setAllVendors([]);
+                }
+            }
+        }
+        void loadVendors();
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    useEffect(() => {
+        const vendorsById = new Map(allVendors.map((vendor) => [vendor.id, vendor]));
+
+        setChats((prev) => {
+            const nextChats = event.bookedVendors
+                .map((booking, index) => {
+                    const vendor = vendorsById.get(booking.vendorId);
+                    if (!vendor) return null;
+
+                    const serviceFallback = booking.service || "Vendor service";
+                    const initialText = `Hi ${vendor.name}, following up on ${serviceFallback} for ${event.eventName}.`;
+                    const chatId = `${event.id}:${vendor.id}`;
+
+                    const existing = prev.find((chat) => chat.id === chatId);
+                    if (existing) {
+                        return {
+                            ...existing,
+                            name: vendor.name,
+                            vendorSlug: vendor.slug || vendor.id,
+                            category: vendor.categories?.[0] || serviceFallback,
+                            location: vendor.location,
+                            price: booking.amount || formatPrice(vendor.price),
+                        };
+                    }
+
+                    return {
+                        id: chatId,
+                        vendorId: vendor.id,
+                        vendorSlug: vendor.slug || vendor.id,
+                        name: vendor.name,
+                        category: vendor.categories?.[0] || serviceFallback,
+                        lastMsg: index === 0 ? 'The quote is ready for your review.' : `Update on ${serviceFallback}.`,
+                        time: index === 0 ? '10:30 AM' : 'Recently',
+                        unread: index === 0,
+                        avatarUrl: vendor.vendor?.logo || vendor.vendor?.avatar || vendor.image || undefined,
+                        avatarFallback: vendor.name.charAt(0).toUpperCase(),
+                        status: booking.status.toLowerCase(),
+                        location: vendor.location,
+                        price: booking.amount || formatPrice(vendor.price),
+                        messages: [
+                            { id: `${chatId}-1`, text: `Hello! ${serviceFallback} is available for your date.`, isMe: false },
+                            { id: `${chatId}-2`, text: initialText, isMe: true },
+                        ],
+                    } satisfies EventChat;
+                })
+                .filter(Boolean) as EventChat[];
+            const bookedChatIds = new Set(nextChats.map((chat) => chat.id));
+            const retainedDirectChats = prev.filter((chat) => !bookedChatIds.has(chat.id));
+            return [...retainedDirectChats, ...nextChats];
+        });
+    }, [allVendors, event]);
+
+    useEffect(() => {
+        if (!chats.length) {
+            setActiveChatId('');
+            return;
+        }
+        if (!activeChatId || !chats.some((chat) => chat.id === activeChatId)) {
+            setActiveChatId(chats[0].id);
+        }
+    }, [activeChatId, chats]);
+
+    const composeContacts: ComposeContact[] = useMemo(() => {
+        return allVendors
+            .filter((vendor) => savedVendorIds.has(vendor.id))
+            .map((vendor) => ({
+                id: vendor.id,
+                name: vendor.name,
+                slug: vendor.slug || vendor.id,
+                category: vendor.categories?.[0] || "General",
+                location: vendor.location,
+                price: vendor.price ?? null,
+                logo: vendor.vendor?.logo || vendor.vendor?.avatar || vendor.image || undefined,
+            }));
+    }, [allVendors, savedVendorIds]);
+
+    const activeChat = chats.find((chat) => chat.id === activeChatId);
+
+    const updateStatus = (chatId: string, newStatus: string) => {
+        setChats((prev) => prev.map((chat) =>
             chat.id === chatId ? { ...chat, status: newStatus } : chat
         ));
-        if (activeChat.id === chatId) {
-            setActiveChat(prev => ({ ...prev, status: newStatus }));
+    };
+
+    const handleSendMessage = () => {
+        if (!messageInput.trim() || !activeChat) return;
+        const nextMessage = messageInput.trim();
+        setChats((prev) =>
+            prev.map((chat) =>
+                chat.id === activeChat.id
+                    ? {
+                        ...chat,
+                        lastMsg: nextMessage,
+                        time: "Just now",
+                        messages: [...chat.messages, { id: `${chat.id}-${Date.now()}`, text: nextMessage, isMe: true }],
+                    }
+                    : chat
+            )
+        );
+        setMessageInput('');
+    };
+
+    const handleShareEvent = () => {
+        if (!activeChat) return;
+        const defaultMessage = `Hi ${activeChat.name}, I was wondering if you might be available for my event? Please check out the details below.`;
+        const nextMessage: EventMessage = {
+            id: `${activeChat.id}-${Date.now()}`,
+            text: defaultMessage,
+            isMe: true,
+            attachment: {
+                type: 'event',
+                eventId: event.id,
+                eventName: event.eventName,
+            }
+        };
+
+        setChats((prev) =>
+            prev.map((chat) =>
+                chat.id === activeChat.id
+                    ? {
+                        ...chat,
+                        lastMsg: "Shared an event",
+                        time: "Just now",
+                        messages: [...chat.messages, nextMessage],
+                    }
+                    : chat
+            )
+        );
+    };
+
+    const handleCompose = () => {
+        const contactId = selectedContactId.trim();
+        if (!contactId || !composerMessage.trim()) return;
+
+        const nextMessage = composerMessage.trim();
+        const contact = composeContacts.find((item) => item.id === contactId);
+        const existing = chats.find((chat) => chat.vendorId === contactId);
+
+        if (existing) {
+            setChats((prev) =>
+                prev.map((chat) =>
+                    chat.id === existing.id
+                        ? {
+                            ...chat,
+                            lastMsg: nextMessage,
+                            time: "Just now",
+                            messages: [...chat.messages, { id: `${chat.id}-${Date.now()}`, text: nextMessage, isMe: true }],
+                        }
+                        : chat
+                )
+            );
+            setActiveChatId(existing.id);
+            setActiveView('chat');
+            setIsComposerOpen(false);
+            setSelectedContactId('');
+            setComposerMessage('');
+            return;
         }
+
+        if (!contact) return;
+
+        const newChatId = `${event.id}:${contact.id}:direct`;
+        const newChat: EventChat = {
+            id: newChatId,
+            vendorId: contact.id,
+            vendorSlug: contact.slug,
+            name: contact.name,
+            category: contact.category,
+            lastMsg: nextMessage,
+            time: 'Now',
+            unread: false,
+            avatarUrl: contact.logo,
+            avatarFallback: (contact.name.charAt(0) || 'V').toUpperCase(),
+            status: 'requested',
+            location: contact.location,
+            price: formatPrice(contact.price),
+            messages: [{ id: `${newChatId}-${Date.now()}`, text: nextMessage, isMe: true }],
+        };
+
+        setChats((prev) => [newChat, ...prev]);
+        setActiveChatId(newChatId);
+        setActiveView('chat');
+        setIsComposerOpen(false);
+        setSelectedContactId('');
+        setComposerMessage('');
     };
 
     const filteredChats = chats.filter((chat) => {
@@ -39,22 +308,87 @@ export default function InboxTab() {
         const query = searchQuery.toLowerCase();
         return (
             chat.name.toLowerCase().includes(query) ||
+            chat.category.toLowerCase().includes(query) ||
             chat.lastMsg.toLowerCase().includes(query) ||
             chat.location.toLowerCase().includes(query)
         );
     });
 
+    if (!activeChat) {
+        return (
+            <div className="rounded-xl border border-border bg-background p-6 text-sm text-muted-foreground">
+                No vendor conversations yet for this event.
+            </div>
+        );
+    }
+
+    const activeVendorPath = `/dashboard/hosts/vendor/${activeChat.vendorSlug}`;
+
     return (
         <div className="flex flex-col gap-3 h-[70vh] min-h-[500px] mb-6">
-            <div className={cn(activeView === 'chat' && "hidden")}>
-                <DashboardFilter
-                    placeholder="Search chats..."
-                    onSearchChange={setSearchQuery}
-                />
+            <div className={cn("flex items-center gap-2", activeView === 'chat' && "hidden")}>
+                <div className="min-w-0 flex-1">
+                    <DashboardFilter
+                        placeholder="Search chats..."
+                        onSearchChange={setSearchQuery}
+                    />
+                </div>
+                <Dialog open={isComposerOpen} onOpenChange={setIsComposerOpen}>
+                    <DialogTrigger asChild>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-10 w-10 rounded-xl shrink-0"
+                            aria-label="Compose message"
+                        >
+                            <SquarePen size={18} />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md rounded-2xl">
+                        <DialogHeader>
+                            <DialogTitle>New Message</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label>Select Saved Vendor</Label>
+                                <Select value={selectedContactId} onValueChange={setSelectedContactId}>
+                                    <SelectTrigger className="w-full rounded-xl h-11">
+                                        <SelectValue placeholder="Choose a saved vendor" />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-xl">
+                                        {composeContacts.map((contact) => (
+                                            <SelectItem key={contact.id} value={contact.id} className="rounded-lg">
+                                                {contact.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {composeContacts.length === 0 && (
+                                    <p className="text-xs text-muted-foreground">No saved vendors found.</p>
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Message</Label>
+                                <Textarea
+                                    placeholder="Type your message..."
+                                    value={composerMessage}
+                                    onChange={(e) => setComposerMessage(e.target.value)}
+                                    className="min-h-[120px] resize-none rounded-xl"
+                                />
+                            </div>
+                            <Button
+                                className="w-full h-11 rounded-xl font-bold"
+                                onClick={handleCompose}
+                                disabled={!selectedContactId || !composerMessage.trim()}
+                            >
+                                Send Message
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
 
             <div className="flex-1 flex flex-col bg-background border border-border rounded-xl overflow-hidden shadow-sm">
-                {/* Sidebar */}
                 <div className={cn(
                     "w-full border-r border-border flex flex-col min-h-0 bg-muted/5",
                     activeView === 'chat' ? "hidden" : "flex"
@@ -63,20 +397,33 @@ export default function InboxTab() {
                         {filteredChats.map((chat) => (
                             <button
                                 key={chat.id}
-                                onClick={() => { setActiveChat(chat); setActiveView('chat'); }}
+                                onClick={() => { setActiveChatId(chat.id); setActiveView('chat'); }}
                                 className={cn(
                                     "w-full p-4 text-left hover:bg-muted/50 transition-colors flex items-center gap-3",
                                     activeChat.id === chat.id ? 'bg-muted' : ''
                                 )}
                             >
-                                <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
-                                    {chat.avatar}
-                                </div>
+                                <Avatar className="w-10 h-10 rounded-lg border border-border shrink-0">
+                                    <AvatarImage src={chat.avatarUrl} alt={chat.name} className="object-cover" />
+                                    <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-bold">
+                                        {chat.avatarFallback}
+                                    </AvatarFallback>
+                                </Avatar>
                                 <div className="flex-1 min-w-0">
-                                    <h4 className="text-sm font-medium text-foreground truncate">{chat.name}</h4>
-                                    <span className="block mt-0.5 text-[10px] text-muted-foreground uppercase tracking-wide font-medium">
-                                        {chat.time}
-                                    </span>
+                                    <div className="flex items-start justify-between gap-2">
+                                        <h4 className="text-sm font-medium text-foreground truncate">{chat.name}</h4>
+                                        <span className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium shrink-0">
+                                            {chat.time}
+                                        </span>
+                                    </div>
+                                    <div className="mt-1 flex items-center gap-1.5 min-w-0">
+                                        <span className="inline-flex items-center rounded-md bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-foreground/80">
+                                            {chat.category}
+                                        </span>
+                                        <span className="inline-flex items-center rounded-md border border-border bg-background px-1.5 py-0.5 text-[10px] font-semibold text-foreground/80 truncate">
+                                            {chat.price}
+                                        </span>
+                                    </div>
                                 </div>
                             </button>
                         ))}
@@ -86,12 +433,10 @@ export default function InboxTab() {
                     </div>
                 </div>
 
-                {/* Chat Area */}
                 <div className={cn(
                     "flex-1 flex flex-col bg-background min-h-0",
                     activeView === 'list' ? "hidden" : "flex"
                 )}>
-                    {/* Chat Header */}
                     <div className="p-4 bg-muted/5 border-b border-border flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <Button
@@ -102,12 +447,23 @@ export default function InboxTab() {
                             >
                                 <ArrowLeft size={18} />
                             </Button>
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
-                                    {activeChat.avatar}
+                            <Link
+                                href={activeVendorPath}
+                                className="flex items-center gap-2 rounded-md px-1 py-0.5 -mx-1"
+                            >
+                                <Avatar className="w-8 h-8 rounded-lg border border-border shrink-0">
+                                    <AvatarImage src={activeChat.avatarUrl} alt={activeChat.name} className="object-cover" />
+                                    <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-bold text-xs">
+                                        {activeChat.avatarFallback}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0">
+                                    <h4 className="text-sm font-medium text-foreground truncate">{activeChat.name}</h4>
+                                    <span className="mt-0.5 inline-flex max-w-full items-center rounded-md bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-foreground/80 truncate">
+                                        {activeChat.category}
+                                    </span>
                                 </div>
-                                <h4 className="text-sm font-medium text-foreground truncate">{activeChat.name}</h4>
-                            </div>
+                            </Link>
                         </div>
 
                         <DropdownMenu>
@@ -138,28 +494,77 @@ export default function InboxTab() {
                         </DropdownMenu>
                     </div>
 
-                    {/* Messages */}
                     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/5">
-                        <div className="flex items-start gap-3 max-w-[85%] sm:max-w-[75%] mr-auto">
-                            <div className="p-3 bg-card border border-border rounded-2xl rounded-tl-none shadow-sm text-sm text-foreground leading-relaxed font-medium">
-                                Hello! We have reviewed your initial event brief. The venue in Lagos is available on May 29th. Would you like to schedule a virtual tour?
+                        {activeChat.messages.map((message) => (
+                            <div
+                                key={message.id}
+                                className={cn(
+                                    "flex items-start gap-3 max-w-[85%] sm:max-w-[75%]",
+                                    message.isMe ? "justify-end ml-auto" : "mr-auto"
+                                )}
+                            >
+                                <div
+                                    className={cn(
+                                        "p-3 rounded-2xl shadow-sm text-sm leading-relaxed font-medium",
+                                        message.isMe
+                                            ? "bg-primary text-primary-foreground rounded-tr-none"
+                                            : "bg-card border border-border rounded-tl-none text-foreground"
+                                    )}
+                                >
+                                    {message.text}
+                                    {message.attachment?.type === 'event' && (
+                                        <div className="mt-3 p-3 rounded-xl bg-background/10 shadow-sm flex items-center justify-between gap-4 border border-background/20">
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className="w-10 h-10 rounded-lg bg-background/20 flex items-center justify-center shrink-0">
+                                                    <CalendarDays size={20} />
+                                                </div>
+                                                <div className="min-w-0 text-primary-foreground">
+                                                    <p className="text-xs font-bold uppercase tracking-widest opacity-80">Event Invitation</p>
+                                                    <p className="text-sm font-semibold truncate">{message.attachment.eventName}</p>
+                                                </div>
+                                            </div>
+                                            <Link
+                                                href={`/dashboard/hosts/events/${message.attachment.eventId}`}
+                                                className="shrink-0 text-xs font-bold bg-background text-primary px-4 py-2 rounded-lg hover:bg-background/90 transition-colors"
+                                            >
+                                                View Event
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex items-start gap-3 justify-end max-w-[85%] sm:max-w-[75%] ml-auto">
-                            <div className="bg-primary text-primary-foreground p-3 rounded-2xl rounded-tr-none shadow-sm text-sm leading-relaxed font-medium">
-                                That sounds great! Does next Tuesday at 2 PM work for you?
-                            </div>
-                        </div>
+                        ))}
                     </div>
 
-                    {/* Message Input */}
                     <div className="p-4 bg-background border-t border-border">
                         <div className="flex gap-2">
                             <Textarea
                                 placeholder="Type your response..."
+                                value={messageInput}
+                                onChange={(e) => setMessageInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSendMessage();
+                                    }
+                                }}
                                 className="flex-1 px-3 py-2 rounded-xl border-border bg-muted/10 focus:bg-background resize-none min-h-[44px] max-h-[120px] font-medium text-sm transition-colors"
                             />
-                            <Button size="icon" className="h-11 w-11 rounded-xl shrink-0 shadow-lg shadow-primary/20">
+                            <Button
+                                title="Share Current Event"
+                                onClick={handleShareEvent}
+                                variant="outline"
+                                size="icon"
+                                className="h-11 w-11 shrink-0 rounded-xl shadow-sm transition-all text-primary border-primary/20 bg-primary/5 hover:bg-primary/10"
+                            >
+                                <CalendarDays size={20} />
+                            </Button>
+                            <Button
+                                size="icon"
+                                className="h-11 w-11 rounded-xl shrink-0 shadow-lg shadow-primary/20"
+                                onClick={handleSendMessage}
+                                disabled={!messageInput.trim()}
+                            >
                                 <Send size={20} />
                             </Button>
                         </div>

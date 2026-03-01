@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, MapPin, Star, Users, ThumbsUp, ThumbsDown, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CITY_COLORS, CITIES } from "@/lib/chat-data";
@@ -92,7 +92,9 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-1 mt-2 mb-3">
-                    {v.tags.map((t: string) => <span key={t} className="bg-secondary text-muted-foreground text-[11px] rounded px-1.5 py-0.5">{t}</span>)}
+                    {v.tags.map((t: string, idx: number) => (
+                        <span key={`${vendorKey || v.name}-tag-${idx}-${t}`} className="bg-secondary text-muted-foreground text-[11px] rounded px-1.5 py-0.5">{t}</span>
+                    ))}
                 </div>
                 <div className="flex justify-between items-center mt-2">
                     <span className="text-primary font-bold text-sm">
@@ -162,8 +164,13 @@ function VendorCardMsg({
     const targetCity = msg.city || activeCity;
     const allForCity = targetCity ? allVendorsByCity[targetCity] || [] : [];
     const sourceVendors = (msg.vendors && msg.vendors.length > 0) ? msg.vendors : allForCity;
-    const shown = sourceVendors.slice(0, 5);
-    const hasMore = sourceVendors.length > shown.length;
+    const dedupedVendors = sourceVendors.filter((vendor: any, idx: number, arr: any[]) => {
+        const vendorKey = String(vendor?.id || vendor?.slug || vendor?.name || `${idx}`);
+        const firstIndex = arr.findIndex((candidate: any) => String(candidate?.id || candidate?.slug || candidate?.name || "") === vendorKey);
+        return firstIndex === idx;
+    });
+    const shown = dedupedVendors.slice(0, 5);
+    const hasMore = dedupedVendors.length > shown.length;
     const viewAllHref = msg.viewAllHref || "/dashboard/hosts/search";
     const viewAllLabel = msg.viewAllLabel || "View all vendors";
 
@@ -174,8 +181,8 @@ function VendorCardMsg({
                 <div className="text-foreground text-[16px] leading-relaxed">{msg.content}</div>
             </div>
             <div className="w-full max-w-[480px] space-y-3">
-                {shown.map((v: any) => (
-                    <VCard key={v.name} v={v} savedVendors={savedVendors} onSave={onSave} onVendorAction={onVendorAction} />
+                {shown.map((v: any, idx: number) => (
+                    <VCard key={`vendor-${v?.id || v?.slug || v?.name || idx}-${idx}`} v={v} savedVendors={savedVendors} onSave={onSave} onVendorAction={onVendorAction} />
                 ))}
             </div>
             {hasMore && (
@@ -183,7 +190,7 @@ function VendorCardMsg({
                     href={viewAllHref}
                     className="block w-full max-w-[480px] py-2.5 mt-2 border border-dashed border-border rounded-xl text-muted-foreground text-xs hover:text-primary hover:border-primary transition-all font-mono text-center"
                 >
-                    {viewAllLabel} ({sourceVendors.length})
+                    {viewAllLabel} ({dedupedVendors.length})
                 </Link>
             )}
             {activeEvent && onAction && (
@@ -450,6 +457,94 @@ function TicketForm({ onSubmit, eventName }: { onSubmit: (data: any) => void; ev
     );
 }
 
+function FlightPreferencesForm({
+    onSubmit,
+    eventId,
+    defaultOrigin,
+    destination,
+}: {
+    onSubmit: (data: any) => void;
+    eventId?: string;
+    defaultOrigin?: string;
+    destination?: string;
+}) {
+    const [data, setData] = useState({
+        origin: defaultOrigin || "",
+        destination: destination || "",
+    });
+
+    const destinationLocked = Boolean(destination && destination.trim());
+
+    useEffect(() => {
+        setData((prev) => ({
+            ...prev,
+            destination: destination || prev.destination || ""
+        }));
+    }, [destination]);
+
+    useEffect(() => {
+        if (typeof window === "undefined" || !eventId) return;
+        const raw = window.localStorage.getItem(`waddi-flight-prefs:chat:${eventId}`);
+        if (!raw) return;
+        try {
+            const parsed = JSON.parse(raw);
+            setData((prev) => ({
+                ...prev,
+                origin: parsed.origin || prev.origin,
+                destination: parsed.destination || prev.destination,
+            }));
+        } catch (_e) {
+            // Ignore invalid local storage payload.
+        }
+    }, [eventId]);
+
+    const submit = () => {
+        if (typeof window !== "undefined" && eventId) {
+            window.localStorage.setItem(`waddi-flight-prefs:chat:${eventId}`, JSON.stringify(data));
+        }
+        onSubmit({
+            eventId,
+            origin: data.origin,
+            destination: data.destination,
+            skipPreferencesPrompt: true
+        });
+    };
+
+    return (
+        <div className="bg-card border border-border rounded-2xl p-4 w-full space-y-3 shadow-sm">
+            <div className="text-[13px] font-bold text-foreground">Where are you flying from?</div>
+            <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center">
+                <input
+                    type="text"
+                    placeholder="Enter location"
+                    className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                    value={data.origin}
+                    onChange={(e) => setData({ ...data, origin: e.target.value })}
+                />
+                <span className="text-muted-foreground text-lg leading-none">→</span>
+                <input
+                    type="text"
+                    placeholder="Event location"
+                    className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none ${destinationLocked
+                        ? "bg-muted/60 border-border text-muted-foreground cursor-not-allowed"
+                        : "bg-secondary/50 border-border focus:border-primary/50"
+                        }`}
+                    value={data.destination}
+                    onChange={(e) => setData({ ...data, destination: e.target.value })}
+                    disabled={destinationLocked}
+                />
+            </div>
+            <button
+                onClick={submit}
+                disabled={!data.origin.trim() || !data.destination.trim()}
+                className="w-full bg-primary text-primary-foreground font-bold py-2 rounded-lg text-sm transition-all active:scale-95 disabled:opacity-50"
+            >
+                Search Flights
+            </button>
+        </div>
+    );
+}
+
 
 function CalendarPicker({ onSelect }: { onSelect: (date: string) => void }) {
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -623,6 +718,52 @@ function StoreListMsg({ msg, onStoreAction }: { msg: any; onStoreAction?: (actio
     );
 }
 
+function InspirationGalleryMsg({ msg }: { msg: any }) {
+    const images = Array.isArray(msg.images) ? msg.images.slice(0, 8) : [];
+
+    return (
+        <div className="w-full mt-1">
+            <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-3">
+                <div className="text-sm font-bold text-foreground">
+                    {msg.title || "Inspiration references"}
+                </div>
+                {msg.query && (
+                    <div className="text-[11px] text-muted-foreground">
+                        Query: <span className="text-foreground">{msg.query}</span>
+                    </div>
+                )}
+                {images.length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {images.map((image: any, index: number) => (
+                            <a
+                                key={`${image.url || index}-${index}`}
+                                href={image.pageUrl || image.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="block rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all"
+                            >
+                                <img
+                                    src={image.url}
+                                    alt={image.alt || "Inspiration image"}
+                                    className="h-28 sm:h-32 w-full object-cover"
+                                    loading="lazy"
+                                />
+                            </a>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-[12px] text-muted-foreground">
+                        No images returned yet. Try again with a slightly different event theme.
+                    </div>
+                )}
+                <div className="text-[11px] text-muted-foreground">
+                    Source: {String(msg.source || "internet")}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 type MsgProps = {
     msg: any;
     onSelectCity: (city: string) => void;
@@ -635,6 +776,7 @@ type MsgProps = {
     allVendorsByCity: Record<string, any[]>;
     onFormSubmit: (data: any) => void;
     onTicketFormSubmit: (data: any) => void;
+    onFlightFormSubmit: (data: any) => void;
     onCalendarSelect: (date: string) => void;
     liveEvents: SharedEvent[];
     selectedEventId: string | null;
@@ -657,6 +799,7 @@ export function Msg({
     allVendorsByCity,
     onFormSubmit,
     onTicketFormSubmit,
+    onFlightFormSubmit,
     onCalendarSelect,
     liveEvents,
     selectedEventId,
@@ -776,6 +919,25 @@ export function Msg({
                                 <TicketForm onSubmit={onTicketFormSubmit} eventName={activeEvent?.eventName} />
                             </div>
                         </div>
+                    ) : msg.type === "flight_form" ? (
+                        <div className="w-full space-y-2 mt-1">
+                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            <div className="w-full">
+                                <FlightPreferencesForm
+                                    onSubmit={onFlightFormSubmit}
+                                    eventId={msg.eventId || activeEvent?.id}
+                                    defaultOrigin={msg.defaultOrigin || activeCity || ""}
+                                    destination={msg.destination || activeEvent?.location || ""}
+                                />
+                            </div>
+                        </div>
+                    ) : msg.type === "flight_status" || msg.type === "deliberation_status" ? (
+                        <div className="w-full mt-1">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-secondary/30 px-3 py-1.5 text-[11px] text-muted-foreground">
+                                <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                                <span>{msg.content || "Processing..."}</span>
+                            </div>
+                        </div>
                     ) : msg.type === "calendar_picker" ? (
                         <div className="w-full space-y-2 mt-1">
                             {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
@@ -789,6 +951,7 @@ export function Msg({
                         </div>
                     ) : msg.type === "overview" ? (
                         <div className="w-full mt-1 space-y-4">
+                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
                             {liveEvents && liveEvents.length > 0 ? (
                                 liveEvents.map((event: SharedEvent) => (
                                     <EventOverviewCard key={event.id} event={event} onAction={onSuggestion} />
@@ -814,7 +977,8 @@ export function Msg({
                             })()}
                         </div>
                     ) : msg.type === "todo" ? (
-                        <div className="w-full mt-1">
+                        <div className="w-full mt-1 space-y-3">
+                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
                             <TaskChecklist
                                 events={liveEvents}
                                 selectedEventId={selectedEventId}
@@ -823,7 +987,8 @@ export function Msg({
                             />
                         </div>
                     ) : msg.type === "timeline" ? (
-                        <div className="w-full mt-1">
+                        <div className="w-full mt-1 space-y-3">
+                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
                             <DayOfTimeline
                                 events={liveEvents}
                                 selectedEventId={selectedEventId}
@@ -832,7 +997,8 @@ export function Msg({
                             />
                         </div>
                     ) : msg.type === "budget" ? (
-                        <div className="w-full mt-1">
+                        <div className="w-full mt-1 space-y-3">
+                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
                             <BudgetPlanner
                                 events={liveEvents}
                                 selectedEventId={selectedEventId}
@@ -866,7 +1032,9 @@ export function Msg({
                                         </div>
                                     ))}
                                     {(!msg.deals || msg.deals.length === 0) && (
-                                        <div className="text-[12px] text-muted-foreground">No deals found. Try different dates or origin.</div>
+                                        <div className="text-[12px] text-muted-foreground">
+                                            {msg.emptyHint || "I couldn't confirm priced options right now. Try different dates or origin."}
+                                        </div>
                                     )}
                                 </div>
                                 {msg.sources && msg.sources.length > 0 && (
@@ -896,6 +1064,8 @@ export function Msg({
                                 )}
                             </div>
                         </div>
+                    ) : msg.type === "inspiration_gallery" ? (
+                        <InspirationGalleryMsg msg={msg} />
                     ) : msg.type === "vendors" ? (
                         <div className="w-full mt-1">
                             <VendorGrid />
@@ -913,6 +1083,21 @@ export function Msg({
                         ) : null
                     )}
                 </div>
+
+                {ag && msg.suggestions && showSuggestions && (
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                        {msg.suggestions.map((s: any, i: number) => (
+                            <SuggestionBubble key={i} label={s.label} onClick={() => onSuggestion(s)} />
+                        ))}
+                        <button
+                            type="button"
+                            onClick={() => onSuggestion({ label: "I'm good", action: "dismiss_suggestions" })}
+                            className="bg-secondary/40 border border-border hover:bg-secondary text-foreground text-[12px] px-3 py-1.5 rounded-full transition-all duration-200 active:scale-95 whitespace-nowrap"
+                        >
+                            I&apos;m good
+                        </button>
+                    </div>
+                )}
 
                 {ag && msg.type === "text" && (
                     <div className="flex items-center gap-1.5 mt-2">
@@ -939,21 +1124,6 @@ export function Msg({
                             className="h-7 w-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all flex items-center justify-center"
                         >
                             <ThumbsDown size={14} />
-                        </button>
-                    </div>
-                )}
-
-                {ag && msg.suggestions && showSuggestions && (
-                    <div className="flex flex-wrap gap-1.5 mt-3">
-                        {msg.suggestions.map((s: any, i: number) => (
-                            <SuggestionBubble key={i} label={s.label} onClick={() => onSuggestion(s)} />
-                        ))}
-                        <button
-                            type="button"
-                            onClick={() => onSuggestion({ label: "I'm good", action: "dismiss_suggestions" })}
-                            className="bg-secondary/40 border border-border hover:bg-secondary text-foreground text-[12px] px-3 py-1.5 rounded-full transition-all duration-200 active:scale-95 whitespace-nowrap"
-                        >
-                            I&apos;m good
                         </button>
                     </div>
                 )}

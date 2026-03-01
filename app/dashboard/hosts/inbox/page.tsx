@@ -2,10 +2,11 @@
 
 import React, { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Inbox, { ChatConversation } from '@/components/dashboard/Inbox';
+import Inbox, { ChatConversation, InboxContact } from '@/components/dashboard/Inbox';
 import { getEvents, getVendors } from '@/lib/firestore-service';
 import { Vendor, SharedEvent } from '@/lib/types';
 import { useAuth } from '@/components/providers/auth-provider';
+import { useSavedVendors } from '@/hooks/use-saved-vendors';
 
 const generateConversations = (events: SharedEvent[], allVendors: Vendor[]): ChatConversation[] => {
   // Logic to build conversations from event bookedVendors
@@ -15,10 +16,12 @@ const generateConversations = (events: SharedEvent[], allVendors: Vendor[]): Cha
     event.bookedVendors?.forEach((booking, index) => {
       const vendor = allVendors.find(v => v.id === booking.vendorId);
       if (vendor) {
+        const conversationId = `${vendor.id}:${event.id || index}`;
         conversations.push({
-          id: vendor.id,
+          id: conversationId,
           name: vendor.name,
           eventName: event.eventName,
+          phone: vendor.phone,
           lastMsg: index === 0 ? 'The quote is ready for your review.' : 'Tasting scheduled for next Tuesday.',
           time: index === 0 ? '10:30 AM' : 'Yesterday',
           unread: index === 0,
@@ -38,8 +41,11 @@ const generateConversations = (events: SharedEvent[], allVendors: Vendor[]): Cha
 const InboxContent: React.FC = () => {
   const searchParams = useSearchParams();
   const vendorIdParam = searchParams.get('vendorId');
+  const vendorNameParam = searchParams.get('vendorName');
   const { user, loading: authLoading } = useAuth();
+  const { savedVendorIds } = useSavedVendors(user?.uid);
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const [contacts, setContacts] = useState<InboxContact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -47,7 +53,41 @@ const InboxContent: React.FC = () => {
       if (!user) return;
       try {
         const [events, allVendors] = await Promise.all([getEvents(user.uid), getVendors()]);
-        setConversations(generateConversations(events, allVendors));
+        const generated = generateConversations(events, allVendors);
+        setContacts(
+          allVendors.map((vendor) => ({
+            id: vendor.id,
+            name: vendor.name,
+          }))
+        );
+        if (vendorIdParam) {
+          const existing = generated.some((conv) => conv.id.startsWith(`${vendorIdParam}:`) || conv.id === vendorIdParam);
+          if (!existing) {
+            const vendor = allVendors.find((v) => v.id === vendorIdParam);
+            const displayName = vendor?.name || vendorNameParam || "Vendor";
+            const conversationId = `${vendorIdParam}:direct`;
+            generated.unshift({
+              id: conversationId,
+              name: displayName,
+              eventName: events[0]?.eventName || "General Inquiry",
+              phone: vendor?.phone,
+              lastMsg: "Start a new conversation",
+              time: "Now",
+              unread: false,
+              status: "requested",
+              messages: [
+                {
+                  id: "seed-1",
+                  senderId: "me",
+                  text: `Hi ${displayName}, I’m interested in your services for my event.`,
+                  timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                  isMe: true,
+                },
+              ],
+            });
+          }
+        }
+        setConversations(generated);
       } catch (error) {
         console.error("Error fetching host inbox data:", error);
       } finally {
@@ -61,7 +101,11 @@ const InboxContent: React.FC = () => {
         setIsLoading(false);
       }
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, vendorIdParam, vendorNameParam]);
+
+  const savedContacts = React.useMemo(() => {
+    return contacts.filter(contact => savedVendorIds.has(contact.id));
+  }, [contacts, savedVendorIds]);
 
   if (isLoading) {
     return (
@@ -96,8 +140,10 @@ const InboxContent: React.FC = () => {
     <div className="max-w-7xl mx-auto">
       <Inbox
         conversations={conversations}
+        contacts={savedContacts}
         userType="host"
         title="Messages"
+        preferredConversationId={vendorIdParam || undefined}
       />
     </div>
   );

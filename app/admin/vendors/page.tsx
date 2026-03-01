@@ -9,6 +9,8 @@ import { Plus, Edit, Trash2, Search, ExternalLink, Save, X, Image as ImageIcon, 
 import { cn } from "@/lib/utils";
 import { uploadImage } from "@/lib/upload-service";
 import { VENDOR_CATEGORIES, EVENT_THEMES } from "@/lib/constants";
+import { useAuth } from "@/components/providers/auth-provider";
+import { toast } from "sonner";
 
 type BulkListMode = "add" | "remove" | "replace";
 
@@ -16,6 +18,7 @@ export default function AdminVendorsPage() {
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const { user } = useAuth();
 
     const [editedVendors, setEditedVendors] = useState<{ [id: string]: Partial<Vendor> }>({});
     const [isSaving, setIsSaving] = useState(false);
@@ -67,12 +70,17 @@ export default function AdminVendorsPage() {
     const handleRowImageUpload = async (id: string, file: File) => {
         setUploadingImageId(id);
         try {
+            if (!user) {
+                toast.error("You must be signed in to upload images");
+                return;
+            }
             const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
             const imageUrl = await uploadImage(file, `vendors/main/${id}/${Date.now()}-${safeName}`);
             handleBulkEditChange(id, "image", imageUrl);
+            toast.success("Image uploaded successfully");
         } catch (error) {
             console.error("Failed to upload image:", error);
-            alert("Failed to upload image");
+            toast.error("Failed to upload image");
         } finally {
             setUploadingImageId(null);
         }

@@ -33,12 +33,20 @@ export type VendorCategory =
 
 export type UserRole = 'admin' | 'host' | 'vendor';
 
+export interface TeamMember {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+}
+
 export interface UserProfile {
     uid: string;
     email: string;
     displayName: string;
     photoURL?: string;
     role: UserRole;
+    teamMembers?: TeamMember[];
     createdAt: string;
     updatedAt: string;
 }
@@ -141,6 +149,7 @@ export interface SharedEvent {
     budgetBreakdown?: BudgetAllocation[];
     aiTodoSuggestionsUsed?: number;
     aiItinerarySuggestionsUsed?: number;
+    sharedWith?: string[];
 }
 
 export interface TimelineEntry {

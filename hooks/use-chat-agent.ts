@@ -114,12 +114,50 @@ export function useChatAgent({
         }).slice(0, 5);
     };
 
+    const addAffiliateParams = (rawUrl?: string) => {
+        if (!rawUrl) return "";
+        try {
+            const url = new URL(rawUrl);
+            const affiliateParam = process.env.NEXT_PUBLIC_FLIGHT_AFFILIATE_PARAM || "waddi_ref";
+            const affiliateId = process.env.NEXT_PUBLIC_FLIGHT_AFFILIATE_ID || "waddi";
+            if (!url.searchParams.has(affiliateParam)) {
+                url.searchParams.set(affiliateParam, affiliateId);
+            }
+            if (!url.searchParams.has("utm_source")) url.searchParams.set("utm_source", "waddi");
+            if (!url.searchParams.has("utm_medium")) url.searchParams.set("utm_medium", "assistant");
+            if (!url.searchParams.has("utm_campaign")) url.searchParams.set("utm_campaign", "flight_deals");
+            return url.toString();
+        } catch (_e) {
+            return rawUrl;
+        }
+    };
+
     const runFlightDealSearch = async (
         event: SharedEvent,
         origin: string,
+        destinationOverride?: string,
         chatIdOverride?: string
     ) => {
-        const destination = event.location || "your event city";
+        const parseFlightPayload = (input: string) => {
+            if (!input) return null;
+            const candidates: string[] = [input];
+            const fenced = input.match(/```json\s*([\s\S]*?)\s*```/i) || input.match(/```\s*([\s\S]*?)\s*```/i);
+            if (fenced?.[1]) candidates.push(fenced[1].trim());
+            const firstBrace = input.indexOf("{");
+            const lastBrace = input.lastIndexOf("}");
+            if (firstBrace >= 0 && lastBrace > firstBrace) candidates.push(input.slice(firstBrace, lastBrace + 1));
+            for (const chunk of candidates) {
+                try {
+                    const parsed = JSON.parse(chunk);
+                    if (parsed && typeof parsed === "object") return parsed;
+                } catch (_e) {
+                    // Keep trying next candidate.
+                }
+            }
+            return null;
+        };
+
+        const destination = String(event.location || "").trim() || String(destinationOverride || "").trim() || "your event city";
         const date = event.date || "your event date";
         const prompt = `Return flight deal recommendations based on Google Search results.
 Trip: ${origin} → ${destination} around ${date}.
@@ -140,6 +178,7 @@ Rules:
 - Use 3 to 5 deals.
 - If a field is unknown, set it to "".
 - Prefer short labels like "LHR → LOS (via ADD)".
+- Do not invent prices, routes, or links. If you cannot verify a deal, omit it.
 `;
 
         const reply = await processGeminiChat(
@@ -152,28 +191,129 @@ Rules:
 
         const rawText = reply?.type === "text" ? String(reply.text || "").trim() : "";
         const sources = extractSearchSources((reply as any)?.groundingMetadata);
-        let payload: any = null;
-        try {
-            payload = rawText ? JSON.parse(rawText) : null;
-        } catch (e) {
-            payload = null;
-        }
+        let payload: any = parseFlightPayload(rawText);
 
         if (!payload || payload.type !== "flight_deals") {
             payload = {
                 type: "flight_deals",
                 title: `Flight deal guidance for ${origin} → ${destination} around ${date}`,
                 deals: [],
-                sources: sources.map((s: any) => ({ title: s.title || "", url: s.uri || "" }))
+                sources: sources.map((s: any) => ({ title: s.title || "", url: s.uri || "" })),
+                emptyHint: "I couldn't confirm priced options from live search right now. Try nearby dates or another origin."
             };
         } else if (sources.length > 0 && (!Array.isArray(payload.sources) || payload.sources.length === 0)) {
             payload.sources = sources.map((s: any) => ({ title: s.title || "", url: s.uri || "" }));
         }
 
+        payload.deals = Array.isArray(payload.deals)
+            ? payload.deals
+                .filter((deal: any) => String(deal?.url || "").trim().length > 0)
+                .map((deal: any) => ({ ...deal, url: addAffiliateParams(deal?.url) }))
+            : [];
+        payload.sources = Array.isArray(payload.sources)
+            ? payload.sources.map((source: any) => ({ ...source, url: addAffiliateParams(source?.url) }))
+            : [];
+
+        if (typeof window !== "undefined" && currentUser?.uid && event?.id) {
+            try {
+                window.localStorage.setItem(
+                    `waddi-flight-deals:${currentUser.uid}:${event.id}`,
+                    JSON.stringify({
+                        eventId: event.id,
+                        updatedAt: Date.now(),
+                        title: payload.title || "",
+                        deals: payload.deals || [],
+                        sources: payload.sources || []
+                    })
+                );
+            } catch (_e) {
+                // Ignore storage failures.
+            }
+        }
+
+        const sourceNames = (payload.sources || [])
+            .map((s: any) => String(s?.title || "").trim())
+            .filter(Boolean);
+        const uniqueSourceNames = Array.from(new Set(sourceNames));
+        const verifiedDeals = Array.isArray(payload.deals) ? payload.deals.length : 0;
+        const deliberationLine =
+            verifiedDeals >= 2 && uniqueSourceNames.length >= 2
+                ? `I compared ${uniqueSourceNames.slice(0, 2).join(" and ")} for ${origin} to ${destination}, then kept the most actionable options.`
+                : verifiedDeals > 0
+                    ? `I found a few verifiable options for ${origin} to ${destination} and filtered to the clearest links.`
+                    : uniqueSourceNames.length > 0
+                        ? `I checked ${uniqueSourceNames.length} sources for ${origin} to ${destination}, but none exposed reliable fare details right now.`
+                        : `I checked live search results for ${origin} to ${destination}, but I couldn't verify strong options yet.`;
+
+        await persistAgentMessage(
+            {
+                type: "deliberation_status",
+                content: deliberationLine
+            },
+            chatIdOverride
+        );
+
         await persistAgentMessage(
             payload,
             chatIdOverride
         );
+    };
+
+    const runInspirationSearch = async (
+        event: SharedEvent,
+        chatIdOverride?: string
+    ) => {
+        const params = new URLSearchParams({
+            eventName: String(event.eventName || "").trim(),
+            location: String(event.location || "").trim(),
+            categories: (event.categories || []).join(","),
+            themes: (event.themes || []).join(",")
+        });
+
+        await persistAgentMessage(
+            {
+                type: "deliberation_status",
+                content: `Pulling visual inspiration for "${event.eventName}"...`
+            },
+            chatIdOverride
+        );
+
+        try {
+            const response = await fetch(`/api/inspiration-images?${params.toString()}`, {
+                method: "GET",
+                cache: "no-store"
+            });
+            if (!response.ok) {
+                throw new Error(`Inspiration request failed with status ${response.status}`);
+            }
+
+            const payload = await response.json();
+            const images = Array.isArray(payload?.images) ? payload.images : [];
+
+            await persistAgentMessage(
+                {
+                    type: "inspiration_gallery",
+                    content: `Here are visual references for ${event.eventName}.`,
+                    title: payload?.title || `Inspiration ideas for ${event.eventName}`,
+                    query: payload?.query || "",
+                    source: payload?.source || "unsplash",
+                    images,
+                    suggestions: [
+                        { label: "Discover Vendors", action: "vendor_search", eventId: event.id },
+                        { label: "Open Budget", action: "budget", eventId: event.id }
+                    ]
+                },
+                chatIdOverride
+            );
+        } catch (_error) {
+            await persistAgentMessage(
+                {
+                    type: "text",
+                    content: "I couldn't pull image inspiration right now. Try again in a moment."
+                },
+                chatIdOverride
+            );
+        }
     };
 
     const persistAgentMessage = async (msg: any, chatIdOverride?: string) => {
@@ -714,17 +854,64 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 let inferredOrigin = String(actionData?.origin || "").trim()
                     || String(activeCity || "").trim();
                 if (!inferredOrigin || (activeEvent.location && inferredOrigin.toLowerCase() === activeEvent.location.toLowerCase())) {
-                    inferredOrigin = "your city";
+                    inferredOrigin = "";
+                }
+
+                if (!actionData?.skipPreferencesPrompt && !inferredOrigin) {
+                    await persistAgentMessage(
+                        {
+                            type: "flight_form",
+                            eventId: activeEvent.id,
+                            defaultOrigin: String(activeCity || "").trim(),
+                            destination: String(activeEvent.location || "").trim(),
+                            content: "Enter your departure location."
+                        },
+                        currentChatId
+                    );
+                    return;
+                }
+
+                const eventDestination = String(activeEvent.location || "").trim();
+                const fallbackDestination = String(actionData?.destination || "").trim();
+                if (!eventDestination && !fallbackDestination) {
+                    await persistAgentMessage(
+                        {
+                            type: "flight_form",
+                            eventId: activeEvent.id,
+                            defaultOrigin: inferredOrigin,
+                            destination: "",
+                            content: "Add your departure location and destination."
+                        },
+                        currentChatId
+                    );
+                    return;
                 }
 
                 await persistAgentMessage(
                     {
                         type: "text",
-                        content: `Flight deal guidance for ${inferredOrigin} → ${activeEvent.location || "your event city"} around ${activeEvent.date || "your event date"}:`
+                        content: `Got it. I’m checking live options from ${inferredOrigin} to ${eventDestination || fallbackDestination || "your event location"} around ${activeEvent.date || "your event date"} and I’ll share the best links next.`
                     },
                     currentChatId
                 );
-                await runFlightDealSearch(activeEvent, inferredOrigin, currentChatId);
+                await runFlightDealSearch(
+                    activeEvent,
+                    inferredOrigin,
+                    fallbackDestination,
+                    currentChatId
+                );
+                return;
+            }
+
+            if (normalizedIntent === "get_inspiration") {
+                if (!activeEvent) {
+                    response.content = "Which event should I use for inspiration?";
+                    setMessages((prev) => [...prev, response]);
+                    if (currentChatId) saveChatMessage(currentChatId, response);
+                    return;
+                }
+
+                await runInspirationSearch(activeEvent, currentChatId);
                 return;
             }
 
@@ -785,7 +972,35 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
 
             if (intent === "overview" || intent === "todo" || intent === "timeline" || intent === "budget") {
                 response.type = intent;
-                response.content = `Here is your ${intent === "overview" ? "events overview" : (intent === "timeline" ? "itinerary" : intent)} for your planning session:`;
+                if (intent === "overview") {
+                    response.content = "I pulled your current events so we can decide what to tackle next.";
+                    response.suggestions = [
+                        { label: "Open To-do", action: "todo" },
+                        { label: "Open Itinerary", action: "timeline" },
+                        { label: "Open Budget", action: "budget" }
+                    ];
+                } else if (intent === "todo") {
+                    response.content = "Perfect. Here is your checklist workspace. I can also suggest next tasks after you review it.";
+                    response.suggestions = [
+                        { label: "Open Itinerary", action: "timeline" },
+                        { label: "Open Budget", action: "budget" },
+                        { label: "Discover Vendors", action: "vendor_search" }
+                    ];
+                } else if (intent === "timeline") {
+                    response.content = "Got it. Here is your itinerary workspace so we can shape the run-of-show.";
+                    response.suggestions = [
+                        { label: "Open To-do", action: "todo" },
+                        { label: "Open Budget", action: "budget" },
+                        { label: "Discover Vendors", action: "vendor_search" }
+                    ];
+                } else {
+                    response.content = "Here is your budget workspace. Once you review the split, I can help rebalance it.";
+                    response.suggestions = [
+                        { label: "Open To-do", action: "todo" },
+                        { label: "Open Itinerary", action: "timeline" },
+                        { label: "Discover Vendors", action: "vendor_search" }
+                    ];
+                }
                 setMessages((prev) => [...prev, response]);
                 if (currentChatId) saveChatMessage(currentChatId, response);
                 return;
@@ -1343,6 +1558,20 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         }, 1200);
     };
 
+    const handleFlightFormSubmit = async (data: any) => {
+        const text = data?.origin
+            ? `Search flights from ${data.origin}`
+            : "Search flights";
+
+        await send(text, {
+            action: "search_flights",
+            eventId: data?.eventId,
+            origin: String(data?.origin || "").trim() || undefined,
+            destination: String(data?.destination || "").trim() || undefined,
+            skipPreferencesPrompt: true
+        });
+    };
+
     return {
         getRouteChatId,
         send,
@@ -1351,6 +1580,7 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         dispatchLogic,
         handleSelectCity,
         handleFormSubmit,
-        handleTicketFormSubmit
+        handleTicketFormSubmit,
+        handleFlightFormSubmit
     };
 }

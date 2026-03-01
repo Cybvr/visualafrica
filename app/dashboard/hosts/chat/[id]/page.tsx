@@ -202,6 +202,7 @@ export default function ChatPage() {
         if (isTransientNewChat) {
             const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
             setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
+            setShowSuggestions(true);
             setChatTitle("New Chat");
             setActiveCity(null);
             setChatMetadata(null);
@@ -219,6 +220,7 @@ export default function ChatPage() {
             } else {
                 const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
                 setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
+                setShowSuggestions(true);
                 setChatTitle("New Chat");
                 setActiveCity(null);
                 setChatMetadata(null);
@@ -227,6 +229,7 @@ export default function ChatPage() {
             console.error("Failed to load chat metadata:", err);
             const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
             setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
+            setShowSuggestions(true);
             setChatTitle("New Chat");
             setActiveCity(null);
             setChatMetadata(null);
@@ -242,6 +245,7 @@ export default function ChatPage() {
                 } else {
                     const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
                     setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
+                    setShowSuggestions(true);
                 }
                 setHistoryLoaded(true);
             },
@@ -249,6 +253,7 @@ export default function ChatPage() {
                 console.error("Failed to listen to chat messages:", error);
                 const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
                 setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
+                setShowSuggestions(true);
                 setChatTitle("New Chat");
                 setActiveCity(null);
                 setChatMetadata(null);
@@ -270,7 +275,8 @@ export default function ChatPage() {
         dispatchLogic,
         handleSelectCity,
         handleFormSubmit,
-        handleTicketFormSubmit
+        handleTicketFormSubmit,
+        handleFlightFormSubmit
     } = useChatAgent({
         paramsId: params.id,
         router,
@@ -303,14 +309,34 @@ export default function ChatPage() {
     useEffect(() => {
         const routeChatId = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
         const prefillPrompt = (searchParams.get("q") || "").trim();
+        const flightAction = searchParams.get("flightAction") === "1";
+        const flightEventId = (searchParams.get("eventId") || "").trim();
+        const origin = (searchParams.get("origin") || "").trim();
+        const autoKey = [
+            prefillPrompt,
+            flightAction ? "flight" : "plain",
+            flightEventId,
+            origin
+        ].join("|");
 
-        if (!prefillPrompt || routeChatId !== "new") return;
-        if (!historyLoaded || !dataLoaded || autoPromptSentRef.current === prefillPrompt) return;
+        if ((!prefillPrompt && !flightAction) || routeChatId !== "new") return;
+        if (!historyLoaded || !dataLoaded || autoPromptSentRef.current === autoKey) return;
 
-        autoPromptSentRef.current = prefillPrompt;
-        setInput(prefillPrompt);
+        autoPromptSentRef.current = autoKey;
+        const seedPrompt = prefillPrompt || "Find flight deals for my event";
+        setInput(seedPrompt);
         setMessageUsage((prev) => prev + 1);
-        void send(prefillPrompt);
+
+        if (flightAction) {
+            void send(seedPrompt, {
+                action: "search_flights",
+                eventId: flightEventId || undefined,
+                origin: origin || undefined,
+            });
+            return;
+        }
+
+        void send(seedPrompt);
     }, [params.id, searchParams, historyLoaded, dataLoaded, send, setInput]);
 
     const handleCalendarSelect = (date: string) => {
@@ -350,8 +376,16 @@ export default function ChatPage() {
 
     const handleVendorAction = (action: any, vendor: any) => {
         if (action.id === 'message') {
-            addUserMsg(`Message ${vendor.name}`);
-            dispatchLogic(`I'd like to message ${vendor.name}`);
+            const vendorId = String(vendor?.id || "").trim();
+            const vendorName = String(vendor?.name || "").trim();
+            if (!vendorId) {
+                addAgentMsg({
+                    content: "I couldn't open messages for this vendor. Please try from the vendor profile.",
+                    type: "text"
+                });
+                return;
+            }
+            router.push(`/dashboard/hosts/inbox?vendorId=${encodeURIComponent(vendorId)}&vendorName=${encodeURIComponent(vendorName)}`);
         } else if (action.id === 'contract') {
             addUserMsg(`Generate brief for ${vendor.name}`);
             dispatchLogic(`Create a brief for ${vendor.name}`);
@@ -374,6 +408,7 @@ export default function ChatPage() {
     const resetToNewChat = () => {
         const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
         setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
+        setShowSuggestions(true);
         setInput("");
         setTyping(false);
         setActiveCity(null);
@@ -549,6 +584,7 @@ export default function ChatPage() {
                                 onSave={handleSaveVendor}
                                 onFormSubmit={handleFormSubmit}
                                 onTicketFormSubmit={handleTicketFormSubmit}
+                                onFlightFormSubmit={handleFlightFormSubmit}
                                 onCalendarSelect={handleCalendarSelect}
                                 liveEvents={liveEvents}
                                 selectedEventId={selectedEventId}
@@ -638,17 +674,6 @@ export default function ChatPage() {
                     <p className="text-[11px] text-muted-foreground mt-3 text-center opacity-60 hidden md:block">
                         Waddi can access vendors, contracts, and guest data for this event
                     </p>
-                    {!showSuggestions && (
-                        <div className="mt-2 flex justify-center">
-                            <button
-                                type="button"
-                                onClick={() => setShowSuggestions(true)}
-                                className="text-[11px] text-muted-foreground hover:text-foreground underline underline-offset-4"
-                            >
-                                Show suggestions
-                            </button>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

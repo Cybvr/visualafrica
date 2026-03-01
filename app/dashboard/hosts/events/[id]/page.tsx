@@ -7,17 +7,21 @@ import {
     MapPin, Calendar, Users, Rocket,
     ChevronLeft, ChevronRight, Share2, Printer, Ticket,
     Plus, Mail, Download, Upload,
-    LayoutDashboard, Store, FileText, Inbox, ListChecks, Globe, LucideIcon
+    LayoutDashboard, Store, FileText, Inbox, ListChecks, Globe, Plane, LucideIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { listenToEventById, updateEvent } from '@/lib/firestore-service';
 import { SharedEvent } from '@/lib/types';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { ShareEventDialog } from '@/components/dashboard/ShareEventDialog';
 import PlanTab from '@/components/dashboard/event-tabs/PlanTab';
 import GuestsTab from '@/components/dashboard/event-tabs/GuestsTab';
 import VendorsTab from '@/components/dashboard/event-tabs/VendorsTab';
 import ContractsTab from '@/components/dashboard/event-tabs/ContractsTab';
 import InboxTab from '@/components/dashboard/event-tabs/InboxTab';
 import WebsiteTab from '@/components/dashboard/event-tabs/WebsiteTab';
+import FlightsTab from '@/components/dashboard/event-tabs/FlightsTab';
 import { TaskChecklist, DayOfTimeline } from '@/components/dashboard/chat';
 
 const parseCsvRow = (row: string): string[] => {
@@ -76,6 +80,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     const [isLoading, setIsLoading] = useState(true);
     const [isImportingGuests, setIsImportingGuests] = useState(false);
     const [guestImportMessage, setGuestImportMessage] = useState<string | null>(null);
+    const [teamMembers, setTeamMembers] = useState<any[]>([]);
 
     // Sync state with URL
     useEffect(() => {
@@ -96,6 +101,22 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         });
         return () => unsubscribe();
     }, [id]);
+
+    useEffect(() => {
+        async function fetchTeamMembers() {
+            if (!event?.hostId) return;
+            try {
+                const profileRef = doc(db, 'userProfiles', event.hostId);
+                const snap = await getDoc(profileRef);
+                if (snap.exists()) {
+                    setTeamMembers(snap.data().teamMembers || []);
+                }
+            } catch (error) {
+                console.error("Failed to load team members:", error);
+            }
+        }
+        fetchTeamMembers();
+    }, [event?.hostId]);
 
     const handleImportGuestsCsv = async (file: File) => {
         if (!event) return;
@@ -186,6 +207,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         { value: "contracts", label: "Contracts", meta: "Uploaded docs", scope: "docs", icon: FileText },
         { value: "inbox", label: "Inbox", meta: "Messages", scope: "local", icon: Inbox },
         { value: "itinerary", label: "Itinerary", meta: "Agent generated", scope: "docs", icon: Calendar },
+        { value: "flights", label: "Flights", meta: "Travel planning", scope: "docs", icon: Plane },
         { value: "todo", label: "To-Do List", meta: "Agent checklist", scope: "docs", icon: ListChecks },
         { value: "website", label: "Website", meta: "RSVP page", scope: "local", icon: Globe },
     ];
@@ -211,7 +233,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
             return <ContractsTab eventId={id} bookedVendors={event.bookedVendors} />;
         }
         if (activeTab === "inbox") {
-            return <InboxTab />;
+            return <InboxTab event={event} />;
         }
         if (activeTab === "itinerary") {
             return (
@@ -221,6 +243,9 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     onEventChange={() => { }}
                 />
             );
+        }
+        if (activeTab === "flights") {
+            return <FlightsTab event={event} />;
         }
         if (activeTab === "todo") {
             return (
@@ -281,10 +306,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <Button variant="outline" className="h-10 gap-2 rounded-xl px-4 font-bold border-border bg-card hover:bg-secondary/50">
-                            <Share2 size={18} />
-                            Share
-                        </Button>
+                        <ShareEventDialog event={event} teamMembers={teamMembers} />
                         <Button className="h-10 gap-2 rounded-xl px-4 font-bold">
                             <Rocket size={18} />
                             Publish

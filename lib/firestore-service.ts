@@ -50,13 +50,32 @@ export async function getVendorBySlug(slug: string): Promise<Vendor | null> {
     return null;
 }
 
-export async function getEvents(userId?: string): Promise<SharedEvent[]> {
-    let q = query(collection(db, 'events'));
-    if (userId) {
-        q = query(collection(db, 'events'), where('hostId', '==', userId));
+export async function getEvents(userId?: string, userEmail?: string): Promise<SharedEvent[]> {
+    if (!userId && !userEmail) {
+        const q = query(collection(db, 'events'));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as SharedEvent));
     }
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as SharedEvent));
+
+    const eventsMap = new Map<string, SharedEvent>();
+
+    if (userId) {
+        const q1 = query(collection(db, 'events'), where('hostId', '==', userId));
+        const snap1 = await getDocs(q1);
+        snap1.docs.forEach(doc => {
+            eventsMap.set(doc.id, { ...doc.data(), id: doc.id } as SharedEvent);
+        });
+    }
+
+    if (userEmail) {
+        const q2 = query(collection(db, 'events'), where('sharedWith', 'array-contains', userEmail));
+        const snap2 = await getDocs(q2);
+        snap2.docs.forEach(doc => {
+            eventsMap.set(doc.id, { ...doc.data(), id: doc.id } as SharedEvent);
+        });
+    }
+
+    return Array.from(eventsMap.values());
 }
 
 export function listenToEvents(userId: string, callback: (events: SharedEvent[]) => void) {

@@ -18,7 +18,7 @@ export default function EventsPage() {
         async function fetchEvents() {
             if (user) {
                 try {
-                    const userEvents = await getEvents(user.uid);
+                    const userEvents = await getEvents(user.uid, user.email || undefined);
                     setEvents(userEvents);
                 } catch (error) {
                     console.error("Error fetching events:", error);

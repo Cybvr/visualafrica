@@ -8,6 +8,7 @@ import { useAuth } from '@/components/providers/auth-provider';
 import { updateVendor } from '@/lib/firestore-service';
 import { uploadImage } from '@/lib/upload-service';
 import { useSavedVendors } from '@/hooks/use-saved-vendors';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -24,7 +25,7 @@ interface VendorDetailProps {
 
 const VendorDetail: React.FC<VendorDetailProps> = ({ vendor }) => {
   const router = useRouter();
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
   const isAdmin = profile?.role === "admin";
   const { savedVendorIds, toggleSavedVendor } = useSavedVendors(profile?.uid);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
@@ -34,7 +35,7 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor }) => {
   const [editImage, setEditImage] = React.useState(vendor.image || "");
   const [editDescription, setEditDescription] = React.useState(vendor.description || "");
   const [editPrice, setEditPrice] = React.useState(
-    vendor.price === null || vendor.price === undefined || vendor.price === ""
+    vendor.price === null || vendor.price === undefined
       ? ""
       : String(vendor.price)
   );
@@ -62,6 +63,7 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor }) => {
       const code = error?.code ? ` (${error.code})` : "";
       const msg = error?.message ? `\n${error.message}` : "";
       alert(`Failed to update vendor${code}.${msg}`);
+      toast.error(`Failed to update vendor${code}`);
     } finally {
       setIsSaving(false);
     }
@@ -71,11 +73,16 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor }) => {
     if (!file) return;
     setIsUploading(true);
     try {
+      if (!user) {
+        toast.error("You must be signed in to upload images");
+        return;
+      }
       const url = await uploadImage(file, `vendors/${Date.now()}-${file.name}`);
       setEditImage(url);
+      toast.success("Image uploaded successfully");
     } catch (error: any) {
       console.error("Admin vendor image upload failed:", error);
-      alert(error?.code ? `Upload failed (${error.code})` : "Upload failed");
+      toast.error(error?.code ? `Upload failed (${error.code})` : "Upload failed");
     } finally {
       setIsUploading(false);
     }
