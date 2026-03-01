@@ -82,9 +82,9 @@ export function WaddiPrompt() {
     if (!mounted) return null;
 
     return (
-        <section className="h-[100dvh] px-4 py-2 md:px-6">
-            <div className="mx-auto flex h-full max-w-5xl items-center justify-center">
-                <div className="w-full text-center space-y-6 py-12 md:px-0">
+        <section className="h-full min-h-[28rem] px-4 md:px-6">
+            <div className="mx-auto grid h-full max-w-5xl place-items-center">
+                <div className="w-full text-center space-y-6 md:px-0">
                     <h1 className="text-4xl md:text-3xl font-bold text-foreground tracking-tight">
                         Stop planning.
                         Start living it.

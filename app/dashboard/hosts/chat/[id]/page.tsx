@@ -72,6 +72,8 @@ export default function ChatPage() {
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
     const [pendingAction, setPendingAction] = useState<any>(null);
     const [isPricingOpen, setIsPricingOpen] = useState(false);
+    const [messageUsage, setMessageUsage] = useState(0);
+    const MESSAGE_LIMIT = 15;
     const autoPromptSentRef = useRef<string | null>(null);
     const chatIdStr = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "new";
     const canShareChat = chatIdStr !== "new" && !chatIdStr.startsWith("task-");
@@ -88,11 +90,27 @@ export default function ChatPage() {
         return () => unsubscribe();
     }, []);
 
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (!currentUser?.uid) {
+            setMessageUsage(0);
+            return;
+        }
+        const saved = window.localStorage.getItem(`waddi-message-usage:${currentUser.uid}`);
+        setMessageUsage(saved ? Number(saved) || 0 : 0);
+    }, [currentUser?.uid]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (!currentUser?.uid) return;
+        window.localStorage.setItem(`waddi-message-usage:${currentUser.uid}`, String(messageUsage));
+    }, [currentUser?.uid, messageUsage]);
+
     const handlePillClick = async (pill: any) => {
         // If pill has an explicit action, route through the action dispatcher
         if (pill.action) {
             const userContent = pill.id === 'store' ? "Browse Store" : (pill.action === 'vendor_search' ? "Show me vendors" : `Show me ${pill.label.toLowerCase()}`);
-            send(userContent, pill);
+            sendWithTokenTracking(userContent, pill);
             return;
         }
 
@@ -112,7 +130,7 @@ export default function ChatPage() {
         // Fallback for static UI views (Overview, Todo, etc)
         // If it's a new chat, use send to ensure it's created and persisted
         const userContent = `Show me ${pill.label.toLowerCase()}`;
-        send(userContent, pill);
+        sendWithTokenTracking(userContent, pill);
     };
 
     const chatQuickActions: { id: string; label: string; icon: IconType; colorClass: string; action?: string }[] = [
@@ -247,6 +265,16 @@ export default function ChatPage() {
         storeKits
     });
 
+    const rawPercent = Math.round((messageUsage / MESSAGE_LIMIT) * 100);
+    const messagePercent = messageUsage > 0 ? Math.min(100, Math.max(1, rawPercent)) : 0;
+
+    const sendWithTokenTracking = (text: string, actionData?: any) => {
+        const normalized = (text || "").trim();
+        if (!normalized) return;
+        setMessageUsage((prev) => prev + 1);
+        send(normalized, actionData);
+    };
+
     useEffect(() => {
         const routeChatId = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : 'new';
         const prefillPrompt = (searchParams.get("q") || "").trim();
@@ -256,6 +284,7 @@ export default function ChatPage() {
 
         autoPromptSentRef.current = prefillPrompt;
         setInput(prefillPrompt);
+        setMessageUsage((prev) => prev + 1);
         void send(prefillPrompt);
     }, [params.id, searchParams, historyLoaded, dataLoaded, send, setInput]);
 
@@ -466,7 +495,7 @@ export default function ChatPage() {
                                 savedVendors={savedVendorIds}
                                 allVendorsByCity={allVendorsByCity}
                                 onSuggestion={(s: any) => {
-                                    send(s.label, s);
+                                    sendWithTokenTracking(s.label, s);
                                 }}
                                 onCopy={(msg: any) => {
                                     const content = typeof msg?.content === "string" ? msg.content : "";
@@ -513,7 +542,7 @@ export default function ChatPage() {
                         <textarea
                             value={input}
                             onChange={e => setInput(e.target.value)}
-                            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
+                            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendWithTokenTracking(input); } }}
                             placeholder="Ask Waddi anything about this chat..."
                             rows={1}
                             className="w-full bg-transparent px-5 pt-5 pb-16 text-sm focus:outline-none resize-none min-h-[100px]"
@@ -547,11 +576,25 @@ export default function ChatPage() {
                             </div>
 
                             <div className="flex items-center gap-2">
+                                <div
+                                    className="relative h-10 w-10 rounded-full shrink-0"
+                                    style={{
+                                        background: `conic-gradient(
+                                            hsl(var(--foreground)) 0% ${messagePercent}%,
+                                            hsl(var(--background)) ${messagePercent}% 100%
+                                        )`
+                                    }}
+                                    title={`${messageUsage} / ${MESSAGE_LIMIT} messages`}
+                                >
+                                    <div className="absolute inset-[5px] rounded-full bg-card flex items-center justify-center">
+                                        <span className="text-[9px] font-semibold text-foreground leading-none">{messagePercent}%</span>
+                                    </div>
+                                </div>
                                 <button className="p-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors">
                                     <Mic size={18} />
                                 </button>
                                 <button
-                                    onClick={() => send(input)}
+                                    onClick={() => sendWithTokenTracking(input)}
                                     disabled={!input.trim()}
                                     className="h-10 w-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center disabled:opacity-50 transition-all active:scale-95 shadow-lg shrink-0"
                                 >

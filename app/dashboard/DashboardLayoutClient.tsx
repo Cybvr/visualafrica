@@ -21,6 +21,7 @@ export default function DashboardLayoutClient({
     const [authChecked, setAuthChecked] = useState(false);
 
     const isChatPage = pathname?.startsWith("/dashboard/hosts/chat/");
+    const isHostHomePage = pathname === "/dashboard/hosts";
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -74,7 +75,11 @@ export default function DashboardLayoutClient({
 
                 <main className={cn(
                     "flex-1 bg-secondary/30",
-                    isChatPage ? "p-0 h-screen overflow-hidden" : "p-3 sm:p-4 md:p-10"
+                    isChatPage
+                        ? "p-0 h-screen overflow-hidden"
+                        : isHostHomePage
+                            ? "p-0 overflow-hidden"
+                            : "p-3 sm:p-4 md:p-10"
                 )}>
                     {children}
                 </main>
