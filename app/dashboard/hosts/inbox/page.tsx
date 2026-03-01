@@ -2,7 +2,7 @@
 
 import React, { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Inbox, { ChatConversation, InboxContact } from '@/components/dashboard/Inbox';
+import Inbox, { ChatConversation, ComposeEvent, InboxContact } from '@/components/dashboard/Inbox';
 import { getEvents, getVendors } from '@/lib/firestore-service';
 import { Vendor, SharedEvent } from '@/lib/types';
 import { useAuth } from '@/components/providers/auth-provider';
@@ -46,6 +46,7 @@ const InboxContent: React.FC = () => {
   const { savedVendorIds } = useSavedVendors(user?.uid);
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [contacts, setContacts] = useState<InboxContact[]>([]);
+  const [composeEvents, setComposeEvents] = useState<ComposeEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -58,6 +59,15 @@ const InboxContent: React.FC = () => {
           allVendors.map((vendor) => ({
             id: vendor.id,
             name: vendor.name,
+            service: vendor.categories?.[0] || "General Inquiry",
+          }))
+        );
+        setComposeEvents(
+          events.map((event) => ({
+            id: event.id,
+            name: event.eventName,
+            date: event.date,
+            location: event.location,
           }))
         );
         if (vendorIdParam) {
@@ -141,6 +151,7 @@ const InboxContent: React.FC = () => {
       <Inbox
         conversations={conversations}
         contacts={savedContacts}
+        composeEvents={composeEvents}
         userType="host"
         title="Messages"
         preferredConversationId={vendorIdParam || undefined}

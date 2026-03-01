@@ -40,6 +40,9 @@ export interface ChatMessage {
         type: 'event';
         eventId: string;
         eventName: string;
+        eventDate?: string;
+        eventLocation?: string;
+        service?: string;
     };
 }
 
@@ -61,6 +64,14 @@ export interface ChatConversation {
 export interface InboxContact {
     id: string;
     name: string;
+    service?: string;
+}
+
+export interface ComposeEvent {
+    id: string;
+    name: string;
+    date?: string;
+    location?: string;
 }
 
 interface InboxProps {
@@ -70,6 +81,7 @@ interface InboxProps {
     preferredConversationId?: string;
     contacts?: InboxContact[];
     currentEventForShare?: { id: string; name: string };
+    composeEvents?: ComposeEvent[];
 }
 
 export default function Inbox({
@@ -78,7 +90,8 @@ export default function Inbox({
     title = "Messages",
     preferredConversationId,
     contacts = [],
-    currentEventForShare
+    currentEventForShare,
+    composeEvents = []
 }: InboxProps) {
     const [conversations, setConversations] = useState(initialConversations);
     const [searchQuery, setSearchQuery] = useState('');
@@ -94,6 +107,7 @@ export default function Inbox({
     const [isComposerOpen, setIsComposerOpen] = useState(false);
     const [composerMessage, setComposerMessage] = useState('');
     const [selectedContactId, setSelectedContactId] = useState('');
+    const [selectedComposeEventId, setSelectedComposeEventId] = useState('');
 
     useEffect(() => {
         setConversations(initialConversations);
@@ -192,7 +206,17 @@ export default function Inbox({
 
     const handleCompose = () => {
         const contactId = selectedContactId.trim();
-        if (!contactId || !composerMessage.trim()) return;
+        const eventId = selectedComposeEventId.trim();
+        if (!contactId || !eventId || !composerMessage.trim()) return;
+
+        const selectedEvent = composeEvents.find((event) => event.id === eventId) || (
+            currentEventForShare && currentEventForShare.id === eventId
+                ? { id: currentEventForShare.id, name: currentEventForShare.name }
+                : undefined
+        );
+        if (!selectedEvent) return;
+        const contact = contacts.find((c) => c.id === contactId);
+        const service = contact?.service || "General Inquiry";
 
         const existing = conversations.find((conv) =>
             conv.id === contactId || conv.id.startsWith(`${contactId}:`)
@@ -203,7 +227,15 @@ export default function Inbox({
             senderId: 'me',
             text: composerMessage,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isMe: true
+            isMe: true,
+            attachment: {
+                type: 'event',
+                eventId: selectedEvent.id,
+                eventName: selectedEvent.name,
+                eventDate: selectedEvent.date,
+                eventLocation: selectedEvent.location,
+                service
+            }
         };
 
         if (existing) {
@@ -211,12 +243,14 @@ export default function Inbox({
             setActiveView('chat');
             setIsComposerOpen(false);
             setSelectedContactId('');
+            setSelectedComposeEventId('');
             setComposerMessage('');
 
             setConversations(prev => prev.map(conv => {
                 if (conv.id === existing.id) {
                     return {
                         ...conv,
+                        eventName: selectedEvent.name,
                         lastMsg: composerMessage,
                         time: 'Just now',
                         messages: [...conv.messages, newMessage]
@@ -227,13 +261,12 @@ export default function Inbox({
             return;
         }
 
-        const contact = contacts.find((c) => c.id === contactId);
         const contactName = contact?.name || "Vendor";
         const conversationId = `${contactId}:direct-${Date.now()}`;
         const newConversation: ChatConversation = {
             id: conversationId,
             name: contactName,
-            eventName: "General Inquiry",
+            eventName: selectedEvent.name,
             lastMsg: composerMessage,
             time: "Now",
             unread: false,
@@ -246,6 +279,7 @@ export default function Inbox({
         setActiveView('chat');
         setIsComposerOpen(false);
         setSelectedContactId('');
+        setSelectedComposeEventId('');
         setComposerMessage('');
     };
 
@@ -261,7 +295,25 @@ export default function Inbox({
                         <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">{title}</h2>
                         <div className="flex items-center gap-2">
                             {userType === "host" && (
-                                <Dialog open={isComposerOpen} onOpenChange={setIsComposerOpen}>
+                                <Dialog
+                                    open={isComposerOpen}
+                                    onOpenChange={(open) => {
+                                        setIsComposerOpen(open);
+                                        if (!open) {
+                                            setSelectedContactId('');
+                                            setSelectedComposeEventId('');
+                                            setComposerMessage('');
+                                            return;
+                                        }
+                                        if (!selectedComposeEventId) {
+                                            if (currentEventForShare?.id) {
+                                                setSelectedComposeEventId(currentEventForShare.id);
+                                            } else if (composeEvents.length > 0) {
+                                                setSelectedComposeEventId(composeEvents[0].id);
+                                            }
+                                        }
+                                    }}
+                                >
                                     <DialogTrigger asChild>
                                         <Button
                                             variant="outline"
@@ -296,6 +348,24 @@ export default function Inbox({
                                                 )}
                                             </div>
                                             <div className="space-y-2">
+                                                <Label>Select Event</Label>
+                                                <Select value={selectedComposeEventId} onValueChange={setSelectedComposeEventId}>
+                                                    <SelectTrigger className="w-full rounded-xl h-11">
+                                                        <SelectValue placeholder="Choose the event this message is about" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="rounded-xl">
+                                                        {composeEvents.map((event) => (
+                                                            <SelectItem key={event.id} value={event.id} className="rounded-lg">
+                                                                {event.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                {composeEvents.length === 0 && (
+                                                    <p className="text-xs text-muted-foreground">Create an event first to message vendors with context.</p>
+                                                )}
+                                            </div>
+                                            <div className="space-y-2">
                                                 <Label>Message</Label>
                                                 <Textarea
                                                     placeholder="Type your message..."
@@ -307,7 +377,7 @@ export default function Inbox({
                                             <Button
                                                 className="w-full h-11 rounded-xl font-bold"
                                                 onClick={handleCompose}
-                                                disabled={!selectedContactId || !composerMessage.trim()}
+                                                disabled={!selectedContactId || !selectedComposeEventId || !composerMessage.trim()}
                                             >
                                                 Send Message
                                             </Button>
@@ -497,6 +567,14 @@ export default function Inbox({
                                                         <div className="min-w-0">
                                                             <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Event Invitation</p>
                                                             <p className="text-sm font-semibold text-foreground truncate">{msg.attachment.eventName}</p>
+                                                            <p className="text-xs text-muted-foreground mt-1 truncate">
+                                                                Regarding: {msg.attachment.eventName}
+                                                                {msg.attachment.eventDate ? ` • ${msg.attachment.eventDate}` : ""}
+                                                                {msg.attachment.service ? ` • ${msg.attachment.service}` : ""}
+                                                            </p>
+                                                            {msg.attachment.eventLocation && (
+                                                                <p className="text-xs text-muted-foreground truncate">{msg.attachment.eventLocation}</p>
+                                                            )}
                                                         </div>
                                                     </div>
                                                     <Link

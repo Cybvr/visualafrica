@@ -42,6 +42,9 @@ interface EventMessage {
         type: 'event';
         eventId: string;
         eventName: string;
+        eventDate?: string;
+        eventLocation?: string;
+        service?: string;
     };
 }
 
@@ -229,6 +232,9 @@ export default function InboxTab({ event }: InboxTabProps) {
                 type: 'event',
                 eventId: event.id,
                 eventName: event.eventName,
+                eventDate: event.date,
+                eventLocation: event.location,
+                service: activeChat.category,
             }
         };
 
@@ -253,6 +259,15 @@ export default function InboxTab({ event }: InboxTabProps) {
         const nextMessage = composerMessage.trim();
         const contact = composeContacts.find((item) => item.id === contactId);
         const existing = chats.find((chat) => chat.vendorId === contactId);
+        const service = existing?.category || contact?.category || "General Inquiry";
+        const contextAttachment: EventMessage["attachment"] = {
+            type: 'event',
+            eventId: event.id,
+            eventName: event.eventName,
+            eventDate: event.date,
+            eventLocation: event.location,
+            service,
+        };
 
         if (existing) {
             setChats((prev) =>
@@ -262,7 +277,7 @@ export default function InboxTab({ event }: InboxTabProps) {
                             ...chat,
                             lastMsg: nextMessage,
                             time: "Just now",
-                            messages: [...chat.messages, { id: `${chat.id}-${Date.now()}`, text: nextMessage, isMe: true }],
+                            messages: [...chat.messages, { id: `${chat.id}-${Date.now()}`, text: nextMessage, isMe: true, attachment: contextAttachment }],
                         }
                         : chat
                 )
@@ -292,7 +307,7 @@ export default function InboxTab({ event }: InboxTabProps) {
             status: 'requested',
             location: contact.location,
             price: formatPrice(contact.price),
-            messages: [{ id: `${newChatId}-${Date.now()}`, text: nextMessage, isMe: true }],
+            messages: [{ id: `${newChatId}-${Date.now()}`, text: nextMessage, isMe: true, attachment: contextAttachment }],
         };
 
         setChats((prev) => [newChat, ...prev]);
@@ -515,6 +530,14 @@ export default function InboxTab({ event }: InboxTabProps) {
                                                         <div className="min-w-0 text-primary-foreground">
                                                             <p className="text-xs font-bold uppercase tracking-widest opacity-80">Event Invitation</p>
                                                             <p className="text-sm font-semibold truncate">{message.attachment.eventName}</p>
+                                                            <p className="text-xs mt-1 truncate opacity-90">
+                                                                Regarding: {message.attachment.eventName}
+                                                                {message.attachment.eventDate ? ` • ${message.attachment.eventDate}` : ""}
+                                                                {message.attachment.service ? ` • ${message.attachment.service}` : ""}
+                                                            </p>
+                                                            {message.attachment.eventLocation && (
+                                                                <p className="text-xs truncate opacity-90">{message.attachment.eventLocation}</p>
+                                                            )}
                                                         </div>
                                                     </div>
                                                     <Link
