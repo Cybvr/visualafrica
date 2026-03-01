@@ -6,20 +6,13 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
     MapPin, Calendar, Users, Rocket,
     ChevronLeft, ChevronRight, Share2, Printer, Ticket,
-    Plus, ExternalLink, Mail, Download,
+    Plus, Mail, Download,
     LayoutDashboard, Store, FileText, Inbox, ListChecks, Globe, LucideIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { listenToEventById } from '@/lib/firestore-service';
 import { SharedEvent } from '@/lib/types';
 import PlanTab from '@/components/dashboard/event-tabs/PlanTab';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import GuestsTab from '@/components/dashboard/event-tabs/GuestsTab';
 import VendorsTab from '@/components/dashboard/event-tabs/VendorsTab';
 import ContractsTab from '@/components/dashboard/event-tabs/ContractsTab';
@@ -269,27 +262,6 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                         <Plus size={14} />
                                         New
                                     </Button>
-                                )}
-
-                                {activeTab === 'website' && (
-                                    <>
-                                        <div className="flex items-center gap-2 mr-2">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Template</span>
-                                            <Select defaultValue="classic">
-                                                <SelectTrigger className="h-8 w-[140px] rounded-md text-xs bg-secondary/50 border-transparent">
-                                                    <SelectValue placeholder="Select Template" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="classic">Classic Invite</SelectItem>
-                                                    <SelectItem value="minimal">Minimal Schedule</SelectItem>
-                                                    <SelectItem value="vibrant">Vibrant Spotlight</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <Button variant="outline" size="sm" className="h-8 w-8 rounded-md p-0">
-                                            <ExternalLink size={14} />
-                                        </Button>
-                                    </>
                                 )}
 
                                 {/* Universal Actions for all tabs */}

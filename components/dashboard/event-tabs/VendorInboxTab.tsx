@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Search, Send, MapPin, ChevronDown, Calendar } from 'lucide-react';
+import { Search, Send, ChevronDown, ArrowLeft } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { getEvents } from '@/lib/firestore-service';
 import { SharedEvent } from '@/lib/types';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
+import { cn } from '@/lib/utils';
 
 // Generate chats from events where vendor is involved
 const generateChats = (events: SharedEvent[]) => {
@@ -52,6 +53,7 @@ export default function VendorInboxTab({ focusedEventId }: VendorInboxTabProps) 
     const [events, setEvents] = useState<SharedEvent[]>([]);
     const initialChats = useMemo(() => generateChats(events), [events]);
     const [chats, setChats] = useState(initialChats);
+    const [mobileView, setMobileView] = useState<'list' | 'chat'>('list');
 
     useEffect(() => {
         async function loadEvents() {
@@ -86,123 +88,153 @@ export default function VendorInboxTab({ focusedEventId }: VendorInboxTabProps) 
 
     if (chats.length === 0) {
         return (
-            <div className="bg-card rounded-[2.5rem] border border-border p-16 text-center">
-                <h3 className="text-xl font-bold text-foreground mb-2">No Messages Yet</h3>
-                <p className="text-muted-foreground">Your client conversations will appear here once you have contracts.</p>
+            <div className="bg-card rounded-2xl border border-border p-12 text-center shadow-sm">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Send size={24} className="text-muted-foreground/50" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2">No Messages Yet</h3>
+                <p className="text-sm text-muted-foreground">Your client conversations will appear here once you have contracts.</p>
             </div>
         );
     }
 
     return (
-        <div className="h-[600px] flex flex-col md:flex-row bg-card rounded-[3rem] border border-border overflow-hidden shadow-sm">
-            <div className="w-full md:w-80 border-r border-border flex flex-col">
-                <div className="p-6 border-b border-border/50">
-                    <h2 className="text-xl font-serif font-black text-foreground mb-4">Messages</h2>
+        <div className="h-[70vh] min-h-[550px] flex flex-col md:flex-row bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
+            {/* Sidebar */}
+            <div className={cn(
+                "w-full md:w-80 border-r border-border flex flex-col min-h-0 bg-muted/5",
+                mobileView === 'chat' ? "hidden md:flex" : "flex"
+            )}>
+                <div className="p-4 border-b border-border">
+                    <h2 className="text-lg font-bold text-foreground mb-3">Messages</h2>
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-                        <Input type="text" placeholder="Search chats..." className="w-full pl-10 pr-4 py-2 bg-secondary border-none rounded-2xl text-sm" />
+                        <Input type="text" placeholder="Search chats..." className="w-full pl-9 h-9 bg-background border-border rounded-xl text-sm" />
                     </div>
                 </div>
-                <div className="flex-1 overflow-y-auto divide-y divide-slate-50 scrollbar-hide">
+                <div className="flex-1 overflow-y-auto divide-y divide-border">
                     {chats.map((chat) => (
                         <button
                             key={chat.id}
-                            onClick={() => setActiveChat(chat)}
-                            className={`w-full p-6 text-left hover:bg-secondary transition-colors flex items-start gap-4 ${activeChat?.id === chat.id ? 'bg-primary/5' : ''}`}
+                            onClick={() => { setActiveChat(chat); setMobileView('chat'); }}
+                            className={cn(
+                                "w-full p-4 text-left hover:bg-muted/50 transition-colors flex items-start gap-4",
+                                activeChat?.id === chat.id ? 'bg-muted' : ''
+                            )}
                         >
-                            <div className="w-12 h-12 rounded-2xl bg-secondary overflow-hidden shrink-0">
+                            <div className="w-11 h-11 rounded-xl bg-secondary overflow-hidden shrink-0 border border-border/50 shadow-sm">
                                 <img src={chat.image || '/placeholder.png'} alt={chat.name} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <div className="flex justify-between items-start mb-1">
-                                    <div>
-                                        <h4 className="font-bold text-foreground truncate">{chat.name}</h4>
-                                        <p className="text-[10px] text-muted-foreground font-medium truncate uppercase tracking-widest">{chat.eventName}</p>
-                                    </div>
+                                <div className="flex justify-between items-start mb-0.5">
+                                    <h4 className="font-bold text-sm text-foreground truncate">{chat.name}</h4>
                                     <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{chat.time}</span>
                                 </div>
+                                <p className="text-xs text-muted-foreground font-semibold truncate uppercase tracking-widest mb-1">{chat.eventName}</p>
                                 <p className="text-sm text-muted-foreground truncate font-medium">{chat.lastMsg}</p>
-                                {chat.unread && <div className="mt-2 w-2 h-2 bg-primary rounded-full" />}
+                                {chat.unread && <div className="mt-2 w-2 h-2 bg-primary rounded-full shadow-lg shadow-primary/50" />}
                             </div>
                         </button>
                     ))}
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-col bg-secondary/10">
+            {/* Chat Area */}
+            <div className={cn(
+                "flex-1 flex flex-col bg-background min-h-0",
+                mobileView === 'list' ? "hidden md:flex" : "flex"
+            )}>
                 {activeChat ? (
                     <>
-                        <div className="p-6 bg-card border-b border-border flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-xl bg-secondary overflow-hidden">
-                                    <img src={activeChat.image || '/placeholder.png'} alt={activeChat.name} className="w-full h-full object-cover" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-foreground">{activeChat.name}</h3>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                        <span className="text-xs text-muted-foreground font-medium">Active now</span>
+                        <div className="p-4 bg-muted/5 border-b border-border flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="md:hidden h-8 w-8 text-muted-foreground hover:text-foreground"
+                                    onClick={() => setMobileView('list')}
+                                >
+                                    <ArrowLeft size={18} />
+                                </Button>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-xl bg-secondary overflow-hidden border border-border shadow-sm">
+                                        <img src={activeChat.image || '/placeholder.png'} alt={activeChat.name} className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <h3 className="font-bold text-sm text-foreground truncate">{activeChat.name}</h3>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                                            <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Active now</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="sm" className="gap-2 rounded-xl font-bold">
-                                            Update Status
-                                            <ChevronDown className="h-3 w-3" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[180px]">
-                                        {['Pending', 'Confirmed', 'In Progress', 'Completed', 'Paid'].map((status) => (
-                                            <DropdownMenuItem key={status} onClick={() => updateStatus(activeChat.id, status.toLowerCase())} className="rounded-xl font-bold hover:bg-secondary">
-                                                Mark as {status}
-                                            </DropdownMenuItem>
-                                        ))}
+
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm" className="h-8 gap-2 rounded-xl font-bold text-xs border-border bg-card shadow-sm">
+                                        {activeChat.status.charAt(0).toUpperCase() + activeChat.status.slice(1)}
+                                        <ChevronDown className="h-3 w-3" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="rounded-xl p-2 min-w-[180px]">
+                                    {['Pending', 'Confirmed', 'In Progress', 'Completed', 'Paid'].map((status) => (
                                         <DropdownMenuItem
-                                            onClick={() => updateStatus(activeChat.id, 'cancelled')}
-                                            className="text-red-600 rounded-xl font-bold focus:bg-red-50 focus:text-red-600"
+                                            key={status}
+                                            onSelect={() => updateStatus(activeChat.id, status.toLowerCase())}
+                                            className="rounded-lg font-bold text-xs hover:bg-secondary"
                                         >
-                                            Cancel
+                                            Mark as {status}
                                         </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
+                                    ))}
+                                    <div className="h-px bg-border my-1" />
+                                    <DropdownMenuItem
+                                        onSelect={() => updateStatus(activeChat.id, 'cancelled')}
+                                        className="text-red-600 rounded-lg font-bold text-xs focus:bg-red-50 focus:text-red-600"
+                                    >
+                                        Cancel Contract
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-8 space-y-6">
-                            <div className="flex items-start gap-3 max-w-lg">
-                                <div className="w-8 h-8 rounded-lg bg-secondary overflow-hidden shrink-0">
+                        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-muted/5">
+                            <div className="flex items-start gap-3 max-w-[90%] sm:max-w-[75%] mr-auto">
+                                <div className="w-7 h-7 rounded-lg bg-secondary overflow-hidden shrink-0 border border-border shadow-sm">
                                     <img src={activeChat.image || '/placeholder.png'} alt={activeChat.name} className="w-full h-full object-cover" />
                                 </div>
-                                <div className="bg-card p-4 rounded-2xl rounded-tl-none border border-border shadow-sm text-sm text-foreground leading-relaxed font-medium">
+                                <div className="bg-card p-3 rounded-2xl rounded-tl-none border border-border shadow-sm text-sm text-foreground leading-relaxed font-medium">
                                     Hello! Thank you so much for accepting our event booking. We're really looking forward to working with you on {activeChat.eventName}.
                                     I've uploaded the initial requirements to the contract tab.
                                 </div>
                             </div>
-                            <div className="flex items-start gap-3 justify-end">
-                                <div className="bg-primary p-4 rounded-[2rem] rounded-tr-none shadow-lg shadow-primary/10 text-sm text-white leading-relaxed max-w-lg font-bold">
+                            <div className="flex items-start gap-3 justify-end max-w-[90%] sm:max-w-[75%] ml-auto">
+                                <div className="bg-primary text-primary-foreground p-3 rounded-2xl rounded-tr-none shadow-lg shadow-primary/10 text-sm leading-relaxed font-bold">
                                     Thank you! I've received the documents. I'm excited to be part of {activeChat.eventName}. I'll review everything and get back to you shortly.
                                 </div>
                             </div>
                         </div>
 
-                        <div className="p-6 bg-card border-t border-border/50">
-                            <div className="flex gap-4">
-                                <Input type="text" placeholder="Type your response..." className="flex-1 px-6 py-4 bg-secondary border-none rounded-[2rem] font-medium focus:ring-2 focus:ring-primary/20" />
-                                <button className="w-14 h-14 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                        <div className="p-4 bg-background border-t border-border">
+                            <div className="flex gap-2">
+                                <Input
+                                    type="text"
+                                    placeholder="Type your response..."
+                                    className="flex-1 h-11 px-4 bg-muted/10 border-transparent rounded-xl font-medium focus:bg-background focus:ring-0 text-sm"
+                                />
+                                <Button size="icon" className="h-11 w-11 rounded-xl shrink-0 shadow-lg shadow-primary/20">
                                     <Send size={20} />
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </>
                 ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                        <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mb-4">
-                            <Send size={32} className="text-foreground-200" />
+                    <div className="flex-1 flex flex-col items-center justify-center text-center p-8 text-muted-foreground/30">
+                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                            <Send size={32} />
                         </div>
                         <h3 className="text-lg font-bold text-foreground">Select a conversation</h3>
-                        <p className="text-sm text-muted-foreground mt-1">Choose a host to start chatting about your job.</p>
+                        <p className="text-sm text-muted-foreground mt-1 font-medium">Choose a host to start chatting about your job.</p>
                     </div>
                 )}
             </div>
