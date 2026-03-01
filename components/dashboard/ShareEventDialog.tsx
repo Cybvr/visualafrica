@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { Share2, Loader2, Users } from 'lucide-react';
+import { Loader2, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TeamMember, SharedEvent } from '@/lib/types';
 import { updateEvent } from '@/lib/firestore-service';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Plus } from 'lucide-react';
+
 interface ShareEventDialogProps {
     event: SharedEvent;
     teamMembers: TeamMember[];
+    hostPhoto?: string | null;
 }
 
-export function ShareEventDialog({ event, teamMembers }: ShareEventDialogProps) {
+export function ShareEventDialog({ event, teamMembers, hostPhoto }: ShareEventDialogProps) {
     const [open, setOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [sharedWith, setSharedWith] = useState<string[]>(event.sharedWith || []);
@@ -37,13 +41,43 @@ export function ShareEventDialog({ event, teamMembers }: ShareEventDialogProps) 
         }
     };
 
+    const sharedMembers = teamMembers.filter(m => sharedWith.includes(m.email));
+    const displayMembers = sharedMembers.slice(0, 2);
+    const extraCount = sharedMembers.length > 2 ? sharedMembers.length - 2 : 0;
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="h-10 gap-2 rounded-xl px-4 font-bold border-border bg-card hover:bg-secondary/50">
-                    <Share2 size={18} />
-                    Share
-                </Button>
+                <div className="flex -space-x-2 overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
+                    {/* Host Avatar */}
+                    <Avatar className="h-10 w-10 border-2 border-background ring-0">
+                        <AvatarImage src={hostPhoto || undefined} />
+                        <AvatarFallback className="bg-primary text-primary-foreground font-bold text-xs">
+                            {event.hostName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                    </Avatar>
+
+                    {/* Shared Members */}
+                    {displayMembers.map((member) => (
+                        <Avatar key={member.id} className="h-10 w-10 border-2 border-background">
+                            <AvatarFallback className="bg-secondary text-secondary-foreground font-bold text-xs">
+                                {member.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
+                    ))}
+
+                    {/* Extra Count */}
+                    {extraCount > 0 && (
+                        <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center border-2 border-background relative z-10 transition-colors">
+                            <span className="text-[10px] font-bold text-muted-foreground">+{extraCount}</span>
+                        </div>
+                    )}
+
+                    {/* Plus Button */}
+                    <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center border-2 border-background relative z-20 hover:bg-secondary/80 transition-colors">
+                        <Plus size={16} className="text-muted-foreground" />
+                    </div>
+                </div>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md bg-card border-border rounded-3xl p-6">
                 <DialogHeader className="mb-4">

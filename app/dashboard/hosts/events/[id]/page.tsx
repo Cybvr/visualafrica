@@ -81,6 +81,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     const [isLoading, setIsLoading] = useState(true);
     const [isImportingGuests, setIsImportingGuests] = useState(false);
     const [guestImportMessage, setGuestImportMessage] = useState<string | null>(null);
+    const [hostPhoto, setHostPhoto] = useState<string | null>(null);
     const [teamMembers, setTeamMembers] = useState<any[]>([]);
 
     // Sync state with URL
@@ -110,7 +111,9 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                 const profileRef = doc(db, 'userProfiles', event.hostId);
                 const snap = await getDoc(profileRef);
                 if (snap.exists()) {
-                    setTeamMembers(snap.data().teamMembers || []);
+                    const data = snap.data();
+                    setTeamMembers(data.teamMembers || []);
+                    setHostPhoto(data.photoURL || null);
                 }
             } catch (error) {
                 console.error("Failed to load team members:", error);
@@ -311,7 +314,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <ShareEventDialog event={event} teamMembers={teamMembers} />
+                        <ShareEventDialog event={event} teamMembers={teamMembers} hostPhoto={hostPhoto} />
                         <Button className="h-10 gap-2 rounded-xl px-4 font-bold">
                             <Rocket size={18} />
                             Publish
