@@ -29,7 +29,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DashboardFilter } from '../DashboardFilter';
 import { cn, formatCurrency } from "@/lib/utils";
-import { getVendors } from '@/lib/firestore-service';
+import { getVendors, listenToMessages, saveChatMessage } from '@/lib/firestore-service';
 import { useAuth } from '@/components/providers/auth-provider';
 import { useSavedVendors } from '@/hooks/use-saved-vendors';
 import { SharedEvent, Vendor } from '@/lib/types';
@@ -46,6 +46,7 @@ interface EventMessage {
         eventLocation?: string;
         service?: string;
     };
+    timestamp?: any;
 }
 
 interface EventChat {
@@ -181,6 +182,36 @@ export default function InboxTab({ event }: InboxTabProps) {
         }
     }, [activeChatId, chats]);
 
+    // ── Real-time Message Listener ───────────────────────────────
+    useEffect(() => {
+        if (!activeChatId) return;
+
+        const unsubscribe = listenToMessages(activeChatId, (newMessages) => {
+            if (newMessages.length === 0) return;
+
+            setChats((prev) =>
+                prev.map((chat) =>
+                    chat.id === activeChatId
+                        ? {
+                            ...chat,
+                            messages: newMessages.map(m => ({
+                                id: m.id,
+                                text: m.text,
+                                isMe: m.isMe ?? (m.senderId === user?.uid),
+                                timestamp: m.timestamp,
+                                attachment: m.attachment
+                            })),
+                            lastMsg: newMessages[newMessages.length - 1].text,
+                            time: "Just now" // We could format the timestamp here
+                        }
+                        : chat
+                )
+            );
+        });
+
+        return () => unsubscribe();
+    }, [activeChatId, user]);
+
     const composeContacts: ComposeContact[] = useMemo(() => {
         return allVendors
             .filter((vendor) => savedVendorIds.has(vendor.id))
@@ -203,22 +234,23 @@ export default function InboxTab({ event }: InboxTabProps) {
         ));
     };
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         if (!messageInput.trim() || !activeChat) return;
-        const nextMessage = messageInput.trim();
-        setChats((prev) =>
-            prev.map((chat) =>
-                chat.id === activeChat.id
-                    ? {
-                        ...chat,
-                        lastMsg: nextMessage,
-                        time: "Just now",
-                        messages: [...chat.messages, { id: `${chat.id}-${Date.now()}`, text: nextMessage, isMe: true }],
-                    }
-                    : chat
-            )
-        );
+        const nextMessageText = messageInput.trim();
         setMessageInput('');
+
+        try {
+            await saveChatMessage(activeChat.id, {
+                senderId: user?.uid,
+                senderName: user?.displayName || 'Host',
+                text: nextMessageText,
+                isMe: true
+            });
+        } catch (error) {
+            console.error("Failed to send message:", error);
+            // Revert message input on error
+            setMessageInput(nextMessageText);
+        }
     };
 
     const handleShareEvent = () => {
@@ -252,70 +284,40 @@ export default function InboxTab({ event }: InboxTabProps) {
         );
     };
 
-    const handleCompose = () => {
+    const handleCompose = async () => {
         const contactId = selectedContactId.trim();
         if (!contactId || !composerMessage.trim()) return;
 
         const nextMessage = composerMessage.trim();
         const contact = composeContacts.find((item) => item.id === contactId);
-        const existing = chats.find((chat) => chat.vendorId === contactId);
-        const service = existing?.category || contact?.category || "General Inquiry";
+        const chatId = `${event.id}:${contactId}`;
+
         const contextAttachment: EventMessage["attachment"] = {
             type: 'event',
             eventId: event.id,
             eventName: event.eventName,
             eventDate: event.date,
             eventLocation: event.location,
-            service,
+            service: contact?.category || "General Inquiry",
         };
 
-        if (existing) {
-            setChats((prev) =>
-                prev.map((chat) =>
-                    chat.id === existing.id
-                        ? {
-                            ...chat,
-                            lastMsg: nextMessage,
-                            time: "Just now",
-                            messages: [...chat.messages, { id: `${chat.id}-${Date.now()}`, text: nextMessage, isMe: true, attachment: contextAttachment }],
-                        }
-                        : chat
-                )
-            );
-            setActiveChatId(existing.id);
+        try {
+            await saveChatMessage(chatId, {
+                senderId: user?.uid,
+                senderName: user?.displayName || 'Host',
+                text: nextMessage,
+                isMe: true,
+                attachment: contextAttachment
+            });
+
+            setActiveChatId(chatId);
             setActiveView('chat');
             setIsComposerOpen(false);
             setSelectedContactId('');
             setComposerMessage('');
-            return;
+        } catch (error) {
+            console.error("Failed to compose message:", error);
         }
-
-        if (!contact) return;
-
-        const newChatId = `${event.id}:${contact.id}:direct`;
-        const newChat: EventChat = {
-            id: newChatId,
-            vendorId: contact.id,
-            vendorSlug: contact.slug,
-            name: contact.name,
-            category: contact.category,
-            lastMsg: nextMessage,
-            time: 'Now',
-            unread: false,
-            avatarUrl: contact.logo,
-            avatarFallback: (contact.name.charAt(0) || 'V').toUpperCase(),
-            status: 'requested',
-            location: contact.location,
-            price: formatPrice(contact.price),
-            messages: [{ id: `${newChatId}-${Date.now()}`, text: nextMessage, isMe: true, attachment: contextAttachment }],
-        };
-
-        setChats((prev) => [newChat, ...prev]);
-        setActiveChatId(newChatId);
-        setActiveView('chat');
-        setIsComposerOpen(false);
-        setSelectedContactId('');
-        setComposerMessage('');
     };
 
     const filteredChats = chats.filter((chat) => {
@@ -512,14 +514,12 @@ export default function InboxTab({ event }: InboxTabProps) {
                                             message.isMe ? "justify-end ml-auto" : "mr-auto"
                                         )}
                                     >
-                                        <div
-                                            className={cn(
-                                                "p-3 rounded-2xl shadow-sm text-sm leading-relaxed font-medium",
-                                                message.isMe
-                                                    ? "bg-primary text-primary-foreground rounded-tr-none"
-                                                    : "bg-card border border-border rounded-tl-none text-foreground"
-                                            )}
-                                        >
+                                        <div className={cn(
+                                            "px-4 py-3 rounded-2xl shadow-sm text-sm leading-relaxed font-medium whitespace-pre-wrap",
+                                            message.isMe
+                                                ? "bg-primary text-primary-foreground rounded-tr-none"
+                                                : "bg-card border border-border rounded-tl-none text-foreground"
+                                        )}>
                                             {message.text}
                                             {message.attachment?.type === 'event' && (
                                                 <div className="mt-3 p-3 rounded-xl bg-background/10 shadow-sm flex items-center justify-between gap-4 border border-background/20">

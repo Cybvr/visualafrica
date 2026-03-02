@@ -345,16 +345,15 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         <TooltipProvider delayDuration={0}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <div className="flex items-center">
-                                        <Switch
-                                            checked={isBriefOpen}
-                                            disabled={isUpdatingBriefState}
-                                            onCheckedChange={() => {
-                                                void handleTogglePublicBrief();
-                                            }}
-                                            aria-label={`Toggle public brief for ${event.eventName}`}
-                                        />
-                                    </div>
+                                    <Switch
+                                        checked={isBriefOpen}
+                                        disabled={isUpdatingBriefState}
+                                        onCheckedChange={() => {
+                                            void handleTogglePublicBrief();
+                                        }}
+                                        aria-label={`Toggle public brief for ${event.eventName}`}
+                                        className="scale-90"
+                                    />
                                 </TooltipTrigger>
                                 <TooltipContent className="bg-foreground text-background font-bold px-3 py-1.5 rounded-lg">
                                     <p className="text-[10px] uppercase tracking-wider">Public Brief Is {isBriefOpen ? 'Open' : 'Closed'}</p>

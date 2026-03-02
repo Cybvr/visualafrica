@@ -340,9 +340,27 @@ export default function VendorDashboardPage() {
           </button>
         </div>
 
-
-
-        {hasVendorProfile === false ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="border border-border rounded-2xl p-4 bg-card animate-pulse">
+                <div className="h-6 w-1/2 rounded bg-secondary" />
+                <div className="mt-3 h-3 w-full rounded bg-secondary" />
+                <div className="mt-2 h-3 w-4/5 rounded bg-secondary" />
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <div className="h-5 w-20 rounded bg-secondary" />
+                  <div className="h-5 w-16 rounded bg-secondary" />
+                  <div className="h-5 w-24 rounded bg-secondary" />
+                </div>
+                <div className="mt-4 border-t border-border pt-3 flex flex-wrap gap-3">
+                  <div className="h-3 w-28 rounded bg-secondary" />
+                  <div className="h-3 w-24 rounded bg-secondary" />
+                  <div className="h-3 w-20 rounded bg-secondary" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : hasVendorProfile === false ? (
           <div className="text-center py-16 bg-card rounded-[2rem] border border-border">
             <div className="text-muted-foreground space-y-2">
               <p className="text-lg font-bold text-foreground">No vendor profile linked</p>

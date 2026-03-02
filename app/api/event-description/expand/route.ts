@@ -5,8 +5,9 @@ import { adminAuth } from "@/lib/firebase-admin";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 const MODEL_CANDIDATES = [
   process.env.GEMINI_MODEL?.trim(),
-  "gemini-2.5-flash",
-  "gemini-2.5-flash-lite",
+  "gemini-1.5-flash-latest",
+  "gemini-1.5-flash",
+  "gemini-2.0-flash-latest",
   "gemini-2.0-flash",
 ].filter((m): m is string => Boolean(m));
 
@@ -107,12 +108,12 @@ ${boundedDescription || "No current description provided."}`;
     const message = String(error?.message || "Failed to expand description.");
     const cause = error?.cause
       ? {
-          message: String(error.cause?.message || ""),
-          code: String(error.cause?.code || ""),
-          errno: String(error.cause?.errno || ""),
-          syscall: String(error.cause?.syscall || ""),
-          hostname: String(error.cause?.hostname || ""),
-        }
+        message: String(error.cause?.message || ""),
+        code: String(error.cause?.code || ""),
+        errno: String(error.cause?.errno || ""),
+        syscall: String(error.cause?.syscall || ""),
+        hostname: String(error.cause?.hostname || ""),
+      }
       : undefined;
     console.error("expand-description error", error);
     return NextResponse.json(

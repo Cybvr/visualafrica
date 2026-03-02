@@ -5,6 +5,8 @@ import { SharedEvent } from '@/lib/types';
 import { SubmitProposalModal, ProposalData } from '@/components/dashboard/SubmitProposalModal';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { auth } from '@/lib/firebase';
+import { toast } from 'sonner';
 
 interface EventDetailProps {
   event: SharedEvent;
@@ -32,11 +34,42 @@ const EventDetail: React.FC<EventDetailProps> = ({ event }) => {
     setImgSrc('/placeholder.png');
   };
 
-  const handleProposalSubmit = (proposalData: ProposalData) => {
-    console.log('Proposal submitted:', proposalData);
-    // TODO: Submit to backend/database
-    // Navigate to jobs page after submission
-    router.push('/dashboard/vendors/jobs');
+  const handleProposalSubmit = async (proposalData: ProposalData) => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        toast.error('You must be logged in to submit a proposal.');
+        return;
+      }
+
+      const idToken = await user.getIdToken();
+      const response = await fetch('/api/vendor/proposals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          eventId: event.id,
+          quotedPrice: proposalData.quotedPrice,
+          deliveryTimeline: proposalData.deliveryTimeline,
+          message: proposalData.message,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit proposal');
+      }
+
+      toast.success('Proposal submitted successfully!');
+      // Navigate to jobs page after submission
+      router.push('/dashboard/vendors/jobs');
+    } catch (error: any) {
+      console.error('Error submitting proposal:', error);
+      toast.error(error.message || 'Something went wrong. Please try again.');
+    }
   };
 
   return (
@@ -123,6 +156,28 @@ const EventDetail: React.FC<EventDetailProps> = ({ event }) => {
               </div>
             </div>
           )}
+
+          {/* Itinerary */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-foreground">Itinerary</h3>
+            {event.itineraryItems && event.itineraryItems.length > 0 ? (
+              <div className="border border-border rounded divide-y divide-border">
+                {event.itineraryItems.map((item, idx) => (
+                  <div key={`${item.time}-${item.label}-${idx}`} className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-medium text-foreground">{item.label}</p>
+                      <p className="text-xs font-semibold text-muted-foreground">{item.time}</p>
+                    </div>
+                    {item.note ? (
+                      <p className="mt-1 text-sm text-muted-foreground">{item.note}</p>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No itinerary added yet.</p>
+            )}
+          </div>
         </div>
 
         {/* Sidebar */}
