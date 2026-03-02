@@ -13,7 +13,7 @@ export function getPaymentStats(payments: PaymentHistory[]) {
     const pending = payments.filter(p => p.status === 'pending' || p.status === 'processing');
 
     const parseAmount = (amount: string) => {
-        return parseFloat(amount.replace(/[NGN₦$,]/g, '').trim()) || 0;
+        return parseFloat(amount.replace(/[^0-9.-]/g, '').trim()) || 0;
     };
 
     const totalEarned = completed.reduce((sum, p) => sum + parseAmount(p.amount), 0);
@@ -44,7 +44,7 @@ export const VENDOR_DASHBOARD_DATA = {
     portfolioItems: [] as PortfolioItem[],
     chats: [] as Chat[],
     stats: {
-        monthlyRevenue: "$0",
+        monthlyRevenue: "0",
         growth: 0,
         activeBookings: 0,
         avgRating: 0

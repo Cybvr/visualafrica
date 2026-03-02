@@ -51,3 +51,9 @@ export const CATEGORY_SLUG_MAP: Record<string, VendorCategory> = {
     yachts: "Yachts",
     experiences: "Experiences",
 }
+export const FAQ_CATEGORIES: { id: string; label: string }[] = [
+    { id: 'general', label: 'General' },
+    { id: 'hosts', label: 'For Hosts' },
+    { id: 'vendors', label: 'For Vendors' },
+    { id: 'payments', label: 'Payments & Security' },
+];

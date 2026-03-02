@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ChevronDown, MapPin, Star, Users, ThumbsUp, ThumbsDown, Copy } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency, getCurrencySymbol } from "@/lib/utils";
 import { CITY_COLORS, CITIES } from "@/lib/chat-data";
 import { SharedEvent } from "@/lib/types";
 import {
@@ -101,7 +101,7 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
                     <span className="text-primary font-bold text-sm">
                         {v.price === null || v.price === undefined || Number.isNaN(Number(v.price))
                             ? "Contact for pricing"
-                            : `₦${Number(v.price).toLocaleString("en-NG")}+`}
+                            : `${formatCurrency(Number(v.price))}+`}
                     </span>
                     {!showActions && (
                         <span className="text-muted-foreground hover:text-foreground transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
@@ -162,6 +162,7 @@ function VendorCardMsg({
     activeEvent?: SharedEvent;
     onAction?: (action: any) => void;
 }) {
+    const currencySymbol = getCurrencySymbol();
     const targetCity = msg.city || activeCity;
     const allForCity = targetCity ? allVendorsByCity[targetCity] || [] : [];
     const sourceVendors = (msg.vendors && msg.vendors.length > 0) ? msg.vendors : allForCity;
@@ -311,6 +312,7 @@ function EventForm({
         setSelectedCategories(next);
         setData((prev) => ({ ...prev, categories: next.join(", ") }));
     };
+    const currencySymbol = getCurrencySymbol();
 
     return (
         <div className="bg-card border border-border rounded-2xl p-4 w-full space-y-3 shadow-sm">
@@ -349,7 +351,7 @@ function EventForm({
                     />
                     <input
                         type="text"
-                        placeholder="Budget (e.g. ₦1M)"
+                        placeholder={`Budget (e.g. ${currencySymbol}1M)`}
                         className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
                         value={data.budget}
                         onChange={e => setData({ ...data, budget: e.target.value })}
@@ -409,6 +411,7 @@ function EventForm({
 }
 
 function TicketForm({ onSubmit, eventName, eventId }: { onSubmit: (data: any) => void; eventName?: string; eventId?: string }) {
+    const currencySymbol = getCurrencySymbol();
     const [data, setData] = useState({ name: "", price: "", quantity: "", description: "" });
     return (
         <div className="bg-card border border-border rounded-2xl p-4 w-full space-y-3 shadow-sm">
@@ -427,7 +430,7 @@ function TicketForm({ onSubmit, eventName, eventId }: { onSubmit: (data: any) =>
                 <div className="grid grid-cols-2 gap-2">
                     <input
                         type="text"
-                        placeholder="Price (₦)"
+                        placeholder={`Price (${currencySymbol})`}
                         className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
                         value={data.price}
                         onChange={e => setData({ ...data, price: e.target.value })}
@@ -687,7 +690,7 @@ function StoreCard({ item, onAction }: { item: any; onAction?: (action: string, 
                         <span className="bg-primary/10 text-primary text-[11px] font-semibold rounded-full px-2 py-0.5">
                             {item.price === null || item.price === undefined || Number.isNaN(Number(item.price))
                                 ? "Contact for pricing"
-                                : `₦${Number(item.price).toLocaleString("en-NG")}+`}
+                                : `${formatCurrency(Number(item.price))}+`}
                         </span>
                     </div>
                 </div>

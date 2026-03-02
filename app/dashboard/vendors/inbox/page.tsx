@@ -1,6 +1,7 @@
 "use client";
 
 import React, { Suspense, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Inbox, { ChatConversation } from '@/components/dashboard/Inbox';
 import { SharedEvent } from '@/lib/types';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
@@ -47,6 +48,8 @@ const generateConversations = (events: SharedEvent[]): ChatConversation[] => {
 };
 
 const InboxContent: React.FC = () => {
+  const searchParams = useSearchParams();
+  const eventIdParam = searchParams.get('eventId') || undefined;
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -54,7 +57,32 @@ const InboxContent: React.FC = () => {
     async function fetchData() {
       try {
         const events = await getEvents();
-        setConversations(generateConversations(events));
+        const generated = generateConversations(events);
+
+        if (eventIdParam) {
+          const alreadyExists = generated.some(
+            (conversation) =>
+              conversation.id === eventIdParam || conversation.id.startsWith(`${eventIdParam}:`)
+          );
+
+          if (!alreadyExists) {
+            const targetEvent = events.find((event) => event.id === eventIdParam);
+            if (targetEvent) {
+              generated.unshift({
+                id: targetEvent.id,
+                name: targetEvent.hostName || "Host",
+                eventName: targetEvent.eventName,
+                lastMsg: "Start conversation",
+                time: "Now",
+                unread: false,
+                status: "pending",
+                messages: [],
+              });
+            }
+          }
+        }
+
+        setConversations(generated);
       } catch (error) {
         console.error("Error fetching inbox data:", error);
       } finally {
@@ -62,7 +90,7 @@ const InboxContent: React.FC = () => {
       }
     }
     fetchData();
-  }, []);
+  }, [eventIdParam]);
 
   if (isLoading) return <div className="p-10 text-center">Loading inbox...</div>;
 
@@ -72,6 +100,7 @@ const InboxContent: React.FC = () => {
         conversations={conversations}
         userType="vendor"
         title="Inbox"
+        preferredConversationId={eventIdParam}
       />
     </div>
   );

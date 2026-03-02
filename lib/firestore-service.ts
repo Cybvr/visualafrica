@@ -18,7 +18,7 @@ import {
     Timestamp
 } from 'firebase/firestore';
 
-import { Vendor, SharedEvent, BlogPost, FAQ, PricingTier, Offering, PlatformFeature } from './types';
+import { Vendor, SharedEvent, BlogPost, FAQ, PricingTier, Offering, PlatformFeature, Experience } from './types';
 import { buildMessageQuota, getCurrentPeriodKey } from './message-usage';
 
 export class MessageLimitReachedError extends Error {
@@ -131,8 +131,13 @@ export function listenToEvents(userId: string, callback: (events: SharedEvent[])
 }
 
 export async function createEvent(eventData: Omit<SharedEvent, 'id'>) {
+    const isPublicBrief = eventData.isPublicBrief ?? false;
+    const publicBriefStatus = eventData.publicBriefStatus ?? (isPublicBrief ? 'open' : 'closed');
+
     const docRef = await addDoc(collection(db, 'events'), {
         ...eventData,
+        isPublicBrief,
+        publicBriefStatus,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
     });
@@ -215,7 +220,7 @@ export async function getPlatformFeatures(): Promise<PlatformFeature[]> {
 export async function getVendorById(id: string): Promise<Vendor | null> {
     const docRef = doc(db, 'vendors', id);
     const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) return toPlainObject(docSnap.data() as Vendor);
+    if (docSnap.exists()) return toPlainObject({ ...docSnap.data(), id: docSnap.id } as Vendor);
     return null;
 }
 
@@ -224,6 +229,22 @@ export async function getEventById(id: string): Promise<SharedEvent | null> {
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) return toPlainObject({ ...docSnap.data(), id: docSnap.id } as SharedEvent);
     return null;
+}
+
+export async function getBookingById(id: string): Promise<any | null> {
+    const docRef = doc(db, 'bookings', id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) return toPlainObject({ ...docSnap.data(), id: docSnap.id });
+    return null;
+}
+
+export async function createBooking(bookingData: any) {
+    const docRef = await addDoc(collection(db, 'bookings'), {
+        ...bookingData,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+    });
+    return docRef.id;
 }
 
 export function listenToEventById(id: string, callback: (event: SharedEvent | null) => void) {
@@ -516,4 +537,107 @@ export async function bulkUpdateVendors(updates: { id: string, data: Partial<Ven
         });
     });
     await batch.commit();
+}
+
+// ── Experience Functions ──────────────────────────────────
+
+export async function getExperiences(): Promise<Experience[]> {
+    const querySnapshot = await getDocs(collection(db, 'experiences'));
+    const experiences = querySnapshot.docs.map(doc => toPlainObject({ ...doc.data(), id: doc.id } as Experience));
+
+    // Fetch unique vendor IDs to avoid redundant lookups
+    const vendorIds = Array.from(new Set(experiences.filter(e => e.vendorId).map(e => e.vendorId)));
+
+    // Batch fetch vendors in parallel
+    const vendors = await Promise.all(vendorIds.map(id => getVendorById(id)));
+    const vendorMap: Record<string, Vendor> = {};
+    vendors.forEach(v => {
+        if (v) vendorMap[v.id] = v;
+    });
+
+    // Map vendor details to experiences
+    return experiences.map(exp => ({
+        ...exp,
+        vendorName: vendorMap[exp.vendorId]?.name || exp.vendorName || "Unknown Vendor",
+        vendorSlug: vendorMap[exp.vendorId]?.slug || exp.vendorSlug || ""
+    }));
+}
+
+export async function getExperiencesByVendor(vendorId: string): Promise<Experience[]> {
+    const q = query(collection(db, 'experiences'), where('vendorId', '==', vendorId));
+    const querySnapshot = await getDocs(q);
+    const experiences = querySnapshot.docs.map(doc => toPlainObject({ ...doc.data(), id: doc.id } as Experience));
+
+    const vendor = await getVendorById(vendorId);
+    if (!vendor) return experiences;
+
+    return experiences.map(exp => ({
+        ...exp,
+        vendorName: vendor.name,
+        vendorSlug: vendor.slug
+    }));
+}
+
+export async function getExperienceById(id: string): Promise<Experience | null> {
+    const docRef = doc(db, 'experiences', id);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return null;
+
+    const experience = toPlainObject({ ...docSnap.data(), id: docSnap.id } as Experience);
+    if (experience.vendorId) {
+        const vendor = await getVendorById(experience.vendorId);
+        if (vendor) {
+            return {
+                ...experience,
+                vendorName: vendor.name,
+                vendorSlug: vendor.slug
+            };
+        }
+    }
+    return experience;
+}
+
+export async function addExperience(experienceData: Omit<Experience, 'id'>) {
+    const docRef = await addDoc(collection(db, 'experiences'), {
+        ...experienceData,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+    });
+    return docRef.id;
+}
+
+export async function updateExperience(id: string, data: Partial<Experience>) {
+    const docRef = doc(db, 'experiences', id);
+    await updateDoc(docRef, {
+        ...data,
+        updatedAt: serverTimestamp()
+    });
+}
+
+export async function deleteExperience(id: string) {
+    const docRef = doc(db, 'experiences', id);
+    await deleteDoc(docRef);
+}
+
+export async function getRelatedExperiences(experienceId: string, limitCount: number = 4): Promise<Experience[]> {
+    const allExperiences = await getExperiences();
+    const current = allExperiences.find(e => e.id === experienceId);
+    if (!current) return allExperiences.filter(e => e.id !== experienceId).slice(0, limitCount);
+
+    // Simple heuristic: same location or same vendor
+    // In a real app, you'd use categories or more complex logic
+    const related = allExperiences.filter(e =>
+        e.id !== experienceId &&
+        (e.location === current.location || e.vendorId === current.vendorId)
+    );
+
+    if (related.length < limitCount) {
+        // Fallback to any other experiences if not enough related ones found
+        const others = allExperiences.filter(e =>
+            e.id !== experienceId && !related.find(r => r.id === e.id)
+        );
+        return [...related, ...others].slice(0, limitCount);
+    }
+
+    return related.slice(0, limitCount);
 }

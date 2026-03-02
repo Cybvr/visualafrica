@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import VendorForm from "@/components/admin/VendorForm";
+import ExperienceManagement from "@/components/admin/ExperienceManagement";
 import { getVendorById, updateVendor } from "@/lib/firestore-service";
 import { Vendor } from "@/lib/types";
 
@@ -38,5 +39,13 @@ export default function EditVendorPage() {
         return <div className="p-8 text-center text-red-500 font-bold">Vendor not found</div>;
     }
 
-    return <VendorForm initialData={vendor} onSubmit={handleSubmit} title={`Edit: ${vendor.name}`} />;
+    return (
+        <div className="p-8 max-w-4xl mx-auto space-y-12">
+            <VendorForm initialData={vendor} onSubmit={handleSubmit} title={`Edit: ${vendor.name}`} />
+
+            <div className="bg-card border border-border p-8 rounded-2xl shadow-sm">
+                <ExperienceManagement vendor={vendor} />
+            </div>
+        </div>
+    );
 }

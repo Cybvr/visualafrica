@@ -14,6 +14,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { VENDOR_DASHBOARD_DATA, PaymentHistory, getPaymentStats } from '@/lib/vendor-dashboard-data';
+import { formatCurrency } from '@/lib/utils';
 
 export default function VendorPaymentsPage() {
     const [activeTab, setActiveTab] = useState<'history' | 'methods'>('history');
@@ -78,7 +79,7 @@ export default function VendorPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">Total Earned</p>
                             <DollarSign size={20} className="text-green-600" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${paymentStats.totalEarned.toLocaleString()}</p>
+                        <p className="text-3xl font-black text-foreground">{formatCurrency(paymentStats.totalEarned)}</p>
                         <p className="text-xs text-muted-foreground mt-1">Lifetime earnings</p>
                     </div>
 
@@ -87,7 +88,7 @@ export default function VendorPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">Pending</p>
                             <Clock size={20} className="text-yellow-600" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">₦{paymentStats.pendingAmount.toLocaleString('en-NG')}</p>
+                        <p className="text-3xl font-black text-foreground">{formatCurrency(paymentStats.pendingAmount)}</p>
                         <p className="text-xs text-muted-foreground mt-1">Awaiting processing</p>
                     </div>
 
@@ -96,7 +97,7 @@ export default function VendorPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">This Month</p>
                             <Calendar size={20} className="text-primary" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${paymentStats.thisMonth.toLocaleString()}</p>
+                        <p className="text-3xl font-black text-foreground">{formatCurrency(paymentStats.thisMonth)}</p>
                         <p className="text-xs text-muted-foreground mt-1">February 2024</p>
                     </div>
                 </div>

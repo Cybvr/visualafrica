@@ -159,6 +159,8 @@ export interface SharedEvent {
     aiTodoSuggestionsUsed?: number;
     aiItinerarySuggestionsUsed?: number;
     sharedWith?: string[];
+    isPublicBrief?: boolean;
+    publicBriefStatus?: "open" | "closed";
 }
 
 export interface TimelineEntry {
@@ -175,6 +177,8 @@ export interface BudgetAllocation {
 
 // ── Blog Types ────────────────────────────────────────────
 
+// ── Blog Types ────────────────────────────────────────────
+
 export interface BlogPost {
     id: string;
     title: string;
@@ -184,6 +188,25 @@ export interface BlogPost {
     author: string;
     excerpt: string;
     content: string;
+}
+
+// ── Experience Types ──────────────────────────────────────
+
+export interface Experience {
+    id: string;
+    vendorId: string;
+    vendorName?: string;
+    vendorSlug?: string;
+    title: string;
+    description: string;
+    image: string;
+    price: number | null;
+    rating: number;
+    location: string;
+    duration?: string;
+    whatsIncluded?: string[];
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 // ── Dashboard Types ───────────────────────────────────────

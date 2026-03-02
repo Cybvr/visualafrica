@@ -13,7 +13,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { VendorCard } from "@/components/dashboard/vendor-card"
-import { EVENT_THEMES, CATEGORY_SLUG_MAP } from "@/lib/constants"
+import { EVENT_THEMES, VENDOR_CATEGORIES, CATEGORY_SLUG_MAP } from "@/lib/constants"
 import { type EventTheme, type VendorCategory, type Vendor, type FAQ } from "@/lib/types"
 
 const ITEMS_PER_PAGE = 8
@@ -109,7 +109,7 @@ export function VendorListingContent({
             >
               {locations.map((loc) => (
                 <option key={loc} value={loc}>
-                  {loc === "All Locations" ? "Select Location (Lagos)" : loc}
+                  {loc === "All Locations" ? "All Locations" : loc}
                 </option>
               ))}
             </select>
@@ -145,7 +145,7 @@ export function VendorListingContent({
       <div className="border-b border-border bg-secondary/30 px-4 lg:px-8">
         <div className="mx-auto max-w-7xl py-4 overflow-x-auto scrollbar-hide">
           <div className="flex gap-2 min-w-max">
-            {["All Categories", "Venues", "Catering", "Photography", "Entertainment", "Decor", "Planning"].map((cat) => (
+            {VENDOR_CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat as VendorCategory)}
@@ -245,7 +245,7 @@ export function VendorListingContent({
               Vendor Services Frequently Asked Questions
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Find answers to common questions about Vendor Services in Lagos
+              Find answers to common questions about vendor services
             </p>
           </div>
           <Accordion type="single" collapsible className="mt-12">

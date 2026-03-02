@@ -65,7 +65,9 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-sans)', 'Mulish', 'Inter', 'system-ui', 'sans-serif'],
         serif: ['var(--font-serif)', 'Neuton', 'Playfair Display', 'Georgia', 'serif'],
+        lora: ['var(--font-lora)', 'Lora', 'serif'],
       },
+
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

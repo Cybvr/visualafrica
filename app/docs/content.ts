@@ -48,13 +48,13 @@ export const offers: Offer[] = [
   {
     name: "Book Early, Lock In More",
     content: [
-      "I used to be the person booking everything last minute. Like genuinely thought it would be fine. Then Detty December came and every vendor I wanted was either gone or double the price. I just sat there refreshing like that was going to help. This year I booked 90 days out, locked in my vendors, got ₦25,000 credit — and honestly just forgot about it until it was time. That's the version of me I want to be every year.",
+      "I used to be the person booking everything last minute. Like genuinely thought it would be fine. Then Detty December came and every vendor I wanted was either gone or double the price. I just sat there refreshing like that was going to help. This year I booked 90 days out, locked in my vendors, got $25,000 credit — and honestly just forgot about it until it was time. That's the version of me I want to be every year.",
     ],
   },
   {
     name: "First Premium Booking",
     content: [
-      "I kept scrolling past the Waddi Verified section because I assumed it wasn't for me. Like those vendors are for people with bigger budgets, bigger events. My friend talked me into it. Used the ₦15,000 credit, booked my first one — and that event still comes up in conversation. Sometimes you just have to let yourself have the good thing.",
+      "I kept scrolling past the Waddi Verified section because I assumed it wasn't for me. Like those vendors are for people with bigger budgets, bigger events. My friend talked me into it. Used the $15,000 credit, booked my first one — and that event still comes up in conversation. Sometimes you just have to let yourself have the good thing.",
     ],
   },
   {
@@ -98,7 +98,7 @@ export const promosTiptapDoc = {
       content: [
         {
           type: "text",
-          text: "I used to be the person booking everything last minute. Like genuinely thought it would be fine. Then Detty December came and every vendor I wanted was either gone or double the price. I just sat there refreshing like that was going to help. This year I booked 90 days out, locked in my vendors, got ₦25,000 credit — and honestly just forgot about it until it was time. That's the version of me I want to be every year.",
+          text: "I used to be the person booking everything last minute. Like genuinely thought it would be fine. Then Detty December came and every vendor I wanted was either gone or double the price. I just sat there refreshing like that was going to help. This year I booked 90 days out, locked in my vendors, got $25,000 credit — and honestly just forgot about it until it was time. That's the version of me I want to be every year.",
         },
       ],
     },
@@ -112,7 +112,7 @@ export const promosTiptapDoc = {
       content: [
         {
           type: "text",
-          text: "I kept scrolling past the Waddi Verified section because I assumed it wasn't for me. Like those vendors are for people with bigger budgets, bigger events. My friend talked me into it. Used the ₦15,000 credit, booked my first one — and that event still comes up in conversation. Sometimes you just have to let yourself have the good thing.",
+          text: "I kept scrolling past the Waddi Verified section because I assumed it wasn't for me. Like those vendors are for people with bigger budgets, bigger events. My friend talked me into it. Used the $15,000 credit, booked my first one — and that event still comes up in conversation. Sometimes you just have to let yourself have the good thing.",
         },
       ],
     },
@@ -347,7 +347,7 @@ export const playbookTiptapDoc = {
 
 export const influencerHooks = [
   "POV: you have 10 days to plan your Kigali trip.",
-  "What ₦250,000 can get you for a full Kigali experience weekend.",
+  "What $250,000 can get you for a full Kigali experience weekend.",
   "I used Waddi to book 3 experiences in one evening.",
   "Before Waddi vs after Waddi trip planning.",
   "The Kigali spots most people skip.",

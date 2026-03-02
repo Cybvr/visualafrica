@@ -276,15 +276,16 @@ export function Header() {
             >
               Pricing
             </Link>
+            <Link
+              href="/explore/experiences"
+              className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              Experinces
+            </Link>
           </nav>
         </div>
 
         <div className="hidden w-[180px] flex-shrink-0 items-center justify-end gap-3 lg:flex">
-          <Link href="/request-demo">
-            <Button variant="outline" size="sm" className="flex items-center gap-2 border-primary/20 text-foreground  hover:text-foreground">
-              Request a Demo
-            </Button>
-          </Link>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -371,12 +372,14 @@ export function Header() {
               >
                 Pricing
               </Link>
+              <Link
+                href="/explore/experiences"
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
+                onClick={() => setMobileOpen(false)}
+              >
+                Experinces
+              </Link>
               <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
-                <Link href="/request-demo" onClick={() => setMobileOpen(false)}>
-                  <Button variant="outline" className="w-full ">
-                    Request a Demo
-                  </Button>
-                </Link>
                 {user ? (
                   <>
                     <Link href="/dashboard" onClick={() => setMobileOpen(false)}>

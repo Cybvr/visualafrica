@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Star, Heart, MapPin } from "lucide-react"
 import type { Vendor } from "@/lib/types"
+import { formatCurrency } from "@/lib/utils"
 
 export function VendorCard({
   vendor,
@@ -21,7 +22,7 @@ export function VendorCard({
             src={vendor.image}
             alt={vendor.name}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover"
           />
         ) : (
           <div className="h-full w-full bg-muted" />
@@ -38,9 +39,8 @@ export function VendorCard({
           </div>
         )}
         <button
-          className={`absolute right-3 bottom-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 transition-colors hover:bg-background ${
-            saved ? "text-primary" : "text-muted-foreground hover:text-foreground"
-          }`}
+          className={`absolute right-3 bottom-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 transition-colors hover:bg-background ${saved ? "text-primary" : "text-muted-foreground hover:text-foreground"
+            }`}
           aria-label={saved ? "Remove from saved vendors" : "Save vendor"}
           aria-pressed={saved}
           onClick={(e) => {
@@ -61,7 +61,7 @@ export function VendorCard({
           <p className="shrink-0 text-sm font-semibold text-foreground">
             {vendor.price === null || vendor.price === undefined || Number.isNaN(Number(vendor.price))
               ? "Contact for pricing"
-              : `₦${Number(vendor.price).toLocaleString("en-NG")}`}
+              : formatCurrency(Number(vendor.price))}
           </p>
         </div>
 

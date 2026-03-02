@@ -17,10 +17,12 @@ import {
 import { EVENT_THEMES } from '@/lib/constants';
 import { useAuth } from '@/components/providers/auth-provider';
 import { createEvent } from '@/lib/firestore-service';
+import { getCurrencySymbol } from '@/lib/utils';
 
 type FormStep = 1 | 2 | 3;
 
 export default function CreateEventPage() {
+    const currencySymbol = getCurrencySymbol();
     const router = useRouter();
     const { user, profile } = useAuth();
     const [step, setStep] = useState<FormStep>(1);
@@ -120,7 +122,9 @@ export default function CreateEventPage() {
                 leads: [],
                 categories: [],
                 themes: [formData.theme],
-                guests: []
+                guests: [],
+                isPublicBrief: false,
+                publicBriefStatus: "closed"
             });
             setIsSuccess(true);
         } catch (error) {
@@ -378,7 +382,7 @@ export default function CreateEventPage() {
                                 <div className="space-y-2">
                                     <label className="text-sm font-black text-foreground">What's your estimated budget?</label>
                                     <div className="relative">
-                                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">₦</span>
+                                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">{currencySymbol}</span>
                                         <input
                                             type="text"
                                             required
@@ -392,7 +396,7 @@ export default function CreateEventPage() {
                                 <div className="space-y-2">
                                     <label className="text-sm font-black text-foreground">Ticket price (optional)</label>
                                     <div className="relative">
-                                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">₦</span>
+                                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">{currencySymbol}</span>
                                         <input
                                             type="text"
                                             placeholder="e.g. 25,000"

@@ -2,38 +2,36 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 
-import { Search, Filter, ChevronDown, Calendar, FileText, Clock, Star, ArrowRight, ExternalLink, Heart, Crown } from 'lucide-react';
+import { Search, Filter, ChevronDown, Calendar, FileText, Clock, Star, ArrowRight, ExternalLink, Heart } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { VENDOR_CATEGORIES, EVENT_THEMES } from '@/lib/constants';
-import { Vendor, BlogPost, SharedEvent } from '@/lib/types';
-import { getVendors, getEvents, getBlogPosts } from '@/lib/firestore-service';
+import { Vendor, BlogPost, SharedEvent, Experience } from '@/lib/types';
+import { getVendors, getEvents, getBlogPosts, getExperiences } from '@/lib/firestore-service';
 import BlogPostCard from '@/components/dashboard/BlogPostCard';
 import { VendorCard } from '@/components/dashboard/vendor-card';
+import { ExperienceCard } from '@/components/dashboard/experience-card';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { useSavedVendors } from '@/hooks/use-saved-vendors';
 import { useAuth } from '@/components/providers/auth-provider';
-
-const VENDOR_TYPES = ['All', 'Regular Vendors', 'Suspended', 'New'];
 
 const FilterBar: React.FC<{
   vendors: Vendor[];
   selectedCategories: string[];
   selectedThemes: string[];
   selectedLocations: string[];
-  selectedType: string;
   priceRange: [number, number];
   onCategoryChange: (category: string) => void;
   onThemeChange: (theme: string) => void;
   onLocationChange: (location: string) => void;
-  onTypeChange: (type: string) => void;
   onPriceChange: (range: [number, number]) => void;
   onClearFilters: () => void;
 }> = ({
@@ -41,11 +39,9 @@ const FilterBar: React.FC<{
   selectedCategories,
   selectedThemes,
   selectedLocations,
-  selectedType,
   onCategoryChange,
   onThemeChange,
   onLocationChange,
-  onTypeChange,
   onClearFilters,
 }) => {
     // Extract unique locations from vendor data
@@ -56,8 +52,7 @@ const FilterBar: React.FC<{
 
     const hasActiveFilters = selectedCategories.length > 0 ||
       selectedThemes.length > 0 ||
-      selectedLocations.length > 0 ||
-      selectedType !== 'All';
+      selectedLocations.length > 0;
 
     return (
       <div className="rounded-2xl mb-6 ">
@@ -93,23 +88,6 @@ const FilterBar: React.FC<{
               />
             </div>
 
-            {/* Type Filter */}
-            <div className="relative group">
-              <div className="flex items-center bg-card border border-border rounded-xl overflow-hidden h-10 shadow-sm">
-                <div className="flex border-r border-border h-full items-center px-3 text-[12px] font-bold text-muted-foreground bg-secondary/30">
-                  Type
-                </div>
-                <select
-                  value={selectedType}
-                  onChange={(e) => onTypeChange(e.target.value)}
-                  className="bg-transparent border-none outline-none text-[13px] px-3 font-medium text-foreground h-full cursor-pointer min-w-[120px]"
-                >
-                  {VENDOR_TYPES.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
           </div>
 
           {/* Clear All */}
@@ -184,24 +162,24 @@ export default function DashboardPage() {
 
   // Data States
   const [allVendors, setAllVendors] = useState<Vendor[]>([]);
+  const [allExperiences, setAllExperiences] = useState<Experience[]>([]);
   const [allEvents, setAllEvents] = useState<SharedEvent[]>([]);
   const [allBlogPosts, setAllBlogPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Filter States
-  const [activeTab, setActiveTab] = useState<'all' | 'experiences' | 'saved'>('all');
+  const [topTab, setTopTab] = useState<'vendors' | 'experiences'>('vendors');
+  const [activeTab, setActiveTab] = useState<'all' | 'saved'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
-  const [selectedType, setSelectedType] = useState<string>('All');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
   const [currentPage, setCurrentPage] = useState(1);
 
   // Counts
   const allVendorsCount = allVendors.length;
-  const experiencesCount = allVendors.filter(v => v.categories.includes('Experiences')).length;
   const { user } = useAuth();
   const { savedVendorIds, toggleSavedVendor } = useSavedVendors(user?.uid);
   const savedVendorsCount = savedVendorIds.size;
@@ -223,15 +201,28 @@ export default function DashboardPage() {
           : (currentUser.displayName || '');
         setDisplayName(name);
 
-        // Fetch remaining data
-        const [v, e, b] = await Promise.all([
-          getVendors(),
+        // Keep vendors independent so other permission errors never blank vendor results.
+        const vendors = await getVendors();
+        setAllVendors(vendors);
+
+        const [eventsResult, blogPostsResult] = await Promise.allSettled([
           getEvents(currentUser.uid),
-          getBlogPosts()
+          getBlogPosts(),
         ]);
-        setAllVendors(v);
-        setAllEvents(e);
-        setAllBlogPosts(b);
+
+        if (eventsResult.status === "fulfilled") {
+          setAllEvents(eventsResult.value);
+        } else {
+          console.warn("Events unavailable. Falling back to empty list.", eventsResult.reason);
+          setAllEvents([]);
+        }
+
+        if (blogPostsResult.status === "fulfilled") {
+          setAllBlogPosts(blogPostsResult.value);
+        } else {
+          console.warn("Blog posts unavailable. Falling back to empty list.", blogPostsResult.reason);
+          setAllBlogPosts([]);
+        }
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {
@@ -240,6 +231,26 @@ export default function DashboardPage() {
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+
+    let cancelled = false;
+    getExperiences()
+      .then((data) => {
+        if (cancelled) return;
+        setAllExperiences(data || []);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.warn("Experiences unavailable. Falling back to empty list.", error);
+        setAllExperiences([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uid, topTab]);
 
   // Filter Handlers
   const toggleCategory = (cat: string) => {
@@ -265,7 +276,6 @@ export default function DashboardPage() {
     setSelectedCategories([]);
     setSelectedThemes([]);
     setSelectedLocations([]);
-    setSelectedType('All');
     setPriceRange([0, 10000000]);
     setCurrentPage(1);
   };
@@ -277,18 +287,6 @@ export default function DashboardPage() {
 
   // Apply filters logic
   let filteredVendors = allVendors;
-
-  if (activeTab === 'experiences') {
-    filteredVendors = filteredVendors.filter((v: Vendor) => v.categories.includes('Experiences'));
-  }
-
-  if (selectedType === 'Regular Vendors') {
-    filteredVendors = filteredVendors.filter((v: Vendor) => !v.categories.includes('Experiences'));
-  } else if (selectedType === 'New') {
-    filteredVendors = filteredVendors.filter((v: Vendor) => v.isNew);
-  } else if (selectedType === 'Sponsored') {
-    filteredVendors = filteredVendors.filter((v: Vendor) => v.isSponsored);
-  }
 
   if (selectedCategories.length > 0) {
     filteredVendors = filteredVendors.filter((v: Vendor) =>
@@ -318,6 +316,18 @@ export default function DashboardPage() {
   const displayVendors = activeTab === 'saved'
     ? filteredVendors.filter(v => savedVendorIds.has(v.id))
     : filteredVendors;
+
+  const filteredExperiences = allExperiences.filter((experience) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      experience.title.toLowerCase().includes(q) ||
+      experience.vendorName.toLowerCase().includes(q) ||
+      experience.location.toLowerCase().includes(q)
+    );
+  });
+
+  const displayExperiences = filteredExperiences;
   const totalPages = Math.max(1, Math.ceil(displayVendors.length / VENDORS_PER_PAGE));
   const clampedPage = Math.min(currentPage, totalPages);
   const paginatedVendors = displayVendors.slice(
@@ -329,8 +339,8 @@ export default function DashboardPage() {
     setCurrentPage(1);
   }, [
     activeTab,
+    topTab,
     searchQuery,
-    selectedType,
     selectedCategories,
     selectedThemes,
     selectedLocations
@@ -346,12 +356,10 @@ export default function DashboardPage() {
       selectedCategories={selectedCategories}
       selectedThemes={selectedThemes}
       selectedLocations={selectedLocations}
-      selectedType={selectedType}
       priceRange={priceRange}
       onCategoryChange={toggleCategory}
       onThemeChange={toggleTheme}
       onLocationChange={toggleLocation}
-      onTypeChange={setSelectedType}
       onPriceChange={setPriceRange}
       onClearFilters={clearAllFilters}
     />
@@ -360,12 +368,8 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto min-w-0 space-y-6 pb-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 animate-pulse">
-          <div className="space-y-3">
-            <div className="h-8 w-48 bg-muted rounded-lg" />
-            <div className="h-4 w-64 bg-muted rounded" />
-          </div>
-          <div className="h-12 w-full md:w-80 bg-muted rounded-xl" />
+        <div className="mb-8 animate-pulse">
+          <div className="h-12 w-full bg-muted rounded-xl" />
         </div>
 
         <div className="space-y-8">
@@ -395,135 +399,170 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto min-w-0 space-y-6 pb-10">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">Search Vendors</h2>
-          <p className="text-muted-foreground">Find and book the best vendors for your event</p>
+      <div className="pt-1">
+        <div className="flex justify-center">
+          <Tabs value={topTab} onValueChange={(value) => setTopTab(value as 'vendors' | 'experiences')}>
+            <TabsList>
+              <TabsTrigger value="vendors">Vendors</TabsTrigger>
+              <TabsTrigger value="experiences">Experiences</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
+      </div>
 
-        <div className="relative w-full md:w-80 group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 group-focus-within:text-primary transition-colors" />
+      <div className="mb-4">
+        <div className="relative w-full group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5 group-focus-within:text-primary transition-colors" />
           <input
             type="text"
-            placeholder="Search vendors..."
+            placeholder={topTab === 'vendors' ? "Search vendors..." : "Search experiences..."}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-card border border-border rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium shadow-sm"
+            className="w-full bg-card border border-border rounded-xl pl-12 pr-5 py-4 text-base outline-none focus:border-primary/30 transition-all font-medium"
           />
         </div>
       </div>
 
-      <div className="space-y-6">
-        <div>
-          {filterBar}
-        </div>
+      {topTab === 'vendors' ? (
+        <div className="space-y-6">
+          <div>
+            {filterBar}
+          </div>
 
-        {/* Main Content */}
-        <div className="flex flex-col gap-8">
+          {/* Main Content */}
+          <div className="flex flex-col gap-8">
 
 
-          {/* Vendors area: tabs + grid */}
-          <div className="flex-1 min-w-0 space-y-4">
-            {/* Tabs */}
-            <div className="w-full min-w-0 flex items-center gap-3 sm:gap-6 border-b border-border overflow-x-auto scrollbar-hide">
-              <button
-                onClick={() => setActiveTab('all')}
-                className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'all'
-                  ? 'border-foreground text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-muted-foreground'
-                  }`}
-              >
-                All Vendors
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'all' ? 'bg-secondary text-foreground' : 'bg-secondary/50 text-muted-foreground'}`}>{allVendorsCount}</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('experiences')}
-                className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'experiences'
-                  ? 'border-foreground text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-muted-foreground'
-                  }`}
-              >
-                Experiences
-                <Crown size={14} className="text-amber-500 fill-amber-500" />
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'experiences' ? 'bg-secondary text-foreground' : 'bg-secondary/50 text-muted-foreground'}`}>{experiencesCount}</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('saved')}
-                className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'saved'
-                  ? 'border-foreground text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-muted-foreground'
-                  }`}
-              >
-                Saved Vendors
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'saved' ? 'bg-secondary text-foreground' : 'bg-secondary/50 text-muted-foreground'}`}>{savedVendorsCount}</span>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-              {paginatedVendors.map(vendor => (
-                <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full min-w-0 transition-transform hover:scale-[1.02]">
-                  <VendorCard
-                    vendor={vendor}
-                    saved={savedVendorIds.has(vendor.id)}
-                    onToggleSave={() => toggleSavedVendor(vendor.id)}
-                  />
-                </Link>
-              ))}
-            </div>
-
-            {displayVendors.length > VENDORS_PER_PAGE && (
-              <div className="flex items-center justify-center gap-2 pt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-lg"
-                  disabled={clampedPage === 1}
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            {/* Vendors area: tabs + grid */}
+            <div className="flex-1 min-w-0 space-y-4">
+              {/* Tabs */}
+              <div className="w-full min-w-0 flex items-center gap-3 sm:gap-6 border-b border-border overflow-x-auto scrollbar-hide">
+                <button
+                  onClick={() => setActiveTab('all')}
+                  className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'all'
+                    ? 'border-foreground text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-muted-foreground'
+                    }`}
                 >
-                  Prev
-                </Button>
-                <span className="text-sm font-semibold text-muted-foreground px-3">
-                  Page {clampedPage} of {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-lg"
-                  disabled={clampedPage === totalPages}
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  All Vendors
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'all' ? 'bg-secondary text-foreground' : 'bg-secondary/50 text-muted-foreground'}`}>{allVendorsCount}</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('saved')}
+                  className={`pb-3 text-xs sm:text-sm font-black transition-all border-b-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'saved'
+                    ? 'border-foreground text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-muted-foreground'
+                    }`}
                 >
-                  Next
-                </Button>
+                  Saved Vendors
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'saved' ? 'bg-secondary text-foreground' : 'bg-secondary/50 text-muted-foreground'}`}>{savedVendorsCount}</span>
+                </button>
               </div>
-            )}
 
-            {displayVendors.length === 0 && (
-              <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card p-16 md:p-32 text-center">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50" />
-                <div className="relative space-y-6">
-                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
-                    <Search size={40} />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-2xl font-black text-foreground">No vendors found</h3>
-                    <p className="text-muted-foreground max-w-sm mx-auto">
-                      We couldn't find any vendors matching your current search or filters. Try adjusting your criteria.
-                    </p>
-                  </div>
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+                {paginatedVendors.map(vendor => (
+                  <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full min-w-0">
+                    <VendorCard
+                      vendor={vendor}
+                      saved={savedVendorIds.has(vendor.id)}
+                      onToggleSave={() => toggleSavedVendor(vendor.id)}
+                    />
+                  </Link>
+                ))}
+              </div>
+
+              {displayVendors.length > VENDORS_PER_PAGE && (
+                <div className="flex items-center justify-center gap-2 pt-2">
                   <Button
                     variant="outline"
-                    onClick={clearAllFilters}
-                    className="rounded-full px-8"
+                    size="sm"
+                    className="rounded-lg"
+                    disabled={clampedPage === 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   >
-                    Clear all filters
+                    Prev
+                  </Button>
+                  <span className="text-sm font-semibold text-muted-foreground px-3">
+                    Page {clampedPage} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-lg"
+                    disabled={clampedPage === totalPages}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  >
+                    Next
                   </Button>
                 </div>
-              </div>
-            )}
+              )}
+
+              {displayVendors.length === 0 && (
+                <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card p-16 md:p-32 text-center">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50" />
+                  <div className="relative space-y-6">
+                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
+                      <Search size={40} />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-2xl font-black text-foreground">No vendors found</h3>
+                      <p className="text-muted-foreground max-w-sm mx-auto">
+                        We couldn't find any vendors matching your current search or filters. Try adjusting your criteria.
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={clearAllFilters}
+                      className="rounded-full px-8"
+                    >
+                      Clear all filters
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+            {displayExperiences.map((experience) => (
+              <div key={experience.id} className="block h-full min-w-0 transition-transform hover:scale-[1.02]">
+                <ExperienceCard
+                  experience={experience}
+                  experienceHref={`/dashboard/hosts/experiences/${experience.id}`}
+                  saved={savedVendorIds.has(experience.id)}
+                  onToggleSave={() => toggleSavedVendor(experience.id)}
+                />
+              </div>
+            ))}
+          </div>
+
+          {displayExperiences.length === 0 && (
+            <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card p-16 md:p-32 text-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50" />
+              <div className="relative space-y-6">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
+                  <Search size={40} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-black text-foreground">No experiences found</h3>
+                  <p className="text-muted-foreground max-w-sm mx-auto">
+                    We couldn't find any experiences matching your current search.
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setSearchQuery('')}
+                  className="rounded-full px-8"
+                >
+                  Clear search
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

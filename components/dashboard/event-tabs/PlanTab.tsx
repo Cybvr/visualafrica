@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from 'react';
-import { Plus, CalendarIcon } from 'lucide-react';
+import { Plus, CalendarIcon, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
@@ -60,6 +60,7 @@ const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
     const [category, setCategory] = React.useState(event.categories?.[0] || '');
     const [theme, setTheme] = React.useState(event.themes?.[0] || '');
     const [isSaving, setIsSaving] = React.useState(false);
+    const [isExpandingDescription, setIsExpandingDescription] = React.useState(false);
 
     // Restoring missing state and refs
     const { user } = useAuth();
@@ -146,6 +147,53 @@ const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
             toast.error('Failed to update cover image. Please check your connection and permissions.');
         } finally {
             setIsUploadingCover(false);
+        }
+    };
+
+    const handleExpandDescription = async () => {
+        if (!event.id || !user) {
+            toast.error('You must be signed in to use AI expansion.');
+            return;
+        }
+
+        setIsExpandingDescription(true);
+        try {
+            const idToken = await user.getIdToken();
+            const res = await fetch('/api/event-description/expand', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${idToken}`,
+                },
+                body: JSON.stringify({
+                    eventName,
+                    location,
+                    date: date ? date.toISOString() : event.date,
+                    guestCount: Number(guestCount) || event.guestCount || 0,
+                    category,
+                    theme,
+                    currentDescription: description,
+                }),
+            });
+
+            const data = await res.json();
+            if (!res.ok || !data?.description) {
+                const causeText = data?.cause
+                    ? ` | cause: ${JSON.stringify(data.cause)}`
+                    : '';
+                throw new Error((data?.error || `Failed to expand description (HTTP ${res.status})`) + causeText);
+            }
+
+            const expandedDescription = String(data.description).trim();
+            setDescription(expandedDescription);
+            await updateEvent(event.id, { description: expandedDescription });
+            toast.success('Description expanded with AI.');
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Could not expand description.';
+            console.error('Failed to expand description:', error);
+            toast.error(message);
+        } finally {
+            setIsExpandingDescription(false);
         }
     };
 
@@ -285,7 +333,20 @@ const PlanTab: React.FC<PlanTabProps> = ({ event }) => {
                             </Select>
                         </div>
                         <div className="md:col-span-2 space-y-1.5">
-                            <label className="text-sm font-medium text-muted-foreground">Event Description</label>
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-muted-foreground">Event Description</label>
+                                <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-7 px-2 text-xs font-semibold"
+                                    onClick={handleExpandDescription}
+                                    disabled={isExpandingDescription}
+                                >
+                                    <Sparkles size={14} className="mr-1" />
+                                    {isExpandingDescription ? 'Expanding...' : 'Expand'}
+                                </Button>
+                            </div>
                             <Textarea
                                 rows={4}
                                 value={description}

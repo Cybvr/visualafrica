@@ -28,6 +28,32 @@ import type { Vendor } from "@/lib/types"
 
 export function VendorDetail({ vendor }: { vendor: Vendor }) {
   const [currentImage, setCurrentImage] = useState(0)
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({})
+
+  const initials = (vendor.vendor.name || vendor.name || "Vendor")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || "")
+    .join("")
+
+  const fallbackPalettes = [
+    "bg-rose-100 text-rose-800",
+    "bg-amber-100 text-amber-800",
+    "bg-emerald-100 text-emerald-800",
+    "bg-sky-100 text-sky-800",
+    "bg-indigo-100 text-indigo-800",
+    "bg-fuchsia-100 text-fuchsia-800",
+  ] as const
+
+  const getPalette = (seed: string) => {
+    const hash = Array.from(seed).reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    return fallbackPalettes[hash % fallbackPalettes.length]
+  }
+
+  const markImageFailed = (key: string) => {
+    setFailedImages((prev) => (prev[key] ? prev : { ...prev, [key]: true }))
+  }
 
   const nextImage = () => {
     setCurrentImage((prev) => (prev + 1) % vendor.gallery.length)
@@ -45,13 +71,20 @@ export function VendorDetail({ vendor }: { vendor: Vendor }) {
         <div className="mx-auto flex max-w-7xl items-start gap-6">
           {/* Vendor Avatar */}
           <div className="hidden h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 border-background/20 md:block">
-            <Image
-              src={vendor.vendor.logo}
-              alt={vendor.vendor.name}
-              width={64}
-              height={64}
-              className="h-full w-full object-cover"
-            />
+            {failedImages.avatar ? (
+              <div className={`flex h-full w-full items-center justify-center font-bold ${getPalette(vendor.vendor.name || vendor.name)}`}>
+                <span>{initials || "V"}</span>
+              </div>
+            ) : (
+              <Image
+                src={vendor.vendor.logo}
+                alt={vendor.vendor.name}
+                width={64}
+                height={64}
+                className="h-full w-full object-cover"
+                onError={() => markImageFailed("avatar")}
+              />
+            )}
           </div>
 
           <div className="flex-1">
@@ -111,14 +144,21 @@ export function VendorDetail({ vendor }: { vendor: Vendor }) {
             <div className="flex-1">
               {/* Image Gallery */}
               <div className="relative aspect-video overflow-hidden rounded-lg bg-muted">
-                <Image
-                  src={vendor.gallery[currentImage]?.url ?? vendor.image}
-                  alt={
-                    vendor.gallery[currentImage]?.alt ?? vendor.name
-                  }
-                  fill
-                  className="object-cover"
-                />
+                {failedImages[`main-${currentImage}`] ? (
+                  <div className={`flex h-full w-full items-center justify-center ${getPalette(vendor.name)}`}>
+                    <span className="text-4xl font-bold tracking-wide">{initials || "V"}</span>
+                  </div>
+                ) : (
+                  <Image
+                    src={vendor.gallery[currentImage]?.url ?? vendor.image}
+                    alt={
+                      vendor.gallery[currentImage]?.alt ?? vendor.name
+                    }
+                    fill
+                    className="object-cover"
+                    onError={() => markImageFailed(`main-${currentImage}`)}
+                  />
+                )}
                 {vendor.gallery.length > 1 && (
                   <>
                     <button
@@ -147,16 +187,23 @@ export function VendorDetail({ vendor }: { vendor: Vendor }) {
                       key={i}
                       onClick={() => setCurrentImage(i)}
                       className={`relative h-16 w-20 shrink-0 overflow-hidden rounded-md ${i === currentImage
-                          ? "ring-2 ring-primary"
-                          : "opacity-60 hover:opacity-80"
+                        ? "ring-2 ring-primary"
+                        : "opacity-60 hover:opacity-80"
                         }`}
                     >
-                      <Image
-                        src={img.url}
-                        alt={img.alt}
-                        fill
-                        className="object-cover"
-                      />
+                      {failedImages[`thumb-${i}`] ? (
+                        <div className={`flex h-full w-full items-center justify-center text-xs font-bold ${getPalette(vendor.name + i)}`}>
+                          <span>{initials || "V"}</span>
+                        </div>
+                      ) : (
+                        <Image
+                          src={img.url}
+                          alt={img.alt}
+                          fill
+                          className="object-cover"
+                          onError={() => markImageFailed(`thumb-${i}`)}
+                        />
+                      )}
                     </button>
                   ))}
                 </div>
@@ -223,38 +270,29 @@ export function VendorDetail({ vendor }: { vendor: Vendor }) {
                         <p className="text-sm text-muted-foreground">
                           <strong className="text-foreground">
                             {vendor.stats.eventsPlanned} Events Planned
-                          </strong>{" "}
-                          - Delivering exceptional experiences with precision
-                          and creativity.
+                          </strong>
                         </p>
                         <p className="text-sm text-muted-foreground">
                           <strong className="text-foreground">
                             {vendor.stats.satisfiedClients} Satisfied Clients
-                          </strong>{" "}
-                          - Trusted by individuals and brands for seamless
-                          celebrations.
+                          </strong>
                         </p>
                         <p className="text-sm text-muted-foreground">
                           <strong className="text-foreground">
                             {vendor.stats.corporateEvents} Corporate & Social
                             Events
-                          </strong>{" "}
-                          - Expertise across diverse event formats and
-                          occasions.
+                          </strong>
                         </p>
                         <p className="text-sm text-muted-foreground">
                           <strong className="text-foreground">
                             {vendor.stats.yearsExperience} Years of Extensive
                             Experience
-                          </strong>{" "}
-                          - A legacy of excellence in event management.
+                          </strong>
                         </p>
                         <p className="text-sm text-muted-foreground">
                           <strong className="text-foreground">
                             {vendor.stats.uniqueLocations} Unique Locations
-                          </strong>{" "}
-                          - Curated venues that make every event truly
-                          unforgettable.
+                          </strong>
                         </p>
                       </div>
 

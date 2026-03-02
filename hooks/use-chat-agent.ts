@@ -20,6 +20,7 @@ import {
     getDefaultItineraryItems,
     getDefaultTodoItems
 } from "@/lib/chat/workflows";
+import { formatCurrency } from "@/lib/utils";
 import type { Dispatch, SetStateAction } from "react";
 
 type UseChatAgentArgs = {
@@ -483,7 +484,9 @@ Rules:
                 guests: [],
                 todoList: [],
                 itineraryItems: [],
-                budgetBreakdown: []
+                budgetBreakdown: [],
+                isPublicBrief: false,
+                publicBriefStatus: "closed"
             });
             setSelectedEventId(createdEventId);
             if (eventIdRef) eventIdRef.current = createdEventId;
@@ -1537,7 +1540,9 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 guests: [],
                 todoList: [],
                 itineraryItems: [],
-                budgetBreakdown: []
+                budgetBreakdown: [],
+                isPublicBrief: false,
+                publicBriefStatus: "closed"
             });
         }
         setSelectedEventId(targetEventId);
@@ -1577,7 +1582,9 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         }
 
         const nowStr = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-        const userText = `Add ${data.name} ticket tier: ₦${data.price} (Limit: ${data.quantity})`;
+        const parsedPrice = Number(String(data.price).replace(/[^0-9.-]/g, ""));
+        const formattedPrice = Number.isFinite(parsedPrice) ? formatCurrency(parsedPrice) : String(data.price);
+        const userText = `Add ${data.name} ticket tier: ${formattedPrice} (Limit: ${data.quantity})`;
 
         let chatIdStr = getRouteChatId();
         if (chatIdStr !== "new") {

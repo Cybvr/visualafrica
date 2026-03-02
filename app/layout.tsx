@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
-import { Mulish, Neuton, DM_Serif_Display, DM_Sans } from 'next/font/google'
+import { Mulish, Neuton, DM_Serif_Display, DM_Sans, Lora } from 'next/font/google'
+
 
 import './globals.css'
 
@@ -27,8 +28,15 @@ const dmSansHeading = DM_Sans({
   subsets: ['latin'],
   variable: '--font-heading',
   display: 'swap',
-  weight: ['300'],
+  weight: ['300', '500'],
 })
+
+const lora = Lora({
+  subsets: ['latin'],
+  variable: '--font-lora',
+  display: 'swap',
+})
+
 
 export const metadata: Metadata = {
   title: 'Waddi | Lagos\'s Trusted Event Planner Marketplace',
@@ -65,7 +73,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${mulish.variable} ${neuton.variable} ${dmSerifDisplay.variable} ${dmSansHeading.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${mulish.variable} ${neuton.variable} ${dmSerifDisplay.variable} ${dmSansHeading.variable} ${lora.variable}`}>
+
       <body className="font-sans antialiased">
         <AuthProvider>
           <ThemeProvider

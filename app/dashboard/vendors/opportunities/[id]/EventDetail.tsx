@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { ChevronLeft, Calendar, MapPin, Users, DollarSign, MessageSquare, Heart, Share2 } from 'lucide-react';
+import { ChevronLeft, Calendar, MapPin, Users, MessageSquare, Heart, Share2 } from 'lucide-react';
 import { SharedEvent } from '@/lib/types';
 import { SubmitProposalModal, ProposalData } from '@/components/dashboard/SubmitProposalModal';
 import { useRouter } from 'next/navigation';
@@ -8,6 +8,17 @@ import Link from 'next/link';
 
 interface EventDetailProps {
   event: SharedEvent;
+}
+
+function formatEventDate(value: string): string {
+  if (!value) return 'Date TBA';
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(parsed);
 }
 
 const EventDetail: React.FC<EventDetailProps> = ({ event }) => {
@@ -26,28 +37,6 @@ const EventDetail: React.FC<EventDetailProps> = ({ event }) => {
     // TODO: Submit to backend/database
     // Navigate to jobs page after submission
     router.push('/dashboard/vendors/jobs');
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Planning':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
-      case 'Confirmed':
-        return 'bg-green-50 text-green-700 border-green-200';
-      case 'Completed':
-        return 'bg-secondary text-foreground-700 border-slate-200';
-      default:
-        return 'bg-secondary text-foreground-700 border-slate-200';
-    }
-  };
-
-  const formatBudget = (budget: number) => {
-    return new Intl.NumberFormat('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(budget);
   };
 
   return (
@@ -86,24 +75,13 @@ const EventDetail: React.FC<EventDetailProps> = ({ event }) => {
 
           {/* Title & Meta */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className={`px-3 py-1 border ${getStatusColor(event.status)} rounded text-xs font-medium`}>
-                {event.status}
-              </span>
-            </div>
-
             <h1 className="text-3xl font-semibold text-foreground">{event.eventName}</h1>
 
-            {(event.categories || event.themes) && (
+            {Boolean(event.categories?.length) && (
               <div className="flex flex-wrap gap-2">
                 {event.categories?.map((cat, idx) => (
                   <span key={idx} className="px-2 py-0.5 bg-card text-foreground-600 text-[10px] font-bold rounded-md uppercase">
                     {cat}
-                  </span>
-                ))}
-                {event.themes?.map((theme, idx) => (
-                  <span key={idx} className="px-2 py-0.5 bg-primary/5 text-primary/70 text-[10px] font-bold rounded-md border border-primary/10 italic">
-                    {theme}
                   </span>
                 ))}
               </div>
@@ -112,7 +90,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ event }) => {
             <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground pt-2">
               <div className="flex items-center gap-2">
                 <Calendar size={16} />
-                {event.date}
+                {formatEventDate(event.date)}
               </div>
               <div className="flex items-center gap-2">
                 <MapPin size={16} />
@@ -125,30 +103,21 @@ const EventDetail: React.FC<EventDetailProps> = ({ event }) => {
             </div>
           </div>
 
-          {/* Host Info */}
-          <div className="bg-secondary p-4 rounded border border-border">
-            <p className="text-xs text-muted-foreground mb-1">Event Host</p>
-            <p className="font-medium text-foreground">{event.hostName}</p>
-          </div>
-
           {/* Description */}
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-foreground">Event Overview</h3>
             <p className="text-muted-foreground leading-relaxed">{event.description}</p>
           </div>
 
-          {/* Vendors */}
-          {event.bookedVendors.length > 0 && (
+          {/* Budget Items */}
+          {event.budgetBreakdown && event.budgetBreakdown.length > 0 && (
             <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-foreground">Contracted Vendors</h3>
+              <h3 className="text-lg font-semibold text-foreground">Budget Items</h3>
               <div className="border border-border rounded divide-y divide-border">
-                {event.bookedVendors.map((vendor, idx) => (
+                {event.budgetBreakdown.map((item, idx) => (
                   <div key={idx} className="flex items-center justify-between p-4">
-                    <div>
-                      <p className="font-medium text-foreground">{vendor.service}</p>
-                      <p className="text-xs text-muted-foreground">{vendor.status}</p>
-                    </div>
-                    <p className="font-semibold text-foreground">{vendor.amount}</p>
+                    <p className="font-medium text-foreground">{item.category}</p>
+                    <p className="font-semibold text-foreground">{item.amount}</p>
                   </div>
                 ))}
               </div>
@@ -159,27 +128,15 @@ const EventDetail: React.FC<EventDetailProps> = ({ event }) => {
         {/* Sidebar */}
         <div className="space-y-4">
           <div className="sticky top-6 border border-border rounded p-6 space-y-6 bg-white">
-            {/* Budget */}
-            <div className="pb-6 border-b border-border">
-              <p className="text-xs text-muted-foreground mb-1">Total Budget</p>
-              <p className="text-2xl font-semibold text-foreground">{formatBudget(event.budget)}</p>
-            </div>
-
             {/* Key Details */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Status</span>
-                <span className={`px-2 py-0.5 border ${getStatusColor(event.status)} rounded text-xs font-medium`}>
-                  {event.status}
-                </span>
-              </div>
+            <div className="space-y-4 pb-6 border-b border-border">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Expected Guests</span>
                 <span className="font-medium">{event.guestCount}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Date</span>
-                <span className="font-medium">{event.date}</span>
+                <span className="font-medium">{formatEventDate(event.date)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Location</span>
@@ -195,10 +152,13 @@ const EventDetail: React.FC<EventDetailProps> = ({ event }) => {
               >
                 Submit Proposal
               </button>
-              <button className="w-full border border-border hover:bg-secondary text-foreground py-3 rounded font-bold flex items-center justify-center gap-2 transition-colors">
+              <Link
+                href={`/dashboard/vendors/inbox?eventId=${encodeURIComponent(event.id)}`}
+                className="w-full border border-border hover:bg-secondary text-foreground py-3 rounded font-bold flex items-center justify-center gap-2 transition-colors"
+              >
                 <MessageSquare size={16} />
                 Contact Host
-              </button>
+              </Link>
             </div>
 
             <p className="text-center text-xs text-muted-foreground pt-4 border-t border-border">

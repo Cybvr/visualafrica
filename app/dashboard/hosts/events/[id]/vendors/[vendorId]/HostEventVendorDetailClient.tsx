@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import JobWorkspace, { WorkspaceCard, StatusIndicator } from '@/components/dashboard/JobWorkspace';
 import JobChat from '@/components/dashboard/JobChat';
 import JobBrief from '@/components/dashboard/JobBrief';
+import { formatCurrency } from '@/lib/utils';
 
 interface HostEventVendorDetailClientProps {
     vendor: Vendor;
@@ -28,10 +29,10 @@ export default function HostEventVendorDetailClient({ vendor, event }: HostEvent
     const vendorBooking = event.bookedVendors.find(bv => bv.vendorId === vendorId);
 
     const mockRequestData: Record<string, { status: string; price: string; date: string }> = {
-        'v-venue-1': { status: 'Paid', price: '₦5,250,500', date: 'Oct 12, 2024' },
-        'v-catering-1': { status: 'Deciding', price: '₦1,250,000', date: 'Oct 14, 2024' },
+        'v-venue-1': { status: 'Paid', price: formatCurrency(5250500), date: 'Oct 12, 2024' },
+        'v-catering-1': { status: 'Deciding', price: formatCurrency(1250000), date: 'Oct 14, 2024' },
         'v-photo-1': { status: 'Deciding', price: 'Pending', date: 'Oct 15, 2024' },
-        'v-makeup-1': { status: 'Rejected', price: '₦150,000', date: 'Oct 10, 2024' },
+        'v-makeup-1': { status: 'Rejected', price: formatCurrency(150000), date: 'Oct 10, 2024' },
     };
 
     const request = vendorBooking

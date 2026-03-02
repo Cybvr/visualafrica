@@ -28,7 +28,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DashboardFilter } from '../DashboardFilter';
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { getVendors } from '@/lib/firestore-service';
 import { useAuth } from '@/components/providers/auth-provider';
 import { useSavedVendors } from '@/hooks/use-saved-vendors';
@@ -81,7 +81,7 @@ interface InboxTabProps {
 
 const formatPrice = (value: number | null | undefined): string => {
     if (typeof value !== "number") return "TBD";
-    return `NGN ${value.toLocaleString('en-NG')}`;
+    return formatCurrency(value);
 };
 
 export default function InboxTab({ event }: InboxTabProps) {

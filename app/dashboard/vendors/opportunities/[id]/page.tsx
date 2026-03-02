@@ -10,7 +10,9 @@ interface PageProps {
 export default async function EventDetailPage({ params }: PageProps) {
     const { id } = await params;
     const events = await getEvents();
-    const event = events.find(e => e.id === id);
+    const event = events.find(
+        (e) => e.id === id && e.isPublicBrief === true && (e.publicBriefStatus || "closed") === "open"
+    );
 
     if (!event) {
         return (

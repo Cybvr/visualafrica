@@ -8,12 +8,14 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { updateEvent } from '@/lib/firestore-service';
 import { toast } from 'sonner';
+import { formatCurrency, getCurrencySymbol } from '@/lib/utils';
 
 interface TicketsTabProps {
     event: SharedEvent;
 }
 
 const TicketsTab: React.FC<TicketsTabProps> = ({ event }) => {
+    const currencySymbol = getCurrencySymbol();
     const [ticketPrice, setTicketPrice] = React.useState(String(event.ticketPrice || ''));
     const [tickets, setTickets] = React.useState(event.tickets || []);
     const [isSaving, setIsSaving] = React.useState(false);
@@ -121,7 +123,7 @@ const TicketsTab: React.FC<TicketsTabProps> = ({ event }) => {
                     </div>
                     <div className="flex items-center gap-3 w-full md:w-auto">
                         <div className="relative flex-1 md:w-32">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">₦</span>
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">{currencySymbol}</span>
                             <Input
                                 type="number"
                                 value={ticketPrice}
@@ -158,7 +160,7 @@ const TicketsTab: React.FC<TicketsTabProps> = ({ event }) => {
                         <TableHeader className="bg-secondary/50">
                             <TableRow className="hover:bg-transparent border-border">
                                 <TableHead className="h-10 px-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Tier Name</TableHead>
-                                <TableHead className="h-10 px-4 text-xs font-bold text-muted-foreground uppercase tracking-wider w-32">Price (₦)</TableHead>
+                                <TableHead className="h-10 px-4 text-xs font-bold text-muted-foreground uppercase tracking-wider w-32">Price</TableHead>
                                 <TableHead className="h-10 px-4 text-xs font-bold text-muted-foreground uppercase tracking-wider w-24">Stock</TableHead>
                                 <TableHead className="h-10 px-4 text-xs font-bold text-muted-foreground uppercase tracking-wider w-24 text-right">Actions</TableHead>
                             </TableRow>
@@ -209,7 +211,7 @@ const TicketsTab: React.FC<TicketsTabProps> = ({ event }) => {
                                                 </div>
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-sm font-bold text-foreground">
-                                                ₦{(Number(tier.price) || 0).toLocaleString()}
+                                                {formatCurrency(Number(tier.price) || 0)}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-sm text-muted-foreground font-medium">
                                                 {tier.quantity}

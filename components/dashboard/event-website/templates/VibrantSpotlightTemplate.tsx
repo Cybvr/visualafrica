@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { WebsiteTemplateProps } from "./types";
+import { formatCurrency } from "@/lib/utils";
 
 const VibrantSpotlightTemplate: React.FC<WebsiteTemplateProps> = ({ event }) => {
   const [rsvpDone, setRsvpDone] = useState(false);
@@ -194,7 +195,7 @@ const VibrantSpotlightTemplate: React.FC<WebsiteTemplateProps> = ({ event }) => 
             {[
               ["Date", event.date],
               ["Location", event.location],
-              ["Budget", `₦${(event.budget || 0).toLocaleString("en-NG")}`],
+              ["Budget", formatCurrency(event.budget || 0)],
             ].map(([k, v]) => (
               <div
                 key={k}

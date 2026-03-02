@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, BookOpen, Settings } from "lucide-react";
+import { Users, BookOpen, Compass } from "lucide-react";
 
 export default function AdminNav() {
     const pathname = usePathname();
 
     const navItems = [
         { label: "Vendors", href: "/admin/vendors", icon: Users },
+        { label: "Experiences", href: "/admin/experiences", icon: Compass },
         { label: "Blog", href: "/admin/blog", icon: BookOpen },
     ];
 

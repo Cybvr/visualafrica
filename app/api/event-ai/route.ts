@@ -3,6 +3,12 @@ import { NextResponse } from "next/server";
 import { adminAuth } from "@/lib/firebase-admin";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const MODEL_CANDIDATES = [
+    process.env.GEMINI_MODEL?.trim(),
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-2.0-flash",
+].filter((m): m is string => Boolean(m));
 
 export async function POST(req: Request) {
     try {
@@ -31,7 +37,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Prompt is too long." }, { status: 400 });
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        let model = genAI.getGenerativeModel({ model: MODEL_CANDIDATES[0] });
 
         const systemPrompt = `
 You are Yinka, an AI event planning assistant for Waddi.
@@ -68,10 +74,27 @@ If any value is missing or unclear, provide a reasonable guess based on the cont
 Translate relative dates (like "next month" or "this December") to absolute dates based on the current year 2025/2026.
 `;
 
-        const result = await model.generateContent([
-            { text: systemPrompt },
-            { text: `User message: ${prompt}` }
-        ]);
+        let result: any = null;
+        let lastError: any = null;
+        for (const modelName of MODEL_CANDIDATES) {
+            try {
+                model = genAI.getGenerativeModel({ model: modelName });
+                result = await model.generateContent([
+                    { text: systemPrompt },
+                    { text: `User message: ${prompt}` }
+                ]);
+                break;
+            } catch (error: any) {
+                lastError = error;
+                const message = String(error?.message || "");
+                if (message.includes("404") || message.includes("not found")) {
+                    continue;
+                }
+                throw error;
+            }
+        }
+
+        if (!result) throw lastError || new Error("No compatible Gemini model available.");
 
         const response = result.response;
         let text = response.text();

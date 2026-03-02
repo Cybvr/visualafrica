@@ -1,5 +1,6 @@
 import React from "react";
 import { WebsiteTemplateProps } from "./types";
+import { formatCurrency } from "@/lib/utils";
 
 const ClassicInviteTemplate: React.FC<WebsiteTemplateProps> = ({ event }) => {
   return (
@@ -133,7 +134,7 @@ const ClassicInviteTemplate: React.FC<WebsiteTemplateProps> = ({ event }) => {
         >
           {[
             { label: "Guests", value: event.guestCount },
-            { label: "Budget", value: `₦${(event.budget || 0).toLocaleString("en-NG")}` },
+            { label: "Budget", value: formatCurrency(event.budget || 0) },
           ].map(({ label, value }) => (
             <div
               key={label}

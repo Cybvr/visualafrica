@@ -63,6 +63,12 @@ service cloud.firestore {
       allow update, delete: if isAdmin() || (resource.data.ownerId != null && isOwner(resource.data.ownerId));
     }
 
+    // Experiences: Public read, Admin write
+    match /experiences/{experienceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Events: Public read for public event pages.
     match /events/{eventId} {
       allow read: if true;

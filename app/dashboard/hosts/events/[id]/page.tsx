@@ -7,9 +7,17 @@ import {
     MapPin, Calendar, Users, Rocket,
     ChevronLeft, ChevronRight, Share2, Printer, Ticket,
     Plus, Mail, Download, Upload,
-    LayoutDashboard, Store, FileText, Inbox, ListChecks, Globe, Plane, LucideIcon
+    LayoutDashboard, Store, FileText, Inbox, ListChecks, Globe, Plane, LucideIcon,
+    ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { listenToEventById, updateEvent } from '@/lib/firestore-service';
 import { SharedEvent } from '@/lib/types';
 import { doc, getDoc } from 'firebase/firestore';
@@ -24,6 +32,7 @@ import WebsiteTab from '@/components/dashboard/event-tabs/WebsiteTab';
 import FlightsTab from '@/components/dashboard/event-tabs/FlightsTab';
 import TicketsTab from '@/components/dashboard/event-tabs/TicketsTab';
 import { TaskChecklist, DayOfTimeline } from '@/components/dashboard/chat';
+import { formatCurrency } from '@/lib/utils';
 
 const parseCsvRow = (row: string): string[] => {
     const cells: string[] = [];
@@ -83,6 +92,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     const [guestImportMessage, setGuestImportMessage] = useState<string | null>(null);
     const [hostPhoto, setHostPhoto] = useState<string | null>(null);
     const [teamMembers, setTeamMembers] = useState<any[]>([]);
+    const [isUpdatingBriefState, setIsUpdatingBriefState] = useState(false);
 
     // Sync state with URL
     useEffect(() => {
@@ -204,11 +214,29 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         return <div className="max-w-4xl mx-auto py-12 text-center text-muted-foreground">Event not found.</div>;
     }
 
+    const isBriefOpen = Boolean(event.isPublicBrief && event.publicBriefStatus !== "closed");
+
+    const handleTogglePublicBrief = async () => {
+        if (isUpdatingBriefState) return;
+        setIsUpdatingBriefState(true);
+        try {
+            const nextOpenState = !isBriefOpen;
+            await updateEvent(event.id, {
+                isPublicBrief: nextOpenState,
+                publicBriefStatus: nextOpenState ? "open" : "closed",
+            });
+        } catch (error) {
+            console.error("Failed to update brief visibility:", error);
+        } finally {
+            setIsUpdatingBriefState(false);
+        }
+    };
+
     const navItems: Array<{ value: string; label: string; meta: string; scope: 'local' | 'docs'; icon: LucideIcon }> = [
         { value: "overview", label: "Overview", meta: "Event plan", scope: "local", icon: LayoutDashboard },
         { value: "vendors", label: "Vendors", meta: `${event.bookedVendors.length} booked`, scope: "local", icon: Store },
         { value: "guests", label: "Guests", meta: `${event.guests.length} invited`, scope: "local", icon: Users },
-        { value: "tickets", label: "Tickets", meta: event.ticketPrice ? `₦${event.ticketPrice.toLocaleString('en-NG')}` : 'Free', scope: "local", icon: Ticket },
+        { value: "tickets", label: "Tickets", meta: event.ticketPrice ? formatCurrency(event.ticketPrice) : 'Free', scope: "local", icon: Ticket },
         { value: "contracts", label: "Contracts", meta: "Uploaded docs", scope: "docs", icon: FileText },
         { value: "inbox", label: "Inbox", meta: "Messages", scope: "local", icon: Inbox },
         { value: "itinerary", label: "Itinerary", meta: "Agent generated", scope: "docs", icon: Calendar },
@@ -305,24 +333,51 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                             </div>
                             <div className="flex items-center gap-1 text-sm">
                                 <Ticket size={16} className="text-muted-foreground" />
-                                <span>{event.ticketPrice ? `₦${event.ticketPrice.toLocaleString('en-NG')}` : 'Free'}</span>
+                                <span>{event.ticketPrice ? formatCurrency(event.ticketPrice) : 'Free'}</span>
                             </div>
                             <div className="flex items-center gap-1 text-sm">
-                                <span className="font-medium text-success">₦{(event.budget || 0).toLocaleString('en-NG')}</span>
+                                <span className="font-medium text-success">{formatCurrency(event.budget || 0)}</span>
                             </div>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <ShareEventDialog event={event} teamMembers={teamMembers} hostPhoto={hostPhoto} />
-                        <Link
-                            href={`/e/${event.id}`}
-                            target="_blank"
-                            className="bg-card hover:bg-secondary/50 border border-border flex items-center gap-2 h-10 px-4 rounded-xl font-bold transition-colors"
-                        >
-                            <Globe size={18} />
-                            View Site
-                        </Link>
+                        <TooltipProvider delayDuration={0}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <div className="flex items-center">
+                                        <Switch
+                                            checked={isBriefOpen}
+                                            disabled={isUpdatingBriefState}
+                                            onCheckedChange={() => {
+                                                void handleTogglePublicBrief();
+                                            }}
+                                            aria-label={`Toggle public brief for ${event.eventName}`}
+                                        />
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-foreground text-background font-bold px-3 py-1.5 rounded-lg">
+                                    <p className="text-[10px] uppercase tracking-wider">Public Brief Is {isBriefOpen ? 'Open' : 'Closed'}</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            <ShareEventDialog event={event} teamMembers={teamMembers} hostPhoto={hostPhoto} />
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Link
+                                        href={`/e/${event.id}`}
+                                        target="_blank"
+                                        className="bg-card hover:bg-secondary/50 border border-border flex items-center justify-center h-10 w-10 rounded-xl transition-colors shrink-0"
+                                    >
+                                        <ExternalLink size={18} />
+                                    </Link>
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-foreground text-background font-bold px-3 py-1.5 rounded-lg">
+                                    <p className="text-[10px] uppercase tracking-wider">View RSVP Site</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                 </div>
 

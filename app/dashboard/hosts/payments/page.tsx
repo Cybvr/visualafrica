@@ -13,6 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { formatCurrency } from '@/lib/utils';
 
 // Sample data - would come from a database in production
 interface HostPayment {
@@ -22,7 +23,7 @@ interface HostPayment {
     vendor: string;
     date: string;
     dueDate: string;
-    amount: string;
+    amount: number;
     status: 'paid' | 'pending' | 'overdue' | 'processing';
     method: string;
 }
@@ -45,7 +46,7 @@ const SAMPLE_PAYMENTS: HostPayment[] = [
         vendor: 'Lagos Event Planners',
         date: '2025-02-10',
         dueDate: '2025-02-15',
-        amount: '$1,500',
+        amount: 1500,
         status: 'paid',
         method: 'Visa •••• 4242'
     },
@@ -56,7 +57,7 @@ const SAMPLE_PAYMENTS: HostPayment[] = [
         vendor: 'Premium Caterers Lagos',
         date: '2025-02-12',
         dueDate: '2025-02-20',
-        amount: '$3,750',
+        amount: 3750,
         status: 'pending',
         method: 'Visa •••• 4242'
     },
@@ -67,7 +68,7 @@ const SAMPLE_PAYMENTS: HostPayment[] = [
         vendor: 'Coastal Venue & Events',
         date: '2025-02-01',
         dueDate: '2025-02-05',
-        amount: '$2,500',
+        amount: 2500,
         status: 'paid',
         method: 'Mastercard •••• 5555'
     },
@@ -104,11 +105,11 @@ export default function HostPaymentsPage() {
     // Calculate payment stats
     const totalSpent = SAMPLE_PAYMENTS
         .filter(p => p.status === 'paid')
-        .reduce((sum, p) => sum + parseFloat(p.amount.replace(/[$,]/g, '')), 0);
+        .reduce((sum, p) => sum + p.amount, 0);
 
     const pendingAmount = SAMPLE_PAYMENTS
         .filter(p => p.status === 'pending' || p.status === 'processing')
-        .reduce((sum, p) => sum + parseFloat(p.amount.replace(/[$,]/g, '')), 0);
+        .reduce((sum, p) => sum + p.amount, 0);
 
     const thisMonth = SAMPLE_PAYMENTS
         .filter(p => {
@@ -116,7 +117,7 @@ export default function HostPaymentsPage() {
             const now = new Date();
             return paymentDate.getMonth() === now.getMonth() && paymentDate.getFullYear() === now.getFullYear();
         })
-        .reduce((sum, p) => sum + parseFloat(p.amount.replace(/[$,]/g, '')), 0);
+        .reduce((sum, p) => sum + p.amount, 0);
 
     // Filter payments based on search query
     const filteredPayments = SAMPLE_PAYMENTS.filter((payment) => {
@@ -125,7 +126,7 @@ export default function HostPaymentsPage() {
             payment.eventName.toLowerCase().includes(query) ||
             payment.vendor.toLowerCase().includes(query) ||
             payment.id.toLowerCase().includes(query) ||
-            payment.amount.toLowerCase().includes(query)
+            String(payment.amount).includes(query)
         );
     });
 
@@ -180,7 +181,7 @@ export default function HostPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
                             <DollarSign size={20} className="text-primary" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${totalSpent.toLocaleString('en-US')}</p>
+                        <p className="text-3xl font-black text-foreground">{formatCurrency(totalSpent)}</p>
                         <p className="text-xs text-muted-foreground mt-1">All time</p>
                     </div>
 
@@ -189,7 +190,7 @@ export default function HostPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">Pending</p>
                             <Clock size={20} className="text-yellow-600" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">₦{pendingAmount.toLocaleString('en-NG')}</p>
+                        <p className="text-3xl font-black text-foreground">{formatCurrency(pendingAmount)}</p>
                         <p className="text-xs text-muted-foreground mt-1">Awaiting payment</p>
                     </div>
 
@@ -198,7 +199,7 @@ export default function HostPaymentsPage() {
                             <p className="text-sm font-medium text-muted-foreground">This Month</p>
                             <Calendar size={20} className="text-green-600" />
                         </div>
-                        <p className="text-3xl font-black text-foreground">${thisMonth.toLocaleString('en-US')}</p>
+                        <p className="text-3xl font-black text-foreground">{formatCurrency(thisMonth)}</p>
                         <p className="text-xs text-muted-foreground mt-1">February 2026</p>
                     </div>
                 </div>
@@ -326,7 +327,7 @@ export default function HostPaymentsPage() {
                                                 </div>
                                             </TableCell>
                                             <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                                            <TableCell className="text-right font-black text-lg">{payment.amount}</TableCell>
+                                            <TableCell className="text-right font-black text-lg">{formatCurrency(payment.amount)}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

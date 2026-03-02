@@ -259,11 +259,18 @@ const VendorDetail: React.FC<VendorDetailProps> = ({ vendor }) => {
             </div>
 
             <div className="space-y-2 pt-3">
+              <Link
+                href={`/dashboard/hosts/vendor/${vendor.slug}/books/new`}
+                className="w-full bg-primary hover:bg-primary/90 text-white py-2.5 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md"
+              >
+                <Zap size={14} className="fill-white" />
+                Book Now
+              </Link>
               <button
                 onClick={() => toggleSavedVendor(vendor.id)}
                 className={`w-full py-2.5 rounded-lg font-bold text-sm shadow-sm hover:shadow-md transition-all ${savedVendorIds.has(vendor.id)
                   ? 'bg-foreground text-background hover:bg-foreground/90'
-                  : 'bg-primary hover:bg-primary/90 text-white'
+                  : 'bg-card border border-border hover:bg-accent text-foreground'
                   }`}
               >
                 {savedVendorIds.has(vendor.id) ? 'Saved' : 'Save Vendor'}

@@ -2,6 +2,7 @@
 import React from 'react';
 import { SharedEvent } from '@/lib/types';
 import { Calendar, MapPin, User, Users } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 interface EventCardProps {
   event: SharedEvent;
@@ -31,12 +32,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
   };
 
   const formatBudget = (budget: number) => {
-    return new Intl.NumberFormat('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(budget);
+    return formatCurrency(budget);
   };
 
   return (

@@ -82,7 +82,7 @@ export function EventInsights() {
 
                         <div className="relative z-10">
                             <h2 className="text-3xl font-bold text-white mb-6 leading-tight">
-                                Nigeria's event industry contributes over ₦100 billion to GDP annually.
+                                Nigeria's event industry contributes over $100 billion to GDP annually.
                             </h2>
                             <p className="text-lg text-white/90 mb-6 leading-relaxed font-medium">
                                 From grand weddings averaging 1,000 guests to major corporate events, Nigeria's celebration economy is a powerhouse. Over 80% of event vendors are informal micro-businesses thriving on referrals and social media.
@@ -113,10 +113,10 @@ export function EventInsights() {
                     <div className="relative bg-primary rounded-[2rem] p-10 flex flex-col justify-between overflow-hidden">
                         <div className="relative z-10">
                             <h2 className="text-3xl font-bold text-white mb-6 leading-tight">
-                                Average Nigerian wedding: ₦5M-₦20M budget, 1,000 guests.
+                                Average Nigerian wedding: $5M-$20M budget, 1,000 guests.
                             </h2>
                             <p className="text-lg text-white/90 mb-6 leading-relaxed font-medium">
-                                Nigerian weddings are multi-funded cultural performances. Lagos hotel bookings alone generate ₦7 billion annually from wedding-related stays, while Instagram has become the new exhibition hall for vendors.
+                                Nigerian weddings are multi-funded cultural performances. Lagos hotel bookings alone generate $7 billion annually from wedding-related stays, while Instagram has become the new exhibition hall for vendors.
                             </p>
                             <p className="text-xs text-white/70">
                                 Source: CNN Africa, Hospitality Association of Nigeria 2023

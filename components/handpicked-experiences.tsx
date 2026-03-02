@@ -1,20 +1,19 @@
 import Link from "next/link"
 import { MapPin, Star } from "lucide-react"
 
-import { getVendors } from "@/lib/firestore-service"
+import { getExperiences } from "@/lib/firestore-service"
 
 export async function HandpickedExperiences() {
-    const vendors = await getVendors()
-    const experiences = vendors
-        .filter(v => v.categories.includes("Experiences"))
+    const experiencesData = await getExperiences()
+    const experiences = experiencesData
         .slice(0, 8)
-        .map(v => ({
-            id: v.id,
-            slug: v.slug,
-            location: v.location.split(",")[0], // Just the city
-            title: v.name,
-            rating: v.rating || 0,
-            image: v.image,
+        .map(e => ({
+            id: e.id,
+            slug: e.vendorSlug, // Or e.id if we use dedicated experience pages
+            location: e.location.split(",")[0], // Just the city
+            title: e.title,
+            rating: e.rating || 0,
+            image: e.image,
         }))
 
     return (
