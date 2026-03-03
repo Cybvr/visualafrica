@@ -119,22 +119,29 @@ export async function POST(req: Request) {
         userId: hostId, // For compatibility with global inbox queries
         hostId,
         vendorId,
+        vendorUid: uid, // Store the vendor's UID explicitly
         eventId,
         eventName: eventData.eventName || "Event",
         lastMsg: "New Proposal Received",
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        participants: [hostId, vendorId],
+        participants: [hostId, uid], // Use UIDs for security rules
         type: 'proposal'
       }, { merge: true });
 
       // Add the proposal as a message in the subcollection
       await chatRef.collection("messages").add({
         senderId: vendorId,
-        senderName: vendorData.name || "Vendor",
-        text: proposalMessage,
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        isMe: false, // From vendor's perspective in host inbox
-        type: 'proposal_auto_msg'
+        senderName: vendorData.businessName || "Vendor",
+        senderAvatar: vendorData.logo || vendorData.image || null,
+        text: `Proposal: ${quotedPrice} - ${deliveryTimeline}`,
+        type: 'proposal_card',
+        proposalData: {
+          quotedPrice: quotedPrice,
+          deliveryTimeline: deliveryTimeline,
+          messageText: message,
+          vendorCategory: service
+        },
+        timestamp: admin.firestore.FieldValue.serverTimestamp()
       });
     }
 

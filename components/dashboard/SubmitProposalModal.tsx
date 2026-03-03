@@ -1,7 +1,15 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { X, DollarSign, FileText, Calendar, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { auth } from '@/lib/firebase';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 interface SubmitProposalModalProps {
     isOpen: boolean;
@@ -25,13 +33,33 @@ export const SubmitProposalModal: React.FC<SubmitProposalModalProps> = ({
     eventId,
     onSubmit
 }) => {
+    const buildProposalTemplateText = useCallback(() => {
+        const vendorDisplayName = auth.currentUser?.displayName?.trim() || 'Vendor';
+        return `Hi,
+I'm interested in vending at ${eventName || "this event"}. We offer our products/services and based on your expected crowd, we think we'd be a natural fit. You can check us out here: [Instagram/website link].
+Is vendor space still available? Happy to move forward whenever you're ready.
+— ${vendorDisplayName}`;
+    }, [eventName]);
+
+    const proposalTemplateText = buildProposalTemplateText();
     const [quotedPrice, setQuotedPrice] = useState('');
     const [deliveryTimeline, setDeliveryTimeline] = useState('');
-    const [message, setMessage] = useState('');
+    const [message, setMessage] = useState(proposalTemplateText);
     const [attachments, setAttachments] = useState<File[]>([]);
+    const deliveryTimelineOptions = [
+        "1-2 days",
+        "3-5 days",
+        "1 week",
+        "2 weeks",
+        "3-4 weeks",
+        "1-2 months",
+        "Flexible (depends on scope)",
+    ];
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!deliveryTimeline) return;
+
         const proposalData: ProposalData = {
             quotedPrice,
             deliveryTimeline,
@@ -47,9 +75,15 @@ export const SubmitProposalModal: React.FC<SubmitProposalModalProps> = ({
         onClose();
         setQuotedPrice('');
         setDeliveryTimeline('');
-        setMessage('');
+        setMessage(buildProposalTemplateText());
         setAttachments([]);
     };
+
+    useEffect(() => {
+        if (isOpen) {
+            setMessage(buildProposalTemplateText());
+        }
+    }, [isOpen, buildProposalTemplateText]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -104,14 +138,18 @@ export const SubmitProposalModal: React.FC<SubmitProposalModalProps> = ({
                             <Calendar size={16} className="inline mr-1" />
                             Delivery Timeline
                         </label>
-                        <input
-                            type="text"
-                            value={deliveryTimeline}
-                            onChange={(e) => setDeliveryTimeline(e.target.value)}
-                            placeholder="e.g., 2-3 weeks, By event date, etc."
-                            required
-                            className="w-full px-4 py-3 bg-secondary border border-border rounded-xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                        />
+                        <Select value={deliveryTimeline} onValueChange={setDeliveryTimeline}>
+                            <SelectTrigger className="w-full h-12 rounded-xl bg-secondary border-border font-medium">
+                                <SelectValue placeholder="Select timeline" />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl">
+                                {deliveryTimelineOptions.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                        {option}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                         <p className="text-xs text-muted-foreground">When can you complete this service?</p>
                     </div>
 
@@ -124,7 +162,6 @@ export const SubmitProposalModal: React.FC<SubmitProposalModalProps> = ({
                         <textarea
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
-                            placeholder="Describe what you'll provide, your approach, why you're the best fit..."
                             required
                             rows={6}
                             className="w-full px-4 py-3 bg-secondary border border-border rounded-xl outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none font-medium"
@@ -165,6 +202,7 @@ export const SubmitProposalModal: React.FC<SubmitProposalModalProps> = ({
                         </Button>
                         <Button
                             type="submit"
+                            disabled={!deliveryTimeline}
                             className="flex-1 py-6 font-bold bg-primary hover:bg-primary/90"
                         >
                             Submit Proposal

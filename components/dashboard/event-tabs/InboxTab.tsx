@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Send, ChevronDown, ArrowLeft, SquarePen, CalendarDays } from 'lucide-react';
+import { Send, ChevronDown, ArrowLeft, SquarePen, CalendarDays, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 import {
     DropdownMenu,
@@ -36,6 +36,7 @@ import { SharedEvent, Vendor } from '@/lib/types';
 
 interface EventMessage {
     id: string;
+    senderId?: string;
     text: string;
     isMe: boolean;
     attachment?: {
@@ -47,6 +48,13 @@ interface EventMessage {
         service?: string;
     };
     timestamp?: any;
+    type?: 'text' | 'proposal_card' | 'proposal_auto_msg';
+    proposalData?: {
+        quotedPrice: string;
+        deliveryTimeline: string;
+        messageText: string;
+        vendorCategory?: string;
+    };
 }
 
 interface EventChat {
@@ -196,7 +204,12 @@ export default function InboxTab({ event }: InboxTabProps) {
                             ...chat,
                             messages: newMessages.map(m => ({
                                 id: m.id,
+                                senderId: m.senderId,
+                                senderName: m.senderName,
+                                senderAvatar: m.senderAvatar,
                                 text: m.text,
+                                type: m.type,
+                                proposalData: m.proposalData,
                                 isMe: m.isMe ?? (m.senderId === user?.uid),
                                 timestamp: m.timestamp,
                                 attachment: m.attachment
@@ -399,8 +412,8 @@ export default function InboxTab({ event }: InboxTabProps) {
 
             <div className="flex-1 flex flex-col bg-background border border-border rounded-xl overflow-hidden shadow-sm">
                 <div className={cn(
-                    "w-full border-r border-border flex flex-col min-h-0 bg-muted/5",
-                    activeView === 'chat' ? "hidden" : "flex"
+                    "w-full md:w-64 lg:w-72 border-r border-border flex flex-col min-h-0 bg-muted/5 shrink-0",
+                    activeView === 'chat' ? "hidden md:flex" : "flex"
                 )}>
                     <div className="flex-1 overflow-y-auto divide-y divide-border">
                         {filteredChats.map((chat) => (
@@ -444,7 +457,7 @@ export default function InboxTab({ event }: InboxTabProps) {
 
                 <div className={cn(
                     "flex-1 flex flex-col bg-background min-h-0",
-                    activeView === 'list' ? "hidden" : "flex"
+                    activeView === 'list' ? "hidden md:flex" : "flex"
                 )}>
                     {activeChat ? (
                         <>
@@ -453,7 +466,7 @@ export default function InboxTab({ event }: InboxTabProps) {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                        className="h-8 w-8 text-muted-foreground hover:text-foreground md:hidden"
                                         onClick={() => setActiveView('list')}
                                     >
                                         <ArrowLeft size={18} />
@@ -506,51 +519,126 @@ export default function InboxTab({ event }: InboxTabProps) {
                             </div>
 
                             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/5">
-                                {activeChat.messages.map((message) => (
-                                    <div
-                                        key={message.id}
-                                        className={cn(
-                                            "flex items-start gap-3 max-w-[85%] sm:max-w-[75%]",
-                                            message.isMe ? "justify-end ml-auto" : "mr-auto"
-                                        )}
-                                    >
-                                        <div className={cn(
-                                            "px-4 py-3 rounded-2xl shadow-sm text-sm leading-relaxed font-medium whitespace-pre-wrap",
-                                            message.isMe
-                                                ? "bg-primary text-primary-foreground rounded-tr-none"
-                                                : "bg-card border border-border rounded-tl-none text-foreground"
-                                        )}>
-                                            {message.text}
-                                            {message.attachment?.type === 'event' && (
-                                                <div className="mt-3 p-3 rounded-xl bg-background/10 shadow-sm flex items-center justify-between gap-4 border border-background/20">
-                                                    <div className="flex items-center gap-3 min-w-0">
-                                                        <div className="w-10 h-10 rounded-lg bg-background/20 flex items-center justify-center shrink-0">
-                                                            <CalendarDays size={20} />
-                                                        </div>
-                                                        <div className="min-w-0 text-primary-foreground">
-                                                            <p className="text-xs font-bold uppercase tracking-widest opacity-80">Event Invitation</p>
-                                                            <p className="text-sm font-semibold truncate">{message.attachment.eventName}</p>
-                                                            <p className="text-xs mt-1 truncate opacity-90">
-                                                                Regarding: {message.attachment.eventName}
-                                                                {message.attachment.eventDate ? ` • ${message.attachment.eventDate}` : ""}
-                                                                {message.attachment.service ? ` • ${message.attachment.service}` : ""}
+                                {activeChat.messages.map((message) => {
+                                    const isSenderMe = user?.uid ? message.senderId === user.uid : message.isMe;
+
+                                    return (
+                                        <div
+                                            key={message.id}
+                                            className={cn(
+                                                "flex items-start gap-3 max-w-[85%] sm:max-w-[75%]",
+                                                isSenderMe ? "justify-end ml-auto flex-row-reverse" : "mr-auto"
+                                            )}
+                                        >
+                                            {!isSenderMe && (
+                                                <Avatar className="w-8 h-8 rounded-lg border border-border shrink-0">
+                                                    <AvatarImage src={activeChat.avatarUrl} alt={activeChat.name} className="object-cover" />
+                                                    <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-bold text-xs">
+                                                        {activeChat.avatarFallback}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            )}
+                                            <div className={cn(
+                                                "flex flex-col gap-1.5",
+                                                isSenderMe ? "items-end" : "items-start"
+                                            )}>
+                                                {message.type === 'proposal_card' && message.proposalData ? (
+                                                    <div className="w-full max-w-[360px] bg-card border border-border rounded-2xl overflow-hidden shadow-xl">
+                                                        {/* Card Header with Greeting */}
+                                                        <div className="bg-primary/5 p-5 border-b border-border">
+                                                            <div className="flex items-center gap-3 mb-3">
+                                                                <Avatar className="w-10 h-10 rounded-xl border-2 border-background shadow-sm">
+                                                                    <AvatarImage src={activeChat.avatarUrl} alt={activeChat.name} className="object-cover" />
+                                                                    <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                                                                        {activeChat.avatarFallback}
+                                                                    </AvatarFallback>
+                                                                </Avatar>
+                                                                <div>
+                                                                    <h4 className="font-bold text-sm text-foreground">Hi there! 👋</h4>
+                                                                    <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+                                                                        {message.proposalData.vendorCategory || activeChat.category} Proposal
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <p className="text-xs font-medium text-foreground/80 leading-relaxed">
+                                                                I'm excited to work on this event. Here's my quote:
                                                             </p>
-                                                            {message.attachment.eventLocation && (
-                                                                <p className="text-xs truncate opacity-90">{message.attachment.eventLocation}</p>
-                                                            )}
+                                                        </div>
+
+                                                        {/* Key Details */}
+                                                        <div className="p-5 grid grid-cols-2 gap-4 bg-background">
+                                                            <div className="space-y-0.5">
+                                                                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Quoted Price</p>
+                                                                <p className="text-xl font-black text-primary tracking-tight">{message.proposalData.quotedPrice}</p>
+                                                            </div>
+                                                            <div className="space-y-0.5">
+                                                                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Timeline</p>
+                                                                <p className="text-lg font-bold text-foreground">{message.proposalData.deliveryTimeline}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Personal Message */}
+                                                        {message.proposalData.messageText && (
+                                                            <div className="mx-5 p-3 rounded-xl bg-muted/30 border border-border/50 mb-5">
+                                                                <p className="text-[9px] font-black uppercase tracking-[0.1em] text-muted-foreground/60 mb-1">Message</p>
+                                                                <p className="text-xs font-medium leading-relaxed italic text-foreground/80">
+                                                                    "{message.proposalData.messageText}"
+                                                                </p>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Footer Action */}
+                                                        <div className="px-5 py-3 bg-muted/5 border-t border-border flex justify-between items-center">
+                                                            <span className="text-[9px] font-black uppercase tracking-widest text-green-600 bg-green-50 px-2 py-0.5 rounded-md">
+                                                                Pending Review
+                                                            </span>
+                                                            <div className="flex gap-1.5 items-center">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                                                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Active</span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <Link
-                                                        href={`/dashboard/hosts/events/${message.attachment.eventId}`}
-                                                        className="shrink-0 text-xs font-bold bg-background text-primary px-4 py-2 rounded-lg hover:bg-background/90 transition-colors"
-                                                    >
-                                                        View Event
-                                                    </Link>
-                                                </div>
-                                            )}
+                                                ) : (
+                                                    <div className={cn(
+                                                        "px-4 py-3 rounded-2xl shadow-sm text-sm leading-relaxed font-medium whitespace-pre-wrap",
+                                                        isSenderMe
+                                                            ? "bg-primary text-primary-foreground rounded-tr-none"
+                                                            : "bg-card border border-border rounded-tl-none text-foreground"
+                                                    )}>
+                                                        {message.text}
+                                                        {message.attachment?.type === 'event' && (
+                                                            <div className="mt-3 p-3 rounded-xl bg-background/10 shadow-sm flex items-center justify-between gap-4 border border-background/20">
+                                                                <div className="flex items-center gap-3 min-w-0">
+                                                                    <div className="w-10 h-10 rounded-lg bg-background/20 flex items-center justify-center shrink-0">
+                                                                        <CalendarDays size={20} />
+                                                                    </div>
+                                                                    <div className="min-w-0 text-primary-foreground">
+                                                                        <p className="text-xs font-bold uppercase tracking-widest opacity-80">Event Invitation</p>
+                                                                        <p className="text-sm font-semibold truncate">{message.attachment.eventName}</p>
+                                                                        <p className="text-xs mt-1 truncate opacity-90">
+                                                                            Regarding: {message.attachment.eventName}
+                                                                            {message.attachment.eventDate ? ` • ${message.attachment.eventDate}` : ""}
+                                                                            {message.attachment.service ? ` • ${message.attachment.service}` : ""}
+                                                                        </p>
+                                                                        {message.attachment.eventLocation && (
+                                                                            <p className="text-xs truncate opacity-90">{message.attachment.eventLocation}</p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                <Link
+                                                                    href={`/dashboard/hosts/events/${message.attachment.eventId}`}
+                                                                    className="shrink-0 text-xs font-bold bg-background text-primary px-4 py-2 rounded-lg hover:bg-background/90 transition-colors"
+                                                                >
+                                                                    View Event
+                                                                </Link>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             <div className="p-4 bg-background border-t border-border">

@@ -9,74 +9,99 @@ import { SharedEvent } from '@/lib/types';
 import { getEvents } from '@/lib/firestore-service';
 import { Button } from '@/components/ui/button';
 import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
+import { useVendorProfile } from '@/hooks/use-vendor-profile';
 
 type JobStatus = 'all' | 'pending' | 'offers' | 'active' | 'declined' | 'completed';
 
-// Map booking statuses to job filter categories
-function getJobCategory(booking: Booking): JobStatus[] {
-    const categories: JobStatus[] = ['all'];
-
-    switch (booking.status) {
-        case 'Confirmed':
-        case 'Upcoming':
-            categories.push('active');
-            break;
-        case 'Pending Payment':
-        case 'Unresolved':
-            categories.push('pending');
-            break;
-        case 'Paid':
-        case 'Completed':
-            categories.push('completed');
-            break;
-    }
-
-    return categories;
-}
-
 export default function VendorJobsPage() {
-    const { bookings } = VENDOR_DASHBOARD_DATA;
+    const { vendorId, isLoading: profileLoading } = useVendorProfile();
+    const [bookings, setBookings] = useState<Booking[]>([]);
     const [allEvents, setAllEvents] = useState<SharedEvent[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState<JobStatus>('all');
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        async function fetchEvents() {
+        async function fetchJobs() {
+            if (!vendorId) {
+                if (!profileLoading) setIsLoading(false);
+                return;
+            }
+
             try {
                 const events = await getEvents();
                 setAllEvents(events);
+
+                const vendorBookings: Booking[] = [];
+                events.forEach(event => {
+                    const bookingEntry = event.bookedVendors?.find(bv => bv.vendorId === vendorId);
+                    if (bookingEntry) {
+                        vendorBookings.push({
+                            id: `booking-${event.id}`,
+                            event: event.eventName,
+                            date: event.date,
+                            location: event.location,
+                            client: event.hostName || 'Host',
+                            amount: bookingEntry.amount || 'TBD',
+                            status: bookingEntry.status === 'Confirmed' ? 'Confirmed' :
+                                bookingEntry.status === 'Paid' ? 'Paid' : 'Upcoming'
+                        });
+                        return;
+                    }
+
+                    const leadEntry = event.leads?.find(l => l.vendorId === vendorId);
+                    if (leadEntry) {
+                        vendorBookings.push({
+                            id: `lead-${event.id}`,
+                            event: event.eventName,
+                            date: event.date,
+                            location: event.location,
+                            client: event.hostName || 'Host',
+                            amount: 'Proposal Sent',
+                            status: 'Upcoming'
+                        });
+                    }
+                });
+
+                setBookings(vendorBookings);
             } catch (error) {
                 console.error("Error fetching vendor jobs data:", error);
             } finally {
                 setIsLoading(false);
             }
         }
-        fetchEvents();
-    }, []);
+        fetchJobs();
+    }, [vendorId, profileLoading]);
 
-    // Calculate real counts based on booking statuses
     const jobCounts = {
         all: bookings.length,
-        pending: bookings.filter(b => getJobCategory(b).includes('pending')).length,
-        offers: 0,
-        active: bookings.filter(b => getJobCategory(b).includes('active')).length,
+        pending: bookings.filter(b => b.status === 'Upcoming').length,
+        offers: bookings.filter(b => b.id.startsWith('lead-')).length,
+        active: bookings.filter(b => b.status === 'Confirmed').length,
         declined: 0,
-        completed: bookings.filter(b => getJobCategory(b).includes('completed')).length
+        completed: bookings.filter(b => b.status === 'Paid').length
     };
 
     const statusConfig = [
         { key: 'all' as JobStatus, label: 'All Jobs', count: jobCounts.all },
-        { key: 'pending' as JobStatus, label: 'Pending Reviews', count: jobCounts.pending },
-        { key: 'offers' as JobStatus, label: 'Offers Sent', count: jobCounts.offers },
+        { key: 'pending' as JobStatus, label: 'Pending/Offers', count: jobCounts.pending },
         { key: 'active' as JobStatus, label: 'Active', count: jobCounts.active },
-        { key: 'declined' as JobStatus, label: 'Declined', count: jobCounts.declined },
         { key: 'completed' as JobStatus, label: 'Completed', count: jobCounts.completed },
     ];
 
-    // Filter bookings based on active filter
-    const filteredBookings = activeFilter === 'all'
-        ? bookings
-        : bookings.filter(booking => getJobCategory(booking).includes(activeFilter));
+    const filteredBookings = bookings.filter(booking => {
+        const matchesFilter = activeFilter === 'all' ||
+            (activeFilter === 'pending' && booking.status === 'Upcoming') ||
+            (activeFilter === 'active' && booking.status === 'Confirmed') ||
+            (activeFilter === 'completed' && booking.status === 'Paid');
+        const matchesSearch = booking.event.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            booking.client.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesFilter && matchesSearch;
+    });
+
+    if (isLoading || profileLoading) {
+        return <div className="p-20 text-center font-bold">Loading your jobs...</div>;
+    }
 
     return (
         <div className="max-w-7xl mx-auto space-y-6 pb-16">
@@ -118,13 +143,17 @@ export default function VendorJobsPage() {
             <div className="grid grid-cols-1 gap-6">
                 {filteredBookings.length > 0 ? (
                     filteredBookings.map((booking) => {
-                        const eventFromShared = allEvents.find(e => e.id === booking.id.split('-')[1]);
+                        const actualEventId = booking.id.split('-').slice(1).join('-');
+                        const eventFromShared = allEvents.find(e => e.id === actualEventId);
                         const displayImage = eventFromShared?.image || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800';
 
                         return (
                             <Link
                                 key={booking.id}
-                                href={`/dashboard/vendors/jobs/${booking.id}`}
+                                href={booking.id.startsWith('lead-')
+                                    ? `/dashboard/vendors/inbox?eventId=${actualEventId}`
+                                    : `/dashboard/vendors/jobs/${actualEventId}`
+                                }
                                 className="group bg-card border border-border rounded-2xl p-4 flex flex-col md:flex-row gap-6 hover:shadow-lg transition-all hover:border-primary/50 cursor-pointer"
                             >
                                 {/* Job Image */}
@@ -150,13 +179,15 @@ export default function VendorJobsPage() {
                                             <span className="hidden md:inline-block px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest rounded-full">
                                                 {booking.status}
                                             </span>
-                                            <span className="text-xs font-bold text-muted-foreground">ID: #{booking.id}</span>
+                                            <span className="text-xs font-bold text-muted-foreground">EVENT: {actualEventId}</span>
                                         </div>
                                         <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
                                             {booking.event}
                                         </h3>
                                         <p className="text-muted-foreground text-sm line-clamp-2 max-w-2xl">
-                                            Booked for {booking.client}. Project amount: {booking.amount}
+                                            {booking.id.startsWith('lead-')
+                                                ? `Proposal submitted to ${booking.client}. Click to view conversation.`
+                                                : `Booked for ${booking.client}. Project amount: ${booking.amount}`}
                                         </p>
                                     </div>
 
@@ -167,7 +198,7 @@ export default function VendorJobsPage() {
                                         </div>
                                         <div className="flex items-center gap-2 text-sm text-foreground/80">
                                             <MapPin size={16} className="text-primary" />
-                                            <span className="font-bold">{booking.location}</span>
+                                            <span className="font-bold truncate max-w-[150px]">{booking.location}</span>
                                         </div>
                                         <div className="flex items-center gap-2 text-sm text-foreground/80">
                                             <Briefcase size={16} className="text-primary" />

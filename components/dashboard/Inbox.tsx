@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Search, Send, ChevronDown, Phone, ArrowLeft, SquarePen, CalendarDays } from 'lucide-react';
+import { Search, Send, ChevronDown, Phone, ArrowLeft, SquarePen, CalendarDays, Briefcase, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import {
     DropdownMenu,
@@ -44,6 +44,16 @@ export interface ChatMessage {
         eventLocation?: string;
         service?: string;
     };
+    // NEW: Structured data for proposals
+    type?: 'text' | 'proposal_card' | 'proposal_auto_msg' | 'system';
+    senderName?: string;
+    senderAvatar?: string;
+    proposalData?: {
+        quotedPrice: string;
+        deliveryTimeline: string;
+        messageText: string;
+        vendorCategory?: string;
+    };
 }
 
 export interface ChatConversation {
@@ -81,6 +91,9 @@ interface InboxProps {
     preferredConversationId?: string;
     contacts?: InboxContact[];
     currentEventForShare?: { id: string; name: string };
+    currentUserId?: string; // NEW: For dynamic alignment
+    onSendMessage?: (chatId: string, message: { text: string; attachment?: any; type?: string; proposalData?: any }) => Promise<void>;
+    onDeleteConversation?: (chatId: string) => Promise<void> | void;
     composeEvents?: ComposeEvent[];
 }
 
@@ -91,6 +104,9 @@ export default function Inbox({
     preferredConversationId,
     contacts = [],
     currentEventForShare,
+    currentUserId,
+    onSendMessage,
+    onDeleteConversation,
     composeEvents = []
 }: InboxProps) {
     const [conversations, setConversations] = useState(initialConversations);
@@ -147,10 +163,11 @@ export default function Inbox({
 
         const newMessage: ChatMessage = {
             id: Date.now().toString(),
-            senderId: 'me',
+            senderId: currentUserId || 'me',
             text: messageInput,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isMe: true
+            isMe: true,
+            type: 'text'
         };
 
         setConversations(prev => prev.map(conv => {
@@ -164,6 +181,10 @@ export default function Inbox({
             }
             return conv;
         }));
+
+        if (onSendMessage) {
+            onSendMessage(activeChatId, { text: messageInput });
+        }
 
         setMessageInput('');
     };
@@ -196,12 +217,34 @@ export default function Inbox({
             }
             return conv;
         }));
+
+        if (onSendMessage) {
+            onSendMessage(activeChatId, {
+                text: defaultMessage,
+                attachment: newMessage.attachment
+            });
+        }
     };
 
     const updateStatus = (chatId: string, newStatus: string) => {
         setConversations(prev => prev.map(chat =>
             chat.id === chatId ? { ...chat, status: newStatus } : chat
         ));
+    };
+
+    const deleteConversation = async (chatId: string) => {
+        setConversations((prev) => prev.filter((chat) => chat.id !== chatId));
+        if (activeChatId === chatId) {
+            setActiveView('list');
+            setActiveChatId(undefined);
+        }
+        if (onDeleteConversation) {
+            try {
+                await onDeleteConversation(chatId);
+            } catch (error) {
+                console.error("Error deleting conversation:", error);
+            }
+        }
     };
 
     const handleCompose = () => {
@@ -275,6 +318,14 @@ export default function Inbox({
         };
 
         setConversations((prev) => [newConversation, ...prev]);
+
+        if (onSendMessage) {
+            onSendMessage(conversationId, {
+                text: composerMessage,
+                attachment: newMessage.attachment
+            });
+        }
+
         setActiveChatId(conversationId);
         setActiveView('chat');
         setIsComposerOpen(false);
@@ -285,10 +336,10 @@ export default function Inbox({
 
     return (
         <div className="flex h-[calc(100dvh-6rem)] md:h-[calc(100dvh-9rem)] bg-background border border-border rounded-2xl overflow-hidden shadow-xl">
-            {/* Sidebar */}
+            {/* Sidebar / Conversation List */}
             <div className={cn(
-                "w-full border-r border-border flex flex-col bg-muted/5",
-                activeView === 'chat' ? "hidden" : "flex"
+                "w-full md:w-80 lg:w-96 border-r border-border flex flex-col bg-muted/5 shrink-0 transition-all",
+                activeView === 'chat' ? "hidden md:flex" : "flex"
             )}>
                 <div className="p-6 border-b border-border">
                     <div className="flex items-center justify-between mb-6">
@@ -402,9 +453,18 @@ export default function Inbox({
                 <div className="flex-1 overflow-y-auto divide-y divide-border/50 scrollbar-hide">
                     {filteredConversations.length > 0 ? (
                         filteredConversations.map((chat) => (
-                            <button
+                            <div
                                 key={chat.id}
                                 onClick={() => { setActiveChatId(chat.id); setActiveView('chat'); }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        setActiveChatId(chat.id);
+                                        setActiveView('chat');
+                                    }
+                                }}
+                                role="button"
+                                tabIndex={0}
                                 className={cn(
                                     "w-full p-4 md:p-5 text-left transition-all flex items-center gap-4 hover:bg-muted/50 border-l-4 border-transparent",
                                     activeChatId === chat.id ? 'bg-card/5 border-primary shadow-[inset_0_0_20px_rgba(var(--primary),0.02)]' : ''
@@ -424,7 +484,23 @@ export default function Inbox({
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start mb-1">
                                         <h4 className="font-bold text-sm md:text-base truncate text-foreground">{chat.name}</h4>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">{chat.time}</span>
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">{chat.time}</span>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                aria-label={`Delete conversation with ${chat.name}`}
+                                                title="Delete conversation"
+                                                className="h-7 w-7 rounded-md text-muted-foreground hover:text-destructive"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    void deleteConversation(chat.id);
+                                                }}
+                                            >
+                                                <Trash2 size={14} />
+                                            </Button>
+                                        </div>
                                     </div>
                                     {chat.eventName && (
                                         <p className="text-[10px] font-black uppercase tracking-widest text-foreground/70 mb-1 truncate">
@@ -435,7 +511,7 @@ export default function Inbox({
                                         {chat.lastMsg}
                                     </p>
                                 </div>
-                            </button>
+                            </div>
                         ))
                     ) : (
                         <div className="flex flex-col items-center justify-center h-full p-8 text-center text-muted-foreground">
@@ -450,21 +526,21 @@ export default function Inbox({
 
             {/* Chat Area */}
             <div className={cn(
-                "flex-1 flex flex-col bg-background",
-                activeView === 'list' ? "hidden" : "flex"
+                "flex-1 flex flex-col bg-background min-w-0 transition-all",
+                activeView === 'list' ? "hidden md:flex" : "flex"
             )}>
                 {activeChat ? (
                     <>
                         {/* Chat Header */}
                         <div className="p-4 md:p-6 border-b border-border flex items-center justify-between bg-card shrink-0">
-                            <div className="flex items-center gap-4 min-w-0">
+                            <div className="flex items-center gap-2 md:gap-4 min-w-0">
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="rounded-full h-10 w-10 shrink-0 text-muted-foreground"
+                                    className="md:hidden rounded-full h-8 w-8 shrink-0 text-muted-foreground"
                                     onClick={() => setActiveView('list')}
                                 >
-                                    <ArrowLeft size={20} />
+                                    <ArrowLeft size={18} />
                                 </Button>
                                 <div className="relative">
                                     <Avatar className="w-10 h-10 md:w-12 md:h-12 rounded-xl border border-border shadow-sm">
@@ -499,99 +575,153 @@ export default function Inbox({
                                         <Phone size={18} />
                                     </Button>
                                 )}
-                                <div className="hidden sm:block h-8 w-px bg-border mx-1" />
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="sm" className="gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest rounded-xl border-border bg-background shadow-sm h-9 px-4">
-                                            {activeChat.status}
-                                            <ChevronDown className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[180px] shadow-2xl border-border">
-                                        {(userType === 'host'
-                                            ? ['Requested', 'Sent', 'Quoted', 'Negotiating', 'Booked']
-                                            : ['Pending', 'Confirmed', 'In Progress', 'Completed', 'Paid']
-                                        ).map((status) => (
-                                            <DropdownMenuItem
-                                                key={status}
-                                                onClick={() => updateStatus(activeChat.id, status.toLowerCase())}
-                                                className="rounded-xl font-bold text-xs py-2.5"
-                                            >
-                                                Mark as {status}
-                                            </DropdownMenuItem>
-                                        ))}
-                                        <div className="h-px bg-border my-1" />
-                                        <DropdownMenuItem
-                                            onClick={() => updateStatus(activeChat.id, 'declined')}
-                                            className="text-red-600 focus:text-red-600 font-bold text-xs rounded-xl py-2.5"
-                                        >
-                                            Decline / Cancel
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                {userType === "host" && (
+                                    <>
+                                        <div className="hidden sm:block h-8 w-px bg-border mx-1" />
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" size="sm" className="gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest rounded-xl border-border bg-background shadow-sm h-9 px-4">
+                                                    {activeChat.status}
+                                                    <ChevronDown className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[180px] shadow-2xl border-border">
+                                                {['Requested', 'Sent', 'Quoted', 'Negotiating', 'Booked'].map((status) => (
+                                                    <DropdownMenuItem
+                                                        key={status}
+                                                        onClick={() => updateStatus(activeChat.id, status.toLowerCase())}
+                                                        className="rounded-xl font-bold text-xs py-2.5"
+                                                    >
+                                                        Mark as {status}
+                                                    </DropdownMenuItem>
+                                                ))}
+                                                <div className="h-px bg-border my-1" />
+                                                <DropdownMenuItem
+                                                    onClick={() => updateStatus(activeChat.id, 'declined')}
+                                                    className="text-red-600 focus:text-red-600 font-bold text-xs rounded-xl py-2.5"
+                                                >
+                                                    Decline / Cancel
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </>
+                                )}
                             </div>
                         </div>
 
                         {/* Messages Area */}
                         <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 bg-muted/5 scroll-smooth">
-                            {activeChat.messages.map((msg) => (
-                                <div key={msg.id} className={cn(
-                                    "flex gap-3 md:gap-4 max-w-[90%] sm:max-w-[80%] lg:max-w-[70%]",
-                                    msg.isMe ? "ml-auto flex-row-reverse" : "mr-auto"
-                                )}>
-                                    {!msg.isMe && (
-                                        <Avatar className="w-8 h-8 md:w-10 md:h-10 rounded-xl shrink-0 border border-border shadow-sm">
-                                            <AvatarImage src={activeChat.avatar} className="object-cover" />
-                                            <AvatarFallback className="bg-card/10 text-foreground text-xs font-bold">
-                                                {activeChat.name.charAt(0)}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                    )}
-                                    <div className={cn(
-                                        "flex flex-col gap-1.5",
-                                        msg.isMe ? "items-end" : "items-start"
+                            {activeChat.messages.map((msg) => {
+                                // Determine alignment dynamically
+                                const isSenderMe = currentUserId ? msg.senderId === currentUserId : msg.isMe;
+
+                                return (
+                                    <div key={msg.id} className={cn(
+                                        "flex gap-3 md:gap-4 max-w-[90%] sm:max-w-[80%] lg:max-w-[70%]",
+                                        isSenderMe ? "ml-auto flex-row-reverse" : "mr-auto"
                                     )}>
+                                        {!isSenderMe && (
+                                            <Avatar className="w-8 h-8 md:w-10 md:h-10 rounded-xl shrink-0 border border-border shadow-sm">
+                                                <AvatarImage src={activeChat.avatar} className="object-cover" />
+                                                <AvatarFallback className="bg-card/10 text-foreground text-xs font-bold">
+                                                    {activeChat.name.charAt(0)}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                        )}
                                         <div className={cn(
-                                            "px-4 py-3 md:px-5 md:py-3.5 rounded-2xl text-sm md:text-base font-medium shadow-sm leading-relaxed",
-                                            msg.isMe
-                                                ? "bg-card text-foreground-foreground rounded-tr-none shadow-primary/10"
-                                                : "bg-card text-foreground border border-border rounded-tl-none"
+                                            "flex flex-col gap-1.5",
+                                            isSenderMe ? "items-end" : "items-start"
                                         )}>
-                                            {msg.text}
-                                            {msg.attachment?.type === 'event' && (
-                                                <div className="mt-3 p-3 rounded-xl border border-border bg-background shadow-sm flex items-center justify-between gap-4">
-                                                    <div className="flex items-center gap-3 min-w-0">
-                                                        <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                                                            <CalendarDays size={20} />
+                                            {msg.type === 'proposal_card' && msg.proposalData ? (
+                                                <div className="w-full max-w-[400px] bg-card border border-border rounded-3xl overflow-hidden">
+                                                    {/* Card Header with Greeting */}
+                                                    <div className="bg-primary/5 p-6 border-b border-border">
+                                                        <div className="flex items-center gap-4 mb-4">
+                                                            <Avatar className="w-12 h-12 rounded-2xl border-2 border-background shadow-sm">
+                                                                <AvatarImage src={msg.senderAvatar || activeChat.avatar} className="object-cover" />
+                                                                <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                                                                    {(msg.senderName || activeChat.name).charAt(0)}
+                                                                </AvatarFallback>
+                                                            </Avatar>
+                                                            <div>
+                                                                <h4 className="font-bold text-foreground">Hi {userType === 'host' ? 'there' : activeChat.name}! 👋</h4>
+                                                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                                                                    {msg.proposalData.vendorCategory || 'Service'} Proposal
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                        <div className="min-w-0">
-                                                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Event Invitation</p>
-                                                            <p className="text-sm font-semibold text-foreground truncate">{msg.attachment.eventName}</p>
-                                                            <p className="text-xs text-muted-foreground mt-1 truncate">
-                                                                Regarding: {msg.attachment.eventName}
-                                                                {msg.attachment.eventDate ? ` • ${msg.attachment.eventDate}` : ""}
-                                                                {msg.attachment.service ? ` • ${msg.attachment.service}` : ""}
-                                                            </p>
-                                                            {msg.attachment.eventLocation && (
-                                                                <p className="text-xs text-muted-foreground truncate">{msg.attachment.eventLocation}</p>
-                                                            )}
+                                                        <p className="text-sm font-medium text-foreground/80 leading-relaxed">
+                                                            I'd love to help with your event. Here's my estimated quote and timeline:
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Key Details */}
+                                                    <div className="p-6 grid grid-cols-2 gap-6 bg-background">
+                                                        <div className="space-y-1">
+                                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Quoted Price</p>
+                                                            <p className="text-2xl font-black text-primary tracking-tight">{msg.proposalData.quotedPrice}</p>
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Timeline</p>
+                                                            <p className="text-xl font-bold text-foreground">{msg.proposalData.deliveryTimeline}</p>
                                                         </div>
                                                     </div>
-                                                    <Link
-                                                        href={`/dashboard/hosts/events/${msg.attachment.eventId}`}
-                                                        className="shrink-0 text-xs font-bold bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
-                                                    >
-                                                        View Event
-                                                    </Link>
+
+                                                    {/* Personal Message */}
+                                                    {msg.proposalData.messageText && (
+                                                        <div className="mx-6 p-4 rounded-2xl bg-muted/30 border border-border/50 mb-6">
+                                                            <p className="text-[10px] font-black uppercase tracking-[0.1em] text-muted-foreground/60 mb-2">My Message</p>
+                                                            <p className="text-sm font-medium leading-relaxed italic text-foreground/80">
+                                                                "{msg.proposalData.messageText}"
+                                                            </p>
+                                                        </div>
+                                                    )}
+
+                                                </div>
+                                            ) : (
+                                                <div className={cn(
+                                                    "px-4 py-3 md:px-5 md:py-3.5 rounded-2xl text-sm md:text-base font-medium shadow-sm leading-relaxed",
+                                                    isSenderMe
+                                                        ? "bg-primary text-primary-foreground rounded-tr-none shadow-primary/10"
+                                                        : "bg-card text-foreground border border-border rounded-tl-none"
+                                                )}>
+                                                    {msg.text}
+                                                    {msg.attachment?.type === 'event' && (
+                                                        <div className="mt-3 p-3 rounded-xl border border-border bg-background shadow-sm flex items-center justify-between gap-4">
+                                                            <div className="flex items-center gap-3 min-w-0">
+                                                                <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                                                                    <CalendarDays size={20} />
+                                                                </div>
+                                                                <div className="min-w-0">
+                                                                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Event Invitation</p>
+                                                                    <p className="text-sm font-semibold text-foreground truncate">{msg.attachment.eventName}</p>
+                                                                    <p className="text-xs text-muted-foreground mt-1 truncate">
+                                                                        Regarding: {msg.attachment.eventName}
+                                                                        {msg.attachment.eventDate ? ` • ${msg.attachment.eventDate}` : ""}
+                                                                        {msg.attachment.service ? ` • ${msg.attachment.service}` : ""}
+                                                                    </p>
+                                                                    {msg.attachment.eventLocation && (
+                                                                        <p className="text-xs text-muted-foreground truncate">{msg.attachment.eventLocation}</p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <Link
+                                                                href={`/dashboard/hosts/events/${msg.attachment.eventId}`}
+                                                                className="shrink-0 text-xs font-bold bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+                                                            >
+                                                                View Event
+                                                            </Link>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
+                                            <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest px-1">
+                                                {msg.timestamp}
+                                            </span>
                                         </div>
-                                        <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest px-1">
-                                            {msg.timestamp}
-                                        </span>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
 
                         {/* Message Input */}
@@ -634,12 +764,12 @@ export default function Inbox({
                         </div>
                     </>
                 ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center p-12 text-muted-foreground/30">
-                        <div className="w-24 h-24 bg-muted rounded-[3rem] flex items-center justify-center mb-6 border border-border/50 shadow-inner">
-                            <Send size={40} className="rotate-12 translate-x-1 -translate-y-1" />
+                    <div className="flex-1 hidden md:flex flex-col items-center justify-center text-center p-12 text-muted-foreground/30 bg-muted/5">
+                        <div className="w-32 h-32 bg-card rounded-[3rem] shadow-xl flex items-center justify-center mb-8 border border-border/50">
+                            <Send size={48} className="text-primary rotate-12 translate-x-1 -translate-y-1" />
                         </div>
-                        <h3 className="text-xl font-bold text-foreground">Pick up where you left off</h3>
-                        <p className="mt-2 text-sm max-w-xs font-medium text-muted-foreground/60">
+                        <h3 className="text-2xl font-bold text-foreground mb-3">Your Messages</h3>
+                        <p className="text-base max-w-xs font-medium text-muted-foreground/60">
                             Select a contact from the list to view your conversation history and send new messages.
                         </p>
                     </div>

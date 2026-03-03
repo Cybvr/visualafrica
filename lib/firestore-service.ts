@@ -459,6 +459,39 @@ export async function deleteChat(chatId: string) {
     await deleteDoc(chatRef);
 }
 
+/**
+ * Removes a vendor conversation from a host event.
+ * Host inbox conversation IDs are "eventId:vendorId" — they live inside
+ * the event document, not in the chats collection.
+ */
+export async function removeConversationFromEvent(chatId: string) {
+    const colonIndex = chatId.indexOf(':');
+    if (colonIndex === -1) {
+        // Not a compound ID — fall back to deleting from chats
+        return deleteChat(chatId);
+    }
+    const eventId = chatId.slice(0, colonIndex);
+    const vendorId = chatId.slice(colonIndex + 1);
+
+    const eventRef = doc(db, 'events', eventId);
+    const eventSnap = await getDoc(eventRef);
+    if (!eventSnap.exists()) return;
+
+    const eventData = eventSnap.data() as SharedEvent;
+    const updatedLeads = (eventData.leads || []).filter(
+        (l: any) => l.vendorId !== vendorId
+    );
+    const updatedBookedVendors = (eventData.bookedVendors || []).filter(
+        (b: any) => b.vendorId !== vendorId
+    );
+
+    await updateDoc(eventRef, {
+        leads: updatedLeads,
+        bookedVendors: updatedBookedVendors,
+        updatedAt: serverTimestamp()
+    });
+}
+
 export async function remixChat(originalChatId: string, newUserId: string): Promise<string> {
     const originalChatRef = doc(db, 'chats', originalChatId);
     const originalChatSnap = await getDoc(originalChatRef);

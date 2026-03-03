@@ -64,8 +64,8 @@ const EventDetail: React.FC<EventDetailProps> = ({ event }) => {
       }
 
       toast.success('Proposal submitted successfully!');
-      // Navigate to jobs page after submission
-      router.push('/dashboard/vendors/jobs');
+      // Navigate to inbox with event context
+      router.push(`/dashboard/vendors/inbox?eventId=${event.id}`);
     } catch (error: any) {
       console.error('Error submitting proposal:', error);
       toast.error(error.message || 'Something went wrong. Please try again.');
