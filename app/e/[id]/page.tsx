@@ -39,6 +39,13 @@ export default async function PublicEventPage({ params }: PublicEventPageProps) 
     }
 
     const eventData = docSnap.data();
+    const isOpenPublicBrief = eventData?.isPublicBrief === true && (eventData?.publicBriefStatus || "closed") === "open";
+    const isPublished = eventData?.published === true;
+
+    if (!isOpenPublicBrief && !isPublished) {
+        notFound();
+    }
+
     const event = serializeData({ id: docSnap.id, ...eventData }) as SharedEvent;
 
     return <PublicEventClient event={event} />;

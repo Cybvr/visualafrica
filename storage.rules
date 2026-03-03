@@ -2,9 +2,45 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isImageUpload() {
+      return request.resource != null &&
+             request.resource.contentType.matches('image/.*') &&
+             request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // Public image reads are required for marketplace and event pages.
+    match /vendors/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && isImageUpload();
+    }
+
+    match /experiences/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && isImageUpload();
+    }
+
+    match /events/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && isImageUpload();
+    }
+
+    match /blog/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && isImageUpload();
+    }
+
+    match /store_covers/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && isImageUpload();
+    }
+
+    // Deny everything else.
     match /{allPaths=**} {
-      // TEMPORARY: Open for debugging deployment issues
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

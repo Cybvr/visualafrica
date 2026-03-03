@@ -14,6 +14,7 @@ import { getEvents } from '@/lib/firestore-service';
 import { SharedEvent } from '@/lib/types';
 import { VENDOR_DASHBOARD_DATA } from '@/lib/vendor-dashboard-data';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/components/providers/auth-provider';
 
 // Generate chats from events where vendor is involved
 const generateChats = (events: SharedEvent[]) => {
@@ -50,6 +51,7 @@ interface VendorInboxTabProps {
 }
 
 export default function VendorInboxTab({ focusedEventId }: VendorInboxTabProps) {
+    const { user } = useAuth();
     const [events, setEvents] = useState<SharedEvent[]>([]);
     const initialChats = useMemo(() => generateChats(events), [events]);
     const [chats, setChats] = useState(initialChats);
@@ -58,13 +60,13 @@ export default function VendorInboxTab({ focusedEventId }: VendorInboxTabProps) 
     useEffect(() => {
         async function loadEvents() {
             try {
-                setEvents(await getEvents());
+                setEvents(await getEvents(user?.uid, user?.email || undefined));
             } catch (error) {
                 console.error("Failed to load inbox events:", error);
             }
         }
         loadEvents();
-    }, []);
+    }, [user?.uid, user?.email]);
 
     useEffect(() => {
         setChats(initialChats);

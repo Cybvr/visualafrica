@@ -18,6 +18,13 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == ownerField;
     }
 
+    function isSharedWithCurrentUser(data) {
+      return isSignedIn() &&
+             request.auth.token.email != null &&
+             data.sharedWith is list &&
+             request.auth.token.email in data.sharedWith;
+    }
+
     function currentPeriodKey() {
       return request.time.year() * 100 + request.time.month();
     }
@@ -71,7 +78,11 @@ service cloud.firestore {
 
     // Events: Public read for public event pages.
     match /events/{eventId} {
-      allow read: if true;
+      allow read: if (resource.data.isPublicBrief == true && resource.data.publicBriefStatus == 'open') ||
+                   (resource.data.published == true) ||
+                   isAdmin() ||
+                   isOwner(resource.data.hostId) ||
+                   isSharedWithCurrentUser(resource.data);
       allow create: if isAdmin() || (isSignedIn() && request.resource.data.hostId == request.auth.uid);
       allow update, delete: if isAdmin() || isOwner(resource.data.hostId);
     }

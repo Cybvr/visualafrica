@@ -33,6 +33,7 @@ const generateConversations = (events: SharedEvent[], currentVendorId: string): 
 };
 
 const InboxContent: React.FC = () => {
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const eventIdParam = searchParams.get('eventId') || undefined;
   const { vendorId, isLoading: profileLoading } = useVendorProfile();
@@ -47,7 +48,7 @@ const InboxContent: React.FC = () => {
         return;
       }
       try {
-        const events = await getEvents();
+        const events = await getEvents(user?.uid, user?.email || undefined);
         const generated = generateConversations(events, vendorId);
 
         if (eventIdParam && !generated.some(c => c.id === eventIdParam)) {
@@ -74,7 +75,7 @@ const InboxContent: React.FC = () => {
       }
     }
     fetchData();
-  }, [eventIdParam, vendorId, profileLoading]);
+  }, [eventIdParam, vendorId, profileLoading, user?.uid, user?.email]);
 
   // Handle message updates for all conversations
   useEffect(() => {
@@ -138,8 +139,6 @@ const InboxContent: React.FC = () => {
       console.error("Error deleting vendor conversation:", error);
     }
   };
-
-  const { user } = useAuth();
 
   if (isLoading || profileLoading) return <div className="p-10 text-center">Loading inbox...</div>;
 

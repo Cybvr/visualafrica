@@ -10,11 +10,13 @@ import { getEvents } from '@/lib/firestore-service';
 import { Button } from '@/components/ui/button';
 import { DashboardFilter } from '@/components/dashboard/DashboardFilter';
 import { useVendorProfile } from '@/hooks/use-vendor-profile';
+import { useAuth } from '@/components/providers/auth-provider';
 
 type JobStatus = 'all' | 'pending' | 'offers' | 'active' | 'declined' | 'completed';
 
 export default function VendorJobsPage() {
     const { vendorId, isLoading: profileLoading } = useVendorProfile();
+    const { user } = useAuth();
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [allEvents, setAllEvents] = useState<SharedEvent[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +31,7 @@ export default function VendorJobsPage() {
             }
 
             try {
-                const events = await getEvents();
+                const events = await getEvents(user?.uid, user?.email || undefined);
                 setAllEvents(events);
 
                 const vendorBookings: Booking[] = [];
@@ -71,7 +73,7 @@ export default function VendorJobsPage() {
             }
         }
         fetchJobs();
-    }, [vendorId, profileLoading]);
+    }, [vendorId, profileLoading, user?.uid, user?.email]);
 
     const jobCounts = {
         all: bookings.length,

@@ -95,28 +95,41 @@ export async function getVendorBySlug(slug: string): Promise<Vendor | null> {
 }
 
 export async function getEvents(userId?: string, userEmail?: string): Promise<SharedEvent[]> {
+    const toEvents = (querySnapshot: any) =>
+        querySnapshot.docs.map((doc: any) => toPlainObject({ ...doc.data(), id: doc.id } as SharedEvent));
+
     if (!userId && !userEmail) {
-        const q = query(collection(db, 'events'));
+        const q = query(
+            collection(db, 'events'),
+            where('isPublicBrief', '==', true),
+            where('publicBriefStatus', '==', 'open')
+        );
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => toPlainObject({ ...doc.data(), id: doc.id } as SharedEvent));
+        return toEvents(querySnapshot);
     }
 
     const eventsMap = new Map<string, SharedEvent>();
+    const addToMap = (items: SharedEvent[]) => {
+        items.forEach((item) => {
+            if (item?.id) eventsMap.set(item.id, item);
+        });
+    };
+
+    const publicQ = query(
+        collection(db, 'events'),
+        where('isPublicBrief', '==', true),
+        where('publicBriefStatus', '==', 'open')
+    );
+    addToMap(toEvents(await getDocs(publicQ)));
 
     if (userId) {
         const q1 = query(collection(db, 'events'), where('hostId', '==', userId));
-        const snap1 = await getDocs(q1);
-        snap1.docs.forEach(doc => {
-            eventsMap.set(doc.id, toPlainObject({ ...doc.data(), id: doc.id } as SharedEvent));
-        });
+        addToMap(toEvents(await getDocs(q1)));
     }
 
     if (userEmail) {
         const q2 = query(collection(db, 'events'), where('sharedWith', 'array-contains', userEmail));
-        const snap2 = await getDocs(q2);
-        snap2.docs.forEach(doc => {
-            eventsMap.set(doc.id, toPlainObject({ ...doc.data(), id: doc.id } as SharedEvent));
-        });
+        addToMap(toEvents(await getDocs(q2)));
     }
 
     return Array.from(eventsMap.values());

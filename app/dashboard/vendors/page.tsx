@@ -89,7 +89,7 @@ export default function VendorDashboardPage() {
         setHasVendorProfile(vendorIds.length > 0);
         setClaimModalOpen(vendorIds.length === 0);
 
-        const events = await getEvents();
+        const events = await getEvents(currentUser.uid, currentUser.email || undefined);
         if (!vendorIds.length) {
           setAllEvents([]);
         } else {
