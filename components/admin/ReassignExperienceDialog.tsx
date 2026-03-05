@@ -175,7 +175,7 @@ export function ReassignExperienceDialog({
                             </select>
                             <Input
                                 id="targetEmail"
-                                placeholder="e.g. jide@waddi.com"
+                                placeholder="e.g. jide@waddi.cc"
                                 className="rounded-xl border-border bg-background"
                                 value={targetEmail}
                                 onChange={(e) => setTargetEmail(e.target.value)}

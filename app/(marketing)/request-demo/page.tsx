@@ -90,8 +90,8 @@ export default function RequestDemoPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Email us</h3>
-                    <a href="mailto:hello@waddi.com" className="mt-1 block text-sm text-muted-foreground hover:text-primary">
-                      hello@waddi.com
+                    <a href="mailto:hello@waddi.cc" className="mt-1 block text-sm text-muted-foreground hover:text-primary">
+                      hello@waddi.cc
                     </a>
                   </div>
                 </div>

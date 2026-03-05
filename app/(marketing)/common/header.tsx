@@ -20,6 +20,8 @@ import {
   Zap,
   FileText,
   BookOpen,
+  Store,
+  ShieldCheck,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -231,8 +233,8 @@ export function Header() {
               <DropdownMenuTrigger className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary hover:text-foreground outline-none">
                 Resources
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-[280px] border-none bg-background p-4 shadow-2xl rounded-3xl">
-                <div className="space-y-2">
+              <DropdownMenuContent align="start" className="w-[320px] border-none bg-background p-4 shadow-2xl rounded-3xl">
+                <div className="space-y-1">
                   <div className="pb-2">
                     <span className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Learn More</span>
                   </div>
@@ -242,9 +244,7 @@ export function Header() {
                         <BookOpen className="h-4 w-4" />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <span className="text-sm font-bold text-foreground">
-                          Blog
-                        </span>
+                        <span className="text-sm font-bold text-foreground">Blog</span>
                         <p className="mt-0.5 text-xs text-foreground line-clamp-2">
                           Tips, guides, and inspiration for planning amazing events
                         </p>
@@ -257,11 +257,39 @@ export function Header() {
                         <Users className="h-4 w-4" />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <span className="text-sm font-bold text-foreground">
-                          Support
-                        </span>
+                        <span className="text-sm font-bold text-foreground">Support</span>
                         <p className="mt-0.5 text-xs text-foreground line-clamp-2">
                           Find answers to common questions and get help
+                        </p>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                  <div className="my-1 border-t border-border/50" />
+                  <div className="pb-1 pt-1">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground/60">For Vendors</span>
+                  </div>
+                  <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
+                    <Link href="/for-vendors" className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
+                      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
+                        <Store className="h-4 w-4" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-sm font-bold text-foreground">For Vendors</span>
+                        <p className="mt-0.5 text-xs text-foreground line-clamp-2">
+                          Grow your business and reach diaspora clients
+                        </p>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
+                    <Link href="/become-verified-vendor" className="group flex items-start gap-3 rounded-2xl p-3 transition-all hover:bg-secondary/50">
+                      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
+                        <ShieldCheck className="h-4 w-4" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-sm font-bold text-foreground">Become Verified</span>
+                        <p className="mt-0.5 text-xs text-foreground line-clamp-2">
+                          Get the badge that wins trust and 3× more bookings
                         </p>
                       </div>
                     </Link>
@@ -358,13 +386,39 @@ export function Header() {
                   </Link>
                 ))}
               </div>
-              <Link
-                href="/blog"
-                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
-                onClick={() => setMobileOpen(false)}
-              >
-                Resources
-              </Link>
+              <div className="flex flex-col gap-1">
+                <span className="px-3 text-sm font-bold text-foreground">Resources</span>
+                <div className="ml-4 flex flex-col gap-2 border-l border-border pl-4">
+                  <Link
+                    href="/blog"
+                    className="text-sm font-medium text-foreground transition-colors hover:text-foreground"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Blog
+                  </Link>
+                  <Link
+                    href="/support"
+                    className="text-sm font-medium text-foreground transition-colors hover:text-foreground"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Support
+                  </Link>
+                  <Link
+                    href="/for-vendors"
+                    className="text-sm font-medium text-foreground transition-colors hover:text-foreground"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    For Vendors
+                  </Link>
+                  <Link
+                    href="/become-verified-vendor"
+                    className="text-sm font-medium text-foreground transition-colors hover:text-foreground"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Become Verified
+                  </Link>
+                </div>
+              </div>
               <Link
                 href="/pricing"
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"

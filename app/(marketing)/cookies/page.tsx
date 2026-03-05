@@ -47,7 +47,7 @@ export default function CookiesPage() {
             <div>
               <h2 className="font-serif text-2xl font-bold">5. Contact</h2>
               <p className="mt-3 text-muted-foreground leading-relaxed">
-                For cookie questions, contact <a href="mailto:hello@waddi.com" className="text-primary hover:underline">hello@waddi.com</a>.
+                For cookie questions, contact <a href="mailto:hello@waddi.cc" className="text-primary hover:underline">hello@waddi.cc</a>.
               </p>
             </div>
           </div>

@@ -68,7 +68,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="font-serif text-2xl font-bold">6. Contact</h2>
               <p className="mt-3 text-muted-foreground leading-relaxed">
-                For privacy questions, contact us at <a href="mailto:hello@waddi.com" className="text-primary hover:underline">hello@waddi.com</a>.
+                For privacy questions, contact us at <a href="mailto:hello@waddi.cc" className="text-primary hover:underline">hello@waddi.cc</a>.
               </p>
             </div>
           </div>

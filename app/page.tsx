@@ -2,6 +2,7 @@ import { Header } from "@/app/(marketing)/common/header"
 import { Footer } from "@/app/(marketing)/common/footer"
 import { WaddiPrompt } from "@/components/landingpage/waddi-prompt"
 import { Hero } from "@/components/landingpage/hero"
+import { FilmstripGallery } from "@/components/landingpage/filmstrip-gallery"
 import { Features } from "@/components/landingpage/features"
 import { HowItWorks } from "@/components/landingpage/how-it-works"
 import { Locations } from "@/components/landingpage/locations"
@@ -16,6 +17,7 @@ export default function HomePage() {
       <Header />
       <main className="flex-1">
         <WaddiPrompt mode="marketing" />
+        <FilmstripGallery />
         <Hero />
 
         <section className="py-20 bg-background">

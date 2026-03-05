@@ -3,12 +3,18 @@ import { Facebook, Instagram, MessageCircle } from "lucide-react"
 import { getPlatformFeatures, getSolutions } from "@/lib/firestore-service"
 
 const quickLinks = [
-  { label: "Vendor Signup", href: "/vendor-signup" },
   { label: "About Us", href: "/about" },
-  { label: "FAQs", href: "/support" },
   { label: "Blog", href: "/blog" },
   { label: "Pricing", href: "/pricing" },
+  { label: "FAQs", href: "/support" },
   { label: "Contact", href: "/contact" },
+]
+
+const vendorLinks = [
+  { label: "For Vendors", href: "/for-vendors" },
+  { label: "Become Verified", href: "/become-verified-vendor" },
+  { label: "Vendor Signup", href: "/auth/login" },
+  { label: "Vendor Dashboard", href: "/dashboard" },
 ]
 
 const legalLinks = [
@@ -74,7 +80,7 @@ export async function Footer() {
 
       {/* Footer Content */}
       <div className="mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2">
@@ -151,6 +157,24 @@ export async function Footer() {
             </ul>
           </div>
 
+          {/* Vendors */}
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
+              For Vendors
+            </h3>
+            <ul className="mt-4 flex flex-col gap-2">
+              {vendorLinks.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="text-sm opacity-70 transition-opacity hover:opacity-100"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
         </div>
 

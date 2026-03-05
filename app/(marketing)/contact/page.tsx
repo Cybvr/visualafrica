@@ -91,10 +91,10 @@ export default function ContactPage() {
                                     <div>
                                         <h3 className="font-semibold">Email</h3>
                                         <a
-                                            href="mailto:hello@Waddi.com"
+                                            href="mailto:hello@waddi.cc"
                                             className="mt-1 text-muted-foreground hover:text-primary"
                                         >
-                                            hello@Waddi.com
+                                            hello@waddi.cc
                                         </a>
                                     </div>
                                 </div>
