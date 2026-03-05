@@ -9,10 +9,14 @@ export function VendorCard({
   vendor,
   saved = false,
   onToggleSave,
+  hideDescription = false,
+  hideLocation = false,
 }: {
   vendor: Vendor
   saved?: boolean
   onToggleSave?: (vendor: Vendor) => void
+  hideDescription?: boolean
+  hideLocation?: boolean
 }) {
   return (
     <Card className="group flex h-full flex-col overflow-hidden border-border bg-card transition-shadow hover:shadow-lg">
@@ -69,14 +73,18 @@ export function VendorCard({
           {vendor.name}
         </h3>
 
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-1">
-          {vendor.shortDescription}
-        </p>
+        {!hideDescription && (
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-1">
+            {vendor.shortDescription}
+          </p>
+        )}
 
-        <div className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground">
-          <MapPin className="h-4 w-4 shrink-0 text-foreground" />
-          <span className="truncate">{vendor.location}</span>
-        </div>
+        {!hideLocation && (
+          <div className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground">
+            <MapPin className="h-4 w-4 shrink-0 text-foreground" />
+            <span className="truncate">{vendor.location}</span>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

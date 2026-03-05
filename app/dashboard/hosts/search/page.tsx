@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import { Search, Filter, ChevronDown, Calendar, FileText, Clock, Star, ArrowRight, ExternalLink, Heart } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
@@ -14,7 +13,7 @@ import { getVendors, getEvents, getBlogPosts, getExperiences } from '@/lib/fires
 import BlogPostCard from '@/components/dashboard/BlogPostCard';
 import { VendorCard } from '@/components/dashboard/vendor-card';
 import { ExperienceCard } from '@/components/dashboard/experience-card';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
@@ -156,7 +155,6 @@ const DropdownFilter: React.FC<{
 };
 
 export default function DashboardPage() {
-  const router = useRouter();
   const [displayName, setDisplayName] = useState<string>('');
   const VENDORS_PER_PAGE = 12;
 
@@ -177,6 +175,8 @@ export default function DashboardPage() {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isVendorSheetOpen, setIsVendorSheetOpen] = useState(false);
+  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
 
   // Counts
   const allVendorsCount = allVendors.length;
@@ -459,17 +459,100 @@ export default function DashboardPage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
                 {paginatedVendors.map(vendor => (
-                  <Link key={vendor.id} href={`/dashboard/hosts/vendor/${vendor.slug}`} className="block h-full min-w-0">
+                  <div
+                    key={vendor.id}
+                    className="block h-full min-w-0 cursor-pointer"
+                    onClick={() => {
+                      setSelectedVendor(vendor);
+                      setIsVendorSheetOpen(true);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedVendor(vendor);
+                        setIsVendorSheetOpen(true);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                  >
                     <VendorCard
                       vendor={vendor}
                       saved={savedVendorIds.has(vendor.id)}
                       onToggleSave={() => toggleSavedVendor(vendor.id)}
+                      hideDescription
+                      hideLocation
                     />
-                  </Link>
+                  </div>
                 ))}
               </div>
+
+              <Sheet open={isVendorSheetOpen} onOpenChange={setIsVendorSheetOpen}>
+                <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-2xl">
+                  {selectedVendor && (
+                    <div className="space-y-6 pr-2">
+                      <SheetHeader className="pr-6">
+                        <SheetTitle>{selectedVendor.name}</SheetTitle>
+                        <SheetDescription>
+                          {selectedVendor.categories?.[0] || "Vendor"}
+                        </SheetDescription>
+                      </SheetHeader>
+
+                      <div className="aspect-[16/9] overflow-hidden rounded-lg border border-border bg-muted">
+                        {selectedVendor.image ? (
+                          <img
+                            src={selectedVendor.image}
+                            alt={selectedVendor.name}
+                            className="h-full w-full object-cover"
+                            onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png'; }}
+                          />
+                        ) : (
+                          <div className="h-full w-full bg-background" />
+                        )}
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Rating</span>
+                          <span className="font-semibold text-foreground">{selectedVendor.rating || "N/A"}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Starting price</span>
+                          <span className="font-semibold text-foreground">
+                            {selectedVendor.price ?? "Contact for pricing"}
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-semibold text-foreground">Location</p>
+                          <p className="text-sm text-muted-foreground">{selectedVendor.location || "Not specified"}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-semibold text-foreground">About</p>
+                          <p className="text-sm leading-relaxed text-muted-foreground">
+                            {selectedVendor.description || selectedVendor.shortDescription || "No description available."}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 pt-2">
+                        <Button asChild>
+                          <Link href={`/dashboard/hosts/vendor/${selectedVendor.slug}`}>
+                            View full profile
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => toggleSavedVendor(selectedVendor.id)}
+                        >
+                          {savedVendorIds.has(selectedVendor.id) ? "Remove from saved" : "Save vendor"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </SheetContent>
+              </Sheet>
 
               {displayVendors.length > VENDORS_PER_PAGE && (
                 <div className="flex items-center justify-center gap-2 pt-2">
