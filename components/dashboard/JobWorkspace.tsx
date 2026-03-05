@@ -105,12 +105,12 @@ export default function JobWorkspace({
                     {/* Tabs Section */}
                     <div className="space-y-6">
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                            <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b border-border rounded-none mb-6">
+                            <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b border-border rounded-none mb-6 overflow-x-auto flex-nowrap">
                                 {tabs.map(tab => (
                                     <TabsTrigger
                                         key={tab.id}
                                         value={tab.id}
-                                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-6 py-3 text-xs font-black uppercase tracking-widest"
+                                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-6 py-3 text-xs font-black uppercase tracking-widest shrink-0"
                                     >
                                         {tab.label}
                                     </TabsTrigger>

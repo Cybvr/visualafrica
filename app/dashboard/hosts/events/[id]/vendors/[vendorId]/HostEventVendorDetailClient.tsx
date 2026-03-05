@@ -12,6 +12,7 @@ import {
 import { Vendor, SharedEvent } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -519,88 +520,101 @@ export default function HostEventVendorDetailClient({ vendor, event }: HostEvent
                     </p>
                 </div>
 
-                <form onSubmit={handlePayment} className="grid gap-4 py-4 max-w-2xl">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-                        <Button
-                            type="button"
-                            variant={paymentMethod === 'card' ? 'default' : 'outline'}
-                            onClick={() => setPaymentMethod('card')}
-                            className="h-11 text-sm font-bold"
-                        >
-                            <CreditCard size={16} className="mr-2" /> Card
-                        </Button>
-                        <Button
-                            type="button"
-                            variant={paymentMethod === 'paypal' ? 'default' : 'outline'}
-                            onClick={() => setPaymentMethod('paypal')}
-                            className="h-11 text-sm font-bold"
-                        >
-                            PayPal
-                        </Button>
-                        <Button
-                            type="button"
-                            variant={paymentMethod === 'paystack' ? 'default' : 'outline'}
-                            onClick={() => setPaymentMethod('paystack')}
-                            className="h-11 text-sm font-bold"
-                        >
-                            Paystack
-                        </Button>
-                        <Button
-                            type="button"
-                            variant={paymentMethod === 'wise' ? 'default' : 'outline'}
-                            onClick={() => setPaymentMethod('wise')}
-                            className="h-11 text-sm font-bold"
-                        >
-                            Wise
-                        </Button>
-                    </div>
-
-                    {paymentMethod === 'card' && (
-                        <div className="space-y-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Name on card</Label>
-                                <Input id="name" placeholder="John Doe" required className="h-11" />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="card">Card number</Label>
-                                <Input id="card" placeholder="0000 0000 0000 0000" required className="h-11" />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
+                <form onSubmit={handlePayment} className="grid gap-6 py-4 max-w-2xl">
+                    <Accordion type="single" value={paymentMethod} onValueChange={(val) => val && setPaymentMethod(val)} className="w-full space-y-4">
+                        {/* CARD / STRIPE */}
+                        <AccordionItem value="card" className="border border-border rounded-xl px-4 bg-card">
+                            <AccordionTrigger className="hover:no-underline py-4">
+                                <div className="flex items-center gap-2 font-bold text-foreground">
+                                    <CreditCard size={18} /> Credit or Debit Card
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="pt-2 pb-6 space-y-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="expiry">Expiry</Label>
-                                    <div className="flex gap-2">
-                                        <Input id="expiry-month" placeholder="MM" required maxLength={2} className="h-11 border-border" />
-                                        <Input id="expiry-year" placeholder="YY" required maxLength={2} className="h-11 border-border" />
+                                    <Label htmlFor="name">Name on card</Label>
+                                    <Input id="name" placeholder="John Doe" className="h-11" required={paymentMethod === 'card'} />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="card">Card number</Label>
+                                    <Input id="card" placeholder="0000 0000 0000 0000" className="h-11" required={paymentMethod === 'card'} />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="expiry">Expiry</Label>
+                                        <div className="flex gap-2">
+                                            <Input id="expiry-month" placeholder="MM" maxLength={2} className="h-11 border-border" required={paymentMethod === 'card'} />
+                                            <Input id="expiry-year" placeholder="YY" maxLength={2} className="h-11 border-border" required={paymentMethod === 'card'} />
+                                        </div>
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="cvc">CVC</Label>
+                                        <Input id="cvc" placeholder="CVC" maxLength={4} className="h-11" required={paymentMethod === 'card'} />
                                     </div>
                                 </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="cvc">CVC</Label>
-                                    <Input id="cvc" placeholder="CVC" required maxLength={4} className="h-11" />
+                            </AccordionContent>
+                        </AccordionItem>
+
+                        {/* PAYPAL */}
+                        <AccordionItem value="paypal" className="border border-border rounded-xl px-4 bg-card">
+                            <AccordionTrigger className="hover:no-underline py-4">
+                                <div className="flex items-center gap-2 font-bold text-foreground">
+                                    <Globe size={18} /> PayPal
                                 </div>
-                            </div>
-                        </div>
-                    )}
+                            </AccordionTrigger>
+                            <AccordionContent className="pt-2 pb-6">
+                                <div className="flex flex-col items-center justify-center p-6 bg-muted/20 border border-border/50 rounded-xl text-center">
+                                    <p className="font-bold mb-1 text-foreground">Pay safely with PayPal</p>
+                                    <p className="text-sm text-muted-foreground">You will be redirected to PayPal's secure gateway to complete your purchase.</p>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
 
-                    {paymentMethod === 'paypal' && (
-                        <div className="flex flex-col items-center justify-center p-8 border border-border rounded-xl text-center bg-card">
-                            <p className="font-bold mb-2 text-foreground">Pay safely with PayPal</p>
-                            <p className="text-sm text-muted-foreground">You will be redirected to PayPal to complete your purchase securely.</p>
-                        </div>
-                    )}
+                        {/* PAYSTACK */}
+                        <AccordionItem value="paystack" className="border border-border rounded-xl px-4 bg-card">
+                            <AccordionTrigger className="hover:no-underline py-4">
+                                <div className="flex items-center gap-2 font-bold text-foreground">
+                                    <Zap size={18} /> Paystack (Africa Local)
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="pt-2 pb-6 space-y-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="paystack-email">Email Address</Label>
+                                    <Input id="paystack-email" type="email" placeholder="email@example.com" className="h-11" required={paymentMethod === 'paystack'} />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="paystack-phone">Phone Number (Mobile Money) - Optional</Label>
+                                    <Input id="paystack-phone" type="tel" placeholder="+234..." className="h-11" />
+                                </div>
+                                <div className="p-4 bg-accent/5 border border-accent/20 rounded-xl text-sm text-foreground">
+                                    Complete your payment instantly using card, bank transfer, USSD, or mobile money via Paystack Checkout.
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
 
-                    {paymentMethod === 'paystack' && (
-                        <div className="flex flex-col items-center justify-center p-8 border border-border rounded-xl text-center bg-card">
-                            <p className="font-bold mb-2 text-foreground">Pay with Paystack</p>
-                            <p className="text-sm text-muted-foreground">Process local transactions smoothly securely via Paystack.</p>
-                        </div>
-                    )}
-
-                    {paymentMethod === 'wise' && (
-                        <div className="flex flex-col items-center justify-center p-8 border border-border rounded-xl text-center bg-card">
-                            <p className="font-bold mb-2 text-foreground">Bank Transfer via Wise</p>
-                            <p className="text-sm text-muted-foreground">Complete zero-fee or low-cost international transfers using Wise.</p>
-                        </div>
-                    )}
+                        {/* WISE */}
+                        <AccordionItem value="wise" className="border border-border rounded-xl px-4 bg-card">
+                            <AccordionTrigger className="hover:no-underline py-4">
+                                <div className="flex items-center gap-2 font-bold text-foreground">
+                                    <Briefcase size={18} /> Wise (International Transfer)
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="pt-2 pb-6 space-y-4">
+                                <div className="p-4 bg-muted/20 border border-border/50 rounded-xl space-y-2">
+                                    <p className="text-sm font-bold text-foreground border-b border-border/50 pb-2 mb-2">Transfer to the following details:</p>
+                                    <div className="grid grid-cols-[100px_1fr] gap-2 text-sm text-muted-foreground">
+                                        <span className="font-medium text-foreground">Name:</span> <span>Waddi Escrow</span>
+                                        <span className="font-medium text-foreground">IBAN:</span> <span className="font-mono">BE68 0000 0000 0000</span>
+                                        <span className="font-medium text-foreground">BIC/SWIFT:</span> <span className="font-mono">WISEBXXX</span>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground pt-2">Zero-fee international bank transfers. Payments may take 1-2 business days to clear.</p>
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="wise-reference">Transfer Reference Number</Label>
+                                    <Input id="wise-reference" placeholder="e.g. #9900223" className="h-11" required={paymentMethod === 'wise'} />
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
 
                     <div className="mt-6 pt-6 border-t border-border">
                         <Button type="submit" disabled={isUpdatingStatus} className="w-full h-12 text-sm font-bold shrink-0 shadow-sm">
