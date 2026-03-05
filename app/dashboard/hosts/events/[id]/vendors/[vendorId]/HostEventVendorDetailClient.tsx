@@ -600,17 +600,13 @@ export default function HostEventVendorDetailClient({ vendor, event }: HostEvent
                             </AccordionTrigger>
                             <AccordionContent className="pt-2 pb-6 space-y-4">
                                 <div className="p-4 bg-muted/20 border border-border/50 rounded-xl space-y-2">
-                                    <p className="text-sm font-bold text-foreground border-b border-border/50 pb-2 mb-2">Transfer to the following details:</p>
+                                    <p className="text-sm font-bold text-foreground border-b border-border/50 pb-2 mb-2">Send payment to {vendor.name}'s account:</p>
                                     <div className="grid grid-cols-[100px_1fr] gap-2 text-sm text-muted-foreground">
-                                        <span className="font-medium text-foreground">Name:</span> <span>Waddi Escrow</span>
-                                        <span className="font-medium text-foreground">IBAN:</span> <span className="font-mono">BE68 0000 0000 0000</span>
-                                        <span className="font-medium text-foreground">BIC/SWIFT:</span> <span className="font-mono">WISEBXXX</span>
+                                        <span className="font-medium text-foreground">Name:</span> <span>{vendor.name}</span>
+                                        <span className="font-medium text-foreground">Bank:</span> <span>Pending Vendor Setup</span>
+                                        <span className="font-medium text-foreground">Account:</span> <span className="font-mono">Hidden</span>
                                     </div>
-                                    <p className="text-xs text-muted-foreground pt-2">Zero-fee international bank transfers. Payments may take 1-2 business days to clear.</p>
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="wise-reference">Transfer Reference Number</Label>
-                                    <Input id="wise-reference" placeholder="e.g. #9900223" className="h-11" required={paymentMethod === 'wise'} />
+                                    <p className="text-xs text-muted-foreground pt-2">Send money directly to the vendor using your Waddi Wise Business integration at the mid-market rate. (Currently mocked for prototype)</p>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
