@@ -308,7 +308,7 @@ export function Header() {
               href="/explore/experiences"
               className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
-              Experinces
+              Experiences
             </Link>
           </nav>
         </div>
@@ -431,7 +431,7 @@ export function Header() {
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary"
                 onClick={() => setMobileOpen(false)}
               >
-                Experinces
+                Experiences
               </Link>
               <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
                 {user ? (

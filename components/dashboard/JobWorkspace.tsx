@@ -20,6 +20,8 @@ interface JobWorkspaceProps {
         label: string;
         content: ReactNode;
     }[];
+    activeTab?: string;
+    onTabChange?: (tabId: string) => void;
 }
 
 export default function JobWorkspace({
@@ -29,9 +31,17 @@ export default function JobWorkspace({
     statusBadge,
     contextCard,
     actionColumn,
-    tabs
+    tabs,
+    activeTab: externalActiveTab,
+    onTabChange
 }: JobWorkspaceProps) {
-    const [activeTab, setActiveTab] = React.useState(tabs[0]?.id);
+    const [internalActiveTab, setInternalActiveTab] = React.useState(tabs[0]?.id);
+
+    const activeTab = externalActiveTab !== undefined ? externalActiveTab : internalActiveTab;
+    const setActiveTab = (val: string) => {
+        setInternalActiveTab(val);
+        onTabChange?.(val);
+    };
 
     const backButton = backUrl ? (
         <Link

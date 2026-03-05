@@ -14,6 +14,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import JobWorkspace, { WorkspaceCard, StatusIndicator } from '@/components/dashboard/JobWorkspace';
 import JobBrief from '@/components/dashboard/JobBrief';
 import { formatCurrency, cn } from '@/lib/utils';
@@ -46,6 +48,8 @@ export default function HostEventVendorDetailClient({ vendor, event }: HostEvent
     const [messageInput, setMessageInput] = useState('');
     const [isSending, setIsSending] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [activeTab, setActiveTab] = useState('inbox');
+    const [paymentMethod, setPaymentMethod] = useState('card');
 
     // Real-time messages
     useEffect(() => {
@@ -232,7 +236,11 @@ export default function HostEventVendorDetailClient({ vendor, event }: HostEvent
                             <span className="text-sm font-bold text-green-700">Vendor Hired</span>
                         </div>
                         {currentStatus !== 'Paid' && (
-                            <Button className="w-full h-11 rounded-xl font-bold gap-2 bg-primary" disabled={isUpdatingStatus}>
+                            <Button
+                                className="w-full h-11 rounded-xl font-bold gap-2 bg-primary"
+                                disabled={isUpdatingStatus}
+                                onClick={() => setActiveTab('payment')}
+                            >
                                 <CreditCard size={18} />
                                 Pay Vendor
                             </Button>
@@ -466,7 +474,7 @@ export default function HostEventVendorDetailClient({ vendor, event }: HostEvent
                                 <p className="font-bold text-foreground">Pay {vendor.name}</p>
                                 <p className="text-sm text-muted-foreground">{displayPrice} for {vendor.categories?.[0]}</p>
                             </div>
-                            <Button className="gap-2 font-bold rounded-xl shrink-0" onClick={() => updateStatus('Paid')}>
+                            <Button className="gap-2 font-bold rounded-xl shrink-0" onClick={() => setActiveTab('payment')}>
                                 <CreditCard size={16} />
                                 Pay Now
                             </Button>
@@ -495,11 +503,125 @@ export default function HostEventVendorDetailClient({ vendor, event }: HostEvent
         </WorkspaceCard>
     );
 
+    const handlePayment = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await updateStatus('Paid');
+        setActiveTab('contract');
+    };
+
+    const paymentTab = (
+        <WorkspaceCard>
+            <div className="space-y-6">
+                <div>
+                    <h3 className="text-lg font-black tracking-tight">Complete Payment</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        Select a payment method and securely pay {vendor.name} {displayPrice}.
+                    </p>
+                </div>
+
+                <form onSubmit={handlePayment} className="grid gap-4 py-4 max-w-2xl">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                        <Button
+                            type="button"
+                            variant={paymentMethod === 'card' ? 'default' : 'outline'}
+                            onClick={() => setPaymentMethod('card')}
+                            className="h-11 text-sm font-bold"
+                        >
+                            <CreditCard size={16} className="mr-2" /> Card
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={paymentMethod === 'paypal' ? 'default' : 'outline'}
+                            onClick={() => setPaymentMethod('paypal')}
+                            className="h-11 text-sm font-bold"
+                        >
+                            PayPal
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={paymentMethod === 'paystack' ? 'default' : 'outline'}
+                            onClick={() => setPaymentMethod('paystack')}
+                            className="h-11 text-sm font-bold"
+                        >
+                            Paystack
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={paymentMethod === 'wise' ? 'default' : 'outline'}
+                            onClick={() => setPaymentMethod('wise')}
+                            className="h-11 text-sm font-bold"
+                        >
+                            Wise
+                        </Button>
+                    </div>
+
+                    {paymentMethod === 'card' && (
+                        <div className="space-y-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="name">Name on card</Label>
+                                <Input id="name" placeholder="John Doe" required className="h-11" />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="card">Card number</Label>
+                                <Input id="card" placeholder="0000 0000 0000 0000" required className="h-11" />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="expiry">Expiry</Label>
+                                    <div className="flex gap-2">
+                                        <Input id="expiry-month" placeholder="MM" required maxLength={2} className="h-11 border-border" />
+                                        <Input id="expiry-year" placeholder="YY" required maxLength={2} className="h-11 border-border" />
+                                    </div>
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="cvc">CVC</Label>
+                                    <Input id="cvc" placeholder="CVC" required maxLength={4} className="h-11" />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {paymentMethod === 'paypal' && (
+                        <div className="flex flex-col items-center justify-center p-8 border border-border rounded-xl text-center bg-card">
+                            <p className="font-bold mb-2 text-foreground">Pay safely with PayPal</p>
+                            <p className="text-sm text-muted-foreground">You will be redirected to PayPal to complete your purchase securely.</p>
+                        </div>
+                    )}
+
+                    {paymentMethod === 'paystack' && (
+                        <div className="flex flex-col items-center justify-center p-8 border border-border rounded-xl text-center bg-card">
+                            <p className="font-bold mb-2 text-foreground">Pay with Paystack</p>
+                            <p className="text-sm text-muted-foreground">Process local transactions smoothly securely via Paystack.</p>
+                        </div>
+                    )}
+
+                    {paymentMethod === 'wise' && (
+                        <div className="flex flex-col items-center justify-center p-8 border border-border rounded-xl text-center bg-card">
+                            <p className="font-bold mb-2 text-foreground">Bank Transfer via Wise</p>
+                            <p className="text-sm text-muted-foreground">Complete zero-fee or low-cost international transfers using Wise.</p>
+                        </div>
+                    )}
+
+                    <div className="mt-6 pt-6 border-t border-border">
+                        <Button type="submit" disabled={isUpdatingStatus} className="w-full h-12 text-sm font-bold shrink-0 shadow-sm">
+                            {isUpdatingStatus ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
+                            {paymentMethod === 'card' ? `Pay ${displayPrice}` : `Continue to ${paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1)}`}
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </WorkspaceCard>
+    );
+
     const tabs = [
         { id: 'inbox', label: 'Inbox', content: inboxTab },
         { id: 'brief', label: 'Project Brief', content: <JobBrief event={event} service={vendorBooking?.service} /> },
         { id: 'contract', label: 'Contract', content: contractTab }
     ];
+
+    if (currentStatus === 'Approved') {
+        tabs.push({ id: 'payment', label: 'Payment', content: paymentTab });
+    }
 
     return (
         <JobWorkspace
@@ -511,6 +633,8 @@ export default function HostEventVendorDetailClient({ vendor, event }: HostEvent
             contextCard={contextCard}
             actionColumn={actionColumn}
             tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
         />
     );
 }
