@@ -32,7 +32,7 @@ export async function HottestVendors() {
                     {featuredVendors.map((vendor) => (
                         <Link href={`/dashboard/hosts/vendor/${vendor.slug}`} key={vendor.id} className="group cursor-pointer">
                             <div>
-                                <div className="relative aspect-square overflow-hidden rounded-[2.5rem] mb-6">
+                                <div className="relative aspect-square overflow-hidden rounded-lg mb-6">
                                     <img
                                         src={vendor.image}
                                         alt={vendor.name}

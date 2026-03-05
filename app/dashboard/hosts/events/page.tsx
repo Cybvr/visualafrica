@@ -76,7 +76,7 @@ export default function EventsPage() {
             </div>
 
             {events.length === 0 ? (
-                <div className="relative overflow-hidden bg-card border border-border rounded-[2.5rem] p-8 md:p-16 text-center space-y-6">
+                <div className="relative overflow-hidden bg-card border border-border rounded-lg p-8 md:p-16 text-center space-y-6">
                     <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl" />
                     <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary/5 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl" />
 

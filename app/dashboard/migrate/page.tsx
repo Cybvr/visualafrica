@@ -66,7 +66,7 @@ export default function MigrateEventsPage() {
 
     return (
         <div className="max-w-2xl mx-auto py-12 space-y-8">
-            <div className="bg-card border border-border rounded-[2.5rem] p-8 md:p-12 shadow-sm text-center">
+            <div className="bg-card border border-border rounded-lg p-8 md:p-12 shadow-sm text-center">
                 <h1 className="text-3xl font-black mb-4">Event Migration Tool</h1>
                 <p className="text-muted-foreground">
                     This temporary tool will find events in the database that DON'T have a owner assigned and assign them to your current account: <br />

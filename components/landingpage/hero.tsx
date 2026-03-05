@@ -35,7 +35,7 @@ export function Hero() {
                         </div>
                     </div>
                     <div className="relative">
-                        <div className="relative aspect-square w-full rounded-[2.5rem] overflow-hidden border border-border shadow-2xl">
+                        <div className="relative aspect-square w-full rounded-lg overflow-hidden border border-border shadow-2xl">
                             <Image
                                 src="/images/waddiup.png"
                                 alt="Waddi Experience"

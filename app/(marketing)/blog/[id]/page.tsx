@@ -81,7 +81,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
                                 </div>
                             </div>
 
-                            <div className="aspect-[21/9] rounded-[2.5rem] overflow-hidden shadow-2xl relative">
+                            <div className="aspect-[21/9] rounded-lg overflow-hidden shadow-2xl relative">
                                 <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
                             </div>
 
@@ -96,7 +96,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
 
                         {/* Sidebar */}
                         <aside className="lg:col-span-4 space-y-8">
-                            <div className="bg-foreground text-background rounded-[2.5rem] p-8 space-y-6 sticky top-24">
+                            <div className="bg-foreground text-background rounded-lg p-8 space-y-6 sticky top-24">
                                 <h3 className="text-2xl font-serif font-bold italic">Start Planning Your Event</h3>
                                 <p className="text-background/70 text-sm font-medium leading-relaxed">
                                     Take the insights from this guide and apply them to your next big success in Lagos.

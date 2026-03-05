@@ -86,7 +86,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
 
                 {/* Sidebar */}
                 <aside className="lg:col-span-4 space-y-8">
-                    <div className="bg-background rounded-[2.5rem] p-8 text-white space-y-6 sticky top-24">
+                    <div className="bg-background rounded-lg p-8 text-white space-y-6 sticky top-24">
                         <h3 className="text-xl font-black italic">Start Planning Your Event</h3>
                         <p className="text-muted-foreground text-sm font-medium leading-relaxed">
                             Take the insights from this guide and apply them to your next big success.

@@ -113,7 +113,7 @@ const ExperiencesPage: React.FC = () => {
         ))}
 
         {displayExperiences.length === 0 && (
-          <div className="col-span-full relative overflow-hidden rounded-[2.5rem] border border-border bg-card p-20 text-center">
+          <div className="col-span-full relative overflow-hidden rounded-lg border border-border bg-card p-20 text-center">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full translate-x-1/2 -translate-y-1/2 blur-3xl" />
             <div className="relative space-y-6">
               <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto text-primary rotate-6">

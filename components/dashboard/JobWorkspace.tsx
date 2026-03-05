@@ -137,7 +137,7 @@ export default function JobWorkspace({
 // Sub-components for consistency
 export function WorkspaceCard({ children, className = "" }: { children: ReactNode, className?: string }) {
     return (
-        <div className={`bg-card rounded-[2.5rem] border border-border p-8 shadow-sm ${className}`}>
+        <div className={`bg-card rounded-lg border border-border p-8 shadow-sm ${className}`}>
             {children}
         </div>
     );

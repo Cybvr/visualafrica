@@ -498,7 +498,7 @@ export default function DashboardPage() {
               )}
 
               {displayVendors.length === 0 && (
-                <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card p-16 md:p-32 text-center">
+                <div className="relative overflow-hidden rounded-lg border border-border bg-card p-16 md:p-32 text-center">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50" />
                   <div className="relative space-y-6">
                     <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
@@ -539,7 +539,7 @@ export default function DashboardPage() {
           </div>
 
           {displayExperiences.length === 0 && (
-            <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card p-16 md:p-32 text-center">
+            <div className="relative overflow-hidden rounded-lg border border-border bg-card p-16 md:p-32 text-center">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50" />
               <div className="relative space-y-6">
                 <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">

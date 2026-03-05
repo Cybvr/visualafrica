@@ -184,7 +184,7 @@ export default function CreateEventPage() {
             {/* Yinka Dialog */}
             {isYinkaOpen && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-background/40 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-500">
+                    <div className="bg-white w-full max-w-lg rounded-lg shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-500">
                         <div className="bg-primary p-8 text-white relative">
                             <button
                                 onClick={() => setIsYinkaOpen(false)}
@@ -282,7 +282,7 @@ export default function CreateEventPage() {
                 </div>
             </div>
 
-            <div className="bg-white border border-border rounded-[2.5rem] p-8 md:p-12 shadow-sm transition-all">
+            <div className="bg-white border border-border rounded-lg p-8 md:p-12 shadow-sm transition-all">
                 <form onSubmit={handleSubmit} className="space-y-10">
                     {step === 1 && (
                         <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">

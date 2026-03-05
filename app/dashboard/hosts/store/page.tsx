@@ -125,7 +125,7 @@ export default function StorePage() {
                         })}
                     </div>
                     {displayedKits.length === 0 && (
-                        <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card p-12 md:p-24 text-center">
+                        <div className="relative overflow-hidden rounded-lg border border-border bg-card p-12 md:p-24 text-center">
                             <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl" />
                             <div className="relative space-y-4">
                                 <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-primary">

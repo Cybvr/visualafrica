@@ -79,7 +79,7 @@ export default function DashboardLayoutClient({
                         ? "p-0 h-screen overflow-hidden"
                         : isHostHomePage
                             ? "p-0 overflow-hidden"
-                            : "p-3 sm:p-4 md:p-10"
+                            : "p-2 sm:p-4 md:p-5"
                 )}>
                     {children}
                 </main>
