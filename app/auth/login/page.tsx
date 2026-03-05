@@ -93,13 +93,6 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <Link
-            href="/"
-            className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to home
-          </Link>
 
           <Card className="border-border bg-card shadow-sm">
             <CardHeader className="pb-4">
@@ -113,7 +106,7 @@ export default function LoginPage() {
             <CardContent>
               <div className="flex flex-col gap-3">
                 <Button
-                  className="w-full bg-primary text-foreground hover:bg-primary/90"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                   onClick={handleGoogleSignIn}
                   disabled={isLoading}
                 >
@@ -149,15 +142,16 @@ export default function LoginPage() {
                 </Button>
               </div>
 
-              <p className="mt-6 text-center text-sm text-muted-foreground">
+              <div className="mt-6 text-center text-sm text-muted-foreground">
                 {"Don't have an account?"}{" "}
-                <Link
-                  href="/auth/register"
-                  className="font-medium text-primary transition-colors hover:text-primary/80"
+                <button
+                  onClick={handleGoogleSignIn}
+                  disabled={isLoading}
+                  className="font-medium text-primary transition-colors hover:text-primary/80 disabled:opacity-50"
                 >
                   Create account
-                </Link>
-              </p>
+                </button>
+              </div>
             </CardContent>
           </Card>
 
