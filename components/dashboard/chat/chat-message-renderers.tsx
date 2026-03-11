@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ChevronDown, MapPin, Star, Users, ThumbsUp, ThumbsDown, Copy } from "lucide-react";
+import { ChevronDown, MapPin, Star, Users, ThumbsUp, ThumbsDown, Copy, ArrowRight } from "lucide-react";
 import { cn, formatCurrency, getCurrencySymbol } from "@/lib/utils";
 import { CITY_COLORS, CITIES } from "@/lib/chat-data";
 import { SharedEvent } from "@/lib/types";
@@ -763,6 +763,54 @@ function StoreListMsg({ msg, onStoreAction }: { msg: any; onStoreAction?: (actio
     );
 }
 
+function DealCard({ deal }: { deal: any }) {
+    return (
+        <a
+            href={deal.url}
+            target="_blank"
+            rel="noreferrer"
+            className="block group relative"
+        >
+            <div className="bg-card border border-border transition-all duration-150 rounded-2xl p-4 mb-2 cursor-pointer select-none group-hover:border-primary/50 group-hover:shadow-md">
+                <div className="flex justify-between items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                        <div className="text-foreground font-bold text-[15px] group-hover:text-primary transition-colors">{deal.deal_name}</div>
+                        <div className="text-muted-foreground text-[12px] mt-0.5 line-clamp-1">{deal.tags}</div>
+                    </div>
+                    <div className="shrink-0 bg-primary/10 text-primary text-[11px] font-bold rounded-full px-2.5 py-1 tracking-tight">
+                        {deal.discount}
+                    </div>
+                </div>
+                
+                <div className="flex justify-between items-center mt-3 pt-3 border-t border-border/50">
+                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                        Claim Deal <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                    </span>
+                    {deal.expires && (
+                        <span className="text-[10px] text-muted-foreground font-medium">Expires: {deal.expires}</span>
+                    )}
+                </div>
+            </div>
+        </a>
+    );
+}
+
+function DealsListMsg({ msg }: { msg: any }) {
+    const deals = msg.deals || [];
+    return (
+        <div className="w-full">
+            <div className="mb-3">
+                <div className="text-foreground text-[16px] leading-relaxed font-medium">{msg.content}</div>
+            </div>
+            <div className="w-full max-w-[480px] space-y-2">
+                {deals.map((deal: any, idx: number) => (
+                    <DealCard key={`deal-${idx}`} deal={deal} />
+                ))}
+            </div>
+        </div>
+    );
+}
+
 function InspirationGalleryMsg({ msg }: { msg: any }) {
     const images = Array.isArray(msg.images) ? msg.images.slice(0, 8) : [];
 
@@ -1117,6 +1165,10 @@ export function Msg({
                                     </div>
                                 )}
                             </div>
+                        </div>
+                    ) : msg.type === "deal_cards" ? (
+                        <div className="mt-1">
+                            <DealsListMsg msg={msg} />
                         </div>
                     ) : msg.type === "inspiration_gallery" ? (
                         <InspirationGalleryMsg msg={msg} />

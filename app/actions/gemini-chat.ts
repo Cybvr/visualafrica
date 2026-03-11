@@ -10,30 +10,43 @@ const DEFAULT_MODEL_CANDIDATES = [
     "gemini-2.0-flash",
 ];
 
+import { buildDealsContext, getDealsByTags } from "@/lib/deals-service";
+
 type GeminiCallOptions = {
     forceFunctionCall?: boolean;
     allowedFunctionNames?: string[];
     useSearch?: boolean;
     systemInstruction?: string;
+    dealTags?: string[];
 };
 
 export async function processGeminiChat(
     chatHistory: { role: string; parts: { text: string }[] }[],
     options?: GeminiCallOptions
 ) {
+    const dealsContext = options?.dealTags && options.dealTags.length > 0 
+        ? await buildDealsContext(options.dealTags)
+        : "";
     const configuredModel = process.env.GEMINI_MODEL?.trim();
     const modelCandidates = Array.from(
         new Set([configuredModel, ...DEFAULT_MODEL_CANDIDATES].filter((m): m is string => !!m))
     );
 
-    const buildSystemInstruction = () =>
-        options?.systemInstruction?.trim() ||
-        `You are Waddi, an intelligent event planner assistant for African cities (Lagos, Accra, Nairobi, Cape Town, Abuja, Kampala, Dar es Salaam).
+    const buildSystemInstruction = () => {
+        const base = options?.systemInstruction?.trim() ||
+            `You are Waddi, an intelligent event planner assistant for African cities (Lagos, Accra, Nairobi, Cape Town, Abuja, Kampala, Dar es Salaam).
 When users share event details, ALWAYS call create_event with the parsed details.
 Do NOT call add_todo_item, add_itinerary_item, or find_vendors in the same turn as create_event unless the user explicitly asks to skip approvals and do everything at once.
 When looking for vendors, use find_vendors with the event city.
 For normal conversation (when no tool is needed), reply naturally and conversationally, then end with one short action-oriented question that moves the user toward a concrete next step in Waddi.
 Be concise and action-oriented.`;
+
+        const dealsContextMessage = dealsContext 
+            ? `\n\n${dealsContext}\n\nCRITICAL: The deals above are ALREADY rendered as visual cards in the UI. DO NOT repeat their names, links, or discounts in your response text. Simply provide a conversational intro (e.g., "I've found some great deals for you!") and a wrap-up question asking if any of them interest the user.`
+            : "";
+
+        return dealsContext ? `${base}${dealsContextMessage}` : base;
+    };
 
     const callSearchModel = async (modelName: string, prompt: string) => {
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
@@ -192,7 +205,16 @@ Be concise and action-oriented.`;
                     console.error("No text in response:", e);
                 }
 
-                return { type: "text", text: replyText };
+                const dealTags = options?.dealTags || [];
+                const deals = (dealTags.length > 0)
+                    ? await getDealsByTags(dealTags)
+                    : [];
+
+                return { 
+                    type: "text", 
+                    text: replyText,
+                    deals: deals.length > 0 ? deals : undefined
+                };
             } catch (modelErr: any) {
                 lastModelError = modelErr;
                 const isNotFound = Number(modelErr?.status) === 404;

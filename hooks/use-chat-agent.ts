@@ -26,6 +26,7 @@ import type { Dispatch, SetStateAction } from "react";
 type UseChatAgentArgs = {
     paramsId: string | string[] | undefined;
     router: { push: (href: string) => void };
+    searchParams: URLSearchParams;
     messages: any[];
     setMessages: Dispatch<SetStateAction<any[]>>;
     setInput: Dispatch<SetStateAction<string>>;
@@ -54,6 +55,7 @@ type ActionMetrics = {
 export function useChatAgent({
     paramsId,
     router,
+    searchParams,
     messages,
     setMessages,
     setInput,
@@ -1162,9 +1164,9 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         }, 1200);
     };
 
-    const handleGeminiAction = async (text: string, chatIdOverride?: string) => {
+    const handleGeminiAction = async (text: string, chatIdOverride?: string, dealTags?: string[]) => {
         const getNaturalReply = async (history: { role: string; parts: { text: string }[] }[]) => {
-            const reply = await processGeminiChat(history);
+            const reply = await processGeminiChat(history, { dealTags });
             const replyText = reply?.text && String(reply.text).trim();
             if (replyText) return replyText;
 
@@ -1175,7 +1177,7 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                     role: "user",
                     parts: [{ text: `Reply naturally to this message in one short paragraph: "${text}"` }]
                 }
-            ]);
+            ], { dealTags });
             return retry?.text && String(retry.text).trim() ? String(retry.text).trim() : null;
         };
 
@@ -1191,7 +1193,17 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 ? rawModelHistory.slice(firstUserIndex)
                 : [{ role: "user", parts: [{ text }] }];
 
-        const geminiResult = await processGeminiChat(modelHistory);
+        const geminiResult = await processGeminiChat(modelHistory, { dealTags });
+        
+        // Handle deals returned from the server
+        if (geminiResult.deals && geminiResult.deals.length > 0) {
+            await persistAgentMessage({
+                type: "deal_cards",
+                content: "I found some exclusive deals for your holiday escape!",
+                deals: geminiResult.deals
+            }, chatIdOverride);
+        }
+
         if (!geminiResult) {
             const fallbackText = await getNaturalReply(modelHistory);
             if (fallbackText) {
@@ -1316,6 +1328,11 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         if (!text.trim()) return;
         const nowStr = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
         const hasExplicitAction = Boolean(actionData?.action || actionData?.id);
+        let dealTags = actionData?.dealTags || [];
+        const dealsParam = searchParams.get('deals');
+        if (dealsParam) {
+            dealTags = dealsParam.split(',').map(t => t.trim()).filter(Boolean);
+        }
 
         const pendingFlight = pendingAction?.action === "search_flights";
         if (pendingFlight && !hasExplicitAction) {
@@ -1351,10 +1368,13 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 const approvalHandled = await handleApprovalAction(actionData);
                 if (!approvalHandled) dispatchLogic(text, actionData);
             } else {
-                await addAgentMsg({
-                    type: "text",
-                    content: "AI request failed. Open Chrome DevTools Console to see the exact Gemini error."
-                });
+                const geminiHandled = await handleGeminiAction(text, undefined, dealTags);
+                if (!geminiHandled) {
+                    await addAgentMsg({
+                        type: "text",
+                        content: "AI request failed. Open Chrome DevTools Console to see the exact Gemini error."
+                    });
+                }
             }
             setInput("");
             return;
@@ -1380,7 +1400,7 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 setInput("");
                 return;
             }
-            const geminiHandled = await handleGeminiAction(text, newChatId);
+            const geminiHandled = await handleGeminiAction(text, newChatId, dealTags);
             if (!geminiHandled && actionData) {
                 dispatchLogic(text, actionData, newChatId);
             } else if (!geminiHandled) {
@@ -1410,7 +1430,7 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 setInput("");
                 return;
             }
-            const geminiHandled = await handleGeminiAction(text, chatIdStr);
+            const geminiHandled = await handleGeminiAction(text, chatIdStr, dealTags);
             if (!geminiHandled && actionData) {
                 dispatchLogic(text, actionData, chatIdStr);
             } else if (!geminiHandled) {

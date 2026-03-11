@@ -21,6 +21,7 @@ import {
 import { useAuth } from "@/components/providers/auth-provider";
 import { auth, googleProvider } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
+import { HolidayEscapeCard } from "./holiday-escape-card";
 
 const SUGGESTIONS = [
     "Plan a surprise 30th birthday in Lagos for 20 guests",
@@ -46,8 +47,12 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
 
     useEffect(() => setMounted(true), []);
 
-    const startChat = (prompt: string) => {
-        router.push(`/dashboard/hosts/chat/new?q=${encodeURIComponent(prompt)}`);
+    const startChat = (prompt: string, tags?: string[]) => {
+        let url = `/dashboard/hosts/chat/new?q=${encodeURIComponent(prompt)}`;
+        if (tags && tags.length > 0) {
+            url += `&deals=${encodeURIComponent(tags.join(","))}`;
+        }
+        router.push(url);
     };
 
     const handleStartChat = (e?: React.FormEvent) => {
@@ -100,9 +105,9 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
                         Start living it.
                     </h1>
 
-                    <div className="max-w-2xl mx-auto relative mt-8 group">
-                        <form onSubmit={handleStartChat}>
-                            <div className="relative bg-card rounded-2xl shadow-sm group-hover:shadow-md transition-all overflow-hidden">
+                    <div className="max-w-2xl mx-auto relative mt-8 group flex flex-col items-center gap-4">
+                        <form onSubmit={handleStartChat} className="w-full">
+                            <div className="relative bg-card rounded-2xl shadow-sm group-hover:shadow-md transition-all overflow-hidden border border-border">
                                 <textarea
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
@@ -151,6 +156,8 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
                                 </div>
                             </div>
                         </form>
+
+                        <HolidayEscapeCard onClick={() => startChat("Show me great holiday deals!", ["all"])} />
                     </div>
                 </div>
             </div>

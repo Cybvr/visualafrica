@@ -278,6 +278,7 @@ export default function ChatPage() {
     } = useChatAgent({
         paramsId: params.id,
         router,
+        searchParams: searchParams as any,
         messages,
         setMessages,
         setInput,
