@@ -99,8 +99,8 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
         <section className={cn("px-4 md:px-6", sectionClassName)}>
             <div className="mx-auto grid h-full max-w-5xl place-items-center">
                 <div className="w-full text-center space-y-6 md:px-0">
-                    <h1 className="text-4xl md:text-3xl font-bold text-foreground tracking-tight">
-                        Stop planningz.
+                    <h1 className="text-4xl md:text-3xl sm:text-xl font-bold text-foreground tracking-tight">
+                        Stop planning.
                         Start living it.
                     </h1>
 
