@@ -1,10 +1,18 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 interface DealBannerCardProps {
     title: string;
     description: string;
     image: string;
+    tooltip?: string;
     eyebrow?: string;
     imageClassName?: string;
     className?: string;
@@ -15,12 +23,13 @@ export function DealBannerCard({
     title,
     description,
     image,
+    tooltip,
     eyebrow,
     imageClassName,
     className,
     onClick,
 }: DealBannerCardProps) {
-    return (
+    const CardContent = (
         <div
             onClick={onClick}
             className={cn(
@@ -55,5 +64,20 @@ export function DealBannerCard({
                 </p>
             </div>
         </div>
+    );
+
+    if (!tooltip) return CardContent;
+
+    return (
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    {CardContent}
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>{tooltip}</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     );
 }
