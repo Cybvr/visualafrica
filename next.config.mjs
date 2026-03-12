@@ -17,9 +17,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  turbopack: {
-    root: '/Users/jidepinheiro/waddi',
-  },
+
   images: {
     remotePatterns: [
       {
