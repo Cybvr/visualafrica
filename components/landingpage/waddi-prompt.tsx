@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight, Brain } from "lucide-react";
 import { signInWithPopup } from "firebase/auth";
 import {
     DropdownMenu,
@@ -100,7 +100,7 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
             <div className="mx-auto grid h-full max-w-5xl place-items-center">
                 <div className="w-full text-center space-y-6 md:px-0">
                     <h1 className="text-4xl md:text-3xl font-bold text-foreground tracking-tight">
-                        Stop planning.
+                        Stop planningz.
                         Start living it.
                     </h1>
 
@@ -126,10 +126,11 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
                                         <DropdownMenuTrigger asChild>
                                             <button
                                                 type="button"
-                                                className="h-10 w-10 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors inline-flex items-center justify-center"
-                                                aria-label="Open sample prompts"
+                                                className="h-10 px-3 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors inline-flex items-center gap-2"
+                                                aria-label="Open ideas"
                                             >
-                                                <Plus size={18} />
+                                                <Brain size={16} />
+                                                <span className="text-sm font-medium">Ideas</span>
                                             </button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="start" className="w-80 p-1 bg-background">
@@ -157,22 +158,22 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
                         </form>
 
                         <div className="flex flex-wrap justify-center gap-3">
-                            <DealBannerCard 
-                                title="Up to 20% off your next Holiday Escape" 
-                                description="Experience a new destination at an affordable price" 
+                            <DealBannerCard
+                                title="Up to 20% off your next Holiday Escape"
+                                description="Experience a new destination at an affordable price"
                                 image="/images/holiday-escape.png"
                                 tooltip="Click to explore exclusive travel and hotel deals curated for your next escape."
-                                onClick={() => startChat("Show me great holiday deals!", ["travel", "holiday"])} 
+                                onClick={() => startChat("Show me great holiday deals!", ["travel", "holiday"])}
                             />
-                            <DealBannerCard 
+                            <DealBannerCard
                                 eyebrow="Sponsored"
-                                title="Up to 10% off Car Rentals" 
-                                description="From compact rides to luxury vehicles for every trip" 
+                                title="Up to 10% off Car Rentals"
+                                description="From compact rides to luxury vehicles for every trip"
                                 image="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=400"
                                 tooltip="Find the perfect ride for your adventure or business trip with our rental partners."
                                 className="items-stretch min-h-[96px]"
                                 imageClassName="h-full w-1/2"
-                                onClick={() => startChat("I'm looking for car rental deals", ["cars", "rentals"])} 
+                                onClick={() => startChat("I'm looking for car rental deals", ["cars", "rentals"])}
                             />
                         </div>
                     </div>
