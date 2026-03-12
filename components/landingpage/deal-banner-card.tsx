@@ -1,7 +1,15 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-export function HolidayEscapeCard({ className, onClick }: { className?: string; onClick?: () => void }) {
+interface DealBannerCardProps {
+    title: string;
+    description: string;
+    image: string;
+    className?: string;
+    onClick?: () => void;
+}
+
+export function DealBannerCard({ title, description, image, className, onClick }: DealBannerCardProps) {
     return (
         <div
             onClick={onClick}
@@ -12,18 +20,18 @@ export function HolidayEscapeCard({ className, onClick }: { className?: string; 
         >
             <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl">
                 <Image
-                    src="/images/holiday-escape.png"
-                    alt="Holiday Escape"
+                    src={image}
+                    alt={title}
                     fill
                     className="object-cover"
                 />
             </div>
             <div className="flex flex-col text-left justify-center overflow-hidden">
                 <h3 className="text-sm font-bold text-foreground leading-tight truncate">
-                    Holiday Escape
+                    {title}
                 </h3>
                 <p className="text-muted-foreground text-[12px] leading-tight line-clamp-2">
-                    Experience a new destination at an affordable price
+                    {description}
                 </p>
             </div>
         </div>

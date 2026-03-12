@@ -774,6 +774,13 @@ function DealCard({ deal }: { deal: any }) {
             <div className="bg-card border border-border transition-all duration-150 rounded-2xl p-4 mb-2 cursor-pointer select-none group-hover:border-primary/50 group-hover:shadow-md">
                 <div className="flex justify-between items-start gap-3">
                     <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                            {deal.source && (
+                                <span className="bg-secondary text-muted-foreground text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+                                    {deal.source === 'cars' ? 'Car Rental' : 'Travel'}
+                                </span>
+                            )}
+                        </div>
                         <div className="text-foreground font-bold text-[15px] group-hover:text-primary transition-colors">{deal.deal_name}</div>
                         <div className="text-muted-foreground text-[12px] mt-0.5 line-clamp-1">{deal.tags}</div>
                     </div>

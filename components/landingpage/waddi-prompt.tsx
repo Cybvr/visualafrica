@@ -21,7 +21,7 @@ import {
 import { useAuth } from "@/components/providers/auth-provider";
 import { auth, googleProvider } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
-import { HolidayEscapeCard } from "./holiday-escape-card";
+import { DealBannerCard } from "./deal-banner-card";
 
 const SUGGESTIONS = [
     "Plan a surprise 30th birthday in Lagos for 20 guests",
@@ -157,7 +157,20 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
                             </div>
                         </form>
 
-                        <HolidayEscapeCard onClick={() => startChat("Show me great holiday deals!", ["all"])} />
+                        <div className="flex flex-wrap justify-center gap-3">
+                            <DealBannerCard 
+                                title="Holiday Escape" 
+                                description="Experience a new destination at an affordable price" 
+                                image="/images/holiday-escape.png"
+                                onClick={() => startChat("Show me great holiday deals!", ["all"])} 
+                            />
+                            <DealBannerCard 
+                                title="Car Rentals" 
+                                description="Sleek rides for your next adventure or business trip" 
+                                image="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=400"
+                                onClick={() => startChat("I'm looking for car rental deals", ["cars", "rentals"])} 
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
