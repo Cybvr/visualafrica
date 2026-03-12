@@ -38,9 +38,30 @@ async function fetchDealsFromUrl(url: string, sourceKey: string): Promise<Deal[]
         
         const headers = rows[0];
         return rows.slice(1).map(row => {
-            const deal = Object.fromEntries(headers.map((h, i) => [h, row[i]])) as unknown as Deal;
-            deal.source = sourceKey;
-            return deal;
+            const raw = Object.fromEntries(headers.map((h, i) => [h, row[i]]));
+            
+            // Map Car Rental headers to Deal type
+            if (sourceKey === 'cars') {
+                return {
+                    deal_name: `${raw['Agency'] || ''}: ${raw['Car Type'] || ''}`.trim(),
+                    url: raw['URL'] || '',
+                    discount: raw['Daily Rate (NGN)'] || raw['Good Deal Price (USD)'] || 'N/A',
+                    active: 'true', // Car sheet has no active col, assume true
+                    tags: `cars, rentals, ${raw['Rental Locations'] || ''}`,
+                    source: sourceKey
+                };
+            }
+            
+            // Default (Travel) mapping
+            return {
+                deal_name: raw['deal_name'] || '',
+                url: raw['url'] || '',
+                discount: raw['discount'] || '',
+                active: raw['active'] || 'false',
+                expires: raw['expires'],
+                tags: raw['tags'] || '',
+                source: sourceKey
+            };
         });
     } catch (error) {
         console.error(`Error fetching deals from ${sourceKey}:`, error);
@@ -69,8 +90,12 @@ function parseDate(dateStr?: string): Date | null {
 export async function getDealsByTags(tags: string[]): Promise<Deal[]> {
     const allDeals = await fetchAllDeals();
     const userTags = tags.map(t => t.toLowerCase());
-    const showAll = userTags.includes('all');
     
+    // Check if we want all deals, or all deals for a specific category
+    const showAll = userTags.includes('all');
+    const showCars = userTags.includes('cars') || userTags.includes('rentals');
+    const showTravel = userTags.includes('travel') || userTags.includes('holiday');
+
     return allDeals.filter((deal: Deal) => {
         if (deal.active?.toLowerCase() !== 'true') return false;
         
@@ -78,6 +103,10 @@ export async function getDealsByTags(tags: string[]): Promise<Deal[]> {
         if (expiry && expiry < new Date()) return false;
         
         if (showAll) return true;
+        
+        // If clicking a category banner, show all from that source
+        if (showCars && deal.source === 'cars') return true;
+        if (showTravel && deal.source === 'travel') return true;
 
         const dealTags = (deal.tags || "").split(',').map((t: string) => t.toLowerCase().trim());
         const dealNameWords = (deal.deal_name || "").toLowerCase().split(/\s+/);

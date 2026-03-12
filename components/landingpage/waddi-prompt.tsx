@@ -158,17 +158,17 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
                         </form>
 
                         <div className="flex flex-wrap justify-center gap-3">
-                            <DealBannerCard 
-                                title="Holiday Escape" 
-                                description="Experience a new destination at an affordable price" 
+                            <DealBannerCard
+                                title="Up to 20% off your next Holiday Escape"
+                                description="Experience a new destination at an affordable price"
                                 image="/images/holiday-escape.png"
-                                onClick={() => startChat("Show me great holiday deals!", ["all"])} 
+                                onClick={() => startChat("Show me great holiday deals!", ["travel", "holiday"])}
                             />
-                            <DealBannerCard 
-                                title="Car Rentals" 
-                                description="Sleek rides for your next adventure or business trip" 
+                            <DealBannerCard
+                                title="Up to 10% off Car Rentals"
+                                description="From compact rides to luxury vehicles for every trip"
                                 image="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=400"
-                                onClick={() => startChat("I'm looking for car rental deals", ["cars", "rentals"])} 
+                                onClick={() => startChat("I'm looking for car rental deals", ["cars", "rentals"])}
                             />
                         </div>
                     </div>
