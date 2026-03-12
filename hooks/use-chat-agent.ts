@@ -1504,6 +1504,11 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         }
 
         if (isNew && currentUser) {
+            // Eager UI update
+            setMessages((prev) => [...prev, { id: Date.now().toString(), role: "user", content: text, time: nowStr }]);
+            setTyping(true);
+            setInput("");
+
             const newChatId = await createChat(currentUser.uid, text.substring(0, 30), activeCity);
 
             for (const m of INITIAL_MESSAGES) {
@@ -1513,14 +1518,13 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             const persisted = await persistUserMessage(newChatId, text, nowStr);
             if (!persisted.ok) {
                 router.push(`/dashboard/hosts/chat/${newChatId}`);
-                setInput("");
+                setTyping(false);
                 return;
             }
             if (hasExplicitAction) {
                 const approvalHandled = await handleApprovalAction(actionData, newChatId);
                 if (!approvalHandled) dispatchLogic(text, actionData, newChatId);
                 router.push(`/dashboard/hosts/chat/${newChatId}`);
-                setInput("");
                 return;
             }
             const geminiHandled = await handleGeminiAction(text, newChatId, dealTags);
@@ -1537,7 +1541,6 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             }
 
             router.push(`/dashboard/hosts/chat/${newChatId}`);
-            setInput("");
             return;
         }
 
