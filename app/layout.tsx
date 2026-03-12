@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import Script from 'next/script'
 import { Mulish, Neuton, DM_Serif_Display, DM_Sans, Lora } from 'next/font/google'
 
 
@@ -74,6 +75,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${mulish.variable} ${neuton.variable} ${dmSerifDisplay.variable} ${dmSansHeading.variable} ${lora.variable}`}>
+      <head>
+        <Script
+          id="tp-em-confirmation"
+          strategy="afterInteractive"
+          data-noptimize="1"
+          data-cfasync="false"
+          data-wpfc-render="false"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                  var script = document.createElement("script");
+                  script.async = 1;
+                  script.src = 'https://tp-em.com/NTA3MDk3.js?t=507097';
+                  document.head.appendChild(script);
+              })();
+            `,
+          }}
+        />
+      </head>
 
       <body className="font-sans antialiased">
         <AuthProvider>
