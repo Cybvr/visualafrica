@@ -68,7 +68,6 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
             return;
         }
 
-        // Route to the real new-chat flow; chat page will create/persist via send()
         startChat(prompt);
     };
 
@@ -105,9 +104,9 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
                         Start living it.
                     </h1>
 
-                    <div className="max-w-2xl mx-auto relative mt-8 group flex flex-col items-center gap-4">
+                    <div className="max-w-2xl mx-auto relative mt-8 flex flex-col items-center gap-4">
                         <form onSubmit={handleStartChat} className="w-full">
-                            <div className="relative bg-card rounded-2xl shadow-sm group-hover:shadow-md transition-all overflow-hidden border border-border">
+                            <div className="relative bg-card rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden border border-border">
                                 <textarea
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
@@ -165,9 +164,12 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
                                 onClick={() => startChat("Show me great holiday deals!", ["travel", "holiday"])}
                             />
                             <DealBannerCard
+                                eyebrow="Sponsored"
                                 title="Up to 10% off Car Rentals"
                                 description="From compact rides to luxury vehicles for every trip"
                                 image="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=400"
+                                className="items-stretch min-h-[96px]"
+                                imageClassName="h-full w-1/2"
                                 onClick={() => startChat("I'm looking for car rental deals", ["cars", "rentals"])}
                             />
                         </div>
