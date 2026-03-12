@@ -18,6 +18,8 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
+  turbopack: {},
+
   images: {
     remotePatterns: [
       {
