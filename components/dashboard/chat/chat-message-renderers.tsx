@@ -90,14 +90,18 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
                             <span className="truncate max-w-[80px] sm:max-w-none">{v.type}</span>
                             {v.location && (
                                 <>
-                                    <span className="opacity-50">•</span>
+                                    <span className="opacity-50 hidden sm:inline">•</span>
                                     <button 
                                         type="button" 
                                         onClick={(e) => { e.stopPropagation(); setShowMap(!showMap); }}
-                                        className={cn("flex flex-1 items-center gap-0.5 transition-colors text-left", showMap ? "text-primary" : "hover:text-primary")}
+                                        className={cn(
+                                            "flex items-center gap-1 transition-all rounded-full px-2 py-0.5 border text-xs sm:text-[11px]",
+                                            showMap ? "bg-primary text-primary-foreground border-primary" : "bg-secondary/40 border-border hover:border-primary/50 text-foreground"
+                                        )}
                                     >
                                         <MapPin size={10} className="shrink-0" />
                                         <span className="truncate max-w-[80px] sm:max-w-[120px]">{v.location}</span>
+                                        {!showMap && <span className="text-[9px] font-bold uppercase ml-1 opacity-70">Map</span>}
                                     </button>
                                 </>
                             )}

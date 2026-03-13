@@ -397,9 +397,14 @@ export async function saveUserChatMessage(chatId: string, message: any, userId: 
 }
 
 export async function saveChatMessage(chatId: string, message: any) {
-    const sanitizedMessage = Object.fromEntries(
-        Object.entries(message || {}).filter(([, value]) => value !== undefined)
-    );
+    let sanitizedMessage = {};
+    try {
+        sanitizedMessage = JSON.parse(JSON.stringify(message || {}));
+    } catch (e) {
+        sanitizedMessage = Object.fromEntries(
+            Object.entries(message || {}).filter(([, value]) => value !== undefined)
+        );
+    }
 
     // Save to messages subcollection
     const messagesRef = collection(db, 'chats', chatId, 'messages');
