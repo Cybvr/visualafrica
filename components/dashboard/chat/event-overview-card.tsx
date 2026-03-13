@@ -96,6 +96,17 @@ export const EventOverviewCard = ({ event, onAction }: EventOverviewCardProps) =
                 ))}
             </div>
 
+            {event?.location && (
+                <div className="mb-3.5 w-full rounded-xl overflow-hidden border border-border">
+                    <iframe
+                        className="w-full h-[140px] block"
+                        loading="lazy"
+                        allowFullScreen
+                        src={`https://maps.google.com/maps?q=${encodeURIComponent(event.location)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                    />
+                </div>
+            )}
+
             <div className="bg-card border border-border rounded-xl p-3.5">
                 <div className="flex justify-between mb-2">
                     <span className="text-[10px] tracking-widest uppercase text-muted-foreground">Budget Allocated</span>
