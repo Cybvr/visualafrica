@@ -796,12 +796,7 @@ function StoreListMsg({ msg, onStoreAction }: { msg: any; onStoreAction?: (actio
 
 function DealCard({ deal }: { deal: any }) {
     return (
-        <a
-            href={deal.url}
-            target="_blank"
-            rel="noreferrer"
-            className="block group relative"
-        >
+        <div className="block group relative">
             <div className="bg-card border border-border transition-all duration-150 rounded-2xl p-4 mb-2 cursor-pointer select-none group-hover:border-primary/50 group-hover:shadow-md">
                 <div className="flex justify-between items-start gap-3">
                     <div className="flex-1 min-w-0">
@@ -820,16 +815,38 @@ function DealCard({ deal }: { deal: any }) {
                     </div>
                 </div>
                 
-                <div className="flex justify-between items-center mt-3 pt-3 border-t border-border/50">
-                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
-                        Claim Deal <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
-                    </span>
+                <div className="mt-3 pt-3 border-t border-border/50">
+                    <div className="bg-secondary/40 rounded-full p-1 border border-border flex items-center justify-between gap-1 w-full">
+                        <a
+                            href={deal.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex-1 text-[11px] font-semibold py-1.5 hover:bg-background rounded-full transition-all flex justify-center items-center gap-1.5 text-foreground leading-none"
+                        >
+                            <span className="text-[16px]">🧾</span>
+                            <span className="hidden sm:inline">Details</span>
+                            <span className="sm:hidden">Details</span>
+                        </a>
+                        <div className="w-[1px] h-3 bg-border"></div>
+                        <a
+                            href={deal.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex-1 text-[11px] font-semibold py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full transition-all flex justify-center items-center gap-1.5 leading-none"
+                        >
+                            <span className="text-[16px]">👀</span>
+                            <span className="hidden sm:inline">View deal</span>
+                            <span className="sm:hidden">View</span>
+                        </a>
+                    </div>
                     {deal.expires && (
-                        <span className="text-[10px] text-muted-foreground font-medium">Expires: {deal.expires}</span>
+                        <div className="mt-2 text-right text-[10px] text-muted-foreground font-medium">
+                            Expires: {deal.expires}
+                        </div>
                     )}
                 </div>
             </div>
-        </a>
+        </div>
     );
 }
 

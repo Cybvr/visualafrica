@@ -20,15 +20,15 @@ export function buildVendorsList(vendors: Vendor[], city: string) {
     return vendors
         .filter(v => v.location.toLowerCase().includes(city.toLowerCase()))
         .map(v => ({
-            id: v.id,
-            name: v.name,
-            slug: v.slug || v.id,
+            id: v.id || "",
+            name: v.name || "",
+            slug: v.slug || v.id || "",
             image: v.image || "/placeholder.png",
-            type: v.categories[0],
-            categories: v.categories,
-            tags: v.services.slice(0, 4),
-            price: v.price || "Contact for price",
-            rating: v.rating,
+            type: v.categories?.[0] || "",
+            categories: v.categories || [],
+            tags: v.services?.slice(0, 4) || [],
+            price: v.price ?? null,
+            rating: v.rating ?? null,
             status: "Available",
             statusColor: "hsl(var(--primary))",
             location: v.location || "Lagos",
