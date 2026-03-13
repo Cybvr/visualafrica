@@ -64,6 +64,7 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
     const vendorKey = v?.id || v?.slug || v?.name;
     const isSaved = vendorKey ? savedVendors.has(vendorKey) : false;
     const [showActions, setShowActions] = useState(false);
+    const [showMap, setShowMap] = useState(false);
 
     return (
         <div className="block relative group">
@@ -85,15 +86,30 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="text-foreground font-bold text-sm group-hover:text-primary transition-colors">{v.name}</div>
-                        <div className="text-muted-foreground text-[11px]">{v.type}</div>
+                        <div className="text-muted-foreground text-[11px] flex gap-1 items-center mt-0.5">
+                            <span className="truncate max-w-[80px] sm:max-w-none">{v.type}</span>
+                            {v.location && (
+                                <>
+                                    <span className="opacity-50">•</span>
+                                    <button 
+                                        type="button" 
+                                        onClick={(e) => { e.stopPropagation(); setShowMap(!showMap); }}
+                                        className={cn("flex flex-1 items-center gap-0.5 transition-colors text-left", showMap ? "text-primary" : "hover:text-primary")}
+                                    >
+                                        <MapPin size={10} className="shrink-0" />
+                                        <span className="truncate max-w-[80px] sm:max-w-[120px]">{v.location}</span>
+                                    </button>
+                                </>
+                            )}
+                        </div>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 shrink-0">
                         {isSaved && <span className="text-primary text-sm">🔖</span>}
                         <span className="bg-primary/10 text-primary text-[11px] font-semibold rounded-full px-2 py-0.5">{v.status}</span>
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-1 mt-2 mb-3">
-                    {v.tags.map((t: string, idx: number) => (
+                    {v.tags?.map((t: string, idx: number) => (
                         <span key={`${vendorKey || v.name}-tag-${idx}-${t}`} className="bg-secondary text-muted-foreground text-[11px] rounded px-1.5 py-0.5">{t}</span>
                     ))}
                 </div>
@@ -109,6 +125,17 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
                         </span>
                     )}
                 </div>
+
+                {showMap && (
+                    <div className="mt-3 w-full animate-in fade-in slide-in-from-top-1 duration-200" onClick={(e) => e.stopPropagation()}>
+                        <iframe
+                            className="w-full h-[140px] rounded-lg border border-border"
+                            loading="lazy"
+                            allowFullScreen
+                            src={`https://maps.google.com/maps?q=${encodeURIComponent(v.location || v.name)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                        />
+                    </div>
+                )}
 
                 {showActions && (
                     <div className="mt-3 bg-secondary/40 rounded-full p-1 border border-border flex items-center justify-between gap-1 w-full animate-in fade-in slide-in-from-top-2 duration-200" onClick={(e) => e.stopPropagation()}>

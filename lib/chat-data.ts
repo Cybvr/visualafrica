@@ -31,6 +31,7 @@ export function buildVendorsList(vendors: Vendor[], city: string) {
             rating: v.rating,
             status: "Available",
             statusColor: "hsl(var(--primary))",
+            location: v.location || "Lagos",
         }));
 }
 
