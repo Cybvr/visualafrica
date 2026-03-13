@@ -161,7 +161,7 @@ export default function ChatPage() {
         { id: 'budget', label: 'Budget', icon: MdAccountBalanceWallet, colorClass: 'text-green-600' },
         { id: 'timeline', label: 'Itinerary', icon: MdSchedule, colorClass: 'text-amber-600' },
         { id: 'tickets', label: 'Tickets', icon: MdLocalActivity, colorClass: 'text-rose-600', action: 'tickets' },
-        { id: 'vendors_search', label: 'Discover Vendors', icon: MdTravelExplore, colorClass: 'text-sky-600', action: 'vendor_search' },
+        { id: 'vendors_search', label: 'Vendors', icon: MdTravelExplore, colorClass: 'text-sky-600', action: 'vendor_search' },
         { id: 'experience', label: 'Experiences', icon: MdAutoAwesome, colorClass: 'text-pink-600', action: 'experience' },
         { id: 'store', label: 'Shop', icon: MdStorefront, colorClass: 'text-orange-600', action: 'start_store' },
     ];
@@ -354,7 +354,7 @@ export default function ChatPage() {
             addAgentMsg({
                 type: "text",
                 content: `Great choice! I've marked ${date} on the calendar. What's the plan for that day?`,
-                suggestions: [{ label: "Discover Vendors", action: "vendor_search" }]
+                suggestions: [{ label: "Vendors", action: "vendor_search" }]
             });
         });
     };
@@ -599,7 +599,7 @@ export default function ChatPage() {
                                 selectedEventId={selectedEventId}
                                 onEventSelect={setSelectedEventId}
                                 onUpgradeToPro={() => setIsPricingOpen(true)}
-                                showSuggestions={showSuggestions}
+                                showSuggestions={showSuggestions && idx === messages.length - 1}
                             />
                         </div>
                     ))}
@@ -638,12 +638,15 @@ export default function ChatPage() {
                                             <ChevronDown size={14} className="text-muted-foreground" />
                                         </button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-52 p-1 bg-background">
+                                    <DropdownMenuContent
+                                        align="start"
+                                        className="w-52 md:w-64 p-1 bg-background md:grid md:grid-cols-2 md:gap-1"
+                                    >
                                         {chatQuickActions.map((pill) => (
                                             <DropdownMenuItem
                                                 key={pill.id}
                                                 onClick={() => handlePillClick(pill)}
-                                                className="flex items-center gap-2 cursor-pointer py-2 text-foreground"
+                                                className="flex items-center gap-2 cursor-pointer py-2 text-foreground md:py-2.5"
                                             >
                                                 <pill.icon size={16} className={pill.colorClass} />
                                                 <span className="text-sm font-medium">{pill.label}</span>
