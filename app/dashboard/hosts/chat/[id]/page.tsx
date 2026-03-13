@@ -83,6 +83,12 @@ export default function ChatPage() {
     const [messageQuota, setMessageQuota] = useState<MessageQuota | null>(null);
     const [showSuggestions, setShowSuggestions] = useState(true);
     const autoPromptSentRef = useRef<string | null>(null);
+    const introContent = (INITIAL_MESSAGES[0]?.content || "").trim();
+    const isIntroMessage = (msg: any) =>
+        msg?.role === "agent" &&
+        msg?.type === "text" &&
+        typeof msg?.content === "string" &&
+        msg.content.trim() === introContent;
     const chatIdStr = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "new";
     const canShareChat = chatIdStr !== "new" && !chatIdStr.startsWith("task-");
 
@@ -239,7 +245,9 @@ export default function ChatPage() {
             chatIdStr,
             (msgs) => {
                 if (msgs.length > 0) {
-                    setMessages(msgs);
+                    const hasUserMsg = msgs.some((m: any) => m?.role === "user");
+                    const nextMessages = hasUserMsg ? msgs.filter((m: any) => !isIntroMessage(m)) : msgs;
+                    setMessages(nextMessages);
                 } else {
                     const nowStr = new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" });
                     setMessages(INITIAL_MESSAGES.map(m => ({ ...m, time: nowStr })));
@@ -354,7 +362,7 @@ export default function ChatPage() {
             addAgentMsg({
                 type: "text",
                 content: `Great choice! I've marked ${date} on the calendar. What's the plan for that day?`,
-                suggestions: [{ label: "Vendors", action: "vendor_search" }]
+                suggestions: [{ label: "Discover Vendors", action: "vendor_search" }]
             });
         });
     };
@@ -599,7 +607,7 @@ export default function ChatPage() {
                                 selectedEventId={selectedEventId}
                                 onEventSelect={setSelectedEventId}
                                 onUpgradeToPro={() => setIsPricingOpen(true)}
-                                showSuggestions={showSuggestions && idx === messages.length - 1}
+                                showSuggestions={showSuggestions}
                             />
                         </div>
                     ))}

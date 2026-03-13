@@ -1,7 +1,7 @@
 "use client";
 
 import { processGeminiChat } from "@/app/actions/gemini-chat";
-import { INITIAL_MESSAGES, MARKET_DATA } from "@/lib/chat-data";
+import { MARKET_DATA } from "@/lib/chat-data";
 import {
     createChat,
     createEvent,
@@ -1463,9 +1463,6 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             const isNew = chatIdStr === "new" || chatIdStr.startsWith("task-");
             if (isNew && currentUser) {
                 chatIdStr = await createChat(currentUser.uid, text.substring(0, 30), activeCity);
-                for (const m of INITIAL_MESSAGES) {
-                    await saveChatMessage(chatIdStr, { ...m, time: nowStr });
-                }
                 router.push(`/dashboard/hosts/chat/${chatIdStr}`);
             }
             if (chatIdStr !== "new") {
@@ -1510,10 +1507,6 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             setInput("");
 
             const newChatId = await createChat(currentUser.uid, text.substring(0, 30), activeCity);
-
-            for (const m of INITIAL_MESSAGES) {
-                await saveChatMessage(newChatId, { ...m, time: nowStr });
-            }
 
             const persisted = await persistUserMessage(newChatId, text, nowStr);
             if (!persisted.ok) {
@@ -1641,9 +1634,6 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         const isNew = chatIdStr === "new" || chatIdStr.startsWith("task-");
         if (isNew) {
             chatIdStr = await createChat(currentUser.uid, eventName.substring(0, 30), city);
-            for (const m of INITIAL_MESSAGES) {
-                await saveChatMessage(chatIdStr, { ...m, time: nowStr });
-            }
             router.push(`/dashboard/hosts/chat/${chatIdStr}`);
         }
 
