@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ChevronDown, MapPin, Star, Users, ThumbsUp, ThumbsDown, Copy, AlertTriangle, ArrowRight } from "lucide-react";
+import { ChevronDown, MapPin, Star, Users, ThumbsUp, ThumbsDown, Copy, ArrowRight } from "lucide-react";
 import { cn, formatCurrency, getCurrencySymbol } from "@/lib/utils";
 import { CITY_COLORS, CITIES } from "@/lib/chat-data";
 import { SharedEvent } from "@/lib/types";
@@ -246,26 +246,6 @@ function VendorCardMsg({
                     </button>
                 </div>
             )}
-        </div>
-    );
-}
-
-export function AlertMsg({ msg }: { msg: any }) {
-    return (
-        <div className="w-full max-w-[480px] bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex gap-3 animate-in zoom-in-95 duration-300">
-            <div className="shrink-0 w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center text-destructive">
-                <AlertTriangle size={20} />
-            </div>
-            <div className="flex-1">
-                <div className="text-[11px] font-bold uppercase tracking-widest text-destructive mb-1">Real-time Alert</div>
-                <div className="text-sm font-bold text-foreground mb-1">{msg.title}</div>
-                <div className="text-[12px] text-muted-foreground leading-relaxed">{msg.content}</div>
-                {msg.url && (
-                    <Link href={msg.url} target="_blank" className="inline-flex items-center gap-1 text-[11px] font-bold text-destructive hover:underline mt-2">
-                        View Source <ArrowRight size={10} />
-                    </Link>
-                )}
-            </div>
         </div>
     );
 }
@@ -1121,10 +1101,6 @@ export function Msg({
                             <div className="w-full">
                                 <CalendarPicker onSelect={onCalendarSelect} />
                             </div>
-                        </div>
-                    ) : msg.type === "alert" ? (
-                        <div className="mt-1">
-                            <AlertMsg msg={msg} />
                         </div>
                     ) : msg.type === "store_cards" ? (
                         <div className="mt-1">

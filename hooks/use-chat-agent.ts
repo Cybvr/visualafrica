@@ -1337,22 +1337,6 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
         try {
             const { getRecentInsights } = await import("@/lib/firestore-service");
             insights = await getRecentInsights({ city: activeCityRef || undefined });
-            
-            // Check for critical alerts to push proactively
-            const criticalAlert = insights.find(i => 
-                i.tags?.some((t: string) => t.toLowerCase() === 'alert' || t.toLowerCase() === 'safety') ||
-                i.title.toLowerCase().includes('alert') ||
-                i.title.toLowerCase().includes('disruption')
-            );
-
-            if (criticalAlert) {
-                await persistAgentMessage({
-                    type: "alert",
-                    title: criticalAlert.title,
-                    content: criticalAlert.content,
-                    url: criticalAlert.url
-                }, chatIdOverride);
-            }
         } catch (e) {
             console.error("Failed to fetch insights for agent context", e);
         }
