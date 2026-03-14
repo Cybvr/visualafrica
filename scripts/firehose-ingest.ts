@@ -20,7 +20,7 @@ if (!TAP_TOKEN) {
 
 // Map city names to Lucene tags or keywords if needed
 const CITY_KEYWORDS: Record<string, string[]> = {
-    'Lagos': ['Lagos', 'Eko', 'Victoria Island', 'Lekki'],
+    'Lagos': ['Lagos', 'Eko', 'Victoria Island', 'Lekki', 'Ikeja', 'Nigeria'],
     'Accra': ['Accra', 'Ghana'],
     'Nairobi': ['Nairobi', 'Kenya'],
     'Cape Town': ['Cape Town', 'South Africa']
