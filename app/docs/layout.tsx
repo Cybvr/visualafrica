@@ -4,9 +4,9 @@ import { BookOpen, TrendingUp, Gift, Sparkles } from "lucide-react"
 
 const docsNav = [
   { href: "/docs", label: "Overview", icon: BookOpen },
-  { href: "/docs/playbook", label: "Playbook", icon: TrendingUp },
-  { href: "/docs/promos-offers", label: "Promos and Offers", icon: Gift },
-  { href: "/docs/experiences", label: "Narratives & Experiences", icon: Sparkles },
+  { href: "/docs/playbook", label: "Hosting and Planning", icon: TrendingUp },
+  { href: "/docs/experiences", label: "Vendors and Bookings", icon: Sparkles },
+  { href: "/docs/promos-offers", label: "Payments and Security", icon: Gift },
 ]
 
 export default function DocsLayout({ children }: { children: ReactNode }) {
@@ -15,7 +15,7 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
       <div className="mx-auto flex max-w-6xl">
         <aside className="hidden w-60 shrink-0 border-r border-border bg-card lg:block">
           <div className="sticky top-0 flex h-screen flex-col p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-foreground">Docs / Growth</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-foreground">Help Center</p>
             <nav className="mt-4 space-y-1 text-sm">
               {docsNav.map((item) => (
                 <Link
@@ -45,7 +45,7 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-wide text-foreground">Read-only</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-foreground">Knowledge Base</p>
             <article className="mt-4 space-y-10 text-base font-medium leading-7 text-foreground">
               {children}
             </article>

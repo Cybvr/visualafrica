@@ -15,7 +15,8 @@ import {
     setDoc,
     writeBatch,
     runTransaction,
-    Timestamp
+    Timestamp,
+    limit
 } from 'firebase/firestore';
 
 import { Vendor, SharedEvent, BlogPost, FAQ, PricingTier, Offering, PlatformFeature, Experience } from './types';
@@ -691,4 +692,38 @@ export async function getRelatedExperiences(experienceId: string, limitCount: nu
     }
 
     return related.slice(0, limitCount);
+}
+
+// ── Insight Functions ─────────────────────────────────────
+
+export async function saveInsight(insight: {
+    ruleId: string;
+    city?: string;
+    vendorId?: string;
+    title: string;
+    content: string;
+    url: string;
+    matchedAt: string;
+    tags?: string[];
+}) {
+    const insightsRef = collection(db, 'insights');
+    await addDoc(insightsRef, {
+        ...insight,
+        createdAt: serverTimestamp()
+    });
+}
+
+export async function getRecentInsights(filters: { city?: string; vendorId?: string }, limitCount: number = 5) {
+    let q = query(collection(db, 'insights'), orderBy('createdAt', 'desc'));
+    
+    if (filters.city) {
+        q = query(q, where('city', '==', filters.city));
+    }
+    
+    if (filters.vendorId) {
+        q = query(q, where('vendorId', '==', filters.vendorId));
+    }
+    
+    const querySnapshot = await getDocs(query(q, limit(limitCount)));
+    return querySnapshot.docs.map(doc => toPlainObject({ ...doc.data(), id: doc.id }));
 }

@@ -3,7 +3,7 @@ import { TiptapReadonly } from "@/components/docs/TiptapReadonly"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Narratives & Experiences | Waddi Docs",
+  title: "Vendors and Bookings | Waddi Help",
 }
 
 export default function ExperiencesPage() {

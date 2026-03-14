@@ -676,6 +676,16 @@ Rules:
             const city = String(args.city || activeCity || "");
             const category = args.category ? String(args.category) : null;
             const vendorsForCity = city ? (allVendorsByCity[city] || []) : Object.values(allVendorsByCity).flat();
+            
+            // Fetch live insights to cross-reference
+            let insights: any[] = [];
+            try {
+                const { getRecentInsights } = await import("@/lib/firestore-service");
+                insights = await getRecentInsights({ city: city || undefined }, 10);
+            } catch (e) {
+                console.error("Failed to fetch insights for vendor enrichment", e);
+            }
+
             const filtered = category
                 ? vendorsForCity.filter((v: any) => {
                     const type = (v.type || "").toLowerCase();
@@ -684,17 +694,35 @@ Rules:
                 })
                 : vendorsForCity;
 
+            // Enrich vendors with live insights
+            const enrichedVendors = filtered.map((v: any) => {
+                const matchingInsight = insights.find(i => 
+                    (i.vendorId && i.vendorId === v.id) || 
+                    (v.name && i.title.toLowerCase().includes(v.name.toLowerCase()))
+                );
+                if (matchingInsight) {
+                    return { 
+                        ...v, 
+                        isTrending: true, 
+                        liveHeadline: matchingInsight.title,
+                        status: "Trending", 
+                        statusColor: "hsl(var(--primary))" 
+                    };
+                }
+                return v;
+            });
+
             metrics?.vendorSearches.push({
                 city: city || "your area",
                 category,
-                count: filtered.length,
-                topVendors: filtered.slice(0, 3).map((v: any) => String(v?.name || "")).filter(Boolean)
+                count: enrichedVendors.length,
+                topVendors: enrichedVendors.slice(0, 3).map((v: any) => String(v?.name || "")).filter(Boolean)
             });
             metrics?.pendingMessages.push({
                 type: "vendor_cards",
                 content: `Here are the top${category ? ` ${category}` : ""} vendors in ${city || "your area"}:`,
                 city,
-                vendors: filtered,
+                vendors: enrichedVendors,
                 viewAllHref: "/dashboard/hosts/search",
                 viewAllLabel: "View all vendors"
             });
@@ -1304,6 +1332,31 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
             return retry?.text && String(retry.text).trim() ? String(retry.text).trim() : null;
         };
 
+        const activeCityRef = activeCity;
+        let insights: any[] = [];
+        try {
+            const { getRecentInsights } = await import("@/lib/firestore-service");
+            insights = await getRecentInsights({ city: activeCityRef || undefined });
+            
+            // Check for critical alerts to push proactively
+            const criticalAlert = insights.find(i => 
+                i.tags?.some((t: string) => t.toLowerCase() === 'alert' || t.toLowerCase() === 'safety') ||
+                i.title.toLowerCase().includes('alert') ||
+                i.title.toLowerCase().includes('disruption')
+            );
+
+            if (criticalAlert) {
+                await persistAgentMessage({
+                    type: "alert",
+                    title: criticalAlert.title,
+                    content: criticalAlert.content,
+                    url: criticalAlert.url
+                }, chatIdOverride);
+            }
+        } catch (e) {
+            console.error("Failed to fetch insights for agent context", e);
+        }
+
         const rawModelHistory = [...messages, { role: "user", content: text }]
             .slice(-14)
             .map((m: any) => ({
@@ -1316,7 +1369,7 @@ IMPORTANT: You must respond using function calls only (${allowedFunctionNames.jo
                 ? rawModelHistory.slice(firstUserIndex)
                 : [{ role: "user", parts: [{ text }] }];
 
-        const geminiResult = await processGeminiChat(modelHistory, { dealTags });
+        const geminiResult = await processGeminiChat(modelHistory, { dealTags, insights });
         
         // Handle deals returned from the server
         if (geminiResult.deals && geminiResult.deals.length > 0) {

@@ -77,70 +77,82 @@ export const promosTiptapDoc = {
     {
       type: "heading",
       attrs: { level: 1 },
-      content: [{ type: "text", text: "Promos and Offers" }],
+      content: [{ type: "text", text: "Payments and Security" }],
     },
     {
       type: "paragraph",
       content: [
         {
           type: "text",
-          text: "Story-led promos that help people connect first, then book experiences with clear value and simple next steps.",
+          text: "Learn how payments work on Waddi, how deposits are handled, and how to keep your account secure.",
         },
       ],
     },
     {
       type: "heading",
       attrs: { level: 2 },
-      content: [{ type: "text", text: "Book Early, Lock In More" }],
+      content: [{ type: "text", text: "Payment methods" }],
     },
     {
-      type: "paragraph",
+      type: "bulletList",
       content: [
         {
-          type: "text",
-          text: "I used to be the person booking everything last minute. Like genuinely thought it would be fine. Then Detty December came and every vendor I wanted was either gone or double the price. I just sat there refreshing like that was going to help. This year I booked 90 days out, locked in my vendors, got $25,000 credit — and honestly just forgot about it until it was time. That's the version of me I want to be every year.",
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Cards and bank transfer options are shown at checkout." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "If a payment method is not available in your city, contact support." }] }],
         },
       ],
     },
     {
       type: "heading",
       attrs: { level: 2 },
-      content: [{ type: "text", text: "First Premium Booking" }],
+      content: [{ type: "text", text: "Deposits and milestones" }],
     },
     {
       type: "paragraph",
       content: [
         {
           type: "text",
-          text: "I kept scrolling past the Waddi Verified section because I assumed it wasn't for me. Like those vendors are for people with bigger budgets, bigger events. My friend talked me into it. Used the $15,000 credit, booked my first one — and that event still comes up in conversation. Sometimes you just have to let yourself have the good thing.",
+          text: "Vendors can request a deposit to secure a date. For larger events, payments can be split into milestones tied to delivery.",
         },
       ],
     },
     {
       type: "heading",
       attrs: { level: 2 },
-      content: [{ type: "text", text: "Full City Bundle" }],
+      content: [{ type: "text", text: "Refunds and disputes" }],
     },
     {
-      type: "paragraph",
+      type: "bulletList",
       content: [
         {
-          type: "text",
-          text: "The group chat was a disaster. Twelve people, four vendors, nobody agreeing on anything. I just bundled everything through Waddi, sent one link, saved 15%. The chat went quiet in a good way. Planning is supposed to feel like this.",
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Refund eligibility depends on the vendor policy and booking status." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "If there is a delivery issue, open a support ticket within 48 hours." }] }],
         },
       ],
     },
     {
       type: "heading",
       attrs: { level: 2 },
-      content: [{ type: "text", text: "5+ Bookings? You Get Concierge" }],
+      content: [{ type: "text", text: "Security tips" }],
     },
     {
-      type: "paragraph",
+      type: "bulletList",
       content: [
         {
-          type: "text",
-          text: "I had seven bookings across two cities and I was losing my mind a little. Concierge just... took it. Sent me updates, handled the back and forth, kept everything moving. I don't know who they are but I owe them something.",
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Only pay through Waddi to keep your booking protected." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Do not share verification codes or passwords with anyone." }] }],
         },
       ],
     },
@@ -153,14 +165,80 @@ export const overviewTiptapDoc = {
     {
       type: "heading",
       attrs: { level: 1 },
-      content: [{ type: "text", text: "Overview" }],
+      content: [{ type: "text", text: "Help Center" }],
     },
     {
       type: "paragraph",
       content: [
         {
           type: "text",
-          text: "Waddi is where great experiences get discovered, planned, and booked. For people who want to show up, and hosts who need the right talent to make it happen.",
+          text: "Find quick answers, step-by-step guidance, and troubleshooting for planning, bookings, and payments.",
+        },
+      ],
+    },
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Categories" }],
+    },
+    {
+      type: "bulletList",
+      content: [
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Hosting and Planning" }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Vendors and Bookings" }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Payments and Security" }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Account and Access" }] }],
+        },
+      ],
+    },
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Quick answers" }],
+    },
+    {
+      type: "bulletList",
+      content: [
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Create a new event and set a date range." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Invite collaborators and assign tasks." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Request vendor quotes and compare offers." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Pay deposits securely through Waddi." }] }],
+        },
+      ],
+    },
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Need more help?" }],
+    },
+    {
+      type: "paragraph",
+      content: [
+        {
+          type: "text",
+          text: "If you cannot find what you need here, visit Support to message our team directly.",
         },
       ],
     },
@@ -173,73 +251,91 @@ export const experiencesTiptapDoc = {
     {
       type: "heading",
       attrs: { level: 1 },
-      content: [{ type: "text", text: "Narratives and Experiences" }],
+      content: [{ type: "text", text: "Vendors and Bookings" }],
     },
     {
       type: "paragraph",
       content: [
         {
           type: "text",
-          text: "Guidelines for experience-led storytelling across different countries.",
+          text: "How to discover vendors, request quotes, and manage bookings on Waddi.",
         },
       ],
     },
     {
       type: "heading",
       attrs: { level: 2 },
-      content: [{ type: "text", text: "Core strategy" }],
+      content: [{ type: "text", text: "Finding vendors" }],
     },
     {
-      type: "paragraph",
+      type: "bulletList",
       content: [
         {
-          type: "text",
-          text: "Every event is an experience. We do not just sell services; we sell the narrative of a world-class celebration curated by local experts. This is how we frame stories across markets.",
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Search by city, category, and budget range." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Use filters for availability, ratings, and verified partners." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Save vendors to compare later." }] }],
         },
       ],
     },
     {
       type: "heading",
       attrs: { level: 2 },
-      content: [{ type: "text", text: "Narrative Sample" }],
+      content: [{ type: "text", text: "Requesting quotes" }],
     },
     {
-      type: "paragraph",
-      content: [{ type: "text", text: "Experience-led storytelling." }],
-    },
-    {
-      type: "paragraph",
+      type: "orderedList",
+      attrs: { start: 1 },
       content: [
         {
-          type: "text",
-          text: "Planning an event in Kigali meant finding the soul of the city. We curated a day that moved from the aromatic heights of @questioncoffee to the vibrant energy of @nyarutaramarket.",
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Open a vendor profile and choose Request Quote." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Share your event details, date range, and guest count." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Review the response and ask follow-up questions in chat." }] }],
         },
       ],
     },
     {
-      type: "paragraph",
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Bookings and contracts" }],
+    },
+    {
+      type: "bulletList",
       content: [
         {
-          type: "text",
-          text: "Every event is an experience, and Waddi makes it world-class. With thousands of vetted vendors across African cities, you are not just booking services, you are crafting a narrative. From intimate retreats to grand celebrations, Waddi gives you the tools to plan with confidence and the connections to make it real.",
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Confirm the scope, price, and timing before paying a deposit." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Keep all agreements in the Waddi chat for easy reference." }] }],
         },
       ],
+    },
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Changes or cancellations" }],
     },
     {
       type: "paragraph",
       content: [
         {
           type: "text",
-          text: "If you are hosting in Kigali and want an event that feels like the city itself, use my link and start planning with Waddi.",
-        },
-      ],
-    },
-    {
-      type: "paragraph",
-      content: [
-        {
-          type: "text",
-          text: "#Waddi #ExperienceKigali #EventPlanning #VisitKigali #AfricanEvents",
+          text: "If plans change, message the vendor immediately and review their cancellation terms before rescheduling.",
         },
       ],
     },
@@ -252,73 +348,21 @@ export const playbookTiptapDoc = {
     {
       type: "heading",
       attrs: { level: 1 },
-      content: [{ type: "text", text: "Growth Playbook" }],
+      content: [{ type: "text", text: "Hosting and Planning" }],
     },
     {
       type: "paragraph",
       content: [
         {
           type: "text",
-          text: "Goal: Drive discovery through city and cultural moments, then convert through curated vendor access and seamless booking.",
+          text: "Set up your event, organize tasks, and keep everyone aligned from first idea to final day.",
         },
       ],
     },
     {
       type: "heading",
       attrs: { level: 2 },
-      content: [{ type: "text", text: "What to run" }],
-    },
-    {
-      type: "bulletList",
-      content: [
-        {
-          type: "listItem",
-          content: [
-            {
-              type: "paragraph",
-              content: [
-                {
-                  type: "text",
-                  text: "Experience Spotlight — Meta Reels, TikTok, Instagram Stories. KPI: Engagement rate.",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          type: "listItem",
-          content: [
-            {
-              type: "paragraph",
-              content: [
-                {
-                  type: "text",
-                  text: "Global Curation — Google Performance Max, Pinterest, YouTube Shorts. KPI: Inquiry rate.",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          type: "listItem",
-          content: [
-            {
-              type: "paragraph",
-              content: [
-                {
-                  type: "text",
-                  text: "Experience Bundles — Influencer whitelisting, Email retargeting, Meta Advantage+. KPI: Bundle checkout starts.",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      type: "heading",
-      attrs: { level: 2 },
-      content: [{ type: "text", text: "How to test (30 days)" }],
+      content: [{ type: "text", text: "Start a new event" }],
     },
     {
       type: "orderedList",
@@ -326,19 +370,77 @@ export const playbookTiptapDoc = {
       content: [
         {
           type: "listItem",
-          content: [{ type: "paragraph", content: [{ type: "text", text: "Test urgency language vs trust language in headlines." }] }],
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Open your dashboard and choose New Event." }] }],
         },
         {
           type: "listItem",
-          content: [{ type: "paragraph", content: [{ type: "text", text: "Test video-first ads vs static card ads." }] }],
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Add a title, date range, and city." }] }],
         },
         {
           type: "listItem",
-          content: [{ type: "paragraph", content: [{ type: "text", text: "Test category pages vs bundle pages as destination." }] }],
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Select the type of event and guest count." }] }],
         },
         {
           type: "listItem",
-          content: [{ type: "paragraph", content: [{ type: "text", text: "Test broad lookalikes vs intent keyword audiences." }] }],
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Save to unlock your plan and vendor shortlist." }] }],
+        },
+      ],
+    },
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Build your plan" }],
+    },
+    {
+      type: "bulletList",
+      content: [
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Track milestones with your timeline and checklist." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Set a budget and compare vendor quotes against it." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Use chat for quick planning questions and suggestions." }] }],
+        },
+      ],
+    },
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Share with collaborators" }],
+    },
+    {
+      type: "paragraph",
+      content: [
+        {
+          type: "text",
+          text: "Invite co-hosts or planners so they can view tasks, chat with vendors, and update the plan.",
+        },
+      ],
+    },
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Helpful prompts" }],
+    },
+    {
+      type: "bulletList",
+      content: [
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Create a timeline for a 150-person wedding in Lagos." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Suggest a budget split for venue, decor, and catering." }] }],
+        },
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "List the top vendors I should book first." }] }],
         },
       ],
     },

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ChevronDown, MapPin, Star, Users, ThumbsUp, ThumbsDown, Copy, ArrowRight } from "lucide-react";
+import { ChevronDown, MapPin, Star, Users, ThumbsUp, ThumbsDown, Copy, AlertTriangle, ArrowRight } from "lucide-react";
 import { cn, formatCurrency, getCurrencySymbol } from "@/lib/utils";
 import { CITY_COLORS, CITIES } from "@/lib/chat-data";
 import { SharedEvent } from "@/lib/types";
@@ -112,6 +112,15 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
                         <span className="bg-primary/10 text-primary text-[11px] font-semibold rounded-full px-2 py-0.5">{v.status}</span>
                     </div>
                 </div>
+                {v.isTrending && (
+                    <div className="mt-2 mb-1 flex items-center gap-1.5 animate-pulse">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                        </span>
+                        <span className="text-primary text-[10px] font-bold uppercase tracking-tight">Trending Now: {v.liveHeadline}</span>
+                    </div>
+                )}
                 <div className="flex flex-wrap gap-1 mt-2 mb-3">
                     {v.tags?.map((t: string, idx: number) => (
                         <span key={`${vendorKey || v.name}-tag-${idx}-${t}`} className="bg-secondary text-muted-foreground text-[11px] rounded px-1.5 py-0.5">{t}</span>
@@ -237,6 +246,26 @@ function VendorCardMsg({
                     </button>
                 </div>
             )}
+        </div>
+    );
+}
+
+export function AlertMsg({ msg }: { msg: any }) {
+    return (
+        <div className="w-full max-w-[480px] bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex gap-3 animate-in zoom-in-95 duration-300">
+            <div className="shrink-0 w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center text-destructive">
+                <AlertTriangle size={20} />
+            </div>
+            <div className="flex-1">
+                <div className="text-[11px] font-bold uppercase tracking-widest text-destructive mb-1">Real-time Alert</div>
+                <div className="text-sm font-bold text-foreground mb-1">{msg.title}</div>
+                <div className="text-[12px] text-muted-foreground leading-relaxed">{msg.content}</div>
+                {msg.url && (
+                    <Link href={msg.url} target="_blank" className="inline-flex items-center gap-1 text-[11px] font-bold text-destructive hover:underline mt-2">
+                        View Source <ArrowRight size={10} />
+                    </Link>
+                )}
+            </div>
         </div>
     );
 }
@@ -1092,6 +1121,10 @@ export function Msg({
                             <div className="w-full">
                                 <CalendarPicker onSelect={onCalendarSelect} />
                             </div>
+                        </div>
+                    ) : msg.type === "alert" ? (
+                        <div className="mt-1">
+                            <AlertMsg msg={msg} />
                         </div>
                     ) : msg.type === "store_cards" ? (
                         <div className="mt-1">
