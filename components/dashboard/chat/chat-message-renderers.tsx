@@ -112,15 +112,6 @@ function VCard({ v, savedVendors, onSave, onVendorAction }: { v: any; savedVendo
                         <span className="bg-primary/10 text-primary text-[11px] font-semibold rounded-full px-2 py-0.5">{v.status}</span>
                     </div>
                 </div>
-                {v.isTrending && (
-                    <div className="mt-2 mb-1 flex items-center gap-1.5 animate-pulse">
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                        </span>
-                        <span className="text-primary text-[10px] font-bold uppercase tracking-tight">Trending Now: {v.liveHeadline}</span>
-                    </div>
-                )}
                 <div className="flex flex-wrap gap-1 mt-2 mb-3">
                     {v.tags?.map((t: string, idx: number) => (
                         <span key={`${vendorKey || v.name}-tag-${idx}-${t}`} className="bg-secondary text-muted-foreground text-[11px] rounded px-1.5 py-0.5">{t}</span>

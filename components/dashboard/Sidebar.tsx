@@ -23,7 +23,6 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Store,
-  Compass,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -379,7 +378,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
   const hostPrimaryNavItems: NavItemConfig[] = [
     { icon: Plus, label: "New Task", href: `/dashboard/hosts/chat/${freshTaskId}` },
     { icon: Search, label: "Search Vendors", href: "/dashboard/hosts/search", matchPaths: ["/dashboard/hosts/vendor/"] },
-    { icon: Compass, label: "Discover", href: "/dashboard/hosts/discover" },
     { icon: Calendar, label: "My Events", href: "/dashboard/hosts/events" },
     { icon: ShoppingBasket, label: "Playbooks", href: "/dashboard/hosts/store" },
     { icon: Inbox, label: "Inbox", href: "/dashboard/hosts/inbox", count: hostInboxCount },

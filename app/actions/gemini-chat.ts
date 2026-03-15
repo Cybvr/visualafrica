@@ -46,11 +46,7 @@ Be concise and action-oriented.`;
             ? `\n\n${dealsContext}\n\nCRITICAL: The deals above are ALREADY rendered as visual cards in the UI. DO NOT repeat their names, links, or discounts in your response text. Simply provide a conversational intro (e.g., "I've found some great deals for you!") and a wrap-up question asking if any of them interest the user.`
             : "";
 
-        const insightsContext = options?.insights && options.insights.length > 0
-            ? `\n\nREAL-TIME MARKET INSIGHTS (sourced via Ahrefs Firehose):\n${options.insights.map(i => `- [${i.matchedAt}] ${i.title}: ${i.content} (Source: ${i.url})`).join('\n')}\n\nCRITICAL: Use these live insights to sound "plugged in." If there is a safety warning or a hot trend, mention it naturally. If a vendor has recent news, acknowledge it when recommending them.`
-            : "";
-
-        return `${base}${dealsContextMessage}${insightsContext}`;
+        return `${base}${dealsContextMessage}`;
     };
 
     const callSearchModel = async (modelName: string, prompt: string) => {
