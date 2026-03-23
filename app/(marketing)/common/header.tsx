@@ -310,6 +310,12 @@ export function Header() {
             >
               Experiences
             </Link>
+            <Link
+              href="/travel"
+              className="flex items-center rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              Travel
+            </Link>
           </nav>
         </div>
 

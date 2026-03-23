@@ -6,6 +6,8 @@ const quickLinks = [
   { label: "About Us", href: "/about" },
   { label: "Blog", href: "/blog" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Experiences", href: "/explore/experiences" },
+  { label: "Travel", href: "/travel" },
   { label: "FAQs", href: "/support" },
   { label: "Contact", href: "/contact" },
 ]
