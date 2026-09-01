@@ -46,14 +46,16 @@ export default function DashboardLayoutClient({
                 )}
 
                 <main className={cn(
-                    "flex-1 min-h-0 overflow-hidden bg-secondary/30",
+                    "flex-1 min-h-0 bg-secondary/30",
+                    // The full-height routes below own their inner scrolling; every other
+                    // page scrolls here, or its content is silently clipped.
                     isChatPage
                         ? "p-0 h-screen overflow-hidden"
                         : isHostHomePage
                             ? "p-0 overflow-hidden"
                             : isEventWorkspace
                                 ? "p-0 overflow-hidden"
-                            : "p-2 sm:p-4 md:p-5"
+                            : "overflow-y-auto p-2 sm:p-4 md:p-5"
                 )}>
                     {children}
                 </main>

@@ -4,6 +4,7 @@ import React from 'react';
 import { Bell, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 import { getBlogPosts, getFaqs } from '@/lib/firestore-service';
 import { FAQ, FAQCategory, BlogPost } from '@/lib/types';
 import {
@@ -21,6 +22,13 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SupportChat from './SupportChat';
 import ProfileMenu from './ProfileMenu';
+
+const NAV_LINKS = [
+  { href: '/dashboard/hosts/events', label: 'Events' },
+  { href: '/dashboard/hosts/search', label: 'Discover' },
+  { href: '/dashboard/hosts/vendors', label: 'Vendors' },
+  { href: '/dashboard/hosts/experiences', label: 'Experiences' },
+];
 
 const FAQ_CATEGORIES: FAQCategory[] = [
   { id: 'general', label: 'General' },
@@ -113,18 +121,24 @@ const Header: React.FC = () => {
   return (
     <div className="h-full flex items-center justify-between gap-2 px-4 sm:px-6 bg-background">
       <nav className="flex items-center gap-5" aria-label="Dashboard">
-        <Link
-          href="/dashboard/hosts/events"
-          className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-        >
-          Events
-        </Link>
-        <Link
-          href="/dashboard/hosts/search"
-          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Discover
-        </Link>
+        {NAV_LINKS.map((link) => {
+          const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={isActive ? "page" : undefined}
+              className={cn(
+                "text-sm transition-colors",
+                isActive
+                  ? "font-semibold text-primary"
+                  : "font-medium text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="flex items-center gap-2">
