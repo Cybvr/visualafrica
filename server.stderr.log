@@ -41,3 +41,4 @@
 ⨯ The requested resource "https://api.dicebear.com/7.x/initials/svg?seed=PAN%20AFRICA%20TV%20UNPLUG" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
 ⨯ upstream image response failed for https://images.unsplash.com/photo-1526491109672-7474bd1bd594?auto=format&fit=crop&w=1400&q=80 404
 ⨯ upstream image response failed for https://images.unsplash.com/photo-1540575861501-7c00117fc24b?auto=format&fit=crop&q=80&w=800 404
+⨯ upstream image response failed for https://images.unsplash.com/photo-1540575861501-7c00117fc24b?auto=format&fit=crop&q=80&w=800 404

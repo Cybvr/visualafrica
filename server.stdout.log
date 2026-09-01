@@ -766,3 +766,4 @@
  GET /manifest.webmanifest 200 in 10ms (compile: 4ms, render: 6ms)
  GET /dashboard/hosts/events 200 in 189ms (compile: 162ms, render: 27ms)
  GET /manifest.webmanifest 200 in 13ms (compile: 8ms, render: 5ms)
+ GET /manifest.webmanifest 200 in 71ms (compile: 29ms, render: 42ms)
