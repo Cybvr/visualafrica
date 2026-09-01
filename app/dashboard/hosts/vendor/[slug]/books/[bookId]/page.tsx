@@ -57,7 +57,7 @@ export default function BookingDetailPage() {
                 <h2 className="text-2xl font-bold">Booking not found</h2>
                 <Button
                     variant="link"
-                    onClick={() => router.push('/dashboard/hosts/search')}
+                    onClick={() => router.push('/dashboard/hosts/vendors')}
                     className="mt-4"
                 >
                     Back to Search

@@ -1,5 +1,5 @@
-import DiscoverBrowser from '@/components/dashboard/discover-browser';
+import PublicEventsBrowser from '@/components/dashboard/public-events-browser';
 
 export default function DiscoverPage() {
-  return <DiscoverBrowser />;
+  return <PublicEventsBrowser />;
 }

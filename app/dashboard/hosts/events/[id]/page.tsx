@@ -10,6 +10,7 @@ import {
     LayoutDashboard, Store, FileText, Inbox, ListChecks, Globe, Plane, PanelLeft, LucideIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { listenToEventById, updateEvent } from '@/lib/firestore-service';
 import { SharedEvent } from '@/lib/types';
 import PlanTab from '@/components/dashboard/event-tabs/PlanTab';
@@ -338,28 +339,26 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                             : "pointer-events-none max-h-0 pt-0 opacity-0"
                             }`}
                     >
-                        <div className="lg:hidden -mx-1 px-1 overflow-x-auto pb-1">
-                            <div className="flex items-center gap-2 min-w-max">
-                                {filteredNavItems.map((item) => {
-                                    const isActive = activeTab === item.value;
-                                    const ItemIcon = item.icon;
-                                    return (
-                                        <button
-                                            key={item.value}
-                                            type="button"
-                                            tabIndex={isNavVisible ? undefined : -1}
-                                            onClick={() => handleTabChange(item.value)}
-                                            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${isActive
-                                                ? "bg-primary text-primary-foreground border-primary"
-                                                : "bg-card text-foreground border-border hover:bg-secondary"
-                                                }`}
-                                        >
-                                            <ItemIcon size={16} className={isActive ? "text-primary-foreground" : "text-muted-foreground"} />
-                                            <span>{item.label}</span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                        {/* Mobile: the 11 sections are tabs across the top instead of a side list. */}
+                        <div className="-mx-4 overflow-x-auto px-4 pb-1 lg:hidden">
+                            <Tabs value={activeTab} onValueChange={handleTabChange}>
+                                <TabsList className="h-9 w-max">
+                                    {filteredNavItems.map((item) => {
+                                        const ItemIcon = item.icon;
+                                        return (
+                                            <TabsTrigger
+                                                key={item.value}
+                                                value={item.value}
+                                                tabIndex={isNavVisible ? undefined : -1}
+                                                className="gap-1.5 px-2.5 text-xs"
+                                            >
+                                                <ItemIcon size={14} />
+                                                <span>{item.label}</span>
+                                            </TabsTrigger>
+                                        );
+                                    })}
+                                </TabsList>
+                            </Tabs>
                         </div>
 
                         <div className="hidden max-h-[calc(100vh-11rem)] overflow-y-auto lg:block">

@@ -204,7 +204,7 @@ function VendorCardMsg({
     });
     const shown = dedupedVendors.slice(0, 5);
     const hasMore = dedupedVendors.length > shown.length;
-    const viewAllHref = msg.viewAllHref || "/dashboard/hosts/search";
+    const viewAllHref = msg.viewAllHref || "/dashboard/hosts/vendors";
     const viewAllLabel = msg.viewAllLabel || "View all vendors";
 
     return (

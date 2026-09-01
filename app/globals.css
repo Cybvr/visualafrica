@@ -124,6 +124,11 @@
     @apply bg-background text-foreground;
   }
 
+  /* Clicking should never leave a focus ring behind; keyboard focus still shows one. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
   h1,
   h2,
   h3,

@@ -29,7 +29,7 @@ export async function HandpickedExperiences() {
                         </h2>
                     </div>
                     <Link
-                        href="/dashboard/hosts/search?tab=experiences"
+                        href="/dashboard/hosts/experiences"
                         className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:tracking-[0.2em] transition-all"
                     >
                         View all

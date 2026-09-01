@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Bell, HelpCircle } from 'lucide-react';
+import { Bell, HelpCircle, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,12 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import SupportChat from './SupportChat';
 import ProfileMenu from './ProfileMenu';
 
@@ -64,6 +70,9 @@ const MESSAGE_NOTIFICATIONS: MessageNotification[] = [
 const Header: React.FC = () => {
   const pathname = usePathname();
   const mode = pathname?.startsWith('/dashboard/vendors') ? 'vendor' : 'host';
+  const activeNavLabel = NAV_LINKS.find(
+    (link) => pathname === link.href || pathname?.startsWith(`${link.href}/`)
+  )?.label ?? 'Menu';
   const [faqs, setFaqs] = React.useState<FAQ[]>([]);
   const [updatePosts, setUpdatePosts] = React.useState<BlogPost[]>([]);
   const [loadingUpdates, setLoadingUpdates] = React.useState(true);
@@ -120,7 +129,36 @@ const Header: React.FC = () => {
 
   return (
     <div className="h-full flex items-center justify-between gap-2 px-4 sm:px-6 bg-background">
-      <nav className="flex items-center gap-5" aria-label="Dashboard">
+      {/* Four links plus the action icons overflow a phone, so collapse to a menu below md. */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            className="flex items-center gap-1.5 rounded-md p-2 text-foreground transition-colors hover:bg-secondary md:hidden"
+            aria-label="Open navigation menu"
+          >
+            <Menu size={20} />
+            <span className="text-sm font-semibold">{activeNavLabel}</span>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-52 bg-background text-foreground">
+          {NAV_LINKS.map((link) => {
+            const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
+            return (
+              <DropdownMenuItem key={link.href} asChild>
+                <Link
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={cn("cursor-pointer", isActive && "font-semibold text-primary")}
+                >
+                  {link.label}
+                </Link>
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <nav className="hidden items-center gap-5 md:flex" aria-label="Dashboard">
         {NAV_LINKS.map((link) => {
           const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
           return (
