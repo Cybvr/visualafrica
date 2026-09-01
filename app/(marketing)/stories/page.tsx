@@ -7,7 +7,7 @@ import type { Metadata } from "next"
 
 export const metadata: Metadata = {
     title: "Success Stories | Waddi - Real Events, Real Results",
-    description: "Explore inspiring event success stories from hosts who transformed their visions into unforgettable experiences with Waddi's trusted vendor marketplace in Lagos.",
+    description: "Read how hosts in Lagos used Waddi to plan events with local vendors.",
 }
 
 export default function StoriesPage() {
@@ -21,7 +21,7 @@ export default function StoriesPage() {
             location: "Lekki Phase 1, Lagos",
             guestCount: 250,
             date: "December 2025",
-            highlight: "Seamlessly coordinated 12 vendors for a flawless outdoor celebration"
+            highlight: "Coordinated 12 vendors for an outdoor celebration"
         },
         {
             id: "tech-conference-2025",
@@ -50,7 +50,7 @@ export default function StoriesPage() {
             title: "Tech Startup's Offsite Retreat",
             category: "Corporate Event",
             image: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&q=80&w=800",
-            excerpt: "A growing startup used Waddi to plan an unforgettable team retreat that boosted morale.",
+            excerpt: "A growing startup used Waddi to plan a team retreat for its staff.",
             location: "Ikeja, Lagos",
             guestCount: 75,
             date: "March 2025",
@@ -61,7 +61,7 @@ export default function StoriesPage() {
             title: "Milestone 50th Birthday Bash",
             category: "Social Gathering",
             image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=800",
-            excerpt: "How a family created an unforgettable milestone celebration with premium vendors.",
+            excerpt: "How a family planned a milestone celebration with local vendors.",
             location: "Victoria Island, Lagos",
             guestCount: 150,
             date: "August 2025",
@@ -72,7 +72,7 @@ export default function StoriesPage() {
             title: "Luxury Product Launch Event",
             category: "Corporate Event",
             image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=800",
-            excerpt: "A fashion brand launched their new collection with a stunning event that impressed VIP guests.",
+            excerpt: "A fashion brand launched its new collection at an event for VIP guests.",
             location: "Lekki, Lagos",
             guestCount: 200,
             date: "October 2025",
@@ -88,10 +88,10 @@ export default function StoriesPage() {
                 <section className="bg-gradient-to-br from-primary to-accent px-4 py-24 lg:px-8 text-center">
                     <div className="mx-auto max-w-4xl">
                         <h1 className="font-serif text-5xl font-bold text-white md:text-7xl text-balance">
-                            Real Events. Real Results.
+                            Events people planned with Waddi.
                         </h1>
                         <p className="mt-6 text-lg leading-relaxed text-white/90 md:text-xl">
-                            Discover how hosts across Lagos are creating unforgettable events with Africa's most trusted vendor marketplace.
+                            See how hosts in Lagos planned weddings, conferences, and celebrations with local vendors.
                         </p>
                     </div>
                 </section>
@@ -101,10 +101,10 @@ export default function StoriesPage() {
                     <div className="mx-auto max-w-7xl">
                         <div className="text-center mb-16">
                             <h2 className="text-sm font-semibold uppercase tracking-widest text-primary mb-4">
-                                Success Stories
+                                Stories from hosts
                             </h2>
                             <h3 className="font-serif text-4xl md:text-5xl font-bold text-foreground">
-                                Inspired by real events
+                                What hosts planned
                             </h3>
                         </div>
 
@@ -154,7 +154,7 @@ export default function StoriesPage() {
                                         </div>
 
                                         {/* Highlight */}
-                                        <div className="bg-primary/5 rounded-2xl p-4 border-l-4 border-primary">
+                                        <div className="rounded-2xl border border-primary/15 bg-primary/5 p-4">
                                             <p className="text-sm font-medium text-foreground flex items-start gap-2">
                                                 <Heart size={16} className="text-primary flex-shrink-0 mt-0.5" />
                                                 <span>{story.highlight}</span>
@@ -171,10 +171,10 @@ export default function StoriesPage() {
                 <section className="bg-secondary/50 px-4 py-24 lg:px-8 text-center">
                     <div className="mx-auto max-w-3xl">
                         <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
-                            Ready to create your own success story?
+                            Planning an event of your own?
                         </h2>
                         <p className="text-lg text-muted-foreground mb-8">
-                            Join hundreds of hosts who have planned exceptional events with Waddi's trusted vendor marketplace.
+                            Start with the event you need to organise.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Button asChild size="lg" className="bg-primary text-foreground hover:bg-primary/90">

@@ -20,7 +20,7 @@ export default async function BlogPage() {
                             The <span className="text-primary italic">Waddi</span> Journal
                         </h1>
                         <p className="max-w-2xl mx-auto text-lg text-muted-foreground font-medium">
-                            Expert insights, planning guides, and stories from Lagos's most extraordinary events.
+                            Planning guides and stories from events in Lagos.
                         </p>
                     </div>
                 </div>
@@ -40,7 +40,7 @@ export default async function BlogPage() {
                     ) : (
                         <div className="text-center py-20">
                             <h2 className="text-2xl font-serif font-bold text-foreground mb-4">No stories yet.</h2>
-                            <p className="text-muted-foreground font-medium">Check back soon for fresh insights from our experts.</p>
+                            <p className="text-muted-foreground font-medium">Check back soon for new planning guides.</p>
                         </div>
                     )}
                 </div>

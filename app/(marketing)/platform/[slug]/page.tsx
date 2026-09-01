@@ -50,7 +50,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                 </Button>
                                 <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base">
                                     <Link href="/book-a-call">
-                                        Talk to an Expert
+                                        Contact Waddi
                                     </Link>
                                 </Button>
                             </div>
@@ -66,7 +66,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                 Built for modern event planning
                             </h2>
                             <p className="text-lg text-muted-foreground">
-                                Everything you need to execute flawless events, integrated into one powerful platform.
+                                The tools you need to plan and run an event in one place.
                             </p>
                         </div>
 
@@ -100,7 +100,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                     Why top planners choose Waddi {feature.title}
                                 </h2>
                                 <p className="mb-8 text-lg text-muted-foreground">
-                                    Join thousands of event professionals who trust our platform to deliver exceptional experiences.
+                                    Use Waddi to keep the work of planning your event in one place.
                                 </p>
 
                                 <ul className="space-y-4">
@@ -131,8 +131,8 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                                         <div className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/20 text-primary mb-6 backdrop-blur-sm">
                                             <Zap className="h-10 w-10 text-primary" />
                                         </div>
-                                        <h3 className="text-2xl font-bold mb-2">Powering Your Success</h3>
-                                        <p className="text-muted-foreground">Advanced tools for professional results</p>
+                                        <h3 className="text-2xl font-bold mb-2">Keep the work moving</h3>
+                                        <p className="text-muted-foreground">Tools for planning, tracking, and follow-up</p>
                                     </div>
                                 </div>
                             </div>
@@ -144,10 +144,10 @@ export default async function PlatformPage({ params }: { params: Promise<{ slug:
                 <section className="py-24 bg-primary text-foreground text-center">
                     <div className="container mx-auto px-4">
                         <h2 className="font-serif text-4xl text-primary-foreground md:text-5xl font-bold mb-6">
-                            Ready to transform your event planning?
+                            Ready to start planning?
                         </h2>
                         <p className="mx-auto mb-10 max-w-2xl text-primary-foreground text-lg opacity-90">
-                            Start using Waddi {feature.title} today and experience the difference.
+                            Start using Waddi {feature.title} to move your event forward.
                         </p>
                         <Button asChild size="lg" variant="secondary" className="h-14 px-10 text-lg bg-white text-primary hover:bg-card">
                             <Link href="/auth/login">Create Free Account</Link>

@@ -21,8 +21,6 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import ChatHeader from "@/components/dashboard/ChatHeader";
 import { PricingDialog } from "@/components/dashboard/PricingDialog";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
-import Sidebar from "@/components/dashboard/Sidebar";
 import { DEMO_CHAT_HISTORY, INITIAL_MESSAGES, buildVendorsList } from "@/lib/chat-data";
 import {
     DropdownMenu,
@@ -71,7 +69,6 @@ export default function ChatPage() {
     const [allVendorsByCity, setAllVendorsByCity] = useState<Record<string, any[]>>({});
     const [liveEvents, setLiveEvents] = useState<SharedEvent[]>([]);
     const [storeKits, setStoreKits] = useState<any[]>(() => DEMO_CHAT_HISTORY.filter((kit: any) => kit.published));
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [chatTitle, setChatTitle] = useState("New Chat");
     const [chatMetadata, setChatMetadata] = useState<any>(null);
     const [dataLoaded, setDataLoaded] = useState(false);
@@ -469,9 +466,8 @@ export default function ChatPage() {
 
     return (
         <div className="bg-background h-screen flex flex-col overflow-hidden relative">
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <>
                 <ChatHeader
-                    onOpenMenu={() => setIsMobileMenuOpen(true)}
                     title={chatTitle}
                     sharePath={canShareChat ? `/share/chat/${chatIdStr}` : undefined}
                     onRename={async (newTitle) => {
@@ -540,10 +536,7 @@ export default function ChatPage() {
                     }}
                 />
 
-                <SheetContent side="left" className="p-0 w-64 border-none">
-                    <Sidebar onNavigate={() => setIsMobileMenuOpen(false)} />
-                </SheetContent>
-            </Sheet>
+            </>
 
             <style>{`
         @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}

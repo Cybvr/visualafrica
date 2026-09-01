@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { MessageSquareShare, Menu, MoreVertical, ChevronDown, Store, Download, ImagePlus, Loader2 } from 'lucide-react';
+import { MessageSquareShare, MoreVertical, ChevronDown, Store, Download, ImagePlus, Loader2 } from 'lucide-react';
 import { storage } from '@/lib/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { Button } from '@/components/ui/button';
@@ -31,9 +31,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import ProfileMenu from './ProfileMenu';
 
 interface ChatHeaderProps {
-  onOpenMenu?: () => void;
   title?: string;
   sharePath?: string;
   onRename?: (nextTitle: string) => void;
@@ -46,7 +46,6 @@ interface ChatHeaderProps {
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
-  onOpenMenu,
   title = "Ama",
   sharePath,
   onRename,
@@ -138,12 +137,6 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     <>
       <div className="min-h-16 py-2 flex items-center justify-between px-4 mt-0 sm:px-6 bg-background/80 backdrop-blur-md border-b border-border sticky top-0 z-30">
         <div className="flex items-center gap-3 min-w-0">
-          <button
-            onClick={onOpenMenu}
-            className={`md:hidden -ml-2 ${iconActionClass}`}
-          >
-            <Menu size={20} />
-          </button>
           {isEditingTitle ? (
             <Input
               value={editingTitle}
@@ -251,6 +244,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <ProfileMenu mode="host" />
         </div>
       </div>
 

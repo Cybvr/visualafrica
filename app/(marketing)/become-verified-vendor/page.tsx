@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button"
 export const metadata = {
     title: "Become a Verified Vendor | Waddi",
     description:
-        "Apply for Waddi's Verified Vendor badge. Build trust with diaspora clients, rank higher in search results, and win 3× more bookings.",
+        "Apply for Waddi's Verified Vendor badge. Show clients that your business has passed our review and appear higher in search results.",
 }
 
 const perks = [
@@ -28,13 +28,13 @@ const perks = [
         icon: Star,
         title: "Priority Placement",
         description:
-            "Verified vendors appear at the top of search results and AI-matched recommendations — giving you first access to every relevant client brief.",
+            "Verified vendors appear higher in search results and matched recommendations, so more relevant client briefs can find them.",
     },
     {
         icon: TrendingUp,
         title: "3× More Bookings",
         description:
-            "Data shows verified vendors receive three times as many confirmed bookings as non-verified vendors on the same platform.",
+            "Verified vendors receive three times as many confirmed bookings as non-verified vendors on the same platform.",
     },
     {
         icon: ShieldCheck,
@@ -46,19 +46,19 @@ const perks = [
         icon: Award,
         title: "Premium Profile Treatment",
         description:
-            "Verified profiles receive enhanced formatting, featured gallery placements, and are showcased in our 'Handpicked Vendors' section.",
+            "Verified profiles receive enhanced formatting, featured gallery placements, and a place in our 'Handpicked Vendors' section.",
     },
     {
         icon: Zap,
         title: "Faster Response Priority",
         description:
-            "When clients post urgent briefs, verified vendors receive notifications first — giving you a competitive head start on every hot lead.",
+            "When clients post urgent briefs, verified vendors receive notifications first, so they can respond sooner.",
     },
     {
         icon: FileCheck,
         title: "Verified Proposals",
         description:
-            "Your proposals carry a 'Verified' stamp, making them stand out from competitors and increasing client conversion rates significantly.",
+            "Your proposals carry a 'Verified' stamp, which helps clients tell them apart from other proposals.",
     },
 ]
 
@@ -95,14 +95,14 @@ const applicationSteps = [
         step: "01",
         title: "Submit Application",
         description:
-            "Complete the online application form with your business details, portfolio links, and references. Takes around 15 minutes.",
+            "Complete the online application with your business details, portfolio links, and references. It takes around 15 minutes.",
     },
     {
         icon: ClipboardCheck,
         step: "02",
         title: "Document Review",
         description:
-            "Our vetting team reviews your submission within 3–5 business days. We may reach out to your references or request additional materials.",
+            "Our vetting team reviews your submission within 3 to 5 business days. We may contact your references or request more materials.",
     },
     {
         icon: Clock,
@@ -116,18 +116,18 @@ const applicationSteps = [
         step: "04",
         title: "Go Verified",
         description:
-            "Once approved, your badge goes live immediately. Your profile is promoted and your first leads arrive within 48 hours.",
+            "Once approved, your badge goes live. Your profile is promoted and you can start receiving leads.",
     },
 ]
 
 const faqs = [
     {
         q: "How long does the verification process take?",
-        a: "From submission to decision, the full process typically takes 7–10 business days. Urgent applications may be fast-tracked for a small processing fee.",
+        a: "From submission to decision, the full process typically takes 7 to 10 business days. Urgent applications may be fast-tracked for a small processing fee.",
     },
     {
         q: "Is there a cost to become verified?",
-        a: "The application is free. Once approved, Verified Vendors remain on our enhanced tier as part of our standard commission model — no additional monthly fees.",
+        a: "The application is free. Once approved, Verified Vendors remain on our enhanced tier as part of our standard commission model. There are no additional monthly fees.",
     },
     {
         q: "Can my application be declined?",
@@ -153,7 +153,7 @@ const testimonials = [
     },
     {
         quote:
-            "Worth every step. Clients specifically ask for verified vendors — it saves so much time convincing them of your credibility.",
+            "Worth every step. Clients specifically ask for verified vendors. It saves time when you are explaining your credibility.",
         author: "Seun B.",
         role: "Events MC & Host, Abuja",
         rating: 5,
@@ -181,12 +181,12 @@ export default function BecomeVerifiedVendorPage() {
                             and bookings.
                         </h1>
                         <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed opacity-80 md:text-xl">
-                            Waddi Verified vendors earn 3× more bookings. Apply today and let your badge do the selling — so you can focus on delivering extraordinary experiences.
+                            Verified vendors earn 3× more bookings on Waddi. Apply today so clients can see that your business has passed our review.
                         </p>
                         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                             <Link href="/auth/login">
                                 <Button size="lg" className="h-14 px-10 text-base rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-                                    Apply Now — It's Free <ArrowRight className="ml-2 h-4 w-4" />
+                                    Apply now. It's free <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
                             <Link href="/for-vendors">
@@ -205,7 +205,7 @@ export default function BecomeVerifiedVendorPage() {
                                 <CheckCircle2 className="h-3 w-3 text-primary" /> 3× More Bookings on Average
                             </div>
                             <div className="flex items-center gap-1.5 rounded-full border border-background/10 bg-background/5 px-4 py-1.5 text-xs text-background/70">
-                                <CheckCircle2 className="h-3 w-3 text-primary" /> 7–10 Day Approval
+                                <CheckCircle2 className="h-3 w-3 text-primary" /> 7 to 10 day approval
                             </div>
                         </div>
                     </div>
@@ -246,7 +246,7 @@ export default function BecomeVerifiedVendorPage() {
                                 What we look for
                             </h2>
                             <p className="mx-auto mt-4 max-w-lg text-base text-muted-foreground">
-                                Our standards are high — because our clients expect the best. Here's what you'll need to qualify.
+                                We review each application against the same requirements. Here's what you'll need to qualify.
                             </p>
                         </div>
                         <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -274,7 +274,7 @@ export default function BecomeVerifiedVendorPage() {
                             How to apply
                         </h2>
                         <p className="mx-auto mt-4 max-w-lg text-base text-muted-foreground">
-                            A clear, straightforward process. No bureaucracy — just a thorough check so both you and your clients can feel confident.
+                            The process is simple. We check your documents, portfolio, and references before making a decision.
                         </p>
                     </div>
                     <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -347,7 +347,7 @@ export default function BecomeVerifiedVendorPage() {
                             Your badge is waiting.
                         </h2>
                         <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed opacity-90">
-                            Apply today. Get verified in 7–10 days. Start winning premium clients who trust your standard.
+                            Apply today. Most applications take 7 to 10 days to review.
                         </p>
                         <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                             <Link href="/auth/login">

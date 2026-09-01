@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Calendar, Plus } from 'lucide-react';
+import { Calendar, MapPin, Plus } from 'lucide-react';
 import { getEvents } from '@/lib/firestore-service';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/components/providers/auth-provider';
@@ -34,7 +34,7 @@ export default function EventsPage() {
 
     if (authLoading || loading) {
         return (
-            <div className="max-w-7xl mx-auto space-y-8">
+            <div className="w-full max-w-6xl mx-auto space-y-8">
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="h-9 w-48 bg-muted animate-pulse rounded-lg" />
@@ -42,15 +42,15 @@ export default function EventsPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {[1, 2, 3].map((i) => (
-                        <div key={i} className="border border-border rounded-md p-4 animate-pulse">
-                            <div className="w-full h-48 rounded-2xl bg-muted mb-4" />
-                            <div className="space-y-3">
-                                <div>
-                                    <div className="h-8 w-3/4 bg-muted rounded mb-3" />
-                                    <div className="h-4 w-full bg-muted rounded" />
-                                    <div className="h-4 w-5/6 bg-muted rounded mt-2" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="border border-border rounded-md p-3 animate-pulse">
+                            <div className="flex items-center gap-3">
+                                <div className="w-20 h-14 sm:w-24 sm:h-16 rounded-lg bg-muted shrink-0" />
+                                <div className="min-w-0 flex-1 space-y-2">
+                                    <div className="h-3 w-16 bg-muted rounded" />
+                                    <div className="h-4 w-3/4 bg-muted rounded" />
+                                    <div className="h-3 w-5/6 bg-muted rounded" />
                                 </div>
                             </div>
                         </div>
@@ -61,16 +61,15 @@ export default function EventsPage() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8">
+        <div className="w-full max-w-6xl mx-auto space-y-8">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-3xl font-black tracking-tight text-foreground">My Events</h2>
-                    <p className="text-muted-foreground mt-1">Manage all your upcoming and past events.</p>
+                    <h2 className="text-2xl font-black tracking-tight text-foreground">My Events</h2>
                 </div>
                 <Link href="/dashboard/hosts/events/new">
                     <Button className="rounded-full gap-2 text-primary-foreground shadow-lg hover:shadow-primary/20 transition-all">
                         <Plus size={18} />
-                        Create Event
+                        New
                     </Button>
                 </Link>
             </div>
@@ -92,12 +91,12 @@ export default function EventsPage() {
 
                     <Link href="/dashboard/hosts/events/new" className="inline-block relative z-10">
                         <Button size="lg" className="rounded-full px-10 h-14 text-lg font-bold shadow-xl shadow-primary/20">
-                            Create First Event
+                            New
                         </Button>
                     </Link>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {events.map((event) => (
                         <Link
                             key={event.id}
@@ -115,11 +114,16 @@ export default function EventsPage() {
                                 </div>
 
                                 <div className="min-w-0">
+                                    <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                                        <Calendar size={13} aria-hidden="true" />
+                                        {event.date}
+                                    </p>
                                     <h3 className="text-base font-bold text-foreground mb-0.5 group-hover:text-primary transition-colors truncate">
                                         {event.eventName}
                                     </h3>
-                                    <p className="text-muted-foreground text-xs line-clamp-2 leading-relaxed">
-                                        {event.description}
+                                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground truncate">
+                                        <MapPin size={13} aria-hidden="true" />
+                                        {event.location || 'Location TBD'}
                                     </p>
                                 </div>
                             </div>

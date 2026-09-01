@@ -2,14 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Brain } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { signInWithPopup } from "firebase/auth";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -21,14 +15,11 @@ import {
 import { useAuth } from "@/components/providers/auth-provider";
 import { auth, googleProvider } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
-import { DealBannerCard } from "./deal-banner-card";
 
-const SUGGESTIONS = [
-    "Plan a surprise 30th birthday in Lagos for 20 guests",
-    "Find a wedding venue in Accra with ocean views",
-    "Help me plan traditional wedding",
-    "Budget for a corporate gala in Nairobi",
-    "Book a private chef for a brunch in Cape Town"
+const QUICK_STARTS = [
+    "Plan an event",
+    "Find a vendor",
+    "Build a trip",
 ];
 
 type WaddiPromptProps = {
@@ -99,10 +90,12 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
         <section className={cn("px-4 md:px-6", sectionClassName)}>
             <div className="mx-auto grid h-full max-w-5xl place-items-center">
                 <div className="w-full text-center space-y-6 md:px-0">
-                    <h1 className="text-4xl md:text-3xl sm:text-xl font-bold text-foreground tracking-tight">
-                        Stop planning.
-                        Start living it.
+                    <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">
+                        {mode === "dashboard" ? "What needs your attention?" : "What needs doing?"}
                     </h1>
+                    <p className="mx-auto max-w-xl text-base text-muted-foreground md:text-lg">
+                        Tell Waddi what you need to move forward today.
+                    </p>
 
                     <div className="max-w-2xl mx-auto relative mt-8 flex flex-col items-center gap-4">
                         <form onSubmit={handleStartChat} className="w-full">
@@ -122,29 +115,18 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
                                 />
 
                                 <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
+                                    <div className="flex flex-wrap gap-2">
+                                        {QUICK_STARTS.map((label) => (
                                             <button
+                                                key={label}
                                                 type="button"
-                                                className="h-10 px-3 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors inline-flex items-center gap-2"
-                                                aria-label="Open ideas"
+                                                onClick={() => setInput(`${label} `)}
+                                                className="h-10 rounded-lg border border-border bg-card px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                                             >
-                                                <Brain size={16} />
-                                                <span className="text-sm font-medium">Ideas</span>
+                                                {label}
                                             </button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="start" className="w-80 p-1 bg-background">
-                                            {SUGGESTIONS.map((s, i) => (
-                                                <DropdownMenuItem
-                                                    key={i}
-                                                    onClick={() => setInput(s)}
-                                                    className="py-2 whitespace-normal leading-relaxed cursor-pointer"
-                                                >
-                                                    {s}
-                                                </DropdownMenuItem>
-                                            ))}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                        ))}
+                                    </div>
 
                                     <button
                                         type="submit"
@@ -157,25 +139,6 @@ export function WaddiPrompt({ mode = "marketing" }: WaddiPromptProps) {
                             </div>
                         </form>
 
-                        <div className="flex flex-wrap justify-center gap-3">
-                            <DealBannerCard
-                                title="Up to 20% off your next Holiday Escape"
-                                description="Experience a new destination at an affordable price"
-                                image="/images/holiday-escape.png"
-                                tooltip="Click to explore exclusive travel and hotel deals curated for your next escape."
-                                onClick={() => startChat("Show me great holiday deals!", ["travel", "holiday"])}
-                            />
-                            <DealBannerCard
-                                eyebrow="Sponsored"
-                                title="Up to 10% off Car Rentals"
-                                description="From compact rides to luxury vehicles for every trip"
-                                image="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=400"
-                                tooltip="Find the perfect ride for your adventure or business trip with our rental partners."
-                                className="items-stretch min-h-[96px]"
-                                imageClassName="h-full w-1/2"
-                                onClick={() => startChat("I'm looking for car rental deals", ["cars", "rentals"])}
-                            />
-                        </div>
                     </div>
                 </div>
             </div>

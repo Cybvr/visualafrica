@@ -7,7 +7,7 @@ import { getSolutions } from "@/lib/firestore-service"
 export const metadata = {
   title: "Our Solutions | Waddi",
   description:
-    "Explore our full range of event planning solutions. From corporate offsites and conferences to full-service planning, we handle it all.",
+    "Find the Waddi service that fits your event, from corporate offsites and conferences to full-service planning.",
 }
 
 export default async function SolutionsPage() {
@@ -21,8 +21,7 @@ export default async function SolutionsPage() {
             Our Solutions
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed opacity-80">
-            From corporate retreats to full-service event planning, Visual
-            Africa delivers premium experiences tailored to your goals.
+            From corporate retreats to full-service event planning, Waddi helps you organise the work around your event.
           </p>
         </div>
       </section>
@@ -70,8 +69,7 @@ export default async function SolutionsPage() {
           Not sure which service fits?
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed opacity-90 md:text-base">
-          Talk to our team and we will recommend the perfect planning approach
-          for your event.
+          Tell us what you are planning and we will point you to the right service.
         </p>
         <Link href="/contact">
           <Button

@@ -1,7 +1,9 @@
 "use client";
 
 import React from 'react';
-import { Bell, Menu, HelpCircle } from 'lucide-react';
+import { Bell, HelpCircle } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { getBlogPosts, getFaqs } from '@/lib/firestore-service';
 import { FAQ, FAQCategory, BlogPost } from '@/lib/types';
 import {
@@ -18,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SupportChat from './SupportChat';
+import ProfileMenu from './ProfileMenu';
 
 const FAQ_CATEGORIES: FAQCategory[] = [
   { id: 'general', label: 'General' },
@@ -50,11 +53,9 @@ const MESSAGE_NOTIFICATIONS: MessageNotification[] = [
   },
 ];
 
-interface HeaderProps {
-  onOpenMenu?: () => void;
-}
-
-const Header: React.FC<HeaderProps> = ({ onOpenMenu }) => {
+const Header: React.FC = () => {
+  const pathname = usePathname();
+  const mode = pathname?.startsWith('/dashboard/vendors') ? 'vendor' : 'host';
   const [faqs, setFaqs] = React.useState<FAQ[]>([]);
   const [updatePosts, setUpdatePosts] = React.useState<BlogPost[]>([]);
   const [loadingUpdates, setLoadingUpdates] = React.useState(true);
@@ -110,17 +111,23 @@ const Header: React.FC<HeaderProps> = ({ onOpenMenu }) => {
   );
 
   return (
-    <div className="h-full flex items-center justify-between px-6 bg-background">
-      <div className="flex items-center gap-4">
-        <button
-          onClick={onOpenMenu}
-          className="md:hidden p-2 -ml-2 text-muted-foreground hover:bg-secondary rounded-xl transition-colors"
+    <div className="h-full flex items-center justify-between gap-2 px-4 sm:px-6 bg-background">
+      <nav className="flex items-center gap-5" aria-label="Dashboard">
+        <Link
+          href="/dashboard/hosts/events"
+          className="text-sm font-medium text-foreground hover:text-primary transition-colors"
         >
-          <Menu size={20} />
-        </button>
-      </div>
+          Events
+        </Link>
+        <Link
+          href="/dashboard/hosts/search"
+          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Discover
+        </Link>
+      </nav>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
         <div className="flex items-center gap-2">
           <Popover>
             <PopoverTrigger asChild>
@@ -202,6 +209,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenMenu }) => {
             </div>
           </DialogContent>
         </Dialog>
+        <ProfileMenu mode={mode} />
       </div>
     </div>
   );

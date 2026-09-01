@@ -40,10 +40,7 @@ const nextConfig = {
       },
     ],
   },
-  devIndicators: {
-    appIsrStatus: false,
-    buildActivity: false,
-  },
+  devIndicators: false,
 }
 
 export default withPWA(nextConfig);

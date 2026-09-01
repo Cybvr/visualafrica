@@ -13,7 +13,7 @@ export default function AboutPage() {
                             Bridging the gap between the <span className="text-primary italic">diaspora</span> and Lagos.
                         </h1>
                         <p className="mx-auto mt-6 max-w-3xl text-lg text-muted-foreground md:text-xl">
-                            The trust, transparency, and local expertise you need to plan world-class events in Nigeria, from anywhere in the world.
+                            The local help and clear information you need to plan an event in Nigeria from anywhere in the world.
                         </p>
                     </div>
 
@@ -21,7 +21,7 @@ export default function AboutPage() {
                     <div className="mt-20">
                         <h2 className="font-serif text-3xl font-bold md:text-4xl">Our Mission</h2>
                         <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                            At Waddi, we believe distance shouldn't compromise the quality of your celebration. Our mission is to provide the global Nigerian diaspora with a secure, transparent platform to orchestrate extraordinary events in Lagos. We combine cutting-edge technology with high-touch local coordination to ensure your vision is executed flawlessly, no matter where you are.
+                            Distance should not make it harder to plan a celebration. Waddi gives Nigerians abroad a secure, transparent way to organise events in Lagos, with local support when you need it.
                         </p>
                     </div>
 
@@ -42,9 +42,9 @@ export default function AboutPage() {
                                 </p>
                             </div>
                             <div className="rounded-lg border border-border bg-card p-6">
-                                <h3 className="font-serif text-xl font-bold">Vetted Excellence</h3>
+                                <h3 className="font-serif text-xl font-bold">Vetted vendors</h3>
                                 <p className="mt-4 text-muted-foreground text-sm">
-                                    Access a handpicked network of Lagos's most professional vendors, vetted for quality and reliability.
+                                    Find Lagos vendors who have been checked for quality and reliability.
                                 </p>
                             </div>
                         </div>
@@ -59,7 +59,7 @@ export default function AboutPage() {
                                     ✓
                                 </div>
                                 <div>
-                                    <h3 className="font-bold">Diaspora-First trust</h3>
+                            <h3 className="font-bold">Built for Nigerians abroad</h3>
                                     <p className="mt-2 text-muted-foreground">
                                         Designed specifically for the needs of Nigerians abroad, with secure payments and platform guarantees.
                                     </p>
@@ -70,7 +70,7 @@ export default function AboutPage() {
                                     ✓
                                 </div>
                                 <div>
-                                    <h3 className="font-bold">End-to-End Coordination</h3>
+                            <h3 className="font-bold">Local coordination</h3>
                                     <p className="mt-2 text-muted-foreground">
                                         From venue scouting to on-site management, we provide the local feet on the ground you need.
                                     </p>
@@ -83,7 +83,7 @@ export default function AboutPage() {
                                 <div>
                                     <h3 className="font-bold">Cultural Expertise</h3>
                                     <p className="mt-2 text-muted-foreground">
-                                        We understand the nuance of Nigerian celebrations and how to deliver world-class service locally.
+                                        We understand Nigerian celebrations and how to work with local vendors.
                                     </p>
                                 </div>
                             </div>
@@ -96,7 +96,7 @@ export default function AboutPage() {
                             Ready to Plan Your Event?
                         </h2>
                         <p className="mx-auto mt-4 max-w-2xl text-lg opacity-90">
-                            Join thousands of satisfied clients who've found their perfect vendors through Waddi.
+                            Find the vendors you need for your event.
                         </p>
                         <a
                             href="/explore/vendors"

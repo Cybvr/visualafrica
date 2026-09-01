@@ -14,7 +14,6 @@
     "seed:experiences": "node scripts/seed-experiences.js"
   },
   "dependencies": {
-    "@calcom/embed-react": "^1.5.3",
     "@ducanh2912/next-pwa": "^10.2.9",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.9.1",

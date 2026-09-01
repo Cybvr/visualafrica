@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button"
 export const metadata = {
     title: "For Vendors | Waddi",
     description:
-        "Join Africa's fastest-growing event marketplace. Connect with thousands of diaspora clients planning premium events and grow your business with Waddi.",
+        "Join Waddi to connect with diaspora clients planning events and manage your bookings in one place.",
 }
 
 const benefits = [
@@ -28,7 +28,7 @@ const benefits = [
         icon: Globe,
         title: "Reach the Diaspora",
         description:
-            "Tap into a high-value market of Nigerian and African diaspora clients planning events from the UK, US, Canada, and beyond — all looking for premium local vendors like you.",
+            "Connect with Nigerian and African diaspora clients planning events from the UK, US, Canada, and elsewhere. They are looking for local vendors like you.",
     },
     {
         icon: DollarSign,
@@ -40,7 +40,7 @@ const benefits = [
         icon: TrendingUp,
         title: "Grow Your Pipeline",
         description:
-            "Get discovered through AI-powered matching. When clients brief their event, our platform surfaces the right vendors instantly — putting you in front of qualified leads.",
+            "Get discovered through matching. When a client submits an event brief, Waddi shows vendors whose services fit the request.",
     },
     {
         icon: BarChart3,
@@ -52,13 +52,13 @@ const benefits = [
         icon: MessageSquare,
         title: "Built-In Messaging",
         description:
-            "Communicate directly with clients, share quotes, send proposals, and manage all your bookings from one clean interface.",
+            "Message clients, share quotes, send proposals, and manage your bookings in one place.",
     },
     {
         icon: ShieldCheck,
         title: "Dispute Protection",
         description:
-            "Our transparent dispute resolution protects both you and your clients. Deliver on your promises and Waddi has your back.",
+            "Our dispute process gives you and your clients a clear way to resolve problems.",
     },
 ]
 
@@ -74,32 +74,32 @@ const howItWorks = [
         step: "01",
         title: "Create Your Profile",
         description:
-            "Sign up and build your vendor profile with your portfolio, pricing, service areas, and past work. First impressions matter — make yours count.",
+            "Sign up and add your portfolio, prices, service areas, and past work. Give clients enough information to decide if you are a fit.",
     },
     {
         step: "02",
         title: "Get Matched",
         description:
-            "Our AI automatically surfaces your profile to clients whose briefs match your specialty. No bidding wars, no ad spend — just relevant leads.",
+            "Waddi shows your profile to clients whose briefs match your specialty. You can focus on relevant leads instead of bidding for every job.",
     },
     {
         step: "03",
         title: "Send Proposals",
         description:
-            "Review client briefs, craft tailored proposals, and communicate directly through the platform. Seal deals on your terms.",
+            "Review client briefs, write proposals that fit the job, and message clients through Waddi.",
     },
     {
         step: "04",
         title: "Deliver & Get Paid",
         description:
-            "Complete the booking, deliver your best work, and get paid automatically via secure escrow release — directly to your Nigerian account.",
+            "Complete the booking and get paid through secure escrow release, directly to your Nigerian account.",
     },
 ]
 
 const testimonials = [
     {
         quote:
-            "Waddi changed the game for my photography business. I now book 3–4 diaspora events every month without lifting a finger on marketing.",
+            "Waddi changed the game for my photography business. I now book three or four diaspora events every month without lifting a finger on marketing.",
         author: "Tunde A.",
         role: "Event Photographer, Lagos",
         rating: 5,
@@ -123,7 +123,7 @@ const testimonials = [
 const faqs = [
     {
         q: "Is it free to join as a vendor?",
-        a: "Yes. Creating a vendor profile is free. Waddi operates on a success-based commission model — we only earn when you earn.",
+        a: "Yes. Creating a vendor profile is free. Waddi operates on a success-based commission model. We earn when you earn.",
     },
     {
         q: "What types of vendors can join?",
@@ -135,11 +135,11 @@ const faqs = [
     },
     {
         q: "Can I set my own prices?",
-        a: "Absolutely. You control your pricing, availability, and the services you offer. Waddi gives you the tools — you run your business.",
+        a: "Yes. You control your pricing, availability, and services. Waddi provides the tools while you run your business.",
     },
     {
         q: "What is a Verified Vendor badge?",
-        a: "The Verified badge signals to clients that you've passed our vetting process — background check, portfolio review, and quality standards. Verified vendors receive priority placement in search results.",
+        a: "The Verified badge tells clients that you passed our vetting process, which includes a background check, portfolio review, and quality standards. Verified vendors receive priority placement in search results.",
     },
 ]
 
@@ -163,7 +163,7 @@ export default function ForVendorsPage() {
                             <span className="text-primary italic">is already waiting.</span>
                         </h1>
                         <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed opacity-80 md:text-xl">
-                            Join Africa's leading event marketplace and connect with thousands of diaspora clients planning premium events in Lagos, Abuja, and beyond.
+                            Connect with diaspora clients planning events in Lagos, Abuja, and beyond.
                         </p>
                         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                             <Link href="/auth/login">
@@ -202,7 +202,7 @@ export default function ForVendorsPage() {
                             <span className="text-primary italic">grow your business</span>
                         </h2>
                         <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground md:text-lg">
-                            Waddi gives vendors the tools, visibility, and client base to scale — without the marketing headache.
+                            Waddi helps you manage leads, proposals, and bookings without adding another marketing task.
                         </p>
                     </div>
 
@@ -322,7 +322,7 @@ export default function ForVendorsPage() {
                         Ready to grow?
                     </h2>
                     <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed opacity-80">
-                        Join 500+ verified vendors already earning more with Waddi. Sign up free and receive your first qualified lead within 7 days.
+                        Join verified vendors on Waddi. Sign up free and connect with clients looking for your services.
                     </p>
                     <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                         <Link href="/auth/login">

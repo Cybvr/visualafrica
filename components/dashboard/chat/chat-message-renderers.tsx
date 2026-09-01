@@ -53,7 +53,7 @@ function SuggestionBubble({ label, onClick }: { label: string; onClick: () => vo
     return (
         <button
             onClick={onClick}
-            className="bg-card border border-border hover:border-primary/50 text-foreground text-[12px] px-3 py-1.5 rounded-full transition-all duration-200 active:scale-95 whitespace-nowrap"
+            className="bg-card border border-border hover:border-primary/50 text-foreground text-[length:var(--chat-chip,12px)] px-3 py-1.5 rounded-full transition-all duration-200 active:scale-95 whitespace-nowrap"
         >
             {label}
         </button>
@@ -211,7 +211,7 @@ function VendorCardMsg({
         <div className="w-full">
             <div className="mb-3">
                 {msg.city && <CityBadge city={msg.city} />}
-                <div className="text-foreground text-[16px] leading-relaxed">{msg.content}</div>
+                <div className="text-foreground text-[length:var(--chat-body,16px)] leading-relaxed">{msg.content}</div>
             </div>
             <div className="w-full max-w-[480px] space-y-3">
                 {shown.map((v: any, idx: number) => (
@@ -661,7 +661,7 @@ function AmaFlowCard({ msg }: { msg: any }) {
     return (
         <div className="w-full space-y-2.5">
             {msg.kicker && <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-bold">{msg.kicker}</div>}
-            {msg.content && <div className="text-foreground text-[16px] leading-relaxed whitespace-pre-line">{msg.content}</div>}
+            {msg.content && <div className="text-foreground text-[length:var(--chat-body,16px)] leading-relaxed whitespace-pre-line">{msg.content}</div>}
             {msg.meta && <div className="text-[12px] text-primary font-medium">{msg.meta}</div>}
 
             {tableHeaders.length > 0 && tableRows.length > 0 && (
@@ -775,7 +775,7 @@ function StoreListMsg({ msg, onStoreAction }: { msg: any; onStoreAction?: (actio
         <div className="w-full">
             <div className="mb-3">
                 {msg.city && <CityBadge city={msg.city} />}
-                <div className="text-foreground text-[16px] leading-relaxed">{msg.content}</div>
+                <div className="text-foreground text-[length:var(--chat-body,16px)] leading-relaxed">{msg.content}</div>
             </div>
             <div className="w-full max-w-[480px] space-y-3">
                 {shown.map((item: any) => (
@@ -855,7 +855,7 @@ function DealsListMsg({ msg }: { msg: any }) {
     return (
         <div className="w-full">
             <div className="mb-3">
-                <div className="text-foreground text-[16px] leading-relaxed font-medium">{msg.content}</div>
+                <div className="text-foreground text-[length:var(--chat-body,16px)] leading-relaxed font-medium">{msg.content}</div>
             </div>
             <div className="w-full max-w-[480px] space-y-2">
                 {deals.map((deal: any, idx: number) => (
@@ -982,7 +982,7 @@ export function Msg({
         }
     };
     return (
-        <div className={cn("flex gap-3.5 mb-6", ag ? "flex-row items-start" : "flex-row-reverse items-start")}>
+        <div className={cn("flex gap-3.5 mb-[var(--chat-gap,1.5rem)]", ag ? "flex-row items-start" : "flex-row-reverse items-start")}>
             {ag ? null : null}
 
             <div className={cn("flex-1 min-w-0 flex flex-col", ag ? "items-start" : "items-end")}>
@@ -1036,21 +1036,21 @@ export function Msg({
                         </div>
                     ) : msg.type === "knowledge" ? (
                         <div className="w-full space-y-2 mt-1">
-                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[length:var(--chat-body,16px)] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
                                 <KnowledgeCard item={msg.data} />
                             </div>
                         </div>
                     ) : msg.type === "community" ? (
                         <div className="w-full space-y-2 mt-1">
-                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[length:var(--chat-body,16px)] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
                                 <CommunityCard item={msg.data} />
                             </div>
                         </div>
                     ) : msg.type === "event_form" ? (
                         <div className="w-full space-y-2 mt-1">
-                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[length:var(--chat-body,16px)] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
                                 <EventForm
                                     onSubmit={onFormSubmit}
@@ -1062,14 +1062,14 @@ export function Msg({
                         </div>
                     ) : msg.type === "ticket_form" ? (
                         <div className="w-full space-y-2 mt-1">
-                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[length:var(--chat-body,16px)] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
                                 <TicketForm onSubmit={onTicketFormSubmit} eventName={activeEvent?.eventName} eventId={msg.eventId || activeEvent?.id} />
                             </div>
                         </div>
                     ) : msg.type === "flight_form" ? (
                         <div className="w-full space-y-2 mt-1">
-                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[length:var(--chat-body,16px)] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
                                 <FlightPreferencesForm
                                     onSubmit={onFlightFormSubmit}
@@ -1088,7 +1088,7 @@ export function Msg({
                         </div>
                     ) : msg.type === "calendar_picker" ? (
                         <div className="w-full space-y-2 mt-1">
-                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[length:var(--chat-body,16px)] leading-relaxed text-foreground">{msg.content}</div>}
                             <div className="w-full">
                                 <CalendarPicker onSelect={onCalendarSelect} />
                             </div>
@@ -1099,7 +1099,7 @@ export function Msg({
                         </div>
                     ) : msg.type === "overview" ? (
                         <div className="w-full mt-1 space-y-4">
-                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[length:var(--chat-body,16px)] leading-relaxed text-foreground">{msg.content}</div>}
                             {liveEvents && liveEvents.length > 0 ? (
                                 liveEvents.map((event: SharedEvent) => (
                                     <EventOverviewCard key={event.id} event={event} onAction={onSuggestion} />
@@ -1126,7 +1126,7 @@ export function Msg({
                         </div>
                     ) : msg.type === "todo" ? (
                         <div className="w-full mt-1 space-y-3">
-                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[length:var(--chat-body,16px)] leading-relaxed text-foreground">{msg.content}</div>}
                             <TaskChecklist
                                 events={liveEvents}
                                 selectedEventId={selectedEventId}
@@ -1136,7 +1136,7 @@ export function Msg({
                         </div>
                     ) : msg.type === "timeline" ? (
                         <div className="w-full mt-1 space-y-3">
-                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[length:var(--chat-body,16px)] leading-relaxed text-foreground">{msg.content}</div>}
                             <DayOfTimeline
                                 events={liveEvents}
                                 selectedEventId={selectedEventId}
@@ -1146,7 +1146,7 @@ export function Msg({
                         </div>
                     ) : msg.type === "budget" ? (
                         <div className="w-full mt-1 space-y-3">
-                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[length:var(--chat-body,16px)] leading-relaxed text-foreground">{msg.content}</div>}
                             <BudgetPlanner
                                 events={liveEvents}
                                 selectedEventId={selectedEventId}
@@ -1155,7 +1155,7 @@ export function Msg({
                         </div>
                     ) : msg.type === "tickets" ? (
                         <div className="w-full mt-1 space-y-3">
-                            {msg.content && <div className="text-[16px] leading-relaxed text-foreground">{msg.content}</div>}
+                            {msg.content && <div className="text-[length:var(--chat-body,16px)] leading-relaxed text-foreground">{msg.content}</div>}
                             <TicketWorkspace
                                 events={liveEvents}
                                 selectedEventId={selectedEventId}
@@ -1234,7 +1234,7 @@ export function Msg({
                     ) : (
                         msg.content ? (
                             <div className={cn(
-                                "text-[16px] leading-relaxed whitespace-pre-line mt-1 inline-block",
+                                "text-[length:var(--chat-body,16px)] leading-relaxed whitespace-pre-line mt-1 inline-block",
                                 ag
                                     ? "text-foreground text-left"
                                     : "bg-secondary/30 rounded-2xl px-4 py-3 rounded-tr-[4px] text-left"
@@ -1253,7 +1253,7 @@ export function Msg({
                         <button
                             type="button"
                             onClick={() => onSuggestion({ label: "I'm good", action: "dismiss_suggestions" })}
-                            className="bg-secondary/40 border border-border hover:bg-secondary text-foreground text-[12px] px-3 py-1.5 rounded-full transition-all duration-200 active:scale-95 whitespace-nowrap"
+                            className="bg-secondary/40 border border-border hover:bg-secondary text-foreground text-[length:var(--chat-chip,12px)] px-3 py-1.5 rounded-full transition-all duration-200 active:scale-95 whitespace-nowrap"
                         >
                             I&apos;m good
                         </button>

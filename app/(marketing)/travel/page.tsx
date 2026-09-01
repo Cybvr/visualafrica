@@ -21,21 +21,21 @@ export default function TravelPage() {
 
                         <div className="relative z-10 max-w-4xl space-y-8">
                             <div className="inline-flex items-center px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-[11px] font-black uppercase tracking-[0.2em] text-primary">
-                                Waddi Travel v1.0
+                                Visa applications
                             </div>
                             <h1 className="font-serif text-5xl font-bold tracking-tight text-foreground md:text-7xl lg:text-8xl leading-[0.9] text-balance">
-                                Complete Your Visa <br />
-                                Application <span className="text-primary italic">in 5 mins</span>
+                                Get your visa application <br />
+                                ready <span className="text-primary italic">in 5 minutes</span>
                             </h1>
                             <p className="mx-auto max-w-2xl text-xl text-muted-foreground md:text-2xl leading-relaxed">
-                                Focus on your trip, let Waddi handle the paperwork. Get your visa fast, easy and stress-free. Simplify your visa journey with Waddi today.
+                                Tell us about your trip. Waddi helps you prepare the paperwork and keeps the application moving.
                             </p>
                             <div className="flex flex-col gap-4 sm:flex-row justify-center pt-4">
                                 <Button asChild size="lg" className="h-14 px-10 text-lg rounded-full shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95">
-                                    <Link href="/auth/login">Get Started</Link>
+                                    <Link href="/auth/login">Start an application</Link>
                                 </Button>
                                 <Button asChild size="lg" variant="outline" className="h-14 px-10 text-lg rounded-full border-2 transition-all hover:bg-secondary/50">
-                                    <Link href="#how-it-works">Consult a Specialist</Link>
+                                    <Link href="#how-it-works">See the steps</Link>
                                 </Button>
                             </div>
 
@@ -43,7 +43,7 @@ export default function TravelPage() {
                             <div className="pt-12 flex flex-wrap justify-center gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
                                 <Image src="/logo.png" alt="Partner 1" width={100} height={40} className="h-8 w-auto object-contain" />
                                 <div className="h-8 w-[1px] bg-border hidden sm:block" />
-                                <span className="text-sm font-bold tracking-widest uppercase">Trusted by 40,000+ Travelers</span>
+                                <span className="text-sm font-bold tracking-widest uppercase">For people preparing to travel</span>
                             </div>
                         </div>
                     </div>
@@ -54,13 +54,13 @@ export default function TravelPage() {
                     <div className="container mx-auto px-4 max-w-6xl">
                         <div className="text-center mb-16">
                             <h2 className="text-sm font-semibold uppercase tracking-widest text-primary mb-4">The Process</h2>
-                            <h3 className="font-serif text-4xl md:text-5xl font-bold mb-4">Four steps. Five mins. Done.</h3>
-                            <p className="text-muted-foreground text-lg">We've automated the tedious parts of visa applications.</p>
+                            <h3 className="font-serif text-4xl md:text-5xl font-bold mb-4">Four steps to submit</h3>
+                            <p className="text-muted-foreground text-lg">Waddi handles the repetitive parts of a visa application.</p>
                         </div>
                         <div className="relative grid gap-12 md:grid-cols-4">
                             {[
                                 { id: "01", title: "Register", desc: "Create your account in seconds." },
-                                { id: "02", title: "Analyze", desc: "Our AI analyzes your profile for success." },
+                                { id: "02", title: "Review", desc: "Waddi checks your profile before you submit." },
                                 { id: "03", title: "My Documents", desc: "Securely upload your required documents." },
                                 { id: "04", title: "Submit", desc: "We handle the rest and track it for you." }
                             ].map((step, idx, arr) => (

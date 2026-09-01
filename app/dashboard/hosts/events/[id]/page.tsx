@@ -4,25 +4,14 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
-    MapPin, Calendar, Users, Rocket,
-    ChevronLeft, ChevronRight, Share2, Printer, Ticket,
+    Calendar, Home, Users,
+    Share2, Printer, Ticket,
     Plus, Mail, Download, Upload,
-    LayoutDashboard, Store, FileText, Inbox, ListChecks, Globe, Plane, LucideIcon,
-    ExternalLink
+    LayoutDashboard, Store, FileText, Inbox, ListChecks, Globe, Plane, PanelLeft, LucideIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { listenToEventById, updateEvent } from '@/lib/firestore-service';
 import { SharedEvent } from '@/lib/types';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { ShareEventDialog } from '@/components/dashboard/ShareEventDialog';
 import PlanTab from '@/components/dashboard/event-tabs/PlanTab';
 import GuestsTab from '@/components/dashboard/event-tabs/GuestsTab';
 import VendorsTab from '@/components/dashboard/event-tabs/VendorsTab';
@@ -33,6 +22,14 @@ import FlightsTab from '@/components/dashboard/event-tabs/FlightsTab';
 import TicketsTab from '@/components/dashboard/event-tabs/TicketsTab';
 import { TaskChecklist, DayOfTimeline } from '@/components/dashboard/chat';
 import { formatCurrency } from '@/lib/utils';
+import EventAssistant from '@/components/dashboard/EventAssistant';
+
+// Tabs that get the add button, mapped to that button's tooltip/label.
+const ADDABLE_TABS: Record<string, string> = {
+    guests: "Add guest",
+    vendors: "Add vendor",
+    contracts: "Add contract",
+};
 
 const parseCsvRow = (row: string): string[] => {
     const cells: string[] = [];
@@ -83,16 +80,13 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     const importInputRef = React.useRef<HTMLInputElement>(null);
 
     // Get active tab from URL or default to 'overview'
-    const currentTab = searchParams.get('tab') || 'overview';
+    const currentTab = searchParams.get('tab') || 'home';
     const [activeTab, setActiveTab] = useState(currentTab);
-    const [activeFilter, setActiveFilter] = useState<'all' | 'local' | 'docs'>('all');
     const [event, setEvent] = useState<SharedEvent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isImportingGuests, setIsImportingGuests] = useState(false);
     const [guestImportMessage, setGuestImportMessage] = useState<string | null>(null);
-    const [hostPhoto, setHostPhoto] = useState<string | null>(null);
-    const [teamMembers, setTeamMembers] = useState<any[]>([]);
-    const [isUpdatingBriefState, setIsUpdatingBriefState] = useState(false);
+    const [isNavVisible, setIsNavVisible] = useState(true);
 
     // Sync state with URL
     useEffect(() => {
@@ -113,24 +107,6 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         });
         return () => unsubscribe();
     }, [id]);
-
-    useEffect(() => {
-        async function fetchTeamMembers() {
-            if (!event?.hostId) return;
-            try {
-                const profileRef = doc(db, 'userProfiles', event.hostId);
-                const snap = await getDoc(profileRef);
-                if (snap.exists()) {
-                    const data = snap.data();
-                    setTeamMembers(data.teamMembers || []);
-                    setHostPhoto(data.photoURL || null);
-                }
-            } catch (error) {
-                console.error("Failed to load team members:", error);
-            }
-        }
-        fetchTeamMembers();
-    }, [event?.hostId]);
 
     const handleImportGuestsCsv = async (file: File) => {
         if (!event) return;
@@ -214,25 +190,8 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         return <div className="max-w-4xl mx-auto py-12 text-center text-muted-foreground">Event not found.</div>;
     }
 
-    const isBriefOpen = Boolean(event.isPublicBrief && event.publicBriefStatus !== "closed");
-
-    const handleTogglePublicBrief = async () => {
-        if (isUpdatingBriefState) return;
-        setIsUpdatingBriefState(true);
-        try {
-            const nextOpenState = !isBriefOpen;
-            await updateEvent(event.id, {
-                isPublicBrief: nextOpenState,
-                publicBriefStatus: nextOpenState ? "open" : "closed",
-            });
-        } catch (error) {
-            console.error("Failed to update brief visibility:", error);
-        } finally {
-            setIsUpdatingBriefState(false);
-        }
-    };
-
     const navItems: Array<{ value: string; label: string; meta: string; scope: 'local' | 'docs'; icon: LucideIcon }> = [
+        { value: "home", label: "Home", meta: "Event workspace", scope: "local", icon: Home },
         { value: "overview", label: "Overview", meta: "Event plan", scope: "local", icon: LayoutDashboard },
         { value: "vendors", label: "Vendors", meta: `${event.bookedVendors.length} booked`, scope: "local", icon: Store },
         { value: "guests", label: "Guests", meta: `${event.guests.length} invited`, scope: "local", icon: Users },
@@ -245,11 +204,46 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         { value: "website", label: "Website", meta: "RSVP page", scope: "local", icon: Globe },
     ];
 
-    const filteredNavItems = navItems.filter((item) =>
-        activeFilter === 'all' ? true : item.scope === activeFilter
+    const filteredNavItems = navItems;
+
+    const renderEventHome = () => (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+            {navItems.filter((item) => item.value !== "home").map((item) => {
+                const ItemIcon = item.icon;
+                return (
+                    <button
+                        key={item.value}
+                        type="button"
+                        onClick={() => handleTabChange(item.value)}
+                        className="group text-left"
+                    >
+                        <div className="aspect-[4/3] overflow-hidden rounded-lg border border-border bg-secondary/30 p-3 transition-colors group-hover:bg-secondary">
+                            {/* Mirrors the panel header: icon on the left, share/download/print on the right. */}
+                            <div className="flex items-center justify-between gap-2 border-b border-border pb-2">
+                                <ItemIcon size={14} className="text-muted-foreground" />
+                                <div className="flex items-center gap-1">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-muted" />
+                                    <div className="h-1.5 w-1.5 rounded-full bg-muted" />
+                                    <div className="h-1.5 w-1.5 rounded-full bg-muted" />
+                                </div>
+                            </div>
+                            <div className="space-y-2 pt-3">
+                                <div className="h-2 w-4/5 rounded-full bg-muted" />
+                                <div className="h-2 w-full rounded-full bg-muted" />
+                                <div className="h-2 w-3/5 rounded-full bg-muted" />
+                            </div>
+                        </div>
+                        <p className="mt-2 truncate text-sm font-medium text-foreground">{item.label}</p>
+                    </button>
+                );
+            })}
+        </div>
     );
 
     const renderActivePanel = () => {
+        if (activeTab === "home") {
+            return renderEventHome();
+        }
         if (activeTab === "overview") {
             return <PlanTab event={event} />;
         }
@@ -298,113 +292,52 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     const activeItem = navItems.find((item) => item.value === activeTab) ?? navItems[0];
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header with navigation and actions */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex items-center gap-2">
-                    <Link href="/dashboard/hosts/events" className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-1">
-                        <ChevronLeft size={16} />
-                        Back to Events
-                    </Link>
-                    <span className="text-muted">•</span>
-                    <span className="px-2 py-0.5 text-xs font-medium rounded border bg-primary/10 text-primary border-primary/20">
-                        {event.status}
-                    </span>
-                </div>
-            </div>
-
+        <div className="h-full w-full max-w-none overflow-hidden">
+            <div className="grid h-full min-h-0 grid-cols-1 items-start gap-6 lg:items-stretch lg:grid-cols-[minmax(280px,300px)_minmax(0,1fr)]">
+                <EventAssistant event={event} />
+                <div className="mb-3 min-h-0 min-w-0 space-y-6 overflow-y-auto rounded-sm border border-border px-4 pb-4 lg:my-4 lg:mr-4 lg:px-5 lg:pb-5">
             <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
-                    <div className="space-y-2">
-                        <h1 className="text-2xl font-bold text-foreground">{event.eventName}</h1>
-
-                        <div className="flex flex-wrap gap-4">
-                            <div className="flex items-center gap-1 text-sm">
-                                <MapPin size={16} className="text-muted-foreground" />
-                                <span>{event.location}</span>
-                            </div>
-                            <div className="flex items-center gap-1 text-sm">
-                                <Calendar size={16} className="text-muted-foreground" />
-                                <span>{event.date}</span>
-                            </div>
-                            <div className="flex items-center gap-1 text-sm">
-                                <Users size={16} className="text-muted-foreground" />
-                                <span>{event.guestCount} guests</span>
-                            </div>
-                            <div className="flex items-center gap-1 text-sm">
-                                <Ticket size={16} className="text-muted-foreground" />
-                                <span>{event.ticketPrice ? formatCurrency(event.ticketPrice) : 'Free'}</span>
-                            </div>
-                            <div className="flex items-center gap-1 text-sm">
-                                <span className="font-medium text-success">{formatCurrency(event.budget || 0)}</span>
-                            </div>
-                        </div>
+                <header className="sticky top-0 z-10 -mx-4 flex min-w-0 items-center justify-between gap-3 border-b border-border bg-background px-4 pb-1.5 pt-2 lg:-mx-5 lg:px-5">
+                    <button
+                        type="button"
+                        onClick={() => setIsNavVisible((visible) => !visible)}
+                        aria-expanded={isNavVisible}
+                        aria-label={isNavVisible ? "Hide menu" : "Show menu"}
+                        title={isNavVisible ? "Hide menu" : "Show menu"}
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    >
+                        <PanelLeft size={13} />
+                    </button>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                        <Button variant="outline" size="sm" className="h-7 w-7 rounded-md p-0" title="Share">
+                            <Share2 size={13} />
+                        </Button>
+                        <Button variant="outline" size="sm" className="h-7 w-7 rounded-md p-0" title="Download">
+                            <Download size={13} />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 w-7 rounded-md p-0"
+                            title="Print"
+                            onClick={() => typeof window !== 'undefined' && window.print()}
+                        >
+                            <Printer size={13} />
+                        </Button>
                     </div>
+                </header>
 
-                    <div className="flex items-center gap-3">
-                        <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Switch
-                                        checked={isBriefOpen}
-                                        disabled={isUpdatingBriefState}
-                                        onCheckedChange={() => {
-                                            void handleTogglePublicBrief();
-                                        }}
-                                        aria-label={`Toggle public brief for ${event.eventName}`}
-                                        className="scale-90"
-                                    />
-                                </TooltipTrigger>
-                                <TooltipContent className="bg-foreground text-background font-bold px-3 py-1.5 rounded-lg">
-                                    <p className="text-[10px] uppercase tracking-wider">Public Brief Is {isBriefOpen ? 'Open' : 'Closed'}</p>
-                                </TooltipContent>
-                            </Tooltip>
-
-                            <ShareEventDialog event={event} teamMembers={teamMembers} hostPhoto={hostPhoto} />
-
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Link
-                                        href={`/e/${event.id}`}
-                                        target="_blank"
-                                        className="bg-card hover:bg-secondary/50 border border-border flex items-center justify-center h-10 w-10 rounded-xl transition-colors shrink-0"
-                                    >
-                                        <ExternalLink size={18} />
-                                    </Link>
-                                </TooltipTrigger>
-                                <TooltipContent className="bg-foreground text-background font-bold px-3 py-1.5 rounded-lg">
-                                    <p className="text-[10px] uppercase tracking-wider">View RSVP Site</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-[210px_minmax(0,1fr)] gap-4 lg:gap-6 items-start">
-                    <aside className="space-y-2">
-                        <div className="flex items-center gap-1.5">
-                            {[
-                                { key: 'all' as const, label: 'All' },
-                                { key: 'local' as const, label: 'Local' },
-                                { key: 'docs' as const, label: 'Documents' },
-                            ].map((filter) => {
-                                const selected = activeFilter === filter.key;
-                                return (
-                                    <button
-                                        key={filter.key}
-                                        type="button"
-                                        onClick={() => setActiveFilter(filter.key)}
-                                        className={`rounded-md px-2.5 py-1 text-xs font-bold transition-colors ${selected
-                                            ? "bg-foreground text-background"
-                                            : "bg-secondary text-muted-foreground hover:text-foreground"
-                                            }`}
-                                    >
-                                        {filter.label}
-                                    </button>
-                                );
-                            })}
-                        </div>
-
+                <div className={`grid min-w-0 grid-cols-1 items-start transition-all duration-300 ease-in-out motion-reduce:transition-none ${isNavVisible
+                    ? "gap-4 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-8"
+                    : "gap-0 lg:grid-cols-[0px_minmax(0,1fr)] lg:gap-0"
+                    }`}>
+                    <aside
+                        aria-hidden={!isNavVisible}
+                        className={`overflow-hidden transition-all duration-300 ease-in-out motion-reduce:transition-none lg:sticky lg:top-12 lg:max-h-none ${isNavVisible
+                            ? "max-h-24 pt-2 opacity-100"
+                            : "pointer-events-none max-h-0 pt-0 opacity-0"
+                            }`}
+                    >
                         <div className="lg:hidden -mx-1 px-1 overflow-x-auto pb-1">
                             <div className="flex items-center gap-2 min-w-max">
                                 {filteredNavItems.map((item) => {
@@ -414,13 +347,14 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                         <button
                                             key={item.value}
                                             type="button"
+                                            tabIndex={isNavVisible ? undefined : -1}
                                             onClick={() => handleTabChange(item.value)}
-                                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors ${isActive
+                                            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${isActive
                                                 ? "bg-foreground text-background border-foreground"
                                                 : "bg-card text-foreground border-border hover:bg-secondary"
                                                 }`}
                                         >
-                                            <ItemIcon size={14} className={isActive ? "text-background" : "text-muted-foreground"} />
+                                            <ItemIcon size={16} className={isActive ? "text-background" : "text-muted-foreground"} />
                                             <span>{item.label}</span>
                                         </button>
                                     );
@@ -428,7 +362,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                             </div>
                         </div>
 
-                        <div className="hidden lg:block space-y-2">
+                        <div className="hidden max-h-[calc(100vh-11rem)] overflow-y-auto lg:block">
                             {filteredNavItems.map((item) => {
                                 const isActive = activeTab === item.value;
                                 const ItemIcon = item.icon;
@@ -436,31 +370,22 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                     <button
                                         key={item.value}
                                         type="button"
+                                        tabIndex={isNavVisible ? undefined : -1}
                                         onClick={() => handleTabChange(item.value)}
-                                        className={`w-full rounded-lg border px-2.5 py-1.5 text-left transition-colors ${isActive
-                                            ? "bg-card border-border"
-                                            : "bg-secondary/30 border-transparent hover:bg-card hover:border-border"
+                                        className={`flex min-h-12 w-full items-center gap-3 border-b border-border px-2 py-3 text-left transition-colors hover:text-foreground ${isActive ? "text-foreground" : "text-muted-foreground"
                                             }`}
                                     >
-                                        <div className="flex items-center justify-between gap-3">
-                                            <div className="min-w-0 flex items-center gap-2.5">
-                                                <ItemIcon size={15} className="shrink-0 text-muted-foreground" />
-                                                <div className="min-w-0">
-                                                    <p className="text-sm font-medium text-foreground truncate">{item.label}</p>
-                                                    <p className="text-xs text-muted-foreground truncate">{item.meta}</p>
-                                                </div>
-                                            </div>
-                                            <ChevronRight size={14} className="text-muted-foreground" />
-                                        </div>
+                                        <ItemIcon size={20} className="shrink-0 text-muted-foreground" />
+                                        <span className="min-w-0 truncate text-base font-medium">{item.label}</span>
                                     </button>
                                 );
                             })}
                         </div>
                     </aside>
 
-                    <section className="min-w-0 bg-card rounded-xl shadow-sm p-3 md:p-4 flex flex-col h-full">
-                        <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4">
-                            <div className="flex flex-col">
+                    <section className="min-w-0 bg-card rounded-sm shadow-sm p-3 md:p-4 flex flex-col h-full">
+                        <header className="mb-4 flex items-center justify-between gap-3 border-b border-border pb-3">
+                            <div className="flex min-w-0 flex-col">
                                 <p className="text-sm font-medium text-foreground">{activeItem.label}</p>
                                 {activeTab === 'website' && (
                                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -479,8 +404,8 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                 )}
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-2">
-                                {/* Tab-Specific Actions */}
+                            <div className="flex shrink-0 items-center gap-1.5">
+                                {/* Tab-Specific Actions — icon only, sized to match the content header. */}
                                 {activeTab === 'guests' && (
                                     <>
                                         <input
@@ -498,60 +423,40 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            className="h-8 gap-1.5 rounded-md px-2.5"
+                                            className="h-7 w-7 rounded-md p-0"
+                                            title={isImportingGuests ? "Importing guests..." : "Import guests from CSV"}
+                                            aria-label="Import guests from CSV"
                                             onClick={() => importInputRef.current?.click()}
                                             disabled={isImportingGuests}
                                         >
-                                            <Upload size={14} />
-                                            {isImportingGuests ? "Importing..." : "Import CSV"}
+                                            <Upload size={13} />
                                         </Button>
-                                        <Button variant="outline" size="sm" className="h-8 gap-1.5 rounded-md px-2.5">
-                                            <Plus size={14} />
-                                            New
-                                        </Button>
-                                        <Button variant="outline" size="sm" className="h-8 w-8 rounded-md p-0">
-                                            <Mail size={14} />
+                                        <Button variant="outline" size="sm" className="h-7 w-7 rounded-md p-0" title="Email guests" aria-label="Email guests">
+                                            <Mail size={13} />
                                         </Button>
                                     </>
                                 )}
 
-                                {activeTab === 'vendors' && (
-                                    <Button variant="outline" size="sm" className="h-8 gap-1.5 rounded-md px-2.5">
-                                        <Plus size={14} />
-                                        New
+                                {ADDABLE_TABS[activeTab] && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 w-7 rounded-md p-0"
+                                        title={ADDABLE_TABS[activeTab]}
+                                        aria-label={ADDABLE_TABS[activeTab]}
+                                    >
+                                        <Plus size={13} />
                                     </Button>
                                 )}
-
-                                {activeTab === 'contracts' && (
-                                    <Button variant="outline" size="sm" className="h-8 gap-1.5 rounded-md px-2.5">
-                                        <Plus size={14} />
-                                        New
-                                    </Button>
-                                )}
-
-                                {/* Universal Actions for all tabs */}
-                                <Button variant="outline" size="sm" className="h-8 w-8 rounded-md p-0" title="Share">
-                                    <Share2 size={14} />
-                                </Button>
-                                <Button variant="outline" size="sm" className="h-8 w-8 rounded-md p-0" title="Download">
-                                    <Download size={14} />
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-8 w-8 rounded-md p-0"
-                                    title="Print"
-                                    onClick={() => typeof window !== 'undefined' && window.print()}
-                                >
-                                    <Printer size={14} />
-                                </Button>
                             </div>
-                        </div>
+                        </header>
                         <div className="flex-1 overflow-auto">
                             {renderActivePanel()}
                         </div>
                     </section>
                 </div>
+            </div>
+            </div>
             </div>
         </div>
     );

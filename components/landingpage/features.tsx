@@ -6,32 +6,32 @@ import { CalendarDays, MessageSquareText, ClipboardList, Globe } from "lucide-re
 const features = [
   {
     id: "itinerary",
-    title: "AI Itinerary Build",
-    body: "Tell Waddi the vibe. Get a minute-by-minute itinerary tailored to your group.",
+    title: "Build an itinerary",
+    body: "Tell Waddi what you have in mind and get an itinerary for your group.",
     tag: "AI",
     wide: true,
     Icon: CalendarDays,
   },
   {
     id: "negotiation",
-    title: "AI Proposal Negotiation",
-    body: "Waddi agents negotiate with vendors in real-time for the best rates and terms.",
+    title: "Vendor proposals",
+    body: "Review vendor proposals and keep the rates and terms in one place.",
     tag: "AI",
     wide: false,
     Icon: MessageSquareText,
   },
   {
     id: "tasklist",
-    title: "Centralized Tasklist",
-    body: "Every detail from logistics to talent in one place. No more spreadsheets.",
+    title: "One task list",
+    body: "Keep logistics, vendors, and the rest of the work in one place.",
     tag: "OPS",
     wide: false,
     Icon: ClipboardList,
   },
   {
     id: "guest",
-    title: "Guest Experience",
-    body: "One-click guest websites and RSVP that remembers everyone's preferences.",
+    title: "Guest details",
+    body: "Create a guest page and keep track of RSVPs and preferences.",
     tag: "CX",
     wide: true,
     Icon: Globe,
@@ -46,14 +46,12 @@ export function Features() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-14">
         <h2 className="text-4xl md:text-5xl font-extrabold leading-none tracking-tight max-w-xl font-serif">
-          Everything you need
-          <br />
-          for the perfect moment.
+          Keep the plan moving.
         </h2>
         <p className="text-sm text-muted-foreground leading-relaxed md:text-right shrink-0 font-light">
-          Waddi handles the heavy lifting
+          Waddi keeps the work in one place
           <br />
-          so you can focus on being present.
+          so you can focus on the event.
         </p>
       </div>
 

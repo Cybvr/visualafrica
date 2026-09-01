@@ -1,19 +1,8 @@
-"use client"
-
-import { useEffect } from "react"
-import Cal, { getCalApi } from "@calcom/embed-react"
 import { Header } from "@/app/(marketing)/common/header"
 import { Footer } from "@/app/(marketing)/common/footer"
 import { Calendar, Phone, Mail } from "lucide-react"
 
 export default function RequestDemoPage() {
-  useEffect(() => {
-    (async function () {
-      const cal = await getCalApi({ namespace: "30min" })
-      cal?.("ui", { hideEventTypeDetails: false, layout: "month_view" })
-    })()
-  }, [])
-
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -25,26 +14,13 @@ export default function RequestDemoPage() {
               Request a Demo
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
-              Schedule a free consultation with our team. Pick a time that works for you.
+              Get in touch with our team to learn how Waddi can support your next event.
             </p>
           </div>
 
-          <div className="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-5 lg:gap-16">
-            {/* Cal.com embed - left column */}
-            <div className="lg:col-span-3">
-              <h2 className="font-serif text-2xl font-bold mb-6">Choose a time</h2>
-              <div className="min-h-[600px] w-full overflow-hidden rounded-xl border border-border bg-card p-4">
-                <Cal
-                  namespace="30min"
-                  calLink="pinheirojide/30min"
-                  style={{ width: "100%", height: "100%", overflow: "scroll" }}
-                  config={{ layout: "month_view", useSlotsViewOnSmallScreen: "true" }}
-                />
-              </div>
-            </div>
-
+          <div className="mx-auto mt-16 max-w-3xl">
             {/* What to expect - right column */}
-            <div className="lg:col-span-2">
+            <div>
               <h2 className="font-serif text-2xl font-bold">What to expect</h2>
               <ul className="mt-6 space-y-4 text-muted-foreground">
                 <li className="flex gap-3">
@@ -57,7 +33,7 @@ export default function RequestDemoPage() {
                 </li>
                 <li className="flex gap-3">
                   <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">3</span>
-                  <span>Next steps and options tailored to your needs—no pressure.</span>
+                  <span>We will talk through next steps and options that fit your needs.</span>
                 </li>
               </ul>
 
@@ -69,7 +45,7 @@ export default function RequestDemoPage() {
                   <div>
                     <h3 className="font-semibold text-foreground">Availability</h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Mon–Fri, 9:00 AM – 6:00 PM WAT. Choose any slot in the calendar.
+                      Monday to Friday, 9:00 AM to 6:00 PM WAT. Contact us and we will arrange a convenient time.
                     </p>
                   </div>
                 </div>

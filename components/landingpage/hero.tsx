@@ -22,7 +22,7 @@ export function Hero() {
                                 <span className="text-primary italic">You show up.</span>
                             </h1>
                             <p className="max-w-xl text-xl text-muted-foreground md:text-2xl leading-relaxed">
-                                Waddi is for people who create moments — not spreadsheets. Events, trips, and experiences built for you in minutes.
+                                Waddi is for people who want to plan the event, trip, or experience without building another spreadsheet.
                             </p>
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">

@@ -62,10 +62,10 @@ const ExperiencesPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="text-primary" size={20} />
-            <span className="text-primary text-[10px] font-black uppercase tracking-widest">Premium Branded</span>
+            <span className="text-primary text-[10px] font-black uppercase tracking-widest">Browse experiences</span>
           </div>
           <h2 className="text-4xl font-serif font-black tracking-tight text-foreground">Experiences</h2>
-          <p className="text-muted-foreground font-medium mt-1">Ultra-exclusive curated events and activity packages.</p>
+          <p className="text-muted-foreground font-medium mt-1">Find events and activity packages for your next plan.</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -122,7 +122,7 @@ const ExperiencesPage: React.FC = () => {
               <div>
                 <h3 className="text-2xl font-black text-foreground">No Experiences Found</h3>
                 <p className="text-muted-foreground max-w-sm mx-auto mt-2">
-                  We're still curating our list of ultra-exclusive experiences. Check back soon for something extraordinary.
+                  There are no experiences to show yet. Check back later or start a plan with Waddi.
                 </p>
               </div>
             </div>

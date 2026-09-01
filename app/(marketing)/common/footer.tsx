@@ -42,12 +42,10 @@ export async function Footer() {
       {/* CTA Banner */}
       <div className="bg-primary px-4 py-16 text-center text-white">
         <h2 className="font-serif text-3xl font-bold md:text-4xl">
-          Connect | Create | Celebrate
+          Start planning your event
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed opacity-90 md:text-base">
-          We connect you with the finest vendors in Lagos for your event. Browse
-          through inspiring video reels, select vendors and receive quotes,
-          effortlessly.
+          Find vendors in Lagos, compare their work, and request quotes for your event.
         </p>
         <div className="mt-6 flex items-center justify-center gap-4">
           <a
@@ -105,7 +103,7 @@ export async function Footer() {
           {/* Thunder About (formerly Company + Quick Links) */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider opacity-50">
-              Thunder About
+              About Waddi
             </h3>
             <ul className="mt-4 flex flex-col gap-2">
               {quickLinks.map((link) => (

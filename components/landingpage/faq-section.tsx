@@ -11,12 +11,12 @@ const faqs = [
   {
     question: "What is Waddi?",
     answer:
-      "Waddi is Lagos's trusted event planner marketplace. We connect you with the finest vendors in Lagos for all types of events, from weddings to corporate gatherings and everything in between.",
+      "Waddi is an event planning marketplace for Lagos. Find vendors for weddings, corporate gatherings, and other events.",
   },
   {
     question: "How does Waddi simplify event planning?",
     answer:
-      "Waddi streamlines the event planning process by allowing you to browse inspiring video reels from vendors, compare services, select your preferred vendors, and receive quotes all in one place. No more endless phone calls and meetings.",
+      "Browse vendor videos, compare services, choose who you want to contact, and request quotes in one place.",
   },
   {
     question: "What kinds of events can I organize using Waddi?",
@@ -26,17 +26,17 @@ const faqs = [
   {
     question: "Is Waddi app free to use?",
     answer:
-      "Yes! Browsing vendors, viewing their portfolios, and requesting quotes is completely free for event planners. Vendors pay a small listing fee to showcase their services on the platform.",
+      "Yes. Event planners can browse vendors, view portfolios, and request quotes for free. Vendors pay a listing fee to display their services.",
   },
   {
     question: "What makes Waddi different from traditional event planning?",
     answer:
-      "Waddi offers a curated, video-first marketplace where you can see vendors in action before booking. Our platform provides transparent pricing, verified reviews, and seamless communication between you and your chosen vendors.",
+      "Waddi lets you see vendors in action before booking. You can compare prices, read reviews, and message the vendors you choose.",
   },
   {
     question: "Can businesses partner with Waddi?",
     answer:
-      "Absolutely! If you're an event vendor or service provider in Lagos, you can list your business on Waddi to reach thousands of potential clients. Visit our 'List Your Business' page to get started.",
+      "Yes. If you are an event vendor or service provider in Lagos, you can list your business on Waddi and reach potential clients.",
   },
 ]
 
