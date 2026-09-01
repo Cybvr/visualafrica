@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
     Calendar, Home, Users,
-    Share2, Printer, Ticket,
+    Printer, Ticket,
     Plus, Mail, Download, Upload,
     LayoutDashboard, Store, FileText, Inbox, ListChecks, Globe, Plane, PanelLeft, LucideIcon
 } from 'lucide-react';
@@ -308,18 +308,18 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     >
                         <PanelLeft size={13} />
                     </button>
-                    <div className="flex shrink-0 items-center gap-1.5">
-                        <Button variant="outline" size="sm" className="h-7 w-7 rounded-md p-0" title="Share">
-                            <Share2 size={13} />
+                    <div className="flex shrink-0 items-center gap-2">
+                        <Button variant="ghost" size="sm" title="Share">
+                            Share
                         </Button>
-                        <Button variant="outline" size="sm" className="h-7 w-7 rounded-md p-0" title="Download">
+                        <Button variant="ghost" size="sm" title="Download" aria-label="Download">
                             <Download size={13} />
                         </Button>
                         <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            className="h-7 w-7 rounded-md p-0"
                             title="Print"
+                            aria-label="Print"
                             onClick={() => typeof window !== 'undefined' && window.print()}
                         >
                             <Printer size={13} />
@@ -350,11 +350,11 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                             tabIndex={isNavVisible ? undefined : -1}
                                             onClick={() => handleTabChange(item.value)}
                                             className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${isActive
-                                                ? "bg-foreground text-background border-foreground"
+                                                ? "bg-primary text-primary-foreground border-primary"
                                                 : "bg-card text-foreground border-border hover:bg-secondary"
                                                 }`}
                                         >
-                                            <ItemIcon size={16} className={isActive ? "text-background" : "text-muted-foreground"} />
+                                            <ItemIcon size={16} className={isActive ? "text-primary-foreground" : "text-muted-foreground"} />
                                             <span>{item.label}</span>
                                         </button>
                                     );
@@ -372,10 +372,10 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                         type="button"
                                         tabIndex={isNavVisible ? undefined : -1}
                                         onClick={() => handleTabChange(item.value)}
-                                        className={`flex min-h-12 w-full items-center gap-3 border-b border-border px-2 py-3 text-left transition-colors hover:text-foreground ${isActive ? "text-foreground" : "text-muted-foreground"
+                                        className={`flex min-h-12 w-full items-center gap-3 border-b border-border px-2 py-3 text-left transition-colors hover:text-foreground ${isActive ? "text-primary" : "text-muted-foreground"
                                             }`}
                                     >
-                                        <ItemIcon size={20} className="shrink-0 text-muted-foreground" />
+                                        <ItemIcon size={20} className={`shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
                                         <span className="min-w-0 truncate text-base font-medium">{item.label}</span>
                                     </button>
                                 );
